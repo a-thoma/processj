@@ -140,9 +140,9 @@ public class Compiler {
             }
 
             // Dump the symbol table structure
-//            if (sts) {
+            if (sts) {
                 globalTypeTable.printStructure("");
-//            }
+            }
 
             // -----------------------------------------------------------------------------
             // NAME CHECKER
