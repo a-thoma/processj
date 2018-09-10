@@ -1,0 +1,20 @@
+import std.io;
+
+public proc void writer(int a, int b)[yield=true] {
+    int w;
+    println("Hello");
+}
+
+public proc void writer() {
+    int p;
+}
+
+public proc void reader() {
+    int r;
+}
+
+public proc void main(string args[]) {
+    writer();
+    reader();
+    int a = 4;
+}
