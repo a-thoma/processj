@@ -59,4 +59,19 @@ public class ChannelEndType extends Type {
     public <S extends Object> S visit(Visitor<S> v) {
         return v.visitChannelEndType(this);
     }
+
+    @Override
+    public boolean equal(Type t) {
+        return false;
+    }
+
+    @Override
+    public boolean equivalent(Type t) {
+        return false;
+    }
+
+    @Override
+    public boolean assignmentCompatible(Type t) {
+        return false;
+    }
 }

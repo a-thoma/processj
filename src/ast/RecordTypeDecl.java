@@ -2,7 +2,7 @@ package ast;
 
 import utilities.Visitor;
 
-public class RecordTypeDecl extends Type implements TopLevelDecl {
+public class RecordTypeDecl extends Type implements DefineTopLevelDecl {
 
     public RecordTypeDecl(Sequence<Modifier> modifiers, Name name,
                           Sequence<AST> extend, Annotations annotations,
@@ -53,5 +53,20 @@ public class RecordTypeDecl extends Type implements TopLevelDecl {
 
     public <S extends Object> S visit(Visitor<S> v) {
         return v.visitRecordTypeDecl(this);
+    }
+
+    @Override
+    public boolean equal(Type t) {
+        return false;
+    }
+
+    @Override
+    public boolean equivalent(Type t) {
+        return false;
+    }
+
+    @Override
+    public boolean assignmentCompatible(Type t) {
+        return false;
     }
 }

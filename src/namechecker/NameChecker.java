@@ -23,7 +23,7 @@ import ast.ProtocolTypeDecl;
 import ast.RecordLiteral;
 import ast.RecordTypeDecl;
 import ast.SwitchLabel;
-import ast.TopLevelDecl;
+import ast.DefineTopLevelDecl;
 import utilities.Error;
 import utilities.Log;
 import utilities.SymbolTable;
@@ -62,12 +62,7 @@ public class NameChecker<T extends Object> extends Visitor<T> {
                 return o;
             }
             // if not found look in topScope
-            
-            // /////////////////////////////////////////////////////////////////////
-            // TODO: Dr. Pedersen made changes to the TopLevelDecls.java file
-            // Resolve names must be UPDATED!!
-//            o = topScope.getIncludeImports(name);
-            // /////////////////////////////////////////////////////////////////////
+            o = topScope.getIncludeImports(name);
             if (o != null) {
                 Log.log("Found : " + o);
                 return o;
@@ -223,7 +218,7 @@ public class NameChecker<T extends Object> extends Visitor<T> {
         //    if (o != null)
         //((AST)o).visit(this);  // < -------- this visit doesn't have to happen ... what ever type gets visited when the file is loaded.
         //Log.log("After");
-        nt.setResolvedTopLevelDecl((TopLevelDecl) o);
+        nt.setResolvedTopLevelDecl((DefineTopLevelDecl) o);
         return null;
     }
 
@@ -249,7 +244,7 @@ public class NameChecker<T extends Object> extends Visitor<T> {
             Error.error(nm, "Symbol '" + nm.name().getname() + "' not found.",
                     false, 2211);
         else
-            nm.myDecl = (TopLevelDecl) o;
+            nm.myDecl = (DefineTopLevelDecl) o;
         return null;
     }
 

@@ -20,7 +20,7 @@ import utilities.SymbolTable;
  * @version 07/01/2018
  * @since 1.2
  */
-public class Compiler {
+public class ProcessJc {
     
     private static final String HELP_ERROR_MSG = "Usage: pjc [global options] [source files...] "
             + "[command options].\nPlease use [-h|-help] for a list of possible commands or refer "
@@ -132,7 +132,7 @@ public class Compiler {
             globalTypeTable = SymbolTable.hook;
 
             // Resolve types from imported packages.
-            c.visit(new namechecker.ResolvePackedTypes());
+            c.visit(new namechecker.ResolvePackageTypes());
 
             // Dump log messages
             if (debug) {
@@ -149,10 +149,10 @@ public class Compiler {
             
             c.visit(new namechecker.NameChecker<AST>(globalTypeTable));
             if (Error.errorCount != 0) {
-                System.out.println("---------- Error Report ----------");
-                System.out.println(String.format("%d errors in symbol resolution - fix these before type checking.",
-                        Error.errorCount));
-                System.out.println(Error.errors);
+//                System.out.println("---------- Error Report ----------");
+//                System.out.println(String.format("%d errors in symbol resolution - fix these before type checking.",
+//                        Error.errorCount));
+//                System.out.println(Error.errors);
                 System.out.println("** COMPILATION FAILED #1 **");
                 System.exit(1);
             }
@@ -166,10 +166,10 @@ public class Compiler {
             c.visit(new typechecker.TypeChecker(globalTypeTable));
 
             if (Error.errorCount != 0) {
-                System.out.println("---------- Error Report ----------");
-                System.out.println(String.format("%d errors in type checking - fix these before code generation.",
-                        Error.errorCount));
-                System.out.println(Error.errors);
+//                System.out.println("---------- Error Report ----------");
+//                System.out.println(String.format("%d errors in type checking - fix these before code generation.",
+//                        Error.errorCount));
+//                System.out.println(Error.errors);
                 System.out.println("** COMPILATION FAILED #2 **");
                 System.exit(1);
             }
@@ -182,8 +182,8 @@ public class Compiler {
             c.visit(new yield.Yield());
 
             if (Error.errorCount != 0) {
-                System.out.println("---------- Error Report ----------");
-                System.out.println(Error.errors);
+//                System.out.println("---------- Error Report ----------");
+//                System.out.println(Error.errors);
                 System.out.println("** COMPILATION FAILED #3 **");
                 System.exit(1);
             }

@@ -29,4 +29,19 @@ public class ExternType extends Type {
     public String toString() {
         return typeName();
     }
+
+    @Override
+    public boolean equal(Type t) {
+        return false;
+    }
+
+    @Override
+    public boolean equivalent(Type t) {
+        return false;
+    }
+
+    @Override
+    public boolean assignmentCompatible(Type t) {
+        return false;
+    }
 }

@@ -181,10 +181,10 @@ public final class OptionGroup {
         builder.setHidden(annotation.hidden());
         builder.setRequired(annotation.required());
         
-        // This is to retrieve information about the types of values each field can
+        // This is to retrieve information about the type of values each field can
         // hold. Simple types such as byte, short, int, long, float, double, String
         // and parameterized fields (of simple types) can be inferred at runtime.
-        // A complex type such as user-defined types must be explicitly specified!
+        // Complicated types such as user-defined types must be explicitly specified!
         Class<?>[] fieldFinalTypes = findFieldFinalTypes(field);
         if (fieldFinalTypes.length == 2) {
             // A field of type Map..
@@ -301,7 +301,7 @@ public final class OptionGroup {
         
         // Same as @Options, except that arguments cannot be of type Map. Therefore,
         // only one type should be returned and one parser instance should be created.
-        // Complex type such as user-defined types must be explicitly specified!
+        // Complicated types such as user-defined types must be explicitly specified!
         Class<?>[] fieldFinalTypes = findFieldFinalTypes(field);
         if (fieldFinalTypes.length == 2) {
             throw new RuntimeException(String.format("@Argument '%s' cannot have more than one handler.",
@@ -431,8 +431,8 @@ public final class OptionGroup {
                 objArray = Array.newInstance(option.getField().getType().getComponentType(), 1);
                 Array.set(objArray, 0, parsedValue);
             } else {
-                // Because arrays cannot be resized, a new array of `length + 1' is created
-                // before values are copied into this new array
+                // Because arrays cannot be resized, an array of `length + 1' size is created
+                // before the values are copied into this new array
                 int length = Array.getLength(objArray);
                 Object newObjArray = Array.newInstance(objArray.getClass().getComponentType(), length + 1);
                 System.arraycopy(objArray, 0, newObjArray, 0, length);
@@ -458,7 +458,7 @@ public final class OptionGroup {
             if (objMap == null) {
                 objMap = new HashMap<>();
             }
-            // This will override previous values for keys that occurred multiple times
+            // NOTE: This will override previous values for keys that occurred multiple times
             objMap.put(keyMap, valueMap);
             option.addValue(objMap);
         } catch (Exception e) {
@@ -485,7 +485,7 @@ public final class OptionGroup {
                         + "assigned to field '%s'.", Util.getTypeName(handler), fieldName));
         }
         // If a parser cannot be found, attempt to create one from the given handler.
-        // Is this handler an Enum type? Yes, then create a parser for this Enum
+        // Is this handler an Enum type? Yes, then create a parser for this Enum type
         if (handler == null && Enum.class.isAssignableFrom(fieldType)) {
             return new EnumParser(optName, fieldType);
         }

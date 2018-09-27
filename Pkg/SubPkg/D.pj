@@ -1,0 +1,13 @@
+package Pkg.SubPkg;
+
+// This should be available
+public const int f1 = 10;
+
+// This should not be available
+private const int f2 = 10;
+
+// This should be available
+public proc void foo1() {}
+
+// This should not be available
+private proc void foo2() {}

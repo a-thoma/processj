@@ -258,7 +258,7 @@ public class OptionsBuilder {
                         + "have been found.", paramsName));
         }
         
-        // Associate options by @Parameters type
+        // Associate options by @Parameter type
         OptionGroup optGroup = new OptionGroup(findAllExtendedClasses(type));
         if (commandOptionMap.put(type, optGroup) != null) {
             throw new RuntimeException(String.format("Class '%s' with possible duplicate values "
@@ -394,20 +394,11 @@ public class OptionsBuilder {
             result.put(optName, Util.distance(optName, argName));
         }
         
-        int minDist = result
-                      .entrySet()
-                      .stream()
-                      .sorted(Comparator.comparingInt(Map.Entry::getValue))
-                      .findFirst()
-                      .get()
-                      .getValue();
+        int minDist = result.entrySet().stream().sorted(Comparator.comparingInt(Map.Entry::getValue))
+                            .findFirst().get().getValue();
         
-        return result
-               .entrySet()
-               .stream()
-               .filter(e -> e.getValue() == minDist)
-               .map(e -> e.getKey())
-               .collect(Collectors.toList());
+        return result.entrySet().stream().filter(e -> e.getValue() == minDist)
+                     .map(e -> e.getKey()).collect(Collectors.toList());
     }
     
     public <T extends OptionParameters> T getCommand(Class<T> type) {
@@ -436,13 +427,10 @@ public class OptionsBuilder {
     
     protected static String findCommandName(Map<String, Class<? extends OptionParameters>> namedHashMap,
                                             Class<? extends OptionParameters> command) {
-        return namedHashMap
-               .entrySet()
-               .stream()
-               .filter(entry -> entry.getValue().equals(command))
-               .map(Map.Entry::getKey)
-               .findFirst()
-               .orElse("<UNKNOWN>");
+        return namedHashMap.entrySet().stream()
+                           .filter(entry -> entry.getValue().equals(command))
+                           .map(Map.Entry::getKey).findFirst()
+                           .orElse("<UNKNOWN>");
     }
     
     protected static <T> T createNewInstance(Class<T> objClass) {

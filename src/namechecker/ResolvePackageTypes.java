@@ -4,19 +4,20 @@ import java.io.File;
 
 import ast.AST;
 import ast.Compilation;
+import ast.ResolveImports;
 import ast.Name;
 import ast.NamedType;
 import ast.Sequence;
-import ast.TopLevelDecl;
+import ast.DefineTopLevelDecl;
 import utilities.Error;
 import utilities.Log;
 import utilities.Settings;
 import utilities.SymbolTable;
 import utilities.Visitor;
 
-public class ResolvePackedTypes extends Visitor<AST> {
+public class ResolvePackageTypes extends Visitor<AST> {
 
-    public ResolvePackedTypes() {
+    public ResolvePackageTypes() {
         Log.logHeader("==============================================================");
         Log.logHeader("*       P A C K A G E D   T Y P E   R E S O L U T I O N      *");
         Log.logHeader("*       -----------------------------------------------      *");
@@ -62,21 +63,23 @@ public class ResolvePackedTypes extends Visitor<AST> {
                         + makeImportFileName(pa);
                 if (new File(fileName).isFile()) { // Yes it is a library file.
                     // don't do anything just continue after the if.
-                } else
+                } else {
+                    System.out.println(">>>>> " + fileName);
                     // It was neither a local nor a library file - throw an error...
                     Error.error(pa, "Cannot resolve file `"
                             + makeImportFileName(pa)
                             + "' as a local or library file.", true, 2150);
+                }
             }
             Error.setFileName(fileName);
             // Now import it
-            comp = TopLevelDecls.importFile(pa.child(0), fileName);
+            comp = ResolveImports.importFile(pa.child(0), fileName, "<no-package-name>");
 
             SymbolTable st = new SymbolTable();
             if (comp.visited == false) {
                 comp.visited = true;
                 comp.visit(new TopLevelDecls<AST>(st));
-                comp.visit(new ResolvePackedTypes());
+                comp.visit(new ResolvePackageTypes());
                 comp.visit(new NameChecker<AST>(st));
                 // TODO: should we type check here?
             }
@@ -85,7 +88,7 @@ public class ResolvePackedTypes extends Visitor<AST> {
             // TODO: this should do a proper find if its a symb ol table that comes back
             // but we probably need Type checking for that !
             // so for now - SymbolTable implements TopLevelDecl as well!
-            TopLevelDecl td = (TopLevelDecl) st.getShallow(na.simplename());
+            DefineTopLevelDecl td = (DefineTopLevelDecl) st.getShallow(na.simplename());
             if (td != null) { // Yes, we found something
                 na.c = comp;
                 na.resolvedPackageAccess = td;
@@ -107,7 +110,7 @@ public class ResolvePackedTypes extends Visitor<AST> {
 
     public AST visitNamedType(NamedType nt) {
         Log.log(nt.line + " Resolving NamedType `" + nt.name() + "'");
-        Sequence packages = nt.name().packageAccess();
+        Sequence<Name> packages = nt.name().packageAccess();
         if (packages.size() > 0) {
             resolveTypeOrConstant(nt.name());
         }

@@ -590,7 +590,6 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         // Generated template after evaluating this invocation
         ST stInvocation = stGroup_.getInstanceOf("Invocation");
         // An import is done when an invocation comes from a different package
-        System.out.println(">>>>>>>>>>>> " + invokedProc.myPackage);
         String packageName = Helper.getPackage(invokedProc.myPackage, sourceFile_);
         // Check local procedures, if none is found then the procedure must come
         // from a different file (and package) 
@@ -598,7 +597,6 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
             // The procedure is looked up by its signature.
             // NOTE: this should never return `null'!!!!
             invokedProcName = procMap_.get(invokedProcName + invokedProc.signature());
-            System.out.println(">>>> " + invokedProcName);
         } else {
             // Make the package visible on import by using the qualified name of the
             // class the procedure belongs to and the name of folder the procedure's

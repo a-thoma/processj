@@ -2,7 +2,7 @@ package ast;
 
 import utilities.Visitor;
 
-public class ProtocolTypeDecl extends Type implements TopLevelDecl {
+public class ProtocolTypeDecl extends Type implements DefineTopLevelDecl {
 
     public ProtocolTypeDecl(Sequence<Modifier> modifiers, Name name,
                             Sequence<AST> extend, Annotations annotations,
@@ -46,5 +46,20 @@ public class ProtocolTypeDecl extends Type implements TopLevelDecl {
 
     public <S extends Object> S visit(Visitor<S> v) {
         return v.visitProtocolTypeDecl(this);
+    }
+
+    @Override
+    public boolean equal(Type t) {
+        return false;
+    }
+
+    @Override
+    public boolean equivalent(Type t) {
+        return false;
+    }
+
+    @Override
+    public boolean assignmentCompatible(Type t) {
+        return false;
     }
 }

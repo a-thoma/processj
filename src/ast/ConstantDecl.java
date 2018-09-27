@@ -2,7 +2,7 @@ package ast;
 
 import utilities.Visitor;
 
-public class ConstantDecl extends AST implements VarDecl, TopLevelDecl {
+public class ConstantDecl extends AST implements VarDecl, DefineTopLevelDecl {
 
     public ConstantDecl(Sequence<Modifier> modifiers, Type type, Var var) {
         super(type);

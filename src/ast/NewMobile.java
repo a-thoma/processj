@@ -4,7 +4,7 @@ import utilities.Visitor;
 
 public class NewMobile extends Expression {
 
-    public TopLevelDecl myDecl = null;
+    public DefineTopLevelDecl myDecl = null;
 
     public NewMobile(Name name) {
         super(name);

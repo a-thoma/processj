@@ -2,7 +2,7 @@ package ast;
 
 import utilities.Visitor;
 
-public class ProcTypeDecl extends Type implements TopLevelDecl {
+public class ProcTypeDecl extends Type implements DefineTopLevelDecl {
 
     public boolean isNative = false;
     public String library; // Name of the library, e.g. math.h
@@ -59,5 +59,20 @@ public class ProcTypeDecl extends Type implements TopLevelDecl {
 
     public <S extends Object> S visit(Visitor<S> v) {
         return v.visitProcTypeDecl(this);
+    }
+
+    @Override
+    public boolean equal(Type t) {
+        return false;
+    }
+
+    @Override
+    public boolean equivalent(Type t) {
+        return false;
+    }
+
+    @Override
+    public boolean assignmentCompatible(Type t) {
+        return false;
     }
 }

@@ -1,20 +1,26 @@
-package Parser;
+package parser;
 
-import Scanner.Scanner;
-import AST.*;
-import Utilities.Error;
-import Parser.*;
+import scanner.Scanner;
+import ast.*;
+import utilities.Error;
+import parser.*;
 
 
 action code {:
 
-	
+// Converts a name or a nested record access expression
+// to a package access
 public Sequence<Name> primary2PackageAccess(Expression e) {
-  if (e instanceof NameExpr)
+  if (e instanceof NameExpr) {
+    // A name is OK - just turn it into a sequence with one member
     return new Sequence<Name>(((NameExpr)e).name());
-  else if (!(e instanceof RecordAccess)) 
+  } else if (!(e instanceof RecordAccess)) {
+    // Only a record access looks like a package access - everything
+    // else should produce an error
     Error.error(e,"Syntax error in package access");
-  else {
+  } else {
+    // Take the last (field) name off the record access and call
+    // recursively on the rest - turn all into a sequence of names
     RecordAccess ra = (RecordAccess)e;
     return primary2PackageAccess(ra.record()).append(ra.field());
   }
@@ -260,7 +266,7 @@ non terminal Type        	channel_type;
 
 // 5.0 Packages 
 non terminal Compilation	compilation_unit;
-non terminal Name		package_declaration_opt, package_declaration;
+non terminal Sequence		package_declaration_opt, package_declaration;
 non terminal Sequence           pragmas_opt, pragmas;
 non terminal Pragma             pragma;
 non terminal Sequence		import_declarations_opt, import_declarations;
@@ -641,8 +647,9 @@ primitive_type ::=
 // NamedType :> Type :> AST
 named_type ::= 
           IDENTIFIER:id {: RESULT = new NamedType(new Name(id)); :}
-	| primary:p COLONCOLON IDENTIFIER:id {: RESULT = new NamedType(new Name(id, primary2PackageAccess(p))); :}
-	| IDENTIFIER:p COLONCOLON IDENTIFIER:id {: RESULT = new NamedType(new Name(id, primary2PackageAccess(new NameExpr(new Name(p))))); :}
+    //| primary:p COLONCOLON IDENTIFIER:id {: RESULT = new NamedType(new Name(id, primary2PackageAccess(p))); :}
+	//| IDENTIFIER:p COLONCOLON IDENTIFIER:id {: RESULT = new NamedType(new Name(id, primary2PackageAccess(new NameExpr(new Name(p))))); :}
+	package_access COLONCOLON IDENTIFIER
 	;
 
 // ArrayType :> Type :> AST
@@ -699,9 +706,10 @@ package_declaration_opt ::=
         | /* Epsilon */          {: RESULT = null; :}
         ;
 
-//- Name :> AST
+//- Sequence<Name> :> AST
 package_declaration ::= 
-          PACKAGE IDENTIFIER:id SEMICOLON {: RESULT = new Name(id); :}
+          //PACKAGE IDENTIFIER:id SEMICOLON {: RESULT = new Name(id); :}
+          PACKAGE package_access:p SEMICOLON {: RESULT = p; :}
         ;
 
 //- Sequence[Import :> AST] :> AST

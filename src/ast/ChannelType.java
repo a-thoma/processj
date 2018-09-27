@@ -53,4 +53,19 @@ public class ChannelType extends Type {
         //TODO.
         return 4;
     }
+
+    @Override
+    public boolean equal(Type t) {
+        return false;
+    }
+
+    @Override
+    public boolean equivalent(Type t) {
+        return false;
+    }
+
+    @Override
+    public boolean assignmentCompatible(Type t) {
+        return false;
+    }
 }

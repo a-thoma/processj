@@ -3,12 +3,11 @@ package ast;
 import utilities.Visitor;
 
 public class Compilation extends AST {
-
-
+    
     public boolean visited = false;
-
+    
     public Compilation(Sequence<Pragma> pragmas,
-                       Name packageName,
+                       Sequence<Name> packageName,
                        Sequence<Import> imports,
                        Sequence<Type> typeDecls) {
         super(typeDecls);
@@ -17,11 +16,11 @@ public class Compilation extends AST {
     }
 
     public Sequence<Pragma> pragmas() {
-        return (Sequence) children[0];
+        return (Sequence<Pragma>) children[0];
     }
 
-    public Name packageName() {
-        return (Name) children[1];
+    public Sequence<Name> packageName() {
+        return (Sequence<Name>) children[1];
     }
 
     public Sequence<Import> imports() {

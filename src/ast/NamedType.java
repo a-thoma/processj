@@ -2,9 +2,9 @@ package ast;
 
 import utilities.Visitor;
 
-public class NamedType extends Type implements TopLevelDecl {
+public class NamedType extends Type implements DefineTopLevelDecl {
 
-    private TopLevelDecl resolvedTopLevelDecl = null; // could be a SymbolTable
+    private DefineTopLevelDecl resolvedTopLevelDecl = null; // could be a SymbolTable
     private Type type = null;
 
     public NamedType(Name name) {
@@ -36,7 +36,7 @@ public class NamedType extends Type implements TopLevelDecl {
         return "NamedType: " + name();
     }
 
-    public void setResolvedTopLevelDecl(TopLevelDecl td) {
+    public void setResolvedTopLevelDecl(DefineTopLevelDecl td) {
         this.resolvedTopLevelDecl = td;
     }
 
@@ -50,5 +50,20 @@ public class NamedType extends Type implements TopLevelDecl {
 
     public <S extends Object> S visit(Visitor<S> v) {
         return v.visitNamedType(this);
+    }
+
+    @Override
+    public boolean equal(Type t) {
+        return false;
+    }
+
+    @Override
+    public boolean equivalent(Type t) {
+        return false;
+    }
+
+    @Override
+    public boolean assignmentCompatible(Type t) {
+        return false;
     }
 }

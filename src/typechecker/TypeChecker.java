@@ -747,12 +747,7 @@ public class TypeChecker extends Visitor<Type> {
         // TODO: not sure how to handle error type here
         if (nt.type() == null) {
             // go look up the type and set the type field of nt.
-            
-            // ////////////////////////////////////////////////////////////////////////////////////
-            // TODO: Dr. Pedersen made changes to the SymbolTable for imports
-//            Type t = resolve((Type) topLevelDecls.getIncludeImports(nt.name().getname()));
-            Type t = null; // THIS WAS DONE TO SILENT THE ERROR BUT IT WILL BREAK MUST BE FIXED!!!!!
-            // ////////////////////////////////////////////////////////////////////////////////////
+            Type t = resolve((Type) topLevelDecls.getIncludeImports(nt.name().getname()));
             
             if (t == null) {
                 // check if it was a external packaged type (i.e., something with ::)

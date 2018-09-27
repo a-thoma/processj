@@ -9,6 +9,7 @@ import ast.AST;
 import ast.Compilation;
 import ast.ConstantDecl;
 import ast.Import;
+import ast.ResolveImports;
 import ast.Modifier;
 import ast.Name;
 import ast.NamedType;
@@ -104,8 +105,6 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
      * considered) PJFiles takes a directory and a filename and determines if it should be imported -
      * importFileExtension is ".pj" by default. This is used for importing files in an import statement ending in *.
      */
-    
-    // TODO: This does not work. The parser can parse files with any extension!!!
     static class PJfiles implements FilenameFilter {
         public boolean accept(File dir, String name) {
             String[] result = name.split("\\.");
@@ -142,41 +141,6 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
             if (f.isDirectory())
                 makeFileList(list, directory + "/" + s);
         }
-    }
-
-    /**
-     * Imports (by scanning, parsing and tree building) one file.
-     *
-     * @param a
-     *            An AST node - just used for line number information.
-     * @param fileName
-     *            The name of the file being imported.
-     * @return Returns a Compilation representing the scanned file.
-     */
-    public static Compilation importFile(AST a, String fileName) {
-        Log.log(a.line + " Attempting to import: " + fileName);
-        Compilation c = TopLevelDecls.alreadyImportedFiles.get(fileName);
-        if (c != null) {
-            Log.log(a.line + " Import of '" + fileName
-                    + "' already done before!");
-            return c;
-        }
-        try {
-            Error.setPackageName(fileName);
-            Log.log(a.line + " Starting import of file: `" + fileName + "'");
-            Scanner s1 = new Scanner(new java.io.FileReader(fileName));
-            parser p1 = new parser(s1);
-            java_cup.runtime.Symbol r = p1.parse();
-            TopLevelDecls.alreadyImportedFiles.put(fileName,
-                    (Compilation) r.value);
-            return (Compilation) r.value;
-        } catch (java.io.FileNotFoundException e) {
-            Error.error(a, "File not found : " + fileName, true, 2104);
-        } catch (Exception e) {
-            Error.error(a, "Something went wrong while trying to parse "
-                    + fileName, true, 2105);
-        }
-        return null;
     }
 
     // TODO: remember source imports must be compiled too!
@@ -293,7 +257,7 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
             String oldCurrentFileName = currentFileName;
             currentFileName = fn;
             Error.setFileName(fn);
-            Compilation c = importFile(im, fn);
+            Compilation c = ResolveImports.importFile(im, fn, path /* packageName */);
 
             // Add it to the list of compilations for this import
             im.addCompilation(c);

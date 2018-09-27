@@ -199,4 +199,14 @@ public abstract class Type extends AST {
     public boolean isNamedType() {
         return (this instanceof NamedType);
     }
+    
+    //////////////////
+    // ADDED: 25/09/2018
+    //////////////////
+    
+    public abstract boolean equal(Type t);
+    
+    public abstract boolean equivalent(Type t);
+    
+    public abstract boolean assignmentCompatible(Type t);
 }

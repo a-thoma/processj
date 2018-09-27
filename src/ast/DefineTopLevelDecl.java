@@ -1,5 +1,5 @@
 package ast;
 
-public interface TopLevelDecl {
+public interface DefineTopLevelDecl {
     // Empty for now...
 }

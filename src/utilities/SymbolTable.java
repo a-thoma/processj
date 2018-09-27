@@ -1,6 +1,6 @@
 package utilities;
 
-import ast.TopLevelDecl;
+import ast.DefineTopLevelDecl;
 
 import java.util.Enumeration;
 import java.util.Hashtable;
@@ -14,7 +14,7 @@ import java.util.Hashtable;
  * A single symbol table may be used to hold all declarations of methods with the same name
  * but with different signatures.
  */
-public class SymbolTable implements TopLevelDecl {
+public class SymbolTable implements DefineTopLevelDecl {
     // This hook is used to hold on the global type table
     // and to transport the closest table from TopLevelDecls.
     public static SymbolTable hook = null;
@@ -104,41 +104,41 @@ public class SymbolTable implements TopLevelDecl {
      *            The name of the entry for which we are looking.
      * @return The associated object - null if no entry is found by that name.
      */
-    public Object get(String name) {
-        Object result = entries.get(name);
-        if (result == null) {
-            if (parent != null) {
-                result = parent.get(name);
-                if (result == null) {
-                    if (importParent != null) 
-                        result = importParent.get(name);
-                }
-            } else {
-              if (importParent != null) 
-                   result = importParent.get(name);
-            }
-        }
-        return result;
-    }
-    
 //    public Object get(String name) {
 //        Object result = entries.get(name);
-//        if (result != null)
-//            return result;
-//        if (parent == null) {
-//            return null;
+//        if (result == null) {
+//            if (parent != null) {
+//                result = parent.get(name);
+//                if (result == null) {
+//                    if (importParent != null) 
+//                        result = importParent.get(name);
+//                }
+//            } else {
+//              if (importParent != null) 
+//                   result = importParent.get(name);
+//            }
 //        }
-//        return parent.get(name);
+//        return result;
 //    }
-//
-//    public Object getIncludeImports(String name) {
-//        Object result = entries.get(name);
-//        if (result != null)
-//            return result;
-//        if (importParent == null)
-//            return null;
-//        return importParent.get(name);
-//    }
+    
+    public Object get(String name) {
+        Object result = entries.get(name);
+        if (result != null)
+            return result;
+        if (parent == null) {
+            return null;
+        }
+        return parent.get(name);
+    }
+
+    public Object getIncludeImports(String name) {
+        Object result = entries.get(name);
+        if (result != null)
+            return result;
+        if (importParent == null)
+            return null;
+        return importParent.get(name);
+    }
     
     public Object getShallow(String name) {
         Object result = entries.get(name);
@@ -164,7 +164,7 @@ public class SymbolTable implements TopLevelDecl {
             String element = col.nextElement();
             Object o = entries.get(element);
             System.out.print(
-                    indent + element + "\t" + (o.getClass().getName().equals("Utilities.SymbolTable") ? "Procedure: "
+                    indent + element + "\t" + (o.getClass().getName().equals("utilities.SymbolTable") ? "Procedure: "
                             : o.getClass().getName()));
             if (o instanceof SymbolTable) {
                 Log.log("\n" + indent + "  --------------------------------");

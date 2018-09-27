@@ -1,7 +1,7 @@
-package Scanner;
+package scanner;
 
-import AST.*;
-import Parser.*;
+import ast.*;
+import parser.*;
 
 %%
 

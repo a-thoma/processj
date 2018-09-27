@@ -10,7 +10,7 @@ public class Name extends AST {
     private int arrayDepth = 0; // somewhat of a hack - we keep track of whether this name is an id in a variable declaration with [] on.
 
     // points to what ever packageAccess() resolved to.
-    public TopLevelDecl resolvedPackageAccess = null;
+    public DefineTopLevelDecl resolvedPackageAccess = null;
     // the package hierarchy caused to be loaded because of the packageAccess
     public Compilation c = null;
 
