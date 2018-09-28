@@ -209,4 +209,5 @@ public abstract class Type extends AST {
     public abstract boolean equivalent(Type t);
     
     public abstract boolean assignmentCompatible(Type t);
+
 }

@@ -77,6 +77,14 @@ public abstract class AST {
         this.print(System.out);
     }
 
+
+    abstract public boolean equal(Type other) ;
+    
+    abstract public boolean equivalent(Type other) ;
+    
+    abstract public boolean assingmentCompatible(Type other) ;
+    
+
     /* *********************************************************** */
     /* **                                                       ** */
     /* ** Generic Visitor Stuff                                 ** */
