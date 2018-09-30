@@ -9,7 +9,6 @@ import ast.AST;
 import ast.Compilation;
 import ast.ConstantDecl;
 import ast.Import;
-import ast.ResolveImports;
 import ast.Modifier;
 import ast.Name;
 import ast.NamedType;
