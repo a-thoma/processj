@@ -4,7 +4,6 @@ import java.io.File;
 
 import ast.AST;
 import ast.Compilation;
-import ast.ResolveImports;
 import ast.Name;
 import ast.NamedType;
 import ast.Sequence;
@@ -73,7 +72,7 @@ public class ResolvePackageTypes extends Visitor<AST> {
             }
             Error.setFileName(fileName);
             // Now import it
-            comp = ResolveImports.importFile(pa.child(0), fileName, "<no-package-name>");
+            comp = ResolveImports.importFile(pa.child(0), fileName, makeImportFileName(pa));
 
             SymbolTable st = new SymbolTable();
             if (comp.visited == false) {

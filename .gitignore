@@ -1,6 +1,6 @@
 *.class
 *~
 #*
-src/Parser/parser.java
-src/Parser/sym.java
-src/Scanner/Scanner.java
+src/parser/parser.java
+src/parser/sym.java
+src/scanner/Scanner.java
