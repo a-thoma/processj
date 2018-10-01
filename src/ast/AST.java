@@ -78,13 +78,6 @@ public abstract class AST {
     }
 
 
-    abstract public boolean equal(Type other) ;
-    
-    abstract public boolean equivalent(Type other) ;
-    
-    abstract public boolean assingmentCompatible(Type other) ;
-    
-
     /* *********************************************************** */
     /* **                                                       ** */
     /* ** Generic Visitor Stuff                                 ** */

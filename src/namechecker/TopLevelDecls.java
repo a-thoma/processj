@@ -188,25 +188,19 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
             } else {
                 // It was not a local directory, but see if it is a library directory
                 fileName = new File(utilities.Settings.includeDir)
-                        .getAbsolutePath()
-                        + "/"
-                        + utilities.Settings.targetLanguage + "/" + path;
-                Log.log("visitImport(): Not a local, so try a library: "
-                        + fileName);
+                        .getAbsolutePath() + "/" + utilities.Settings.targetLanguage + "/" + path;
+		Log.log("visitImport(): Not a local, so try a library: " + fileName);
                 if (new File(fileName).isDirectory()) {
                     // Yes, it was, so add it's content to the fileList
                     makeFileList(fileList, fileName);
                 } else {
                     // Oh no, the directory wasn't found at all!
                     String packageName = path.replaceAll("/", ".");
-                    packageName = packageName.substring(0,
-                            packageName.length() - 1);
-                    Error.error(im, " Package '" + packageName
-                            + "' does not exist.", false, 2106);
+                    packageName = packageName.substring(0, packageName.length() - 1);
+                    Error.error(im, " Package '" + packageName + "' does not exist.", false, 2106);
                 }
             }
-            Log.log("visitImport(): About to import `" + im.file().getname()
-                    + ".pj'");
+            Log.log("visitImport(): About to import `" + im.file().getname() + ".pj'");
         } else { // Not a .* import
             fileName = fileName + "/" + im.file().getname() + ".pj";
             Error.setPackageName(path + "." + im.file().getname());
@@ -221,31 +215,20 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
             } else {
                 // No, so look in the library
                 fileName = new File(utilities.Settings.includeDir)
-                        .getAbsolutePath()
-                        + "/"
-                        + utilities.Settings.targetLanguage
-                        + "/"
-                        + path
-                        + (path.equals("") ? "" : "/")
-                        + im.file().getname()
-                        + ".pj";
-                Log.log("visitImport(): Not a local so try a library: "
-                        + fileName);
+                        .getAbsolutePath() + "/" + utilities.Settings.targetLanguage
+                        + "/" + path + (path.equals("") ? "" : "/") + im.file().getname() + ".pj";
+                Log.log("visitImport(): Not a local so try a library: " + fileName);
                 // But only if it isn't of the form 'import f' cause they can only be local!
                 if (!path.equals("") && new File(fileName).isFile()) {
                     fileList.add(fileName);
                 } else {
                     // Nope, nothing found!
                     if (path.equals("")) {
-                        Error.error(im, "File '" + im.file().getname()
-                                + "' not found.", false, 2107);
+                        Error.error(im, "File '" + im.file().getname() + "' not found.", false, 2107);
                     } else {
                         String packageName = path.replaceAll("/", ".");
-                        packageName = packageName.substring(0,
-                                packageName.length() - 1);
-                        Error.error(im, "File '" + im.file().getname()
-                                        + "' not found in package '" + path + "'.",
-                                false, 2108);
+                        packageName = packageName.substring(0, packageName.length() - 1);
+                        Error.error(im, "File '" + im.file().getname() + "' not found in package '" + path + "'.", false, 2108);
                     }
                 }
             }

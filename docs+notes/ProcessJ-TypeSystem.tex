@@ -58,8 +58,31 @@ If we count mobile procedures, ProcessJ has 6 constructed types; they are shown 
 \end{table}
 
 \newcommand{\teq}{=_{\cal T}}
+\newcommand{\tev}{\sim_{\cal T}}
+\newcommand{\tac}{:=_{\cal T}}
+\newcommand{\tlt}{<_{\cal T}}
+\newcommand{\tle}{\leq_{\cal T}}
 
-\section{Type Equality ($\teq$)}
+\section{Primitive Types}
+
+\subsection{Type Equality ($\teq$)}
+
+\[
+\alpha \teq \beta\ \Leftrightarrow \mbox{Primitive}_?(\alpha) \wedge \mbox{Primitive}_?(\beta) \wedge \alpha = \beta
+\]
+where $\alpha$ and $\beta$ are types.
+
+\subsection{Type Equivalence ($\tev$)}
+
+\subsection{Type Assignment Compatibility ($\tac$)}
+
+\section{Constructed Types}
+
+\subsection{Type Equality ($\teq$)}
+
+\subsection{Type Equivalence ($\tev$)}
+
+\subsection{Type Assignment Compatibility ($\tac$)}
 
 
 \end{document}
