@@ -1,0 +1,88 @@
+\documentclass[]{article}
+\usepackage[left=5cm, right=5cm, top=2cm, bottom=4cm]{geometry}
+%opening
+\author{Matt B\ae{}kgaard Pedersen}
+\title{The ProcessJ Type System}
+
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+
+\end{abstract}
+
+\section{ProcessJ Types}
+
+\subsection{Primitive Types}
+ProcessJ has 11 primitive types shown in Table~\ref{tab:primitiveTypes}.
+\begin{table}[!h]
+  \begin{center}
+    \caption{ProcessJ primitive types}
+    \label{tab:primitiveTypes} 
+    \begin{tabular}{|l|l|}\hline
+      Type Name & Values \\ \hline\hline
+      byte & \\
+      short & \\
+      char & \\
+      int & \\
+      long & \\
+      float & \\
+      double & \\
+      bool & \{true, false\}\\
+      string & \\
+      barrier & \\
+      timer & \\ \hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\subsection{Constructed Types}
+If we count mobile procedures, ProcessJ has 6 constructed types; they are shown in Table~\ref{tab:constructedTypes}.
+\begin{table}[!h]
+  \begin{center}
+    \caption{ProcessJ constructed types}
+    \label{tab:constructedTypes} 
+    \begin{tabular}{|l|l|}\hline
+      Type Name & Representation \\ \hline\hline
+      Array    & {\it Array}($\alpha$, {\it index})\\
+      Record   & {\it Record}({\it name},\{($n_1,t_1$),$\ldots$,($n_m,t_m$)\})\\
+      Protocol & {\it Protocol}({\it name},\{({\it tag}$_1$,\{($n_{1,1},t_{1,1}$),$\ldots$,($n_{1,m_1},t_{1,m_1}$)\})\\
+               & \hspace*{2.6cm}$\vdots$\\
+      & \hspace*{2.475cm}({\it tag}$_k$,\{($n_{k,1},t_{k,1}$),$\ldots$,($n_{k,m_k},t_{1,m_k}$)\})\}\\
+      Channel  & {\it Channel}($\alpha$)\\
+      Channel end & {\it ChannelEnd}($\alpha$, access)\\ 
+      Procedure & {\it Procedure}({\it name},($t_1,t_2,\ldots,t_n$),$t$)\\\hline
+    \end{tabular}
+  \end{center}
+\end{table}
+
+\newcommand{\teq}{=_{\cal T}}
+\newcommand{\tev}{\sim_{\cal T}}
+\newcommand{\tac}{:=_{\cal T}}
+\newcommand{\tlt}{<_{\cal T}}
+\newcommand{\tle}{\leq_{\cal T}}
+
+\section{Primitive Types}
+
+\subsection{Type Equality ($\teq$)}
+
+\[
+\alpha \teq \beta\ \Leftrightarrow \mbox{Primitive}_?(\alpha) \wedge \mbox{Primitive}_?(\beta) \wedge \alpha = \beta
+\]
+where $\alpha$ and $\beta$ are types.
+
+\subsection{Type Equivalence ($\tev$)}
+
+\subsection{Type Assignment Compatibility ($\tac$)}
+
+\section{Constructed Types}
+
+\subsection{Type Equality ($\teq$)}
+
+\subsection{Type Equivalence ($\tev$)}
+
+\subsection{Type Assignment Compatibility ($\tac$)}
+
+
+\end{document}

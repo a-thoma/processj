@@ -4,7 +4,6 @@ import java.io.File;
 
 import ast.AST;
 import ast.Compilation;
-import ast.ResolveImports;
 import ast.Name;
 import ast.NamedType;
 import ast.Sequence;
@@ -64,7 +63,6 @@ public class ResolvePackageTypes extends Visitor<AST> {
                 if (new File(fileName).isFile()) { // Yes it is a library file.
                     // don't do anything just continue after the if.
                 } else {
-                    System.out.println(">>>>> " + fileName);
                     // It was neither a local nor a library file - throw an error...
                     Error.error(pa, "Cannot resolve file `"
                             + makeImportFileName(pa)
@@ -73,7 +71,7 @@ public class ResolvePackageTypes extends Visitor<AST> {
             }
             Error.setFileName(fileName);
             // Now import it
-            comp = ResolveImports.importFile(pa.child(0), fileName, "<no-package-name>");
+            comp = ResolveImports.importFile(pa.child(0), fileName, makeImportFileName(pa));
 
             SymbolTable st = new SymbolTable();
             if (comp.visited == false) {

@@ -45,7 +45,6 @@ public class ProcessJc {
         }
     }
     
-    // TODO: /Users/Ben/eclipse-workspace/processj/src/tests
     public static void helpError() {
         System.err.println(HELP_ERROR_MSG);
         System.exit(1);
@@ -74,7 +73,7 @@ public class ProcessJc {
         Settings.includeDir = pjMain.include;
         Settings.targetLanguage = pjMain.target;
         boolean sts = pjMain.sts;
-        boolean debug = pjMain.debug;
+        boolean verbose = pjMain.verbose;
         List<File> files = pjMain.files;
         
         if (files == null || files.isEmpty()) {
@@ -125,6 +124,24 @@ public class ProcessJc {
             // This table will hold all the top level types
             SymbolTable globalTypeTable = new SymbolTable("Main file: " + Error.fileName);
 
+            // Dump log messages
+            if (verbose) {
+                Log.startLogging();
+            }
+
+            // Dump the symbol table structure
+            if (sts) {
+                globalTypeTable.printStructure("");
+            }
+
+            // -----------------------------------------------------------------------------
+            // VISIT IMPORT DECLARATIONS
+            c.visit(new namechecker.ResolveImports<AST>(globalTypeTable));
+            if (Error.errorCount != 0) {
+                System.out.println("** COMPILATION FAILED #0 **");
+                System.exit(1);
+            }
+
             // -----------------------------------------------------------------------------
             // TOP LEVEL DECLARATIONS
             
@@ -133,16 +150,6 @@ public class ProcessJc {
 
             // Resolve types from imported packages.
             c.visit(new namechecker.ResolvePackageTypes());
-
-            // Dump log messages
-            if (debug) {
-                Log.startLogging();
-            }
-
-            // Dump the symbol table structure
-            if (sts) {
-                globalTypeTable.printStructure("");
-            }
 
             // -----------------------------------------------------------------------------
             // NAME CHECKER
@@ -192,7 +199,9 @@ public class ProcessJc {
             // CODE GENERATOR
             
             if (Settings.targetLanguage == Language.JVM) {
-                generateCodeJava(c, inFile, globalTypeTable);
+//                generateCodeJava(c, inFile, globalTypeTable);
+                System.out.println("NO CODE GENERATOR");
+                System.exit(1);
             } else {
                 System.err.println(String.format("Unknown target language '%s' selected.", Settings.targetLanguage));
                 System.exit(1);
