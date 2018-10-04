@@ -63,7 +63,6 @@ public class ResolvePackageTypes extends Visitor<AST> {
                 if (new File(fileName).isFile()) { // Yes it is a library file.
                     // don't do anything just continue after the if.
                 } else {
-                    System.out.println(">>>>> " + fileName);
                     // It was neither a local nor a library file - throw an error...
                     Error.error(pa, "Cannot resolve file `"
                             + makeImportFileName(pa)

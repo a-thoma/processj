@@ -33,7 +33,7 @@ public class PJMain extends OptionParameters {
     // TODO: defaultValue = "/opt/ProcessJ/include"
     @Option(names = { "-I", "-include" },
             metavar = "<DIR>",
-            defaultValue = "/Users/Ben/eclipse-workspace/processj/include", // default include for testing
+            defaultValue = "/Users/Ben/Desktop/processj/include", // default include for testing only!
             help = "Overrides the default include directory which is set to be the Include "
                     + "subdirectory of the ProcessJ directory.")
     public String include;
