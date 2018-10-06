@@ -48,6 +48,10 @@ public class ArityRange extends AbstractList<Integer> {
         return from;
     }
     
+    public boolean hasFixedArity() {
+        return from == to;
+    }
+    
     public static ArityRange createArity(String range) {
         range = Assert.nonNull(range, "Parameter range cannot be null.");
         

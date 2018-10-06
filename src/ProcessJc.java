@@ -3,9 +3,8 @@ import java.util.*;
 
 import ast.AST;
 import ast.Compilation;
-import clp.OptionsBuilder;
+import clp.OptionBuilder;
 import codegeneratorjava.CodeGeneratorJava;
-import codegeneratorjava.Helper;
 import library.Library;
 import parser.parser;
 import scanner.Scanner;
@@ -57,17 +56,19 @@ public class ProcessJc {
             helpError();
         }
         
-        OptionsBuilder optionsBuilder = null;
+        // -----------------------------------------------------------------------------
+        // COMMAND LINE PROCESSOR
+        OptionBuilder optionBuilder = null;
         try {
-            optionsBuilder = new OptionsBuilder()
-                                 .addCommand(PJMain.class)
-                                 .handlerArgs(args);
+            optionBuilder = new OptionBuilder()
+                                .addCommand(PJMain.class)
+                                .handlerArgs(args);
         } catch(Exception e) {
             System.err.println(e.getMessage());
             helpError();
         }
         
-        PJMain pjMain = optionsBuilder.getCommand(PJMain.class);
+        PJMain pjMain = optionBuilder.getCommand(PJMain.class);
         
         // These fields have default values, see PJMain.java for more information
         Settings.includeDir = pjMain.include;
@@ -80,6 +81,8 @@ public class ProcessJc {
             // At least one file must be provided otherwise throw an error
             helpError();
         }
+        
+        // -----------------------------------------------------------------------------
         
         for (File inFile : files) {
             Scanner s = null;

@@ -22,8 +22,9 @@ import utilities.Language;
             versionPrinter = PJMain.VersionPrinter.class)
 public class PJMain extends OptionParameters {
 
+    // TODO: This is for imports (libraries, files, etc), pragmas, etc..
     @Option(names = { "-V", "-verbose" },
-            help = "Output messages about what the compiler is doing")
+            help = "Output messages about the sequence of commands used to compile a ProcessJ program")
     public boolean verbose;
     
     @Option(names = { "-g", "-debug" },
@@ -33,8 +34,8 @@ public class PJMain extends OptionParameters {
     // TODO: defaultValue = "/opt/ProcessJ/include"
     @Option(names = { "-I", "-include" },
             metavar = "<DIR>",
-            defaultValue = "/Users/Ben/Desktop/processj/include", // default include for testing only!
-            help = "Overrides the default include directory which is set to be the Include "
+            defaultValue = "/Users/Ben/Desktop/processj/include", // default include for testing!
+            help = "Override the default include directory which is set to be the Include "
                     + "subdirectory of the ProcessJ directory.")
     public String include;
     
@@ -58,6 +59,31 @@ public class PJMain extends OptionParameters {
             help = "Dump global symbol table structure")
     public boolean sts;
     
+    @Option(names = "pjc-all",
+            help = "Output messages about what the compiler is doing")
+    public boolean pjc_all;
+    
+    @Option(names = "pjc-array-constructor",
+            help = "Output messages when the compiler converts array types to canonical forms")
+    public boolean array_constructor;
+    
+    @Option(names = "pjc-resolve-imports",
+            help = "Output messages when the compiler resolve imported files")
+    public boolean resolve_imports;
+    
+    @Option(names = "pjc-resolve-pkg-types",
+            help = "Output messages when the compiler resolve packages")
+    public boolean resolve_pkg_types;
+    
+    @Option(names = "pjc-name-checker",
+            help = "Output messages when the compiler identifies and translates name symbols")
+    public boolean name_checker;
+    
+    @Option(names = "pjc-top-decls",
+            help = "Output messages when the compiler inserts all top-level declarations into "
+                    + "symbol tables")
+    public boolean top_decls;
+    
     @Argument(metavar = "<FILE>",
               order = "0..*")
     public List<File> files;
@@ -67,7 +93,7 @@ public class PJMain extends OptionParameters {
         public String[] getVersionPrinter() throws Exception {
             return new String[] { "ProcessJ Version: 1.2",
                                   "JVM: " + Util.getCurrentJVM(),
-                                  "Vendor: " + System.getProperty("java.vm.vendor" ),
+                                  "Vendor: " + System.getProperty("java.vm.vendor"),
                                   "OS: " + System.getProperty("os.name")
             };
         }

@@ -39,7 +39,7 @@ import utilities.Visitor;
 
 /**
  * A tree walker that collects data from an {@link AST} object and then
- * pushes this data into a {@code grammarTemplatesJava} to translates a
+ * pushes this data into a {@code grammarTemplatesJava} to translate a
  * ProcessJ source code to Java.
  *
  * @param <T>

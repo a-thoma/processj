@@ -29,8 +29,6 @@
                        debug="${debug}"
                        classpath="${classpath}"
                        includeantruntime="false">
-                        <exclude name="Generated/**" />
-                        <exclude name="SampleTests/**" />
                 </javac>
 
         </target>
@@ -80,7 +78,6 @@
 
         <target name="run" depends="compile">
                 <java classpath="${classpath}:${build}" classname="ProcessJc">
-                  <?arg value="/Users/Ben/eclipse-workspace/processj/Pkg/B.pj"/ ?>
                 <arg value="${arg0}"/>
                 </java>
         </target>
