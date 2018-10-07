@@ -25,9 +25,9 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
     
     public ResolveImports(SymbolTable symtab) {
         this.symtab = symtab;
-        Log.log("======================================");
-        Log.log("*    R E S O L V E   I M P O R T S   *");
-        Log.log("======================================");
+        Log.logHeader("==============================================================");
+        Log.logHeader("*                  R E S O L V E   I M P O R T S             *");
+        Log.logHeader("==============================================================");
     }
     
     public static String packageNameToString(Sequence<Name> packageName) {
@@ -252,6 +252,7 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
                 symtab = importSymtab;
             }
         }
+        
         return null;
     }
 }

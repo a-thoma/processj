@@ -155,15 +155,6 @@ public final class OptionGroup {
                 throw new RuntimeException(String.format("Annotated options must start with a single "
                             + "\"-\". Found @Option '%s'.", name));
             }
-            name = name.substring(1, name.length());
-            if (name.length() == 1 && !name.matches("^([a-z]|[A-Z])")) {
-                throw new RuntimeException(String.format("Short names must be letters. "
-                            + "Found short name '%s' for '%s'.", name, field.getName()));
-            } else if (!name.matches("^([a-z]|[A-Z])[a-z]*")) {
-                throw new RuntimeException(String.format("Long names must start with either a "
-                            + "lower case or upper case letter and be followed by lower case letters. "
-                            + "Found long name '%s' for '%s'.", name, field.getName()));
-            }
         }
         
         String optName = findOptionLongName(field);

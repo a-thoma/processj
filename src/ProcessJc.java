@@ -49,12 +49,19 @@ public class ProcessJc {
         System.exit(1);
     }
     
-    public static void main(String[] args) {
-        AST root = null;
-
+    // TODO: Only for testing purposes!
+    public static final String ANSI_RESET = "\u001B[0m";
+    public static final String ANSI_RED = "\u001B[31m";
+    public static final String ANSI_UNDERLINE = "\033[4m";
+    //
+    
+    public static void main(String[] args) {        
         if (args.length == 0) {
-            helpError();
+            System.out.println("[" + ANSI_UNDERLINE + "INFO" + ANSI_RESET + "] pjc: " + ANSI_RED + "error: " + ANSI_RESET + "no input file(s)");
+            System.exit(1);
         }
+        
+        AST root = null;
         
         // -----------------------------------------------------------------------------
         // COMMAND LINE PROCESSOR
@@ -74,7 +81,7 @@ public class ProcessJc {
         Settings.includeDir = pjMain.include;
         Settings.targetLanguage = pjMain.target;
         boolean sts = pjMain.sts;
-        boolean verbose = pjMain.verbose;
+        boolean visitorAll = pjMain.visitorAll;
         List<File> files = pjMain.files;
         
         if (files == null || files.isEmpty()) {
@@ -128,7 +135,7 @@ public class ProcessJc {
             SymbolTable globalTypeTable = new SymbolTable("Main file: " + Error.fileName);
 
             // Dump log messages
-            if (verbose) {
+            if (visitorAll) {
                 Log.startLogging();
             }
 

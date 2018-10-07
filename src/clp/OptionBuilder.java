@@ -331,7 +331,7 @@ public class OptionBuilder {
                         break;
                     } else if (!argument.equals(optName) && argument.startsWith(optName)) {
                         String separator = getValueSeparator(optName);
-                        if (separator != null) {
+                        if (separator != null && !separator.isEmpty()) {
                             String[] splitResult = argument.split(separator);
                             expandedArgs.addAll(Arrays.asList(splitResult));
                             break;

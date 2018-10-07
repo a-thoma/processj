@@ -24,7 +24,8 @@ public class PJMain extends OptionParameters {
 
     // TODO: This is for imports (libraries, files, etc), pragmas, etc..
     @Option(names = { "-V", "-verbose" },
-            help = "Output messages about the sequence of commands used to compile a ProcessJ program")
+            help = "Output messages of the exact sequence of commands used to compile a "
+                    + "ProcessJ program")
     public boolean verbose;
     
     @Option(names = { "-g", "-debug" },
@@ -59,30 +60,31 @@ public class PJMain extends OptionParameters {
             help = "Dump global symbol table structure")
     public boolean sts;
     
-    @Option(names = "pjc-all",
-            help = "Output messages about what the compiler is doing")
-    public boolean pjc_all;
+    @Option(names = "-visitor-all",
+            help = "Generate all parse tree visitors (not default)")
+    public boolean visitorAll;
     
-    @Option(names = "pjc-array-constructor",
-            help = "Output messages when the compiler converts array types to canonical forms")
-    public boolean array_constructor;
+    @Option(names = "-array-visitor",
+            help = "Generate parse tree visitor only when converting array types to canonical "
+                    + "forms")
+    public boolean arrayVisitor;
     
-    @Option(names = "pjc-resolve-imports",
-            help = "Output messages when the compiler resolve imported files")
-    public boolean resolve_imports;
+    @Option(names = "-import-visitor",
+            help = "Generate parse tree visitor when resolving imported files")
+    public boolean importVisitor;
     
-    @Option(names = "pjc-resolve-pkg-types",
-            help = "Output messages when the compiler resolve packages")
-    public boolean resolve_pkg_types;
+    @Option(names = "-package-type-visitor",
+            help = "Generate parse tree visitor when resolving packages")
+    public boolean packageVisitor;
     
-    @Option(names = "pjc-name-checker",
-            help = "Output messages when the compiler identifies and translates name symbols")
-    public boolean name_checker;
+    @Option(names = "-name-checker-visitor",
+            help = "Generate parse tree visitor when identifing and translating name symbols")
+    public boolean nameCheckerVisitor;
     
-    @Option(names = "pjc-top-decls",
-            help = "Output messages when the compiler inserts all top-level declarations into "
+    @Option(names = "-top-decls-visitor",
+            help = "Generate parse tree visitor when inserting all top-level declarations into "
                     + "symbol tables")
-    public boolean top_decls;
+    public boolean topDeclsVisitor;
     
     @Argument(metavar = "<FILE>",
               order = "0..*")
