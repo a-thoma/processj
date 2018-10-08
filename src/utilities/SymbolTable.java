@@ -6,13 +6,14 @@ import java.util.Enumeration;
 import java.util.Hashtable;
 
 /**
- * The symbol table class. Each symbol table contains a Hashtable that contains the
- * symbols defined in the scope that it corresponds to. A symbol table has a reference 
- * to the symbol table for its enclosing scope (if any) -- called 'parent' -- or to the
- * closest import statement going backwards -- called import parent. 
+ * The class {@code SymbolTable}. Each symbol table contains a Hashtable
+ * that contains the symbols defined in the scope that it corresponds
+ * to. A symbol table has a reference  to the symbol table for its
+ * enclosing scope (if any) -- called 'parent' -- or to the closest
+ * import statement going backwards -- called import parent. 
  * 
- * A single symbol table may be used to hold all declarations of methods with the same name
- * but with different signatures.
+ * A single symbol table may be used to hold all declarations of
+ * methods with the same name but with different signatures.
  */
 public class SymbolTable implements DefineTopLevelDecl {
     // This hook is used to hold on the global type table

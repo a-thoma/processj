@@ -23,36 +23,37 @@ import utilities.Language;
 public class PJMain extends OptionParameters {
 
     // TODO: This is for imports (libraries, files, etc), pragmas, etc..
-    @Option(names = { "-V", "-verbose" },
+    @Option(names = {"-V", "-verbose"},
             help = "Output messages of the exact sequence of commands used to compile a "
                     + "ProcessJ program")
     public boolean verbose;
     
-    @Option(names = { "-g", "-debug" },
+    @Option(names = {"-g", "-debug"},
             help = "Generate all debugging info")
     public boolean debug;
     
     // TODO: defaultValue = "/opt/ProcessJ/include"
-    @Option(names = { "-I", "-include" },
+    @Option(names = {"-I", "-include"},
             metavar = "<DIR>",
             defaultValue = "/Users/Ben/Desktop/processj/include", // default include for testing!
             help = "Override the default include directory which is set to be the Include "
                     + "subdirectory of the ProcessJ directory.")
     public String include;
     
-    @Option(names = { "-t", "-target" }, defaultValue = "JVM", metavar = "<LANGUAGE>",
-            help = "Specify the target language. "
-                    + "C: C source code is written, compiled, and linked with the CSSP runtime. "
-                    + "C++: C++ source code is generated and compiled into an executable."
-                    + "JVM: JVM class files are written. "
+    @Option(names = {"-t", "-target"},
+            defaultValue = "JVM",
+            metavar = "<LANGUAGE>",
+            help = "Specify the target language. C: C source code is written, compiled, "
+                    + "and linked with the CSSP runtime; C++: C++ source code is generated "
+                    + "and compiled into an executable; JVM: JVM class files are written; "
                     + "JS: JavaScript is written.")
     public Language target;
     
-    @Option(names = { "-v", "-version" },
+    @Option(names = {"-v", "-version"},
             help = "Print version information and exit")
     public boolean version;
     
-    @Option(names = { "-h", "-help"},
+    @Option(names = {"-h", "-help"},
             help = "Show this help message and exit")
     public boolean help;
     
@@ -78,7 +79,7 @@ public class PJMain extends OptionParameters {
     public boolean packageVisitor;
     
     @Option(names = "-name-checker-visitor",
-            help = "Generate parse tree visitor when identifing and translating name symbols")
+            help = "Generate parse tree visitor when identifying and translating name symbols")
     public boolean nameCheckerVisitor;
     
     @Option(names = "-top-decls-visitor",
