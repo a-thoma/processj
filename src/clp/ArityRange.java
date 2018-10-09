@@ -35,16 +35,14 @@ public class ArityRange extends AbstractList<Integer> {
     }
     
     public int getFrom() {
-        if (from <= to) {
+        if (from <= to)
             return from;
-        }
         return to;
     }
     
     public int getTo() {
-        if (from <= to) {
+        if (from <= to)
             return to;
-        }
         return from;
     }
     
@@ -55,45 +53,38 @@ public class ArityRange extends AbstractList<Integer> {
     public static ArityRange createArity(String range) {
         range = Assert.nonNull(range, "Parameter range cannot be null.");
         
-        if (StringUtil.isStringEmpty(range) || range.length() == 0) {
+        if (StringUtil.isStringEmpty(range) || range.length() == 0)
             throw new RuntimeException("Invalid or empty range.");
-        }
         
         boolean takesUnlimitedArgs = range.endsWith("..*");
         int fromValue = -1;
         int toValue = -1;
         int separatorIndex = range.indexOf("..");
         if (separatorIndex != -1) {
-            if (separatorIndex == 0) {
+            if (separatorIndex == 0)
                 throw new RuntimeException("Invalid range. A range must be of the form \"0..n\".");
-            }
             fromValue = Integer.parseInt(range.substring(0, separatorIndex));
-            if (!takesUnlimitedArgs) {
+            if (!takesUnlimitedArgs)
                 toValue = Integer.parseInt(range.substring(separatorIndex + 2));
-            } else {
+            else
                 toValue = Integer.MAX_VALUE;
-            }
         } else {
             fromValue = Integer.parseInt(range);
             toValue = fromValue;
         }
         
-        if (fromValue < 0 || toValue < 0) {
+        if (fromValue < 0 || toValue < 0)
             throw new RuntimeException(String.format("A range must be positive. Found [%d..%d].", fromValue, toValue));
-        }
         
         return new ArityRange(fromValue, toValue);
     }
 
     @Override
     public Integer get(int index) {
-        if (index < 0) {
+        if (index < 0)
             throw new RuntimeException();
-        }
-        if (index >= size()) {
+        if (index >= size())
             throw new RuntimeException();
-        }
-        
         return index + getFrom();
     }
 
@@ -120,10 +111,8 @@ public class ArityRange extends AbstractList<Integer> {
     @SuppressWarnings("rawtypes")
     @Override
     public boolean containsAll(Collection obj) {
-        if (!(obj instanceof ArityRange)) {
+        if (!(obj instanceof ArityRange))
             super.containsAll(obj);
-        }
-        
         ArityRange arity = (ArityRange) obj;
         return getFrom() <= arity.getFrom() && arity.getTo() <= getTo();
     }
@@ -139,19 +128,15 @@ public class ArityRange extends AbstractList<Integer> {
     
     @Override
     public final boolean equals(Object obj) {
-        if (this == obj) {
+        if (this == obj)
             return true;
-        }
 
-        if (obj == null || getClass() != obj.getClass()) {
+        if (obj == null || getClass() != obj.getClass())
             return false;
-        }
         
         ArityRange other = (ArityRange) obj;
-        if (from != other.from || to != other.to) {
+        if (from != other.from || to != other.to)
             return false;
-        }
-        
         return true;
     }
     
@@ -191,14 +176,11 @@ public class ArityRange extends AbstractList<Integer> {
 
         @Override
         public Integer next() {
-            if (!hasNext()) {
+            if (!hasNext())
                 throw new RuntimeException("Index out of bound!");
-            }
             
-            if (position++ > 0) {
+            if (position++ > 0)
                 nextValue++;
-            }
-            
             return nextValue;
         }
     }

@@ -1,0 +1,16 @@
+/ast/
+/clp/
+/codegeneratorjava/
+/instrument/
+/library/
+/namechecker/
+/namecollector/
+/parallel_usage_check/
+/parser/
+/printers/
+/processj/
+/reachability/
+/scanner/
+/typechecker/
+/utilities/
+/yield/

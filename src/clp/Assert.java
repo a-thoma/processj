@@ -33,10 +33,8 @@ public class Assert {
      * @return The same object.
      */
     public static <T> T nonNull(T obj, String message) {
-        if (obj == null) {
+        if (obj == null)
             throw new NullPointerException(message);
-        }
-
         return obj;
     }
     
