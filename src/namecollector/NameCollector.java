@@ -34,7 +34,7 @@ public class NameCollector extends Visitor<Object>{
             Error.error("Null list passed to NameCollector Visitor!");
 
         this.myNames = myNames;
-        this.namesSeen = new HashSet();
+        this.namesSeen = new HashSet<>();
     }
 
     /**

@@ -25,9 +25,9 @@ import clp.parsers.MapParser;
 
 /**
  * The class {@link OptionGroup} represents a collection of command
- * line options that {@link OptionsBuilder} instantiates in order to
+ * line options that {@link OptionBuilder} instantiates in order to
  * updated the values that {@link Option @Option} fields and
- * {@link Argument @Argument} fields hold at runtime.
+ * {@link Argument @Argument} fields hold at compile or runtime.
  * 
  * @author Ben Cisneros
  * @version 06/21/2018
@@ -36,7 +36,7 @@ import clp.parsers.MapParser;
 public final class OptionGroup {
     
     /**
-     * Map of {@link Parameters @Parameters} types to their default constructors.
+     * Map of {@link Parameters @Parameters} types to their constructors.
      */
     private Map<Class<? extends OptionParameters>, Constructor<? extends OptionParameters>> constructorsMap = new HashMap<>();
     
@@ -51,8 +51,7 @@ public final class OptionGroup {
     private Map<Field, OptionWithValues> fieldOptionMap = new HashMap<>();
     
     /**
-     * This map contains a collection of fields that are declared by a
-     * class or set of classes.
+     * This map contains a collection of fields declared by a class or set of classes.
      */
     private Map<Class<? extends OptionParameters>, List<Field>> classFieldMap = new HashMap<>();
 
@@ -156,15 +155,6 @@ public final class OptionGroup {
                 throw new RuntimeException(String.format("Annotated options must start with a single "
                             + "\"-\". Found @Option '%s'.", name));
             }
-            name = name.substring(1, name.length());
-            if (name.length() == 1 && !name.matches("^([a-z]|[A-Z])")) {
-                throw new RuntimeException(String.format("Short names must be letters. "
-                            + "Found short name '%s' for '%s'.", name, field.getName()));
-            } else if (!name.matches("^([a-z]|[A-Z])[a-z]*")) {
-                throw new RuntimeException(String.format("Long names must start with either a "
-                            + "lower case or upper case letter and be followed by lower case letters. "
-                            + "Found long name '%s' for '%s'.", name, field.getName()));
-            }
         }
         
         String optName = findOptionLongName(field);
@@ -181,16 +171,16 @@ public final class OptionGroup {
         builder.setHidden(annotation.hidden());
         builder.setRequired(annotation.required());
         
-        // This is to retrieve information about the type of values each field can
-        // hold. Simple types such as byte, short, int, long, float, double, String
-        // and parameterized fields (of simple types) can be inferred at runtime.
-        // Complicated types such as user-defined types must be explicitly specified!
+        // This is to retrieve information about the types each field can hold at compile
+        // or runtime. Basic types such as byte, short, int, long, float, double, String
+        // and parameterized fields (of basic types) can be inferred at runtime.
+        // Complex data types such as user-defined types must be explicitly specified!
         Class<?>[] fieldFinalTypes = findFieldFinalTypes(field);
         if (fieldFinalTypes.length == 2) {
-            // A field of type Map..
+            // Must be a field of type Map
             List<Class<? extends OptionParser>> handlerList = new ArrayList<>();
             if (Util.isArrayEmpty(annotation.handlers())) {
-                // No handler type was provided, find two handlers compatible with the
+                // No handler type was provided, then find two handlers compatible with the
                 // annotated field's type variables
                 handlerList.add(ParserFactory.INSTANCE.inferHandlerType(fieldFinalTypes[0]));
                 handlerList.add(ParserFactory.INSTANCE.inferHandlerType(fieldFinalTypes[1]));
@@ -208,15 +198,14 @@ public final class OptionGroup {
             OptionParser<?> valueParser = findFieldTypeParser(field.getName(), fieldFinalTypes[1],
                                         handlerList.get(1), optName);
             
-            // Throw an exception if an instance of OptionParser could not be create from
-            // either handler type
+            // Throw an exception if an instance of OptionParser could not be create from either handler type
             if (keyParser == null || valueParser == null) {
                 throw new RuntimeException(String.format("A parser could not be created for '%s'.", optName));
             }
             builder.setParsers(new OptionParser<?>[] { keyParser, valueParser });
             builder.setHandlers(handlerList.toArray(new Class[0]));
         } else {
-            // Some primitive or user-defined type
+            // Must be some atomic or user-defined type
             Class<? extends OptionParser> handler = null;
             if (Util.isArrayEmpty(annotation.handlers())) {
                 // No handler type was provided, find one compatible with the annotated
@@ -233,8 +222,8 @@ public final class OptionGroup {
             OptionParser<?> parser = findFieldTypeParser(field.getName(), fieldFinalTypes[0],
                                      handler, optName);
             
-            // Throw an exception if an instance of OptionParser could not be created
-            // from the specified handler type
+            // Throw an exception if an instance of OptionParser could not be created from
+            // the specified handler type
             if (parser == null) {
                 throw new RuntimeException(String.format("A parser could not be created for '%s'.", optName));
             }
@@ -263,7 +252,7 @@ public final class OptionGroup {
         OptionType type = OptionType.SINGLEVALUE;
         if (isCollectionOrMapOrArrayField(field.getType())) {
             type = OptionType.MULTIVALUE;
-        } else if (isBooleanField(field.getType()) && (arity.getFrom() == 0 && arity.getTo() == 0)) {
+        } else if (isBooleanField(field.getType()) && arity.hasFixedArity()) {
             type = OptionType.NONE;
         }
         
@@ -292,16 +281,16 @@ public final class OptionGroup {
         builder.setField(field);
         
         ArityRange order = ArityRange.createArity(annotation.order());
-        if ((order.getFrom() != order.getTo()) && !isCollectionOrMapOrArrayField(field.getType())) {
+        if (!order.hasFixedArity() && !isCollectionOrMapOrArrayField(field.getType())) {
             throw new RuntimeException(String.format("Multivalue @Argument '%s' must be assigned "
                     + "to a field of type List.", fieldName));
         }
         
         builder.setArity(order);
         
-        // Same as @Options, except that arguments cannot be of type Map. Therefore,
-        // only one type should be returned and one parser instance should be created.
-        // Complicated types such as user-defined types must be explicitly specified!
+        // Same as @Options, except that arguments cannot be of type Map. Only one type
+        // should be returned and one parser instance should be created.
+        // Complex data types such as user-defined types must be explicitly specified!
         Class<?>[] fieldFinalTypes = findFieldFinalTypes(field);
         if (fieldFinalTypes.length == 2) {
             throw new RuntimeException(String.format("@Argument '%s' cannot have more than one handler.",
@@ -309,8 +298,7 @@ public final class OptionGroup {
         } else {
             Class<? extends OptionParser> handler = null;
             if (annotation.handler() == OptionParser.class) {
-                // No handler type was provided, find one compatible with the annotated
-                // field type
+                // No handler type was provided, find one compatible with the annotated field type
                 handler = ParserFactory.INSTANCE.inferHandlerType(fieldFinalTypes[0]);
             } else {
                 handler = annotation.handler();
@@ -341,7 +329,7 @@ public final class OptionGroup {
         builder.setValueSeparator(annotation.split());
         builder.setMetavar(annotation.metavar());
         
-        // Build option and parse the value assigned to `defaultValue'
+        // Build argument and parse the value assigned to `defaultValue'
         PositionalValue argument = builder.build();
         if (!StringUtil.isStringEmpty(annotation.defaultValue())) {
             addValue(argument, annotation.defaultValue());
@@ -484,12 +472,14 @@ public final class OptionGroup {
             throw new RuntimeException(String.format("Illegal handler type found. Illegal '%s' type "
                         + "assigned to field '%s'.", Util.getTypeName(handler), fieldName));
         }
-        // If a parser cannot be found, attempt to create one from the given handler.
+        
         // Is this handler an Enum type? Yes, then create a parser for this Enum type
         if (handler == null && Enum.class.isAssignableFrom(fieldType)) {
             return new EnumParser(optName, fieldType);
         }
-        // No, then return `null' (for exception handling) if we fail to create a parser
+        
+        // No, then attempt to create a parse from the given handler or return
+        // `null' (for exception handling) if we fail to create a parser
         OptionParser<?> parser = ParserFactory.INSTANCE.getParserTypeForClassType(fieldType, optName);
         if (parser == null) {
             try {
@@ -509,7 +499,7 @@ public final class OptionGroup {
         if (fieldType instanceof ParameterizedType) {
             ParameterizedType parameterizedType = (ParameterizedType) fieldType;
             if (parameterizedType.getRawType() == List.class || parameterizedType.getRawType() == Map.class) {
-                // Retrieve the actual type declared in List<...> or Map<... , ...>
+                // Retrieve the actual type declared in List or Map
                 fieldTypeResult = findFieldGenericTypes(field);
             } else {
                 throw new RuntimeException(String.format("Unknow type for a multivalue field. Found "
@@ -525,7 +515,7 @@ public final class OptionGroup {
     }
     
     private Class<?>[] findFieldGenericTypes(Field field) {
-        // This will fail if the field's type is not a ParameterizedType such
+        // This will fail if the field's data type is not a ParameterizedType such
         // as a List or a Map type
         ParameterizedType parameterizedType = (ParameterizedType) field.getGenericType();
         Type[] paramTypes = parameterizedType.getActualTypeArguments();
@@ -571,6 +561,7 @@ public final class OptionGroup {
             throw new RuntimeException(String.format("Final (constant) field '%s' cannot "
                         + "be modified.", field.getName()));
         }
+        
         field.setAccessible(true);
         return field;
     }

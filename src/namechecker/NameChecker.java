@@ -167,7 +167,8 @@ public class NameChecker<T extends Object> extends Visitor<T> {
                         + in.procedureName().getname() + "'.", false, 2208);
             else
                 in.candidateMethods = (SymbolTable) o;
-        } else { // in.target() != null
+        } else {
+            // in.target() != null
             // This we cannot do cause Type Checking is required.
             Log.log(in.line
                     + ": Invocation: target not null: too complicated for now!");

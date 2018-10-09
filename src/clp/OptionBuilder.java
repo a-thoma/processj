@@ -20,7 +20,7 @@ import java.util.stream.Collectors;
  * @version 07/21/2018
  * @since 1.2
  */
-public class OptionsBuilder {
+public class OptionBuilder {
     
     /**
      * The first ever registered command is the parent command.
@@ -52,11 +52,11 @@ public class OptionsBuilder {
      */
     private Options options = new Options();
     
-    public OptionsBuilder() {
+    public OptionBuilder() {
         // Nothing to do
     }
     
-    public OptionsBuilder handlerArgs(String[] args) {
+    public OptionBuilder handlerArgs(String[] args) {
         handleArgs(expandArgs(args), mainCommand, 0, new ArrayList<>());
         return this;
     }
@@ -68,9 +68,9 @@ public class OptionsBuilder {
         int index = currentIndex;
         // Collect invoked commands - this is to validate required (individual) options
         invokedCommandList.add(type);
-        // Options that belong to the invoked command type
+        // Options that belong to an invoked command type
         OptionGroup optGroup = commandOptionMap.get(type);
-        // Specifies a chain of command type invocations
+        // Indicates a chain of command type invocations
         boolean subParameters = false;
         // Loop over all of the arguments
         while (index < args.length) {
@@ -126,7 +126,7 @@ public class OptionsBuilder {
         }
         
         if (subParameters) {
-            // Sub-commands are invoked last
+            // Sub-commands are ALWAYS invoked last
             handleArgs(args, namedCommandMap.get(args[index]), index + 1, new ArrayList<>());
         }
         
@@ -152,8 +152,8 @@ public class OptionsBuilder {
             // Current argument on the command line
             index += 1;
             int j = 0;
-            // Consume single value
             if (option.isSingleValue()) {
+                // Consume single value
                 optGroup.addValue(option, args[index++]);
             } else {
                 // Consume the minimum (and required) number of values
@@ -223,7 +223,7 @@ public class OptionsBuilder {
                         consumedValue = true;
                     }
                 }
-                
+                // Have we consumed all required values?
                 if (getFrom < index && getTo != Integer.MAX_VALUE) {
                     throw new RuntimeException(String.format("@Argument '%s' requires %s value(s), "
                                 + "only %d value(s) consumed.", argument.getName(), order, consumedArgs));
@@ -237,7 +237,7 @@ public class OptionsBuilder {
         }
     }
     
-    public OptionsBuilder addCommand(Class<? extends OptionParameters> type) {
+    public OptionBuilder addCommand(Class<? extends OptionParameters> type) {
         type = Assert.nonNull(type, "The specified class cannot be null.");
         Parameters parameters = type.getAnnotation(Parameters.class);
         
@@ -270,8 +270,8 @@ public class OptionsBuilder {
             try {
                 OptionValue optionValue = optGroup.getOption(optName);
                 options.add(optName, optionValue);
-                // Keep track of required @Options
                 if (optionValue.isRequired()) {
+                    // Keep track of every required @Option
                     requiredOptionMap.put(optionValue.getName(), optionValue);
                 }
             } catch (Exception e) {
@@ -331,7 +331,7 @@ public class OptionsBuilder {
                         break;
                     } else if (!argument.equals(optName) && argument.startsWith(optName)) {
                         String separator = getValueSeparator(optName);
-                        if (separator != null) {
+                        if (separator != null && !separator.isEmpty()) {
                             String[] splitResult = argument.split(separator);
                             expandedArgs.addAll(Arrays.asList(splitResult));
                             break;
