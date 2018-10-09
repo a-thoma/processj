@@ -1,8 +1,8 @@
 package utilities;
 
 /**
- * The enum {@link ErrorType} represents various types of error messages
- * in ProcessJ
+ * The enum {@link ErrorType} represents various types of
+ * error messages in ProcessJ.
  * 
  * @author Ben Cisneros
  * @version 09/02/2018
@@ -10,10 +10,9 @@ package utilities;
  */
 public enum ErrorType {
     
-    INFO    ("INFO"),
-    WARNING ("WARNING"),
-    ERROR   ("ERROR"),
-    FATAL   ("FATAL");
+    WARNING     ("warning"),
+    ERROR       ("error"),
+    FATAL       ("fatal");
     
     private final String text;
     

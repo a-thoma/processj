@@ -25,9 +25,9 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
     
     public ResolveImports(SymbolTable symtab) {
         this.symtab = symtab;
-        Log.log("======================================");
-        Log.log("*    R E S O L V E   I M P O R T S   *");
-        Log.log("======================================");
+        Log.logHeader("==============================================================");
+        Log.logHeader("*                  R E S O L V E   I M P O R T S             *");
+        Log.logHeader("==============================================================");
     }
     
     public static String packageNameToString(Sequence<Name> packageName) {
@@ -185,7 +185,7 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
                 // It was not a local directory, but see if it is a library directory
                 fileName = new File(utilities.Settings.includeDir)
                         .getAbsolutePath() + "/" + utilities.Settings.targetLanguage + "/" + path;
-        Log.log("visitImport(): Not a local, so try a library: " + fileName);
+                Log.log("visitImport(): Not a local, so try a library: " + fileName);
                 if (new File(fileName).isDirectory()) {
                     // Yes, it was, so add it's content to the fileList
                     makeFileList(fileList, fileName);
@@ -252,6 +252,7 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
                 symtab = importSymtab;
             }
         }
+        
         return null;
     }
 }

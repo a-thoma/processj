@@ -1,8 +1,13 @@
 package utilities;
 
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.text.MessageFormat;
+import java.util.Properties;
+
 /**
- * The enum {@link ErrorMessage} all the error messages that the ProcessJ
- * compiler can issue.
+ * The enum {@link ErrorMessage} all the error messages that
+ * the ProcessJ compiler can issue.
  * 
  * @author Ben Cisneros
  * @version 09/02/2018
@@ -11,137 +16,132 @@ package utilities;
 public enum ErrorMessage {
     
     // -----------------------------------------------------------------------------
-    // NAME CHECKER (TOP LEVEL) - 2100
+    // RESOLVE IMPORTS (100-199)
     
-    NAME_CHECKER_2100(2100, "Type with name '<var>' already declared in this scope.", ErrorType.ERROR),
-    NAME_CHECKER_2101(2101, "Non-procedure type with name '<var>' already declared in this scope.", ErrorType.ERROR),
-    NAME_CHECKER_2102(2102, "Type with name '<var>' already declared in this scope.", ErrorType.ERROR),
-    NAME_CHECKER_2103(2103, "Type with name '<var>' already declared in this scope.", ErrorType.ERROR),
-    NAME_CHECKER_2104(2104, "File not found: '<var>'.", ErrorType.ERROR),
-    NAME_CHECKER_2105(2105, "Something went wrong while trying to parser '<var>'.", ErrorType.ERROR),
-    NAME_CHECKER_2106(2106, "Package '<var>' does not exist.", ErrorType.ERROR),
-    NAME_CHECKER_2107(2107, "File '<var>' does not exists.", ErrorType.ERROR),
-    NAME_CHECKER_2108(2108, "File '<var>' not found in package '<pkg>'.", ErrorType.ERROR),
-    NAME_CHECKER_2109(2109, "Mobile procedure '<var>' must have a void return type.", ErrorType.ERROR),
-    NAME_CHECKER_2110(2110, "Only one declaration of mobile procedure '<var>' may exists.", ErrorType.ERROR),
-    NAME_CHECKER_2111(2111, "Type with name '<var>' already declared in this scope.", ErrorType.ERROR),
+    RESOLVE_IMPORTS_100(100, ErrorType.ERROR),
+    RESOLVE_IMPORTS_101(101, ErrorType.ERROR),
+    RESOLVE_IMPORTS_102(102, ErrorType.ERROR),
+    RESOLVE_IMPORTS_103(103, ErrorType.ERROR),
+    RESOLVE_IMPORTS_104(104, ErrorType.ERROR),
+    RESOLVE_IMPORTS_105(105, ErrorType.ERROR),
     
     // -----------------------------------------------------------------------------
-    // NAME TYPE RESOLUTION - 2150
+    // TOP LEVEL DECLS (200-299)
     
-    NAME_TYPE_RESOLUTION_2150(2150, "Cannot resolve '<var>' as local file or library.", ErrorType.ERROR),
-    
-    // -----------------------------------------------------------------------------
-    // TYPE CHECKING - 3000
-    
-    TYPE_RESOLUTION_3001(3001, "Array access index must be of integral type.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3002(3002, "Array literal with the keyword 'new'.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3003(3003, "Cannot assign value of type '<var>' to variable of type '<var>'.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3004(3004, "Cannot assign value of type '<var>' to variable of type '<var>'.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3005(3005, "Right hand side operand of operator '<var>' must be of numeric type.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3006(3006, "Left hand side operand of operator '<var>' must be of numeric type.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3007(3007, "Left hand side operand of operator '<var>' must be of integral type.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3008(3008, "Right hand side operand of operator '<var>' must be of integral type.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3009(3009, "Both right and left-hand side operands of operato '<var>' must be of boolean or integral type.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3010(3010, "Operator '<var>' requires operands of numeric type.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3011(3011, "Void type cannot be used here.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3012(3012, "Operator '<var>' requires operands of the same type.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3013(3013, "Operator '<var>' requires operands of boolean type.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3014(3014, "Operator '<var>' requires both operands of either integral or boolean type.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3015(3015, "Operator '<var>' requires of numeric type or string/boolean, string/numeric, or string/string type.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3016(3016, "Operator '<var>' requires left operand of integral type.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3017(3017, "Operator '<var>' requires right operand of integral type.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3018(3018, "Unknown Operator '<var>'.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3019(3019, "Channel end expression requires channel type.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3020(3020, "Unknown sharing status for channel and expression.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3021(3021, "Channel or Time type required in channel/time read.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3022(3022, "Timer read cannot habe extended rendez-vous block.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3023(3023, "Cannot write to a non-channel end.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3024(3024, "Non boolean Expression found as test in do-statement.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3025(3025, "Barrier type expected, found '<var>'.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3026(3026, "Non-boolean expression found in for-statement.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3027(3027, "Non-boolean expression found as test in if-statement.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3028(3028, "Undefined named type '<var>'.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3029(3029, "Unknown name expression.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3030(3030, "Cannot assign value '<var>' to type '<other>'.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3031(3031, "Array dimension must be of integral type.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3032(3032, "Array initializer is not compatible with '<var>'.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3033(3033, "Incorrect number of expression in protocol literal '<var>'.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3034(3034, "Cannot assign value of type '<var>' to protocol field '<other>' of type '<other>'.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3036(3036, "Left hand side of assignment not assignable.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3037(3037, "No suitable procedure found.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3038(3038, "Found more than once candidate - cannot chose between them!.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3039(3039, "Cannot assign non-array to array type '<var>'.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3040(3040, "Procedure return type is void; return statement cannot return a value.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3041(3041, "Procedure return type is '<var>' but procedure return type is void.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3042(3042, "Incompatible type in return statement.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3043(3043, "Non-mobile procedure cannot suspend.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3044(3044, "Switch lables must be of type int or protocol tag.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3045(3045, "Switch lables must be constants.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3046(3046, "Duplicate default lable.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3047(3047, "Duplicate case lable.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3048(3048, "Non-barrier type in sync statement.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3060(3060, "Protocol tag '<var>' not found in protocol '<other>'.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3061(3061, "Request for memeber '<var>' in something not a record or protocol type.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3062(3062, "Switch statement expects value of type int or protocol tag.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3063(3063, "Nested switch statememtns on the same protocol type is not allowed.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3064(3064, "Fall-through cases in protocol switch statement not allowed.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3065(3065, "Default case not allowed in protocol switch.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3066(3066, "Switch label must be of integer type.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3067(3067, "Switch label must be a protocol case name.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3069(3069, "Fall-through cases in protocol switch statement not allowed.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3070(3070, "Non-boolean Expression found as test in ternary expression.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3071(3071, "Both branches of a ternary expression must be of assignment compatible types.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3072(3072, "Both branches of a ternary expression must be of assignment compatible types.", ErrorType.ERROR),
-    TYPE_RESOLUTION_3073(3073, "Unknown field reference '<var>' in protocol tag '<other>' in protocol '<other>'.", ErrorType.ERROR),
+    TOP_LEVEL_DECLS_200(200, ErrorType.ERROR),
+    TOP_LEVEL_DECLS_201(201, ErrorType.ERROR),
+    TOP_LEVEL_DECLS_202(202, ErrorType.ERROR),
+    TOP_LEVEL_DECLS_203(203, ErrorType.ERROR),
+    TOP_LEVEL_DECLS_204(204, ErrorType.ERROR),
+    TOP_LEVEL_DECLS_205(205, ErrorType.ERROR),
+    TOP_LEVEL_DECLS_206(206, ErrorType.ERROR),
+    TOP_LEVEL_DECLS_207(207, ErrorType.ERROR),
     
     // -----------------------------------------------------------------------------
-    // NAME RESOLUTION - 2202
+    // RESOLVE NAMED TYPES (300-399)
     
-    NAME_RESOLUTION_2202(2202, "'<var>' already declared in this scope.", ErrorType.ERROR),
-    NAME_RESOLUTION_2203(2203, "Symbol '<var>' not found.", ErrorType.ERROR),
-    NAME_RESOLUTION_2206(2206, "'<var>' already declared in this scope.", ErrorType.ERROR),
-    NAME_RESOLUTION_2207(2207, "Procedure '<var>' not found.", ErrorType.ERROR),
-    NAME_RESOLUTION_2208(2208, "Cannot invoke non-procedure '<var>'.", ErrorType.ERROR),
-    NAME_RESOLUTION_2210(2210, "Symbol '<var>' not found.", ErrorType.ERROR),
-    NAME_RESOLUTION_2211(2211, "Symbol '<var>' not found.", ErrorType.ERROR),
+    // TODO
     
     // -----------------------------------------------------------------------------
-    // REACHABILITY - 5000
+    // RESOLVE NAMED TYPES (300-399)
     
-    REACHABILITY_5000(5000, "Else-part of if-statement unreachable.", ErrorType.ERROR),
-    REACHABILITY_5001(5001, "Then-part of if-statement unreachable.", ErrorType.ERROR),
-    REACHABILITY_5002(5002, "While-statement is an infinite loop.", ErrorType.ERROR),
-    REACHABILITY_5003(5003, "Unreachable code following statement beginning on line '<var>'.", ErrorType.ERROR),
-    REACHABILITY_5004(5004, "Body of for-statement unreachable.", ErrorType.ERROR),
-    REACHABILITY_5005(5005, "For-statement is an infinite loop.", ErrorType.ERROR),
-    REACHABILITY_5006(5006, "Break statement outside loop or switch construct.", ErrorType.ERROR),
-    REACHABILITY_5008(5008, "Return-statement inside par-block is not legal.", ErrorType.ERROR),
-    REACHABILITY_5009(5009, "Break-statement inside par-block is not legal.", ErrorType.ERROR),
-    REACHABILITY_5011(5011, "Do-statement is an infinite loop.", ErrorType.ERROR),
-    REACHABILITY_5012(5012, "Body of while-statement unreachable.", ErrorType.ERROR),
-    REACHABILITY_5013(5013, "Continue-statement inside par-block is not legal.", ErrorType.ERROR),
-    REACHABILITY_5014(5014, "Continue statement outside loop construct.", ErrorType.ERROR),
+    NAME_CHECKER_400(400, ErrorType.ERROR),
+    NAME_CHECKER_401(401, ErrorType.ERROR),
+    NAME_CHECKER_402(402, ErrorType.ERROR),
+    NAME_CHECKER_403(403, ErrorType.ERROR),
+    NAME_CHECKER_404(404, ErrorType.ERROR),
+    NAME_CHECKER_405(405, ErrorType.ERROR),
+    NAME_CHECKER_406(406, ErrorType.ERROR),
+    NAME_CHECKER_407(407, ErrorType.ERROR),
     
     // -----------------------------------------------------------------------------
-    // PARALLEL USAGE CHECKING - 5100
+    // ARRAY TYPE CONSTRUCTOR (500-599)
     
-    PARALLEL_USAGE_CHECKING_5100(5100, "Parallel read and write access to record memeber '<var>' illegal.", ErrorType.ERROR),
-    PARALLEL_USAGE_CHECKING_5101(5101, "Parallel read and write access to array member '<var>' illegal.", ErrorType.ERROR),
-    PARALLEL_USAGE_CHECKING_5102(5102, "Parallel usage checking is not fully implemented for array access.", ErrorType.ERROR),
-    PARALLEL_USAGE_CHECKING_5103(5103, "Parallel write access to variable '<var>' illegal.", ErrorType.ERROR),
-    PARALLEL_USAGE_CHECKING_5104(5104, "Parallel write access to record member '<var>' illegal.", ErrorType.ERROR),
-    PARALLEL_USAGE_CHECKING_5105(5105, "Parallel write access to array memeber '<var>' illegal.", ErrorType.ERROR),
-    PARALLEL_USAGE_CHECKING_5106(5106, "Parallel usage checking is not fully implemented for array access.", ErrorType.ERROR),
-    PARALLEL_USAGE_CHECKING_5107(5107, "Parallel read and write access to variable '<var>' illegal.", ErrorType.ERROR),
-    PARALLEL_USAGE_CHECKING_5108(5108, "Parallel write access to variable '<var>' illegal.", ErrorType.ERROR),
-    PARALLEL_USAGE_CHECKING_5109(5019, "Parallel write access to record member '<var>' illegal.", ErrorType.ERROR),
-    PARALLEL_USAGE_CHECKING_5110(5110, "Parallel write access to array memeber '<var>' illegal.", ErrorType.ERROR),
-    PARALLEL_USAGE_CHECKING_5111(5111, "Parallel usage checking is not fully implemented for array access.", ErrorType.ERROR),
-    PARALLEL_USAGE_CHECKING_5112(5112, "Parallel write access to variable '<var>' illegal.", ErrorType.ERROR),
-    PARALLEL_USAGE_CHECKING_5113(5113, "Parallel write access to record member '<var>' illegal.", ErrorType.ERROR),
-    PARALLEL_USAGE_CHECKING_5114(5114, "Parallel write access to array member '<var>' illegal.", ErrorType.ERROR),
-    PARALLEL_USAGE_CHECKING_5115(5115, "Parallel usage checking is not fully implemented for array access.", ErrorType.ERROR);
+    ARRAY_TYPE_CONSTRUCTOR_500(500, ErrorType.ERROR),
+    ARRAY_TYPE_CONSTRUCTOR_501(501, ErrorType.ERROR),
+    ARRAY_TYPE_CONSTRUCTOR_502(502, ErrorType.ERROR),
+    ARRAY_TYPE_CONSTRUCTOR_503(503, ErrorType.ERROR),
+    ARRAY_TYPE_CONSTRUCTOR_504(504, ErrorType.ERROR),
+    
+    // -----------------------------------------------------------------------------
+    // TYPE RESOLUTION (600-699)
+    
+    TYPE_RESOLUTION_600(600, ErrorType.ERROR),
+    TYPE_RESOLUTION_601(601, ErrorType.ERROR),
+    TYPE_RESOLUTION_602(602, ErrorType.ERROR),
+    TYPE_RESOLUTION_603(603, ErrorType.ERROR),
+    TYPE_RESOLUTION_604(604, ErrorType.ERROR),
+    TYPE_RESOLUTION_605(605, ErrorType.ERROR),
+    TYPE_RESOLUTION_606(606, ErrorType.ERROR),
+    TYPE_RESOLUTION_607(607, ErrorType.ERROR),
+    TYPE_RESOLUTION_608(608, ErrorType.ERROR),
+    TYPE_RESOLUTION_609(609, ErrorType.ERROR),
+    TYPE_RESOLUTION_610(610, ErrorType.ERROR),
+    TYPE_RESOLUTION_611(611, ErrorType.ERROR),
+    TYPE_RESOLUTION_612(612, ErrorType.ERROR),
+    TYPE_RESOLUTION_613(613, ErrorType.ERROR),
+    TYPE_RESOLUTION_614(614, ErrorType.ERROR),
+    TYPE_RESOLUTION_615(615, ErrorType.ERROR),
+    TYPE_RESOLUTION_616(616, ErrorType.ERROR),
+    TYPE_RESOLUTION_617(617, ErrorType.ERROR),
+    TYPE_RESOLUTION_618(618, ErrorType.ERROR),
+    TYPE_RESOLUTION_619(619, ErrorType.ERROR),
+    TYPE_RESOLUTION_620(620, ErrorType.ERROR),
+    TYPE_RESOLUTION_621(621, ErrorType.ERROR),
+    TYPE_RESOLUTION_622(622, ErrorType.ERROR),
+    TYPE_RESOLUTION_623(623, ErrorType.ERROR),
+    TYPE_RESOLUTION_624(624, ErrorType.ERROR),
+    TYPE_RESOLUTION_625(625, ErrorType.ERROR),
+    TYPE_RESOLUTION_626(626, ErrorType.ERROR),
+    TYPE_RESOLUTION_627(627, ErrorType.ERROR),
+    TYPE_RESOLUTION_628(628, ErrorType.ERROR),
+    TYPE_RESOLUTION_629(629, ErrorType.ERROR),
+    TYPE_RESOLUTION_630(630, ErrorType.ERROR),
+    TYPE_RESOLUTION_631(631, ErrorType.ERROR),
+    TYPE_RESOLUTION_632(632, ErrorType.ERROR),
+    TYPE_RESOLUTION_633(633, ErrorType.ERROR),
+    TYPE_RESOLUTION_634(634, ErrorType.ERROR),
+    TYPE_RESOLUTION_635(635, ErrorType.ERROR),
+    TYPE_RESOLUTION_636(636, ErrorType.ERROR),
+    TYPE_RESOLUTION_637(637, ErrorType.ERROR),
+    TYPE_RESOLUTION_638(638, ErrorType.ERROR),
+    TYPE_RESOLUTION_639(639, ErrorType.ERROR),
+    TYPE_RESOLUTION_640(640, ErrorType.ERROR),
+    TYPE_RESOLUTION_641(641, ErrorType.ERROR),
+    TYPE_RESOLUTION_642(642, ErrorType.ERROR),
+    TYPE_RESOLUTION_643(643, ErrorType.ERROR),
+    TYPE_RESOLUTION_644(644, ErrorType.ERROR),
+    TYPE_RESOLUTION_645(645, ErrorType.ERROR),
+    TYPE_RESOLUTION_646(646, ErrorType.ERROR),
+    TYPE_RESOLUTION_647(647, ErrorType.ERROR),
+    TYPE_RESOLUTION_648(648, ErrorType.ERROR),
+    TYPE_RESOLUTION_649(649, ErrorType.ERROR),
+    TYPE_RESOLUTION_650(650, ErrorType.ERROR),
+    TYPE_RESOLUTION_651(651, ErrorType.ERROR),
+    TYPE_RESOLUTION_652(652, ErrorType.ERROR),
+    TYPE_RESOLUTION_653(653, ErrorType.ERROR),
+    TYPE_RESOLUTION_654(654, ErrorType.ERROR),
+    
+    // -----------------------------------------------------------------------------
+    // PARALLEL USAGE CHECKING (700-799)
+    
+    PARALLEL_USAGE_CHECKING_700(700, ErrorType.ERROR),
+    PARALLEL_USAGE_CHECKING_701(701, ErrorType.ERROR),
+    PARALLEL_USAGE_CHECKING_702(702, ErrorType.ERROR),
+    PARALLEL_USAGE_CHECKING_703(703, ErrorType.ERROR),
+    PARALLEL_USAGE_CHECKING_704(704, ErrorType.ERROR),
+    PARALLEL_USAGE_CHECKING_705(705, ErrorType.ERROR),
+    PARALLEL_USAGE_CHECKING_706(706, ErrorType.ERROR),
+    PARALLEL_USAGE_CHECKING_707(707, ErrorType.ERROR),
+    PARALLEL_USAGE_CHECKING_708(708, ErrorType.ERROR),
+    PARALLEL_USAGE_CHECKING_709(709, ErrorType.ERROR),
+    PARALLEL_USAGE_CHECKING_710(710, ErrorType.ERROR),
+    PARALLEL_USAGE_CHECKING_711(711, ErrorType.ERROR),
+    PARALLEL_USAGE_CHECKING_712(712, ErrorType.ERROR),
+    PARALLEL_USAGE_CHECKING_713(713, ErrorType.ERROR),
+    PARALLEL_USAGE_CHECKING_714(714, ErrorType.ERROR),
+    PARALLEL_USAGE_CHECKING_715(715, ErrorType.ERROR)
+    ;
     
     /**
      * The error number.
@@ -149,18 +149,12 @@ public enum ErrorMessage {
     private final int number;
     
     /**
-     * A brief description of the message.
-     */
-    private final String text;
-    
-    /**
      * The severity level of the error message.
      */
     private ErrorType type;
     
-    private ErrorMessage(int number, String text, ErrorType type) {
+    private ErrorMessage(int number, ErrorType type) {
         this.number = number;
-        this.text = text;
         this.type = type;
     }
     
@@ -168,11 +162,19 @@ public enum ErrorMessage {
         return number;
     }
     
-    public String getText() {
-        return text;
-    }
-    
     public ErrorType getErrorType() {
         return type;
+    }
+    
+    public String format(Object... objects) {
+        // TODO: Make propsFile static
+        Properties property = new Properties();
+        try {
+            FileInputStream propsFile = new FileInputStream("resources/properties/Messages.properties");
+            property.load(propsFile);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return MessageFormat.format(property.getProperty(name()), objects);
     }
 }

@@ -1,8 +1,8 @@
 package utilities;
 
 /**
- * The class {@link Pair} represents a pair of two elements of the same or
- * different data type.
+ * The class {@link Pair} represents a pair of two elements of the
+ * same or different data type.
  *
  * @see Tuple
  * @param <K>

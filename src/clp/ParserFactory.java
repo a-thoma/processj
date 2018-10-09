@@ -65,11 +65,12 @@ public enum ParserFactory {
     }
     
     /**
-     * Returns the class associated with class {@code type}.
+     * Returns the class associated with class {@code type}, or {@code null}
+     * if the given {@code type} does not map to any hander type.
      * 
      * @param type
      *          A class type that maps to a {@link OptionParser}.
-     * @return An {@OptionParser}.
+     * @return An {@OptionParser} or {@code null} if none was found.
      */
     @SuppressWarnings("rawtypes")
     public Class<? extends OptionParser> inferHandlerType(Class<?> type) {
@@ -81,7 +82,7 @@ public enum ParserFactory {
 
     /**
      * Gets the {@link OptionParser} instance associated with the {@code classType}
-     * type that belongs to option {@code optionName}.
+     * that belongs to option {@code optionName}.
      *
      * @param classType
      *            The value type which maps to an {@link OptionParser}.
@@ -97,12 +98,11 @@ public enum ParserFactory {
     }
 
     /**
-     * Registers an instance of type {@link OptionParser} associated with the given
+     * Registers an instance of type {@link OptionParser} associated with
      * {@code classType.}
      *
      * @throws IllegalArgumentException
-     *             When the {@code converter} is not a subtype of
-     *             {@link OptionParser}.
+     *             When the {@code converter} is not a subtype of {@link OptionParser}.
      * @param classType
      *            The value type which maps to an {@link OptionParser} instance.
      * @param converter
@@ -121,7 +121,7 @@ public enum ParserFactory {
 
     /**
      * The class {@link ParameterConverter} is used to search for and
-     * invoke the constructor defined in a class that implements
+     * invoke a constructor defined in a class that implements
      * {@link IOptionParser} and extends {@link OptionParser}. After
      * the constructor is found, it is invoked to create and return
      * an instance of {@link OptionParser}. An {@link Exception} is
@@ -180,7 +180,7 @@ public enum ParserFactory {
         }
         
         /**
-         * Returns the class that declares the constructor.
+         * Returns the class in which the constructor is defined.
          * 
          * @return The class type that the constructor belongs to.
          */

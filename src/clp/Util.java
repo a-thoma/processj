@@ -164,7 +164,7 @@ public final class Util {
      * Returns a string representing the location of the JVM version running on
      * an environment.
      * 
-     * @return A {@code String} containing information of the JVM.
+     * @return A {@code String} containing the location of the JVM.
      */
     public static String getCurrentJVM() {
         return System.getProperty("java.home") + File.separator + "bin" + File.separator
@@ -179,7 +179,7 @@ public final class Util {
      *          The source string.
      * @param target
      *          The destination string.
-     * @return The distance between between {@code src} and {@code target}.
+     * @return The distance between {@code src} and {@code target}.
      */
     public static int distance(String src, String target) {
         int dist[][];
@@ -232,6 +232,7 @@ public final class Util {
                 dist[i][j] = min;
             }
         }
+        
         return dist[n][m];
     }
 }

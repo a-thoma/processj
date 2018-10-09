@@ -5,9 +5,9 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * The enum {@link Tag} represents and identifies various types such as
- * procedures, methods, parameters, local variables, protocols, records,
- * channels, etc.
+ * The enum {@link Tag} represents and identifies various types such
+ * as procedures, methods, parameters, local variables, protocols,
+ * records, channels, etc.
  *
  * @author Ben Cisneros
  * @version 06/15/2018
@@ -27,7 +27,8 @@ public enum Tag {
     RECORD_NAME         ("_rec$", "recordType"),
     CHANNEL_NAME        ("_chan$", "channelType"),
     CHANNEL_READ_NAME   ("READ", "channelReadType"),
-    CHANNEL_WRITE_NAME  ("WRITE", "channelWriteType");
+    CHANNEL_WRITE_NAME  ("WRITE", "channelWriteType")
+    ;
 
     private final String tag;
     private final String label;

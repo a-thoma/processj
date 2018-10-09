@@ -77,7 +77,7 @@ import ast.WhileStat;
  */
 public abstract class Visitor<T extends Object> {
 
-    // The 'debug' field should be set in the constructor of the
+    // The `debug' field should be set in the constructor of the
     // extending class.
     protected boolean debug;
 
