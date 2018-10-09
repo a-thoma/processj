@@ -13,7 +13,8 @@ public enum Language {
     JVM     ("JVM"),
     C       ("C"),
     CPLUS   ("C++"),
-    JS      ("JS");
+    JS      ("JS")
+    ;
     
     private final String language;
     

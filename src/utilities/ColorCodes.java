@@ -47,7 +47,8 @@ public class ColorCodes {
         MAGENTA     ("35"),
         CYAN        ("36"),
         WHITE       ("37"),
-        NONE        ("");
+        NONE        ("")
+        ;
         
         private final String code;
         
@@ -77,7 +78,8 @@ public class ColorCodes {
         MAGENTA     ("45"),
         CYAN        ("46"),
         WHITE       ("47"),
-        NONE        ("");
+        NONE        ("")
+        ;
         
         private final String code;
         
@@ -105,7 +107,8 @@ public class ColorCodes {
         DARK        ("2"),
         UNDERLINE   ("4"),
         HIDDEN      ("8"),
-        NONE        ("");
+        NONE        ("")
+        ;
         
         private final String code;
         

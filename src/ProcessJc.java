@@ -59,7 +59,7 @@ public class ProcessJc {
     public static void main(String[] args) {        
         if (args.length == 0) {
 //            System.out.println("[" + ANSI_UNDERLINE + "INFO" + ANSI_RESET + "] pjc: " + ANSI_RED + "error: " + ANSI_RESET + "no input file(s)");
-            System.out.println("-> " + ErrorMessage.NAME_CHECKER_2101.format("Blah!!"));
+            System.out.println("-> " + ErrorMessage.RESOLVE_IMPORTS_100.format("Blah!!"));
             System.exit(1);
         }
         

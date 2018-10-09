@@ -27,7 +27,8 @@ public enum Tag {
     RECORD_NAME         ("_rec$", "recordType"),
     CHANNEL_NAME        ("_chan$", "channelType"),
     CHANNEL_READ_NAME   ("READ", "channelReadType"),
-    CHANNEL_WRITE_NAME  ("WRITE", "channelWriteType");
+    CHANNEL_WRITE_NAME  ("WRITE", "channelWriteType")
+    ;
 
     private final String tag;
     private final String label;

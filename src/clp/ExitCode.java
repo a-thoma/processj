@@ -12,7 +12,8 @@ public enum ExitCode {
     OK                  ("OK"),
     COMPILATION_ERROR   ("Compilation Error"),
     INTERNAL_ERROR      ("Internal Error"),
-    EXECUTION_ERROR     ("Execution Error");
+    EXECUTION_ERROR     ("Execution Error")
+    ;
     
     private final String code;
     

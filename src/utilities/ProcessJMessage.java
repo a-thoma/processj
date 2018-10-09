@@ -36,6 +36,9 @@ public class ProcessJMessage {
     }
     
     // TODO: Finish building error message
+    public ST getMessage() {
+        return null;
+    }
     
     @Override
     public String toString() {

@@ -185,7 +185,7 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
                 // It was not a local directory, but see if it is a library directory
                 fileName = new File(utilities.Settings.includeDir)
                         .getAbsolutePath() + "/" + utilities.Settings.targetLanguage + "/" + path;
-        Log.log("visitImport(): Not a local, so try a library: " + fileName);
+                Log.log("visitImport(): Not a local, so try a library: " + fileName);
                 if (new File(fileName).isDirectory()) {
                     // Yes, it was, so add it's content to the fileList
                     makeFileList(fileList, fileName);

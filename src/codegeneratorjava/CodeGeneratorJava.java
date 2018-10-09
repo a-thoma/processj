@@ -56,7 +56,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
     /**
      * String template file locator.
      */
-    private final String stGammarFile_ = "stringtemplates/grammarTemplatesJava.stg";
+    private final String stGammarFile_ = "stringtemplates/java/grammarTemplatesJava.stg";
     
     /**
      * Current java version.
