@@ -1,6 +1,7 @@
 package clp;
 
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.stream.Collectors;
 
 /**
@@ -37,6 +38,57 @@ public final class OptionValue extends OptionWithValues {
     
     public String[] getNames() {
         return names;
+    }
+    
+    public String getOptionHelp(int indent, int width) {
+        int defaultLength = FormatterHelp.DEFAULT_LENGTH;
+        defaultLength += help.length();
+        StringBuffer stringBuffer = new StringBuffer(defaultLength);
+        stringBuffer.append(" ");
+        
+        Iterator<String> itNames = Arrays.asList(names).iterator();
+        while (itNames.hasNext()) {
+            stringBuffer.append(itNames.next());
+            if (itNames.hasNext())
+                stringBuffer.append(",");
+        }
+        
+        if (metavar.isEmpty())
+            stringBuffer.append(" ");
+        else if (!split.isEmpty())
+            stringBuffer.append("=").append(metavar);
+        else
+            stringBuffer.append(" ").append(metavar);
+        
+        while (indent > stringBuffer.length() + 2)
+            stringBuffer.append(" ");
+        stringBuffer.append(" ");
+        
+        int descriptionPos = 0;
+        int charLeft = width - stringBuffer.length();
+        for (int line = 0; descriptionPos < help.length(); ++line) {
+            int end = descriptionPos + charLeft;
+            if (end > help.length())
+                end = help.length();
+            else {
+                if (help.charAt(end) == ' ')
+                    ;
+                else if (help.lastIndexOf(' ', end) > descriptionPos)
+                    end = help.lastIndexOf(' ', end);
+                else if (help.indexOf(' ', end) != -1)
+                    end = help.lastIndexOf(' ', end);
+                else
+                    end = help.length();
+            }
+            
+            if (line != 0)
+                stringBuffer.append("\n          ");
+            stringBuffer.append(help.substring(descriptionPos, end).trim());
+            descriptionPos = end + 1;
+            charLeft = width - 10;
+        }
+        
+        return stringBuffer.toString();
     }
     
     @Override

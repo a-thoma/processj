@@ -3,6 +3,7 @@ import java.util.*;
 
 import ast.AST;
 import ast.Compilation;
+import clp.FormatterHelp;
 import clp.OptionBuilder;
 import codegeneratorjava.CodeGeneratorJava;
 import library.Library;
@@ -59,8 +60,8 @@ public class ProcessJc {
     public static void main(String[] args) {        
         if (args.length == 0) {
 //            System.out.println("[" + ANSI_UNDERLINE + "INFO" + ANSI_RESET + "] pjc: " + ANSI_RED + "error: " + ANSI_RESET + "no input file(s)");
-            System.out.println("-> " + ErrorMessage.RESOLVE_IMPORTS_100.format("Blah!!"));
-            System.exit(1);
+//            System.out.println("-> " + ErrorMessage.RESOLVE_IMPORTS_100.format("Blah!!"));
+//            System.exit(1);
         }
         
         AST root = null;
@@ -85,6 +86,14 @@ public class ProcessJc {
         boolean sts = pjMain.sts;
         boolean visitorAll = pjMain.visitorAll;
         List<File> files = pjMain.files;
+        boolean help = pjMain.help;
+        
+        if (help) {
+            FormatterHelp formatHelp = new FormatterHelp();
+            formatHelp.setSorted(true);
+            System.out.println(formatHelp.usagePage(optionBuilder));
+            System.exit(1);
+        }
         
         if (files == null || files.isEmpty()) {
             // At least one file must be provided otherwise throw an error

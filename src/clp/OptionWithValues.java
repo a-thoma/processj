@@ -11,7 +11,7 @@ import java.lang.reflect.Field;
  * @version 08/20/2018
  * @since 1.2
  */
-public class OptionWithValues {
+public abstract class OptionWithValues {
     
     /**
      * The descriptive text messaged used in the help information.
@@ -135,17 +135,19 @@ public class OptionWithValues {
         return parsers;
     }
     
-    public Object getValue() {
+    public final Object getValue() {
         return value;
     }
     
-    public Field getField() {
+    public final Field getField() {
         return field;
     }
     
-    public ArityRange getArity() {
+    public final ArityRange getArity() {
         return arity;
     }
+    
+    public abstract String getOptionHelp(int indent, int width);
     
     /**
      * The class {@link Builder} uses descriptive methods to create options

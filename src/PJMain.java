@@ -37,7 +37,7 @@ public class PJMain extends OptionParameters {
             metavar = "<DIR>",
             defaultValue = "/Users/Ben/Desktop/processj/include", // default include for testing!
             help = "Override the default include directory which is set to be the Include "
-                    + "subdirectory of the ProcessJ directory.")
+                    + "subdirectory of the ProcessJ directory")
     public String include;
     
     @Option(names = {"-t", "-target"},
@@ -46,7 +46,7 @@ public class PJMain extends OptionParameters {
             help = "Specify the target language. C: C source code is written, compiled, "
                     + "and linked with the CSSP runtime; C++: C++ source code is generated "
                     + "and compiled into an executable; JVM: JVM class files are written; "
-                    + "JS: JavaScript is written.")
+                    + "JS: JavaScript is written")
     public Language target;
     
     @Option(names = {"-v", "-version"},
@@ -87,7 +87,15 @@ public class PJMain extends OptionParameters {
                     + "symbol tables")
     public boolean topDeclsVisitor;
     
+    // TODO: Change type to Enum instead!
+    @Option(names = "-error-message",
+            help = "..",
+            metavar = "<number>",
+            split = "=")
+    public String error_message;
+    
     @Argument(metavar = "<FILE>",
+              help = "The file (or files) to compile",
               order = "0..*")
     public List<File> files;
     

@@ -74,9 +74,9 @@ public enum ParserFactory {
      */
     @SuppressWarnings("rawtypes")
     public Class<? extends OptionParser> inferHandlerType(Class<?> type) {
-        if (parserMap.get(type) != null) {
+        if (parserMap.get(type) != null)
             return parserMap.get(type).getType();
-        }
+        
         return null;
     }
 
@@ -91,9 +91,9 @@ public enum ParserFactory {
      * @return An {@link OptionParser} instance or {@code null} if none is found.
      */
     public OptionParser<?> getParserTypeForClassType(Class<?> classType, String optionName) {
-        if (parserMap.get(classType) == null) {
+        if (parserMap.get(classType) == null)
             return null;
-        }
+        
         return parserMap.get(classType).getOptionParser(optionName);
     }
 

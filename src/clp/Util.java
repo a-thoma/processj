@@ -45,9 +45,8 @@ public final class Util {
                 return true;
             } else {
                 for (Object o : objects) {
-                    if (o == null) {
+                    if (o == null)
                         return true;
-                    }
                 }
             }
         }
@@ -95,12 +94,11 @@ public final class Util {
      * @return An instance of a {@link Collection}.
      */
     public static Collection<Object> createCollectionInstance(Class<?> type) {
-        if (List.class.isAssignableFrom(type)) {
+        if (List.class.isAssignableFrom(type))
             return new ArrayList<>();
-        } else {
+        else
             throw new RuntimeException(String.format("Invalid or unknown Collection type \"%s\" "
                         + "found.", getTypeName(type)));
-        }
     }
     
     /**
@@ -115,9 +113,8 @@ public final class Util {
      */
     public static <T> T find(List<?> objects, Class<T> type) {
         for (Object obj : objects) {
-            if (type.isInstance(obj)) {
+            if (type.isInstance(obj))
                 return type.cast(obj);
-            }
         }
         return null;
     }
@@ -172,7 +169,8 @@ public final class Util {
     }
     
     /**
-     * Find the Levenshtein distance between two Strings.
+     * Find the Levenshtein distance between two Strings (Naive approach).
+     * TODO: change this to vector space model! 
      * 
      * @see <a href="https://en.wikipedia.org/wiki/Levenshtein_distance">https://en.wikipedia.org/wiki/Levenshtein_distance</a>
      * @param src
@@ -190,44 +188,36 @@ public final class Util {
         n = src.length();
         m = target.length();
         
-        if (n == 0) {
+        if (n == 0)
             return m;
-        }
-        
-        if (m == 0) {
+        if (m == 0)
             return n;
-        }
         
         dist = new int[n + 1][m + 1];
         
-        for (int i = 0; i <= n; ++i) {
+        for (int i = 0; i <= n; ++i)
             dist[i][0] = i;
-        }
         
-        for (int j = 0; j <= m; ++j) {
+        for (int j = 0; j <= m; ++j)
             dist[0][j] = j;
-        }
         
         for (int i = 1; i <= n; ++i) {
             char srcChar = src.charAt(i - 1);
             for (int j = 1; j <= m; ++j) {
                 char targetChar = target.charAt(j - 1);
                 
-                if (srcChar == targetChar) {
+                if (srcChar == targetChar)
                     cost = 0;
-                } else {
+                else
                     cost = 1;
-                }
                 
                 // Get minimum
                 int min = dist[i - 1][j] + 1;
-                if (min > dist[i][j - 1] + 1) {
+                if (min > dist[i][j - 1] + 1)
                     min = dist[i][j - 1] + 1;
-                }
                 
-                if (min > dist[i - 1][j - 1] + cost) {
+                if (min > dist[i - 1][j - 1] + cost)
                     min = dist[i - 1][j - 1] + cost;
-                }
                 
                 dist[i][j] = min;
             }
