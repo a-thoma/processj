@@ -120,7 +120,7 @@ public class PJMain extends OptionParameters {
     
     // TODO: Change type to Enum instead!
     @Option(names = "-error-message",
-            help = "..",
+            help = "What error code information do you want?",
             metavar = "<number>",
             split = "=")
     public String error_message;

@@ -1,6 +1,8 @@
 package clp;
 
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -54,28 +56,22 @@ public final class PositionalValue extends OptionWithValues {
             stringBuilder.append(" ");
         stringBuilder.append(" ");
         
-        int descriptionPos = 0;
         int charLeft = width - stringBuilder.length();
-        for (int line = 0; descriptionPos < help.length(); ++line) {
-            int end = descriptionPos + charLeft;
-            if (end > help.length())
-                end = help.length();
-            else {
-                if (help.charAt(end) == ' ')
-                    ;
-                else if (help.lastIndexOf(' ', end) > descriptionPos)
-                    end = help.lastIndexOf(' ', end);
-                else if (help.indexOf(' ', end) != -1)
-                    end = help.lastIndexOf(' ', end);
-                else
-                    end = help.length();
+        if (help.length() <= charLeft)
+            return stringBuilder.append(help).toString();
+        
+        List<String> words = Arrays.asList(help.split(" "));
+        int charCount = 0;
+        for (Iterator<String> it = words.iterator(); it.hasNext(); ) {
+            String word = it.next();
+            charCount += word.length() + 1;
+            if (charCount > charLeft) {
+                stringBuilder.append("\n").append(StringUtil.countSpaces(indent - 1));
+                charCount = word.length() + 1;
             }
-            
-            if (line != 0)
-                stringBuilder.append("\n          ");
-            stringBuilder.append(help.substring(descriptionPos, end).trim());
-            descriptionPos = end + 1;
-            charLeft = width - 10;
+            stringBuilder.append(word);
+            if (it.hasNext())
+                stringBuilder.append(" ");
         }
         
         return stringBuilder.toString();
