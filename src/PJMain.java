@@ -119,7 +119,7 @@ public class PJMain extends OptionParameters {
     public boolean topDeclsVisitor;
     
     // TODO: Change type to Enum instead!
-    @Option(names = "-error-message",
+    @Option(names = "-error-code",
             help = "What error code information do you want?",
             metavar = "<number>",
             split = "=")
