@@ -2,9 +2,7 @@
 
 A new programming language being developed at the University of Nevada, Las Vegas.
 
-### Author
-Matt Pedersen
-Benjamin Cisneros
+### ProcessJ: Usage Help Message
 
 ```bash
 $ pjc -help
@@ -42,6 +40,7 @@ Usage: [-array-visitor] [-g | -debug] [-error-message=<number>] [-h | -help]
 [-import-visitor] [-I | -include <DIR>] [-name-checker-visitor]
 [-package-type-visitor] [-sts] [-t | -target <LANGUAGE>] [-top-decls-visitor]
 [-V | -verbose] [-v | -version] [-visitor-all] <FILE>
+
 Parameters: 
   <FILE>                  The file (or files) to compile
 
