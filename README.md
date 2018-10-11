@@ -5,3 +5,9 @@ A new programming language being developed at the University of Nevada, Las Vega
 ### Author
 Matt Pedersen
 Benjamin Cisneros
+
+```bash
+$ java Example -v inputFile1 inputFile2
+
+2 files to process...
+```
