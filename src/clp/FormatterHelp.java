@@ -130,7 +130,6 @@ public class FormatterHelp {
     public String buildUsage(OptionBuilder optionBuilder) {
         StringBuilder stringBuilder = new StringBuilder();
         
-        stringBuilder.append(USAGE_PREFIX);
         Map<Class<? extends OptionParameters>, OptionGroup> commandAndOptions = optionBuilder.getCommandAndOptionMap();
         boolean additionalCommands = commandAndOptions.size() > 1;
         
@@ -194,20 +193,21 @@ public class FormatterHelp {
     }
     
     public String formatUsage(String usage) {
-        int count = 0;
-        int pos = 0;
-        StringBuilder stringBuilder = new StringBuilder();
-        
-        for (int i = 0; i < usage.length(); ++i) {
-            if (count == DEFAULT_WIDTH - 1) {
-                pos = stringBuilder.toString().lastIndexOf(" ");
-                stringBuilder.delete(pos, stringBuilder.length());
-                stringBuilder.append("\n");
-                i = pos + 1;
-                count = 0;
+        StringBuilder stringBuilder = new StringBuilder();        
+        List<String> words = Arrays.asList(usage.split(" "));
+        int charLeft = DEFAULT_WIDTH - USAGE_PREFIX.length();
+        int charCount = 0;
+        stringBuilder.append(USAGE_PREFIX);
+        for (Iterator<String> it = words.iterator(); it.hasNext(); ) {
+            String word = it.next();
+            charCount += word.length() + 1;
+            if (charCount > charLeft) {
+                stringBuilder.append("\n").append(StringUtil.countSpaces(USAGE_PREFIX.length()));
+                charCount = word.length() + 1;
             }
-            stringBuilder.append(usage.charAt(i));
-            ++count;
+            stringBuilder.append(word);
+            if (it.hasNext())
+                stringBuilder.append(" ");
         }
         
         return stringBuilder.toString();
@@ -290,7 +290,7 @@ public class FormatterHelp {
         while (it.hasNext()) {
             stringBuilder.append(it.next());
             if (it.hasNext())
-                stringBuilder.append(" | ");
+                stringBuilder.append("|");
         }
         
         if (!optionValue.split.isEmpty())

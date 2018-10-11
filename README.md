@@ -38,13 +38,13 @@ $ pjc -help
 If called without options, the program may terminate. Use "-help" for a
 list of possible commands and options
 
-Usage: [-array-visitor] [-g | -debug] [-error-message=<number>] [-h | -help]
-[-import-visitor] [-I | -include <DIR>] [-name-checker-visitor]
-[-package-type-visitor] [-sts] [-t | -target <LANGUAGE>] [-top-decls-visitor]
-[-V | -verbose] [-v | -version] [-visitor-all] <FILE>
+Usage: [-array-visitor] [-g|-debug] [-error-code=<number>] [-h|-help] 
+       [-import-visitor] [-I|-include <DIR>] [-name-checker-visitor] 
+       [-package-type-visitor] [-sts] [-t|-target <LANGUAGE>] 
+       [-top-decls-visitor] [-V|-verbose] [-v|-version] [-visitor-all] <FILE>
 
 Parameters: 
-  <FILE>                  The file (or files) to compile
+  <FILE>                 The file (or files) to compile
 
 Options: 
  -array-visitor          Generate parse tree visitor only when converting array 
