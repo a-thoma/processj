@@ -37,6 +37,21 @@ public class FormatterHelp {
     }
     
     /**
+     * Returns the string with the longest sequence of characters.
+     * 
+     * @param list
+     *          An array of strings.
+     * @return A string with the largest length.
+     */
+    public int findMaxLength(String[] list) {
+        int max = 0;
+        for (String str : list)
+            if (str.length() > max)
+                max = str.length();
+        return max;
+    }
+    
+    /**
      * Builds a sentence.
      * 
      * @param stringBuilder
@@ -112,9 +127,8 @@ public class FormatterHelp {
             length += name.length();
             length += 1;
         }
-        
         length += option.getMetavar().length();
-        length += 3;    // Change this as required
+        length += 4;    // Magic (padding) number
         return length;
     }
     
@@ -169,15 +183,18 @@ public class FormatterHelp {
     public String formatHeader(OptionBuilder optionBuilder) {
         Parameters parameter = optionBuilder.getMainCommand().getAnnotation(Parameters.class);
         StringBuilder stringBuilder = new StringBuilder();
+        
+        int indent = findMaxLength(parameter.header());
+        indent = (DEFAULT_WIDTH - indent) / 2;
         for (String header : parameter.header())
-            stringBuilder.append(header)
+            stringBuilder.append(StringUtil.countSpaces(indent - 1))
+                         .append(header)
                          .append("\n");
         
         stringBuilder.append("\n");
-        for (String note : parameter.notes()) {
+        for (String note : parameter.notes())
             stringBuilder.append(note)
                          .append("\n");
-        }
         
         return stringBuilder.append("\n").toString();
     }

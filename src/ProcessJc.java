@@ -23,7 +23,7 @@ import utilities.SymbolTable;
  */
 public class ProcessJc {
     
-    private static final String HELP_ERROR_MSG = "Please use [-h | -help] for a list of possible commands";
+    private static final String HELP_ERROR_MSG = "What would you like me to do?";
     
     /**
      * Pretty prints AST-like structures.
@@ -73,7 +73,7 @@ public class ProcessJc {
                                 .addCommand(PJMain.class)
                                 .handlerArgs(args);
         } catch(Exception e) {
-            System.err.println(e.getMessage());
+            System.out.println(e.getMessage());
             helpError();
         }
         
@@ -89,7 +89,7 @@ public class ProcessJc {
         if (pjMain.help) {
             FormatterHelp formatHelp = new FormatterHelp();
             formatHelp.setSorted(true);
-            System.err.println(formatHelp.usagePage(optionBuilder));
+            System.out.println(formatHelp.usagePage(optionBuilder));
             System.exit(1);
         }
         
