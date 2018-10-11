@@ -2,6 +2,7 @@ package clp;
 
 import java.util.Arrays;
 import java.util.Iterator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -41,54 +42,46 @@ public final class OptionValue extends OptionWithValues {
     }
     
     public String getOptionHelp(int indent, int width) {
-        int defaultLength = FormatterHelp.DEFAULT_LENGTH;
-        defaultLength += help.length();
-        StringBuffer stringBuffer = new StringBuffer(defaultLength);
-        stringBuffer.append(" ");
+        StringBuilder stringBuilder = new StringBuilder(FormatterHelp.DEFAULT_LENGTH + help.length());
+        stringBuilder.append(" ");
         
         Iterator<String> itNames = Arrays.asList(names).iterator();
         while (itNames.hasNext()) {
-            stringBuffer.append(itNames.next());
+            stringBuilder.append(itNames.next());
             if (itNames.hasNext())
-                stringBuffer.append(",");
+                stringBuilder.append(",");
         }
         
         if (metavar.isEmpty())
-            stringBuffer.append(" ");
+            stringBuilder.append(" ");
         else if (!split.isEmpty())
-            stringBuffer.append("=").append(metavar);
+            stringBuilder.append("=").append(metavar);
         else
-            stringBuffer.append(" ").append(metavar);
+            stringBuilder.append(" ").append(metavar);
         
-        while (indent > stringBuffer.length() + 2)
-            stringBuffer.append(" ");
-        stringBuffer.append(" ");
+        while (indent > stringBuilder.length() + 2)
+            stringBuilder.append(" ");
+        stringBuilder.append(" ");
         
-        int descriptionPos = 0;
-        int charLeft = width - stringBuffer.length();
-        for (int line = 0; descriptionPos < help.length(); ++line) {
-            int end = descriptionPos + charLeft;
-            if (end > help.length())
-                end = help.length();
-            else {
-                if (help.charAt(end) == ' ')
-                    ;
-                else if (help.lastIndexOf(' ', end) > descriptionPos)
-                    end = help.lastIndexOf(' ', end);
-                else if (help.indexOf(' ', end) != -1)
-                    end = help.lastIndexOf(' ', end);
-                else
-                    end = help.length();
+        int charLeft = width - stringBuilder.length();
+        if (help.length() <= charLeft)
+            return stringBuilder.append(help).toString();
+        
+        List<String> words = Arrays.asList(help.split(" "));
+        int charCount = 0;
+        for (Iterator<String> it = words.iterator(); it.hasNext(); ) {
+            String word = it.next();
+            charCount += word.length() + 1;
+            if (charCount > charLeft) {
+                stringBuilder.append("\n").append(StringUtil.countSpaces(indent - 1));
+                charCount = word.length() + 1;
             }
-            
-            if (line != 0)
-                stringBuffer.append("\n          ");
-            stringBuffer.append(help.substring(descriptionPos, end).trim());
-            descriptionPos = end + 1;
-            charLeft = width - 10;
+            stringBuilder.append(word);
+            if (it.hasNext())
+                stringBuilder.append(" ");
         }
         
-        return stringBuffer.toString();
+        return stringBuilder.toString();
     }
     
     @Override

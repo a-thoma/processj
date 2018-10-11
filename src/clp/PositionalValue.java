@@ -42,20 +42,20 @@ public final class PositionalValue extends OptionWithValues {
     public String getOptionHelp(int indent, int width) {
         int defaultLength = FormatterHelp.DEFAULT_LENGTH;
         defaultLength += help.length();
-        StringBuffer stringBuffer = new StringBuffer(defaultLength);
-        stringBuffer.append(" ");
+        StringBuilder stringBuilder = new StringBuilder(defaultLength);
+        stringBuilder.append(" ");
         
         if (metavar.isEmpty())
-            stringBuffer.append(" ").append(fieldName);
+            stringBuilder.append(" ").append(fieldName);
         else
-            stringBuffer.append(" ").append(metavar);
+            stringBuilder.append(" ").append(metavar);
         
-        while (indent > stringBuffer.length() + 2)
-            stringBuffer.append(" ");
-        stringBuffer.append(" ");
+        while (indent > stringBuilder.length() + 2)
+            stringBuilder.append(" ");
+        stringBuilder.append(" ");
         
         int descriptionPos = 0;
-        int charLeft = width - stringBuffer.length();
+        int charLeft = width - stringBuilder.length();
         for (int line = 0; descriptionPos < help.length(); ++line) {
             int end = descriptionPos + charLeft;
             if (end > help.length())
@@ -72,13 +72,13 @@ public final class PositionalValue extends OptionWithValues {
             }
             
             if (line != 0)
-                stringBuffer.append("\n          ");
-            stringBuffer.append(help.substring(descriptionPos, end).trim());
+                stringBuilder.append("\n          ");
+            stringBuilder.append(help.substring(descriptionPos, end).trim());
             descriptionPos = end + 1;
             charLeft = width - 10;
         }
         
-        return stringBuffer.toString();
+        return stringBuilder.toString();
     }
     
     @Override

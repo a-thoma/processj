@@ -279,6 +279,10 @@ public class OptionBuilder {
         return options;
     }
     
+    public Class<? extends OptionParameters> getMainCommand() {
+        return mainCommand;
+    }
+    
     private void validateRequired() {
         List<String> optNames = new ArrayList<>();
         

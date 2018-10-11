@@ -23,9 +23,7 @@ import utilities.SymbolTable;
  */
 public class ProcessJc {
     
-    private static final String HELP_ERROR_MSG = "Usage: pjc [global options] [source files...] "
-            + "[command options].\nPlease use [-h|-help] for a list of possible commands or refer "
-            + " to\nthe documentation for command parameters and usage.";
+    private static final String HELP_ERROR_MSG = "Please use [-h | -help] for a list of possible commands";
     
     /**
      * Pretty prints AST-like structures.
@@ -61,7 +59,8 @@ public class ProcessJc {
         if (args.length == 0) {
 //            System.out.println("[" + ANSI_UNDERLINE + "INFO" + ANSI_RESET + "] pjc: " + ANSI_RED + "error: " + ANSI_RESET + "no input file(s)");
 //            System.out.println("-> " + ErrorMessage.RESOLVE_IMPORTS_100.format("Blah!!"));
-//            System.exit(1);
+            System.err.println(HELP_ERROR_MSG);
+            System.exit(1);
         }
         
         AST root = null;
@@ -86,13 +85,16 @@ public class ProcessJc {
         boolean sts = pjMain.sts;
         boolean visitorAll = pjMain.visitorAll;
         List<File> files = pjMain.files;
-        boolean help = pjMain.help;
         
-        if (help) {
+        if (pjMain.help) {
             FormatterHelp formatHelp = new FormatterHelp();
             formatHelp.setSorted(true);
-            System.out.println(formatHelp.usagePage(optionBuilder));
+            System.err.println(formatHelp.usagePage(optionBuilder));
             System.exit(1);
+        }
+        
+        if (pjMain.version) {
+            // TODO:
         }
         
         if (files == null || files.isEmpty()) {
