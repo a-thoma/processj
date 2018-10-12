@@ -147,6 +147,10 @@ public class OptionBuilder {
             index += 1;
             int j = 0;
             if (option.isSingleValue()) {
+                // Throw error if there are missing arguments
+                if (index >= args.length)
+                    throw new RuntimeException(String.format("@Option '%s' requires at least %d value.",
+                            option.getName(), arity.getFrom()));
                 // Consume single value
                 optGroup.addValue(option, args[index++]);
             } else {

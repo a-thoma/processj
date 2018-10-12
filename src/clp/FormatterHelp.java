@@ -152,9 +152,9 @@ public class FormatterHelp {
         commands.addAll(optionBuilder.getNamedAndCommandMap().keySet());
         if (sorted)
             Collections.sort(commands);
-        // For every command in the list
+        // For every option defined in a command
         for (String commandName : commands) {
-            // Grab the command and append it to the `stringBuilder'
+            // Grab the option and append it to its command
             Class<? extends OptionParameters> command = optionBuilder.getNamedAndCommandMap().get(commandName);
             if (additionalCommands)
                 stringBuilder.append("[")
@@ -170,14 +170,26 @@ public class FormatterHelp {
             for (Iterator<OptionValue> it = options.iterator(); it.hasNext();) {
                 stringBuilder.append(buildOption(it.next()));
                 if (it.hasNext())
-                    stringBuilder.append(" ");
+                    stringBuilder.append(DEFAULT_SEPARATOR);
             }
             if (additionalCommands)
-                stringBuilder.append("]");
+                stringBuilder.append("] ");
         }
-        
-        return formatUsage(stringBuilder.append(DEFAULT_SEPARATOR)
-                                        .append("<FILE>").toString());
+        stringBuilder.append(DEFAULT_SEPARATOR);
+        // For every argument defined in the main command
+        List<PositionalValue> arguments = new ArrayList<>();
+        arguments.addAll(commandAndOptions.get(optionBuilder.getMainCommand()).getPositionalArgs());
+        // Finish the `usage' for the main command
+        for (Iterator<PositionalValue> it = arguments.iterator(); it.hasNext();) {
+            PositionalValue positional = it.next();
+            if (positional.getMetavar().isEmpty())
+                stringBuilder.append(positional.getName());
+            else
+                stringBuilder.append(positional.getMetavar());
+            if (it.hasNext())
+                stringBuilder.append(DEFAULT_SEPARATOR);
+        }
+        return formatUsage(stringBuilder.toString());
     }
     
     public String formatHeader(OptionBuilder optionBuilder) {
@@ -224,7 +236,7 @@ public class FormatterHelp {
             }
             stringBuilder.append(word);
             if (it.hasNext())
-                stringBuilder.append(" ");
+                stringBuilder.append(DEFAULT_SEPARATOR);
         }
         
         return stringBuilder.toString();
