@@ -1,5 +1,10 @@
 \documentclass[]{article}
-\usepackage[left=5cm, right=5cm, top=2cm, bottom=4cm]{geometry}
+\usepackage[left=3cm, right3cm, top=2cm, bottom=3cm]{geometry}
+
+\usepackage[table]{xcolor}
+\usepackage{rotating}
+
+
 %opening
 \author{Matt B\ae{}kgaard Pedersen}
 \title{The ProcessJ Type System}
@@ -95,6 +100,35 @@ but also
 int \tlt float \wedge long \tlt double
 \]
 $\tlt$ is, of course, transitive, so if $(\alpha \tlt \beta) \wedge (\beta \tlt \delta) \Rightarrow \alpha \tlt \delta$.
+
+\begin{center}
+\begin{tabular}{|l||l|l|l|l|l|l|l|l|l|l|l|}\hline
+\begin{turn}{45}$\,\,\alpha \tlt \beta$\end{turn} & 
+	\begin{turn}{90}{byte}\end{turn} & 
+	\begin{turn}{90}{short}\end{turn} &
+	\begin{turn}{90}{char}\end{turn} &
+	\begin{turn}{90}{int}\end{turn} &
+	\begin{turn}{90}{long}\end{turn} &
+	\begin{turn}{90}{float} \end{turn}&
+	\begin{turn}{90}{double\quad{}\quad{}}\end{turn} &
+	\begin{turn}{90}{bool}\end{turn}&
+	\begin{turn}{90}{string}\end{turn} &
+	\begin{turn}{90}{barrier}\end{turn} &
+	\begin{turn}{90}{timer}\end{turn} \\ \hline\hline
+byte    & F & \cellcolor{gray!25}T & \cellcolor{gray!25}T & \cellcolor{gray!25}T & \cellcolor{gray!25}T & \cellcolor{gray!25}T & \cellcolor{gray!25}T & F & F & F & F\\ \hline
+short   & F & F & \cellcolor{gray!25}T & \cellcolor{gray!25}T & \cellcolor{gray!25}T & \cellcolor{gray!25}T & \cellcolor{gray!25}T & F & F& F & F\\ \hline
+char    & F & F & F & \cellcolor{gray!25}T & \cellcolor{gray!25}T & \cellcolor{gray!25}T & \cellcolor{gray!25}T & F & F & F & F\\ \hline
+int     & F & F & F & F & \cellcolor{gray!25}T & \cellcolor{gray!25}T & \cellcolor{gray!25}T & F & F & F & F\\ \hline
+long    & F & F & F & F & F & \cellcolor{gray!25}T & \cellcolor{gray!25}T & F & F & F & F\\ \hline
+float   & F & F & F & F & F & F & \cellcolor{gray!25}T & F & F & F & F\\ \hline
+double  & F & F & F & F & F & F & F & F & F & F & F\\ \hline
+bool    & F & F & F & F & F & F & F & F & F & F & F \\ \hline
+string  & F & F & F & F & F & F & F & F & F & F & F \\ \hline
+barrier & F & F & F & F & F & F & F & F & F & F & F \\ \hline
+timer   & F & F & F & F & F & F & F & F & F & F & F\\ \hline
+\end{tabular}
+\end{center}
+
 \subsubsection{Constructed Types}
 
 \paragraph{Protocol}
