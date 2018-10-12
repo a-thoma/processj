@@ -35,17 +35,18 @@ import utilities.Language;
                         "## (### ######. ######( ###### .#, ##  (###### ##",
                         " #( ###/        #######        (#,  ######### .# ",
                         "  #. #######################################  #  ",
-                        "   #* ######   P R O C E S S   J   ##(#####  #   ",
-                        "    ## .####    {v.1.2 # alpha}    ##(###( (#    ",
+                        "   #* ######## P R O C E S S   J ####(#####  #   ",
+                        "    ## .######   v.1.2 - ALPHA   ####(###( (#    ",
                         "     ##* /##############################  ##     ",
                         "       ###  #########################  *##       ",
                         "          ##*  *#################(   ##          ",
-                        "             ###(      ,*,.     *###             "
+                        "             ###(      ,*,.     *###             ",
+                        "                  %############                  "
                         },
-            notes = {   "If called without options, the program may terminate. Use \"-help\" for a",
+            notes = {   "If called without options, the program may terminate. Use '-help' for a",
                         "list of possible commands and options"
                         },
-            footer = {  "Run \"pjc -about <ARG>\" for help with a specific command.\n",
+            footer = {  "Run 'pjc --about <ARG>' for help with a specific command.\n",
                         "Full documentation at: https://processj.org",
                         "Bug reports, feedback, complains, love, food, etc, to matt.pedersen@unlv.edu"
                         },
@@ -57,24 +58,24 @@ public class PJMain extends OptionParameters {
     public VersionPrinter versionPrinter = new VersionPrinter();
 
     // TODO: This is for imports (libraries, files, etc), pragmas, etc..
-    @Option(names = {"-V", "-verbose"},
+    @Option(names = {"-V", "--verbose"},
             help = "Output messages of the exact sequence of commands used to compile a "
                     + "ProcessJ program")
     public boolean verbose;
     
-    @Option(names = {"-g", "-debug"},
+    @Option(names = {"-g", "--debug"},
             help = "Generate all debugging info")
     public boolean debug;
     
     // TODO: defaultValue = "/opt/ProcessJ/include"
-    @Option(names = {"-I", "-include"},
+    @Option(names = {"-I", "--include"},
             metavar = "<DIR>",
             defaultValue = "/Users/Ben/Desktop/processj/include", // default include for testing!
             help = "Override the default include directory which is set to be the Include "
                     + "subdirectory of the ProcessJ directory")
     public String include;
     
-    @Option(names = {"-t", "-target"},
+    @Option(names = {"-t", "--target"},
             defaultValue = "JVM",
             metavar = "<LANGUAGE>",
             help = "Specify the target language. C: C source code is written, compiled, "
@@ -83,51 +84,57 @@ public class PJMain extends OptionParameters {
                     + "JS: JavaScript is written")
     public Language target;
     
-    @Option(names = {"-v", "-version"},
+    @Option(names = {"-v", "--version"},
             help = "Print version information and exit")
     public boolean version;
     
-    @Option(names = {"-h", "-help"},
+    @Option(names = {"-h", "--help"},
             help = "Show this help message and exit")
     public boolean help;
     
-    @Option(names = "-sts",
+    @Option(names = "--sts",
             help = "Dump global symbol table structure")
     public boolean sts;
     
-    @Option(names = "-visitor-all",
+    @Option(names = "--visit-all",
             help = "Generate all parse tree visitors (not default)")
     public boolean visitorAll;
     
-    @Option(names = "-array-visitor",
+    @Option(names = "--visit-array",
             help = "Generate parse tree visitor only when converting array types to canonical "
                     + "forms")
     public boolean arrayVisitor;
     
-    @Option(names = "-import-visitor",
+    @Option(names = "--visit-import",
             help = "Generate parse tree visitor when resolving imported files")
     public boolean importVisitor;
     
-    @Option(names = "-package-type-visitor",
+    @Option(names = "--visit-package-type",
             help = "Generate parse tree visitor when resolving packages")
     public boolean packageVisitor;
     
-    @Option(names = "-name-checker-visitor",
+    @Option(names = "--visit-name-checker",
             help = "Generate parse tree visitor when identifying and translating name symbols")
     public boolean nameCheckerVisitor;
     
-    @Option(names = "-top-decls-visitor",
+    @Option(names = "--visit-top-decls",
             help = "Generate parse tree visitor when inserting all top-level declarations into "
                     + "symbol tables")
     public boolean topDeclsVisitor;
     
-    @Option(names = "-about",
+    @Option(names = { "-!", "--about" },
             help = "Provide additional information about a specific option or command",
             metavar = "<ARG>")
     public String info;
     
+    @Option(names = "--color",
+            help = "...",
+            metavar = "<YES/NO>",
+            split = "=")
+    public boolean color;
+    
     // TODO: Change type to Enum instead!
-    @Option(names = "-error-code",
+    @Option(names = "--error-code",
             help = "What error code information do you want?",
             metavar = "<NUMBER>",
             split = "=")
@@ -141,11 +148,7 @@ public class PJMain extends OptionParameters {
     public static class VersionPrinter implements IVersionPrinter {
         @Override
         public String[] getVersionPrinter() throws Exception {
-            return new String[] { "ProcessJ Version: 1.2",
-                                  "JVM: " + Util.getCurrentJVM(),
-                                  "Vendor: " + System.getProperty("java.vm.vendor"),
-                                  "OS: " + System.getProperty("os.name")
-            };
+            return new String[] { "ProcessJ version 1.2" };
         }
     }
 }

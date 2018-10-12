@@ -22,7 +22,7 @@ public class FormatterHelp {
     
     public static final int DEFAULT_LENGTH = 32;
     
-    public static final String USAGE_PREFIX = "Usage: ";
+    public static final String USAGE_PREFIX = "Usage: pjc ";
     
     public static final String PARAMETERS_PREFIX = "Parameters: ";
     
@@ -319,15 +319,15 @@ public class FormatterHelp {
         while (it.hasNext()) {
             stringBuilder.append(it.next());
             if (it.hasNext())
-                stringBuilder.append("|");
+                stringBuilder.append(" | ");
         }
         
         if (!optionValue.split.isEmpty())
             stringBuilder.append(optionValue.split)
-                        .append(optionValue.metavar);
+                         .append(optionValue.metavar);
         else if (!optionValue.metavar.isEmpty())
             stringBuilder.append(DEFAULT_SEPARATOR)
-                        .append(optionValue.metavar);
+                         .append(optionValue.metavar);
         if (!optionValue.isRequired())
             stringBuilder.append("]");
         
