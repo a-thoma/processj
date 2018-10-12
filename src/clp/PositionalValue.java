@@ -1,6 +1,8 @@
 package clp;
 
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -37,6 +39,42 @@ public final class PositionalValue extends OptionWithValues {
 
     public int getOrder() {
         return order;
+    }
+    
+    public String getOptionHelp(int indent, int width) {
+        int defaultLength = FormatterHelp.DEFAULT_LENGTH;
+        defaultLength += help.length();
+        StringBuilder stringBuilder = new StringBuilder(defaultLength);
+        stringBuilder.append(" ");
+        
+        if (metavar.isEmpty())
+            stringBuilder.append(" ").append(fieldName);
+        else
+            stringBuilder.append(" ").append(metavar);
+        
+        while (indent > stringBuilder.length() + 2)
+            stringBuilder.append(" ");
+        stringBuilder.append(" ");
+        
+        int charLeft = width - stringBuilder.length();
+        if (help.length() <= charLeft)
+            return stringBuilder.append(help).toString();
+        
+        List<String> words = Arrays.asList(help.split(" "));
+        int charCount = 0;
+        for (Iterator<String> it = words.iterator(); it.hasNext(); ) {
+            String word = it.next();
+            charCount += word.length() + 1;
+            if (charCount > charLeft) {
+                stringBuilder.append("\n").append(StringUtil.countSpaces(indent - 1));
+                charCount = word.length() + 1;
+            }
+            stringBuilder.append(word);
+            if (it.hasNext())
+                stringBuilder.append(" ");
+        }
+        
+        return stringBuilder.toString();
     }
     
     @Override

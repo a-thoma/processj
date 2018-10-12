@@ -7,11 +7,11 @@
         <property name="build" value="bin" />
         <property name="parserdir" location="src/parser/"/>
         <property name="scannerdir" location="src/scanner/"/>
-        <property name="cupJar" location="src/utilities/java_cup.jar"/>
-        <property name="cupRuntimeJar" location="src/utilities/java_cup_runtime.jar"/>
-        <property name="jflexJar" location="src/utilities/JFlex.jar"/>
-        <property name="stringtemplatejar" location="src/utilities/ST-4.0.7.jar"/>
-        <property name="asmjar" location="src/utilities/asm-all-3.3.1.jar"/>
+        <property name="cupJar" location="resources/jars/java_cup.jar"/>
+        <property name="cupRuntimeJar" location="resources/jars/java_cup_runtime.jar"/>
+        <property name="jflexJar" location="resources/jars/JFlex.jar"/>
+        <property name="stringtemplatejar" location="resources/jars/ST-4.0.7.jar"/>
+        <property name="asmjar" location="resources/jars/asm-all-3.3.1.jar"/>
     <property name="classpath" value="${cupJar}:${cupRuntimeJar}:${jflexJar}:${stringtemplatejar}:${asmjar}:."/>
         <description>
                 Build File for Processj Compiler Project
@@ -29,8 +29,6 @@
                        debug="${debug}"
                        classpath="${classpath}"
                        includeantruntime="false">
-                        <exclude name="Generated/**" />
-                        <exclude name="SampleTests/**" />
                 </javac>
 
         </target>
@@ -67,7 +65,6 @@
             </delete>
         </target>
 
-
         <target name="clean">
                 <delete dir="${build}" />
                 <delete file="${src}/parser/parser.java"/>
@@ -80,7 +77,6 @@
 
         <target name="run" depends="compile">
                 <java classpath="${classpath}:${build}" classname="ProcessJc">
-                  <?arg value="/Users/Ben/eclipse-workspace/processj/Pkg/B.pj"/ ?>
                 <arg value="${arg0}"/>
                 </java>
         </target>

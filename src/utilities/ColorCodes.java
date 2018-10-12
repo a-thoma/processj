@@ -1,88 +1,124 @@
 package utilities;
 
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
 /**
- * Class used for ANSI Color manipulation in a console supporting
- * ANSI color codes.
- *
- * Color code format WITH background color ->  :foreground,background:
- * Color code format WITHOUT background color -> :foreground,N:
- * Reset Color format -> [RC]
- *
- * Example Use:
- * String ansiColoredString = ColorCodes.ParseColors("Hello, This :blue,n:is[RC] a :red,white:response[RC].");
- * - or -
- * String ansiColoredString = ColorCodes.RED + "Hello" + ColorCodes.WHITE + ". This is a " +
- *                            ColorColorCodes.BLUE + "test";
+ * The class {@code ColorCodes} is used for ANSI colour
+ * manipulation on a terminal console that supports ANSI
+ * colour codes.
+ * 
+ * <p>
+ * Usage:
+ * <ul>
+ * <li> ANSI_PREFIX + (Attribute | Attribute + ANSI_COMMA +
+ * (AnsiForeground | AnsiBackground)) + ANSI_POSTFIX</li>
+ * </ul>
+ * </p>
+ * 
+ * <p>
+ * Example:
+ * <ul>
+ * <li>\033[ + 0 + m = \033[0m (Ansi Reset) </li>
+ * <li> \033[ + 1 + ";" + 31 + "m" = \033[1;31m (Ansi RED) </li>
+ * </ul>
+ * </p>
+ * 
+ * @author Ben Cisneros
+ * @version 10/06/2018
+ * @since 1.2
  */
 public class ColorCodes {
-
-    public static final String RESET = "\u001B[0m";
-    public static final String BLACK = "\u001B[30;40;1m";
-    public static final String RED = "\u001B[31;40;1m";
-    public static final String GREEN = "\u001B[32;40;1m";
-    public static final String YELLOW = "\u001B[33;40;1m";
-    public static final String BLUE = "\u001B[34;40;1m";
-    public static final String PURPLE = "\u001B[35;40;1m";
-    public static final String CYAN = "\u001B[36;40;1m";
-    public static final String WHITE = "\u001B[37;40;1m";
-
+    
+    public static final String ANSI_PREFIX = "\033[";
+    public static final String ANSI_POSTFIX = "m";
+    public static final String ANSI_COMMA = ";";
+    
     /**
-     * Parses a string with ANSI color codes based on the input
-     *
-     * @param input
-     *            the input string
-     * @return the parsed ANSI string
+     * The enum {@code AnsiForeground} represents each ANSI
+     * foreground colour code.
+     * 
+     * @author Ben Cisneros
      */
-    public static String ParseColors(String input) {
-        String ret = input;
-        Pattern regexChecker = Pattern.compile(":\\S+,\\S+:");
-        Matcher regexMatcher = regexChecker.matcher(input);
-        while (regexMatcher.find()) {
-            if (regexMatcher.group().length() != 0) {
-                String sub = regexMatcher.group().trim();
-                sub = sub.replace(":", "");
-                String[] colors = sub.split(",");
-
-                ret = (colors[1].equalsIgnoreCase("N"))
-                        ? ret.replace(regexMatcher.group().trim(), "\u001B[3" + getColorID(colors[0]) + ";1m")
-                        : ret.replace(regexMatcher.group().trim(),
-                                "\u001B[3" + getColorID(colors[0]) + ";4" + getColorID(colors[1]) + ";1m");
-                ret = ret.replace("[RC]", ColorCodes.WHITE);
-            }
+    public enum AnsiForeground {
+        
+        BLACK       ("30"),
+        RED         ("31"),
+        GREEN       ("32"),
+        YELLOW      ("33"),
+        BLUE        ("34"),
+        MAGENTA     ("35"),
+        CYAN        ("36"),
+        WHITE       ("37"),
+        NONE        ("")
+        ;
+        
+        private final String code;
+        
+        AnsiForeground(String code) {
+            this.code = code;
         }
-        ret = ret + ColorCodes.RESET;
-        return ret;
+        
+        @Override
+        public String toString() {
+            return code;
+        }
     }
-
+    
     /**
-     * Internal function for getting a colors value
-     *
-     * @param color
-     *            The color as test
-     * @return The colors integral value
+     * The enum {@code AnsiForeground} represents each ANSI
+     * background colour code.
+     * 
+     * @author Ben Cisneros
      */
-    private static int getColorID(String color) {
-        if (color.equalsIgnoreCase("BLACK")) {
-            return 0;
-        } else if (color.equalsIgnoreCase("RED")) {
-            return 1;
-        } else if (color.equalsIgnoreCase("GREEN")) {
-            return 2;
-        } else if (color.equalsIgnoreCase("YELLOW")) {
-            return 3;
-        } else if (color.equalsIgnoreCase("BLUE")) {
-            return 4;
-        } else if (color.equalsIgnoreCase("MAGENTA")) {
-            return 5;
-        } else if (color.equalsIgnoreCase("CYAN")) {
-            return 6;
-        } else if (color.equalsIgnoreCase("WHITE")) {
-            return 7;
+    public enum AnsiBackground {
+        
+        BLACK       ("40"),
+        RED         ("41"),
+        GREEN       ("42"),
+        YELLOW      ("43"),
+        BLUE        ("44"),
+        MAGENTA     ("45"),
+        CYAN        ("46"),
+        WHITE       ("47"),
+        NONE        ("")
+        ;
+        
+        private final String code;
+        
+        AnsiBackground(String code) {
+            this.code = code;
         }
-
-        return 7;
+        
+        @Override
+        public String toString() {
+            return code;
+        }
+    }
+    
+    /**
+     * The enum {@code Attribute} represents each ANSI
+     * attribute colour code.
+     * 
+     * @author Ben Cisneros
+     */
+    public enum Attribute {
+        
+        DEFAULT     ("0"),
+        BOLD        ("1"),
+        LIGHT       ("1"),
+        DARK        ("2"),
+        UNDERLINE   ("4"),
+        HIDDEN      ("8"),
+        NONE        ("")
+        ;
+        
+        private final String code;
+        
+        Attribute(String code) {
+            this.code = code;
+        }
+        
+        @Override
+        public String toString() {
+            return code;
+        }
     }
 }

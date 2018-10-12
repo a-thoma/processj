@@ -84,11 +84,10 @@ public final class StringUtil {
         boolean delim = true;
 
         for (String str : src) {
-            if (delim) {
+            if (delim)
                 delim = false;
-            } else {
+            else
                 stringBuilder.append(delimiter);
-            }
             stringBuilder.append(str);
         }
 
@@ -104,9 +103,8 @@ public final class StringUtil {
      * @return A {@code String} without leading and trailing quotes.
      */
     public static String stripLeadingAndTrailingQuotes(String str) {
-        if (str.length() > 1 && str.startsWith("\"") && str.endsWith("\"")) {
+        if (str.length() > 1 && str.startsWith("\"") && str.endsWith("\""))
             return str.substring(1, str.length() - 1);
-        }
 
         return str;
     }
@@ -124,9 +122,8 @@ public final class StringUtil {
      *         {@code word}.
      */
     public static char[] splitWordIntoCharacters(String word) {
-        if (isStringEmpty(word)) {
+        if (isStringEmpty(word))
             throw new IllegalArgumentException("Cannot split an empty string.");
-        }
 
         return word.toCharArray();
     }
@@ -142,15 +139,13 @@ public final class StringUtil {
      * @return A list containing each word.
      */
     public static List<String> splitWordIntoSentences(String words, String delimiter) {
-        if (isStringEmpty(delimiter)) {
+        if (isStringEmpty(delimiter))
             throw new IllegalArgumentException("To split a string, a delimiter must "
                         + "be specified.");
-        }
 
-        if (isStringEmpty(words)) {
+        if (isStringEmpty(words))
             throw new IllegalArgumentException(String.format("Delimiter \"%s\" cannot be used "
                         + "to split an empty string into sentences.", delimiter));
-        }
 
         return Arrays.asList(words.split(delimiter));
     }
@@ -165,15 +160,14 @@ public final class StringUtil {
      * @return A {@code String} containing a sequence of whitespace characters.
      */
     public static String countSpaces(int count) {
-        if (count < 1) {
+        if (count < 1)
             throw new IllegalArgumentException("The number of whitespace characters "
                     + "mut be greater than zero.");
-        }
 
         StringBuilder stringBuilder = new StringBuilder();
-        while (--count >= 0) {
+        
+        while (--count >= 0)
             stringBuilder.append(" ");
-        }
 
         return stringBuilder.toString();
     }

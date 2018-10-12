@@ -25,9 +25,9 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
     
     public ResolveImports(SymbolTable symtab) {
         this.symtab = symtab;
-        Log.log("======================================");
-        Log.log("*    R E S O L V E   I M P O R T S   *");
-        Log.log("======================================");
+        Log.logHeader("==============================================================");
+        Log.logHeader("*                  R E S O L V E   I M P O R T S             *");
+        Log.logHeader("==============================================================");
     }
     
     public static String packageNameToString(Sequence<Name> packageName) {
@@ -70,13 +70,16 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
             parser p1 = new parser(s1);
             java_cup.runtime.Symbol r = p1.parse();
             
+            // TODO: THIS WILL EXECUTE AND VALIDATE THE EXTENSION (PATH) OF IMPORTED
+            // FILES!!
+            
             // Checks the path of the imported file and compares the import statements found
             // in `fileName' against this file path format. An error is thrown if the import
             // statements do not match the path of the package name in which `fileName' exists
             String packageName = packageNameToString(((Compilation) r.value).packageName());
             String importPathDot = importPath.replaceAll(File.separator, "\\.");
             System.out.println("|-" + packageName + " && " + importPathDot);
-            if (!importPathDot.contains(packageName)) {
+            if (!importPathDot.equals(packageName)) {
                 Error.error(a, "Invalid package name found! Path string `" + packageName
                         + "' may contain invalid characters or the path string does not "
                         + "match the import statement `" + importPathDot
@@ -185,7 +188,7 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
                 // It was not a local directory, but see if it is a library directory
                 fileName = new File(utilities.Settings.includeDir)
                         .getAbsolutePath() + "/" + utilities.Settings.targetLanguage + "/" + path;
-        Log.log("visitImport(): Not a local, so try a library: " + fileName);
+                Log.log("visitImport(): Not a local, so try a library: " + fileName);
                 if (new File(fileName).isDirectory()) {
                     // Yes, it was, so add it's content to the fileList
                     makeFileList(fileList, fileName);
@@ -252,6 +255,7 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
                 symtab = importSymtab;
             }
         }
+        
         return null;
     }
 }

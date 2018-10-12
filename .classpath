@@ -1,11 +1,13 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <classpath>
 	<classpathentry kind="src" path="src"/>
+	<classpathentry kind="src" path="lib"/>
+	<classpathentry kind="src" path="resources"/>
 	<classpathentry kind="con" path="org.eclipse.jdt.launching.JRE_CONTAINER"/>
-	<classpathentry kind="lib" path="src/utilities/asm-all-3.3.1.jar"/>
-	<classpathentry kind="lib" path="src/utilities/java_cup_runtime.jar"/>
-	<classpathentry kind="lib" path="src/utilities/java_cup.jar"/>
-	<classpathentry kind="lib" path="src/utilities/JFlex.jar"/>
-	<classpathentry kind="lib" path="src/utilities/ST-4.0.7.jar"/>
+	<classpathentry kind="lib" path="/Users/Ben/Desktop/processj/resources/jars/asm-all-3.3.1.jar"/>
+	<classpathentry kind="lib" path="/Users/Ben/Desktop/processj/resources/jars/java_cup_runtime.jar"/>
+	<classpathentry kind="lib" path="/Users/Ben/Desktop/processj/resources/jars/java_cup.jar"/>
+	<classpathentry kind="lib" path="/Users/Ben/Desktop/processj/resources/jars/JFlex.jar"/>
+	<classpathentry kind="lib" path="/Users/Ben/Desktop/processj/resources/jars/ST-4.0.7.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>

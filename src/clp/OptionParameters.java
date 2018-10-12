@@ -2,7 +2,7 @@ package clp;
 
 /**
  * The class {@link OptionParameters} serves as the base class for
- * all extended commands.
+ * all extended commands in ProcessJ.
  * <p>
  * See {@link Parameters @Parameters}.
  * </p>
