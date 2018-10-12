@@ -76,12 +76,10 @@ Bug reports, feedback, complains, love, food, etc, to matt.pedersen@unlv.edu
 
 ### TODOs
 
-- [ ] Mercury
-- [x] Venus
-- [x] Earth (Orbit/Moon)
-- [x] Mars
-- [ ] Jupiter
-- [ ] Saturn
-- [ ] Uranus
-- [ ] Neptune
-- [ ] Comet Haley
+- [x] Complete Command-Line Processor (CLP)
+- [ ] Test ResolveImports
+- [ ] Test NameChecker
+- [ ] Test ResolvePackagesTypes
+- [ ] Test TopLevelDecls
+- [ ] Complete Error Messages
+- [ ] Complete Ascii color code
