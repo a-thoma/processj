@@ -70,13 +70,16 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
             parser p1 = new parser(s1);
             java_cup.runtime.Symbol r = p1.parse();
             
+            // TODO: THIS WILL EXECUTE AND VALIDATE THE EXTENSION (PATH) OF IMPORTED
+            // FILES!!
+            
             // Checks the path of the imported file and compares the import statements found
             // in `fileName' against this file path format. An error is thrown if the import
             // statements do not match the path of the package name in which `fileName' exists
             String packageName = packageNameToString(((Compilation) r.value).packageName());
             String importPathDot = importPath.replaceAll(File.separator, "\\.");
             System.out.println("|-" + packageName + " && " + importPathDot);
-            if (!importPathDot.contains(packageName)) {
+            if (!importPathDot.equals(packageName)) {
                 Error.error(a, "Invalid package name found! Path string `" + packageName
                         + "' may contain invalid characters or the path string does not "
                         + "match the import statement `" + importPathDot

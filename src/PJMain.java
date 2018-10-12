@@ -45,13 +45,16 @@ import utilities.Language;
             notes = {   "If called without options, the program may terminate. Use \"-help\" for a",
                         "list of possible commands and options"
                         },
-            footer = {  "Full documentation at: https://processj.org",
+            footer = {  "Run \"pjc -about <ARG>\" for help with a specific command.\n",
+                        "Full documentation at: https://processj.org",
                         "Bug reports, feedback, complains, love, food, etc, to matt.pedersen@unlv.edu"
                         },
             name = "ProcessJ",
             help = "The following options are available:",
             versionPrinter = PJMain.VersionPrinter.class)
 public class PJMain extends OptionParameters {
+    
+    public VersionPrinter versionPrinter = new VersionPrinter();
 
     // TODO: This is for imports (libraries, files, etc), pragmas, etc..
     @Option(names = {"-V", "-verbose"},
@@ -118,12 +121,17 @@ public class PJMain extends OptionParameters {
                     + "symbol tables")
     public boolean topDeclsVisitor;
     
+    @Option(names = "-about",
+            help = "Provide additional information about a specific option or command",
+            metavar = "<ARG>")
+    public String info;
+    
     // TODO: Change type to Enum instead!
     @Option(names = "-error-code",
             help = "What error code information do you want?",
-            metavar = "<number>",
+            metavar = "<NUMBER>",
             split = "=")
-    public String error_message;
+    public int errorCode;
     
     @Argument(metavar = "<FILE>",
               help = "The file (or files) to compile",
