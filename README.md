@@ -73,3 +73,13 @@ Options:
 Full documentation at: https://processj.org
 Bug reports, feedback, complains, love, food, etc, to matt.pedersen@unlv.edu
 ```
+
+### TODOs
+
+- [x] Complete Command-Line Processor (CLP)
+- [ ] Test ResolveImports
+- [ ] Test NameChecker
+- [ ] Test ResolvePackagesTypes
+- [ ] Test TopLevelDecls
+- [ ] Complete Error Messages
+- [ ] Complete Ascii color code
