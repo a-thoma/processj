@@ -75,7 +75,7 @@ public class ProcessJc {
                                 .handlerArgs(args);
             pjMain = optionBuilder.getCommand(PJMain.class);
         } catch(Exception e) {
-            System.out.println(e.getMessage() + ">>>>>?????");
+            System.out.println(e.getMessage());
             System.exit(1);
         }
         
