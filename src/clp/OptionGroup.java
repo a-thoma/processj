@@ -155,7 +155,7 @@ public final class OptionGroup {
                         + "'%s' cannot be empty.", field.getName()));
         
         for (String name : annotation.names()) {
-            if (!name.startsWith("-") || name.startsWith("--"))
+            if (!name.startsWith("-"))
                 throw new RuntimeException(String.format("Annotated options must start with a single "
                             + "\"-\". Found @Option '%s'.", name));
         }

@@ -79,8 +79,6 @@ public class ProcessJc {
             System.exit(1);
         }
         
-        System.out.println(">>>>>> ");
-        
         // These fields have default values, see PJMain.java for more information
         Settings.includeDir = pjMain.include;
         Settings.targetLanguage = pjMain.target;
