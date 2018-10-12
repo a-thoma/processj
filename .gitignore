@@ -1,3 +1,12 @@
 *.class
 *~
-#*
+src/parser/parser.java
+src/parser/sym.java
+src/scanner/Scanner.java
+*.aux
+
+docs\+notes/ProcessJ-TypeSystem\.log
+
+*#
+
+docs\+notes/ProcessJ-TypeSystem\.synctex\.gz
