@@ -10,3 +10,6 @@ docs\+notes/ProcessJ-TypeSystem\.log
 *#
 
 docs\+notes/ProcessJ-TypeSystem\.synctex\.gz
+
+#Ignore All binary files. ez
+bin/
