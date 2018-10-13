@@ -6,7 +6,6 @@ import clp.IVersionPrinter;
 import clp.Option;
 import clp.OptionParameters;
 import clp.Parameters;
-import clp.Util;
 import utilities.Language;
 
 /**
@@ -46,11 +45,11 @@ import utilities.Language;
             notes = {   "If called without options, the program may terminate. Use '-help' for a",
                         "list of possible commands and options"
                         },
-            footer = {  "Run 'pjc --about <ARG>' for help with a specific command.\n",
+            footer = {  "Run 'pjc --about <cmd|opt>' for help with a specific command.\n",
                         "Full documentation at: https://processj.org",
                         "Bug reports, feedback, complains, love, food, etc, to matt.pedersen@unlv.edu"
                         },
-            name = "ProcessJ",
+            name = "pjc",
             help = "The following options are available:",
             versionPrinter = PJMain.VersionPrinter.class)
 public class PJMain extends OptionParameters {
@@ -58,89 +57,89 @@ public class PJMain extends OptionParameters {
     public VersionPrinter versionPrinter = new VersionPrinter();
 
     // TODO: This is for imports (libraries, files, etc), pragmas, etc..
-    @Option(names = {"-V", "--verbose"},
+    @Option(names = {"-V", "-verbose"},
             help = "Output messages of the exact sequence of commands used to compile a "
                     + "ProcessJ program")
     public boolean verbose;
     
-    @Option(names = {"-g", "--debug"},
+    @Option(names = {"-g", "-debug"},
             help = "Generate all debugging info")
     public boolean debug;
     
     // TODO: defaultValue = "/opt/ProcessJ/include"
-    @Option(names = {"-I", "--include"},
-            metavar = "<DIR>",
+    @Option(names = {"-I", "-include"},
+            metavar = "<dir>",
             defaultValue = "/Users/Ben/Desktop/processj/include", // default include for testing!
             help = "Override the default include directory which is set to be the Include "
                     + "subdirectory of the ProcessJ directory")
     public String include;
     
-    @Option(names = {"-t", "--target"},
+    @Option(names = {"-t", "-target"},
             defaultValue = "JVM",
-            metavar = "<LANGUAGE>",
+            metavar = "<language>",
             help = "Specify the target language. C: C source code is written, compiled, "
                     + "and linked with the CSSP runtime; C++: C++ source code is generated "
                     + "and compiled into an executable; JVM: JVM class files are written; "
                     + "JS: JavaScript is written")
     public Language target;
     
-    @Option(names = {"-v", "--version"},
+    @Option(names = {"-v", "-version"},
             help = "Print version information and exit")
     public boolean version;
     
-    @Option(names = {"-h", "--help"},
+    @Option(names = {"-h", "-help"},
             help = "Show this help message and exit")
     public boolean help;
     
-    @Option(names = "--sts",
+    @Option(names = "-sts",
             help = "Dump global symbol table structure")
     public boolean sts;
     
-    @Option(names = "--visit-all",
+    @Option(names = "-visit-all",
             help = "Generate all parse tree visitors (not default)")
     public boolean visitorAll;
     
-    @Option(names = "--visit-array",
+    @Option(names = "-visit-array",
             help = "Generate parse tree visitor only when converting array types to canonical "
                     + "forms")
     public boolean arrayVisitor;
     
-    @Option(names = "--visit-import",
+    @Option(names = "-visit-import",
             help = "Generate parse tree visitor when resolving imported files")
     public boolean importVisitor;
     
-    @Option(names = "--visit-package-type",
+    @Option(names = "-visit-package-type",
             help = "Generate parse tree visitor when resolving packages")
     public boolean packageVisitor;
     
-    @Option(names = "--visit-name-checker",
+    @Option(names = "-visit-name-checker",
             help = "Generate parse tree visitor when identifying and translating name symbols")
     public boolean nameCheckerVisitor;
     
-    @Option(names = "--visit-top-decls",
+    @Option(names = "-visit-top-decls",
             help = "Generate parse tree visitor when inserting all top-level declarations into "
                     + "symbol tables")
     public boolean topDeclsVisitor;
     
-    @Option(names = { "-!", "--about" },
+    @Option(names = "-about",
             help = "Provide additional information about a specific option or command",
-            metavar = "<ARG>")
+            metavar = "<cmd|opt>")
     public String info;
     
-    @Option(names = "--color",
+    @Option(names = "-color",
             help = "...",
-            metavar = "<YES/NO>",
+            metavar = "<yes|no>",
             split = "=")
     public boolean color;
     
     // TODO: Change type to Enum instead!
-    @Option(names = "--error-code",
+    @Option(names = "-error-code",
             help = "What error code information do you want?",
-            metavar = "<NUMBER>",
+            metavar = "<number>",
             split = "=")
     public int errorCode;
     
-    @Argument(metavar = "<FILE>",
+    @Argument(metavar = "<file>",
               help = "The file (or files) to compile",
               order = "0..*")
     public List<File> files;
