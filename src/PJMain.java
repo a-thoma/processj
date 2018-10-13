@@ -45,7 +45,7 @@ import utilities.Language;
             notes = {   "If called without options, the program may terminate. Use '-help' for a",
                         "list of possible commands and options"
                         },
-            footer = {  "Run 'pjc --about <cmd|opt>' for help with a specific command.\n",
+            footer = {  "Run 'pjc -about <arg>' for help with a specific command.\n",
                         "Full documentation at: https://processj.org",
                         "Bug reports, feedback, complains, love, food, etc, to matt.pedersen@unlv.edu"
                         },
@@ -123,12 +123,12 @@ public class PJMain extends OptionParameters {
     
     @Option(names = "-about",
             help = "Provide additional information about a specific option or command",
-            metavar = "<cmd|opt>")
+            metavar = "<arg>")
     public String info;
     
-    @Option(names = "-color",
-            help = "...",
-            metavar = "<yes|no>",
+    @Option(names = "-console-ansi-code",
+            help = "Try and use color on terminals that support ANSI espace codes",
+            metavar = "<flag>",
             split = "=")
     public boolean color;
     

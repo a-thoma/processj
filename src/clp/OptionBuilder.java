@@ -6,6 +6,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
@@ -13,7 +14,10 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
 import java.util.stream.Collectors;
+
+import utilities.MultiValueMap;
 
 /**
  * @author Ben Cisneros
@@ -102,8 +106,8 @@ public class OptionBuilder {
             } else if (argument.startsWith("-")) {
                 List<String> maybeList = startWithOptionName(argument);
                 throw new RuntimeException(String.format("Unknown @Option '%s' for @Parameters '%s'. "
-                            + "Did you mean to say: %s? ", argument, findCommandName(namedAndCommandMap, type),
-                            String.join(",", maybeList)));
+                            + "Did you mean to say?\n%s", argument, findCommandName(namedAndCommandMap, type),
+                            String.join("\n", maybeList)));
             } else {
                 // Throw an error if the running command takes no arguments
                 if (optGroup.getPositionalArgs().size() == 0) {
@@ -386,15 +390,45 @@ public class OptionBuilder {
     }
     
     private List<String> startWithOptionName(String argName) {
-        Map<String, Integer> result = new HashMap<>();
-        for (String optName : options.getNames())
-            result.put(optName, Util.distance(optName, argName));
-        
-        int minDist = result.entrySet().stream().sorted(Comparator.comparingInt(Map.Entry::getValue))
-                            .findFirst().get().getValue();
-        
-        return result.entrySet().stream().filter(e -> e.getValue() == minDist)
-                     .map(e -> e.getKey()).collect(Collectors.toList());
+        final int MAX_CANDIDATES = 4;
+        MultiValueMap<Integer, String> result = new MultiValueMap<>();
+        List<String> candidateList = new ArrayList<>();
+        for (String optName : options.getNames()) {
+            if (optName.contains(argName)) {
+                candidateList.add(optName);
+                continue;
+            }
+        }
+        // Check for possible matches
+        if (!candidateList.isEmpty()) {
+            for (String candidate : candidateList)
+                result.put(Util.distance(candidate, argName), candidate);
+            result = sortCandidateOptions(result);
+            return new ArrayList<>(result.values());
+        }
+        // Unknown option! Use Levenshtein to compute possible candidates
+        for (String optName : options.getNames()) {
+            String[] optSplit = optName.split("-");
+            result.put(Util.distance("-" + optSplit[1], argName), optName);
+        }
+        result = sortCandidateOptions(result);
+        Collection<Integer> keys = result.keys();
+        for (Integer k : keys) {
+            for (String name : result.get(k))
+                candidateList.add(name);
+        }
+        if (candidateList.size() >= MAX_CANDIDATES)
+            return candidateList.subList(0, MAX_CANDIDATES);
+        return candidateList;
+    }
+    
+    public static MultiValueMap<Integer, String> sortCandidateOptions(MultiValueMap<Integer, String> options) {
+        MultiValueMap<Integer, String> sortedOptions = new MultiValueMap<>();
+        List<Integer> keys = new ArrayList<>(options.keys());
+        Collections.sort(keys);
+        for (Integer key : keys)
+            sortedOptions.putAll(key, options.get(key));
+        return sortedOptions;
     }
     
     public <T extends OptionParameters> T getCommand(Class<T> type) {
