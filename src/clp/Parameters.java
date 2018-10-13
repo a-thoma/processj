@@ -70,11 +70,6 @@ public @interface Parameters {
     String[] version() default {};
 
     /**
-     * Specify a lexicographical order of options.
-     */
-    OptionOrder order() default OptionOrder.LEXICOGRAPHIC;
-
-    /**
      * A custom version information that gets instantiated when provided.
      * If none is provided then the default specified version information
      * in ProcessJ is used.

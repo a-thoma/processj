@@ -107,7 +107,7 @@ public final class OptionGroup {
         // Loop over all the class hierarchy if any
         for (Class<? extends OptionParameters> type : setClass) {
             // Parse all annotated fields
-            List<Field> fields = findAnnotatedFields(type);            
+            List<Field> fields = findAnnotatedFields(type);
             for (Field field : fields) {
                 // Multiple annotations attached to a field is not allowed
                 if (field.getAnnotations().length > 1) {

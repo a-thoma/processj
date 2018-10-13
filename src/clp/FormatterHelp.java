@@ -22,7 +22,7 @@ public class FormatterHelp {
     
     public static final int DEFAULT_LENGTH = 32;
     
-    public static final String USAGE_PREFIX = "Usage: pjc ";
+    public static final String USAGE_PREFIX = "Usage: ";
     
     public static final String PARAMETERS_PREFIX = "Parameters: ";
     
@@ -32,8 +32,10 @@ public class FormatterHelp {
     
     public boolean sorted = false;
     
-    public void setSorted(boolean sorted) {
-        this.sorted = sorted;
+    private OptionBuilder optionBuilder;
+    
+    public FormatterHelp(OptionBuilder optionBuilder) {
+        this.optionBuilder = optionBuilder;
     }
     
     /**
@@ -128,20 +130,11 @@ public class FormatterHelp {
             length += 1;
         }
         length += option.getMetavar().length();
-        length += 4;    // Magic (padding) number
+        length += 4;
         return length;
     }
     
-    /**
-     * Builds a usage clause that shows how to invoke all commands and options
-     * from a shell prompt in ProcessJ.
-     * 
-     * @param optionBuilder
-     *          The group of commands and their list of options.
-     * @return The usage statement that shows how to use commands and options
-     *         in ProcessJ.
-     */
-    public String buildUsage(OptionBuilder optionBuilder) {
+    public String buildUsage() {
         StringBuilder stringBuilder = new StringBuilder();
         
         Map<Class<? extends OptionParameters>, OptionGroup> commandAndOptions = optionBuilder.getCommandAndOptionMap();
@@ -150,8 +143,7 @@ public class FormatterHelp {
         // Grab the list of commands and sort them
         List<String> commands = new ArrayList<>();
         commands.addAll(optionBuilder.getNamedAndCommandMap().keySet());
-        if (sorted)
-            Collections.sort(commands);
+        Collections.sort(commands);
         // For every option defined in a command
         for (String commandName : commands) {
             // Grab the option and append it to its command
@@ -164,8 +156,7 @@ public class FormatterHelp {
             // options in lexicographic order
             List<OptionValue> options = new ArrayList<>();
             options.addAll(commandAndOptions.get(command).getOptionSet());
-            if (sorted)
-                Collections.sort(options, new OptionComparator());
+            Collections.sort(options, OPTION_COMPARATOR);
             // Build a `usage' for this command and its options
             for (Iterator<OptionValue> it = options.iterator(); it.hasNext();) {
                 stringBuilder.append(buildOption(it.next()));
@@ -192,7 +183,7 @@ public class FormatterHelp {
         return formatUsage(stringBuilder.toString());
     }
     
-    public String formatHeader(OptionBuilder optionBuilder) {
+    public String formatHeader() {
         Parameters parameter = optionBuilder.getMainCommand().getAnnotation(Parameters.class);
         StringBuilder stringBuilder = new StringBuilder();
         
@@ -211,7 +202,7 @@ public class FormatterHelp {
         return stringBuilder.append("\n").toString();
     }
     
-    public String formatFooter(OptionBuilder optionBuilder) {
+    public String formatFooter() {
         Parameters parameter = optionBuilder.getMainCommand().getAnnotation(Parameters.class);
         StringBuilder stringBuilder = new StringBuilder();
         for (String footer : parameter.footer())
@@ -242,11 +233,11 @@ public class FormatterHelp {
         return stringBuilder.toString();
     }
     
-    public String usagePage(OptionBuilder optionBuilder) {
+    public String usagePage() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("\n")
-                     .append(formatHeader(optionBuilder))
-                     .append(buildUsage(optionBuilder))
+                     .append(formatHeader())
+                     .append(buildUsage())
                      .append("\n");
         // Find maximum length
         int indent = 0;
@@ -276,17 +267,17 @@ public class FormatterHelp {
         // For example: command -option <arguments>
         stringBuilder.append(OPTIONS_PREFIX)
                      .append("\n");
-        for (Class<? extends OptionParameters> command : commandAndOptionMap.keySet()) {
+//        for (Class<? extends OptionParameters> command : commandAndOptionMap.keySet()) {
+        for (Map.Entry<Class<? extends OptionParameters>, OptionGroup> entry : commandAndOptionMap.entrySet()) {
             if (commandAndOptionMap.size() > 1)
                 // If we have more than one command, then output each command individually
                 stringBuilder.append(">")
-                             .append(OptionBuilder.findCommandName(namedAndCommandMap, command) + ":");
+                             .append(OptionBuilder.findCommandName(namedAndCommandMap, entry.getKey()) + ":");
             
-            OptionGroup optionGroup = commandAndOptionMap.get(command);
+            OptionGroup optionGroup = commandAndOptionMap.get(entry.getKey());
             List<OptionValue> optionList = new ArrayList<>();
             optionList.addAll(optionGroup.getOptionSet());
-            if (sorted)
-                Collections.sort(optionList, new OptionComparator());
+            Collections.sort(optionList, OPTION_COMPARATOR);
             for (OptionValue optionValue : optionList) {
                 String optionHelp = optionValue.getOptionHelp(indent, DEFAULT_WIDTH);
                 if (optionHelp != null)
@@ -296,7 +287,7 @@ public class FormatterHelp {
             stringBuilder.append("\n");
         }
         
-        stringBuilder.append(formatFooter(optionBuilder));
+        stringBuilder.append(formatFooter());
         
         return stringBuilder.toString();
     }
@@ -319,7 +310,7 @@ public class FormatterHelp {
         while (it.hasNext()) {
             stringBuilder.append(it.next());
             if (it.hasNext())
-                stringBuilder.append(" | ");
+                stringBuilder.append("|");
         }
         
         if (!optionValue.split.isEmpty())
@@ -340,4 +331,6 @@ public class FormatterHelp {
             return o1.getName().compareToIgnoreCase(o2.getName());
         }
     }
+    
+    private static final OptionComparator OPTION_COMPARATOR = new OptionComparator();
 }

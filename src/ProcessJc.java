@@ -87,9 +87,8 @@ public class ProcessJc {
         List<File> files = pjMain.files;
         
         if (pjMain.help) {
-            FormatterHelp formatHelp = new FormatterHelp();
-            formatHelp.setSorted(true);
-            System.out.println(formatHelp.usagePage(optionBuilder));
+            FormatterHelp formatHelp = new FormatterHelp(optionBuilder);
+            System.out.println(formatHelp.usagePage());
             System.exit(0);
         }
         
