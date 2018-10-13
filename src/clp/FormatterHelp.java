@@ -267,7 +267,6 @@ public class FormatterHelp {
         // For example: command -option <arguments>
         stringBuilder.append(OPTIONS_PREFIX)
                      .append("\n");
-//        for (Class<? extends OptionParameters> command : commandAndOptionMap.keySet()) {
         for (Map.Entry<Class<? extends OptionParameters>, OptionGroup> entry : commandAndOptionMap.entrySet()) {
             if (commandAndOptionMap.size() > 1)
                 // If we have more than one command, then output each command individually
@@ -310,7 +309,7 @@ public class FormatterHelp {
         while (it.hasNext()) {
             stringBuilder.append(it.next());
             if (it.hasNext())
-                stringBuilder.append("|");
+                stringBuilder.append(" | ");
         }
         
         if (!optionValue.split.isEmpty())

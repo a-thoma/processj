@@ -92,6 +92,8 @@ public class ProcessJc {
             System.exit(0);
         }
         
+        System.out.print(">> " + pjMain.errorCode);
+        
         if (pjMain.version) {
             try {
                 String[] list = pjMain.versionPrinter.getVersionPrinter();
