@@ -3,7 +3,9 @@ import java.util.*;
 
 import ast.AST;
 import ast.Compilation;
+import clp.FormatterHelp;
 import clp.OptionBuilder;
+import clp.StringUtil;
 import codegeneratorjava.CodeGeneratorJava;
 import library.Library;
 import parser.parser;
@@ -22,9 +24,7 @@ import utilities.SymbolTable;
  */
 public class ProcessJc {
     
-    private static final String HELP_ERROR_MSG = "Usage: pjc [global options] [source files...] "
-            + "[command options].\nPlease use [-h|-help] for a list of possible commands or refer "
-            + " to\nthe documentation for command parameters and usage.";
+    private static final String HELP_ERROR_MSG = "What would you like me to do?";
     
     /**
      * Pretty prints AST-like structures.
@@ -45,9 +45,9 @@ public class ProcessJc {
         }
     }
     
-    public static void helpError() {
+    public static void whatMessage() {
         System.err.println(HELP_ERROR_MSG);
-        System.exit(1);
+        System.exit(0);
     }
     
     // TODO: Only for testing purposes!
@@ -56,11 +56,11 @@ public class ProcessJc {
     public static final String ANSI_UNDERLINE = "\033[4m";
     //
     
-    public static void main(String[] args) {        
+    public static void main(String[] args) {
         if (args.length == 0) {
 //            System.out.println("[" + ANSI_UNDERLINE + "INFO" + ANSI_RESET + "] pjc: " + ANSI_RED + "error: " + ANSI_RESET + "no input file(s)");
-            System.out.println("-> " + ErrorMessage.RESOLVE_IMPORTS_100.format("Blah!!"));
-            System.exit(1);
+//            System.out.println("-> " + ErrorMessage.RESOLVE_IMPORTS_100.format("Blah!!"));
+            whatMessage();
         }
         
         AST root = null;
@@ -68,16 +68,16 @@ public class ProcessJc {
         // -----------------------------------------------------------------------------
         // COMMAND LINE PROCESSOR
         OptionBuilder optionBuilder = null;
+        PJMain pjMain = null;
         try {
             optionBuilder = new OptionBuilder()
                                 .addCommand(PJMain.class)
                                 .handlerArgs(args);
+            pjMain = optionBuilder.getCommand(PJMain.class);
         } catch(Exception e) {
-            System.err.println(e.getMessage());
-            helpError();
+            System.out.println(e.getMessage());
+            System.exit(1);
         }
-        
-        PJMain pjMain = optionBuilder.getCommand(PJMain.class);
         
         // These fields have default values, see PJMain.java for more information
         Settings.includeDir = pjMain.include;
@@ -86,9 +86,33 @@ public class ProcessJc {
         boolean visitorAll = pjMain.visitorAll;
         List<File> files = pjMain.files;
         
+        if (pjMain.help) {
+            FormatterHelp formatHelp = new FormatterHelp();
+            formatHelp.setSorted(true);
+            System.out.println(formatHelp.usagePage(optionBuilder));
+            System.exit(0);
+        }
+        
+        if (pjMain.version) {
+            try {
+                String[] list = pjMain.versionPrinter.getVersionPrinter();
+                for (String text : list)
+                    System.out.println(text);
+                System.exit(0);
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+        
+        if (!StringUtil.isStringEmpty(pjMain.info)) {
+            System.out.println(String.format("Information about @Option '%s' is not available.", pjMain.info));
+            System.exit(0);
+        }
+        
         if (files == null || files.isEmpty()) {
             // At least one file must be provided otherwise throw an error
-            helpError();
+            // Throw error messages
+            System.exit(0);
         }
         
         // -----------------------------------------------------------------------------
