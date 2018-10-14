@@ -4,7 +4,7 @@ import java.util.List;
 import clp.Argument;
 import clp.IVersionPrinter;
 import clp.Option;
-import clp.OptionParameters;
+import clp.Command;
 import clp.Parameters;
 import utilities.Language;
 
@@ -52,7 +52,7 @@ import utilities.Language;
             name = "pjc",
             help = "The following options are available:",
             versionPrinter = PJMain.VersionPrinter.class)
-public class PJMain extends OptionParameters {
+public class PJMain extends Command {
     
     public VersionPrinter versionPrinter = new VersionPrinter();
 

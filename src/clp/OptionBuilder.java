@@ -13,6 +13,8 @@ import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
@@ -28,17 +30,17 @@ public class OptionBuilder {
     /**
      * The first ever registered command is the parent command.
      */
-    Class<? extends OptionParameters> mainCommand;
+    Class<? extends Command> mainCommand;
     
     /**
      * Map of names to command types.
      */
-    private Map<String, Class<? extends OptionParameters>> namedAndCommandMap = new HashMap<>();
+    private Map<String, Class<? extends Command>> namedAndCommandMap = new HashMap<>();
     
     /**
      * Map of command types to option group.
      */
-    private Map<Class<? extends OptionParameters>, OptionGroup> commandAndOptionMap = new HashMap<>();
+    private Map<Class<? extends Command>, OptionGroup> commandAndOptionMap = new HashMap<>();
     
     /**
      * Map of names to option values.
@@ -48,7 +50,7 @@ public class OptionBuilder {
     /**
      * Map of invoked command types.
      */
-    List<Class<? extends OptionParameters>> invokedCommandList = new ArrayList<>();
+    List<Class<? extends Command>> invokedCommandList = new ArrayList<>();
     
     /**
      * Collections of shared-options.
@@ -65,7 +67,7 @@ public class OptionBuilder {
     }
     
     private void handleArgs(String[] args,
-                            Class<? extends OptionParameters> type,
+                            Class<? extends Command> type,
                             int currentIndex,
                             List<String> positionArgs) {
         int index = currentIndex;
@@ -232,7 +234,7 @@ public class OptionBuilder {
                         + "arguments.", index, argList.size() - index));
     }
     
-    public OptionBuilder addCommand(Class<? extends OptionParameters> type) {
+    public OptionBuilder addCommand(Class<? extends Command> type) {
         type = Assert.nonNull(type, "The specified class cannot be null.");
         Parameters parameters = type.getAnnotation(Parameters.class);
         
@@ -240,7 +242,7 @@ public class OptionBuilder {
             throw new RuntimeException(String.format("@Parameters annotation is either not attached to '%s' "
                         + "or its 'name' attribute is not defined.", Util.getTypeName(type)));
         
-        // Set parent command
+        // Set main (parent) command
         if (mainCommand == null)
             mainCommand = type;
 
@@ -272,11 +274,11 @@ public class OptionBuilder {
         return this;
     }
     
-    public Map<String, Class<? extends OptionParameters>> getNamedAndCommandMap() {
+    public Map<String, Class<? extends Command>> getNamedAndCommandMap() {
         return namedAndCommandMap;
     }
     
-    public Map<Class<? extends OptionParameters>, OptionGroup> getCommandAndOptionMap() {
+    public Map<Class<? extends Command>, OptionGroup> getCommandAndOptionMap() {
         return commandAndOptionMap;
     }
     
@@ -284,14 +286,14 @@ public class OptionBuilder {
         return options;
     }
     
-    public Class<? extends OptionParameters> getMainCommand() {
+    public Class<? extends Command> getMainCommand() {
         return mainCommand;
     }
     
     private void validateRequiredOptions() {
         List<String> optNames = new ArrayList<>();
         
-        for (Class<? extends OptionParameters> type : invokedCommandList) {
+        for (Class<? extends Command> type : invokedCommandList) {
             OptionGroup optGroup = commandAndOptionMap.get(type);
             if (optGroup != null) {
                 Set<OptionValue> optSet = new HashSet<>();
@@ -428,14 +430,14 @@ public class OptionBuilder {
         return sortedOptions;
     }
     
-    public <T extends OptionParameters> T getCommand(Class<T> type) {
+    public <T extends Command> T getCommand(Class<T> type) {
         OptionGroup optGroup = commandAndOptionMap.get(type);
         Constructor<T> constructor = optGroup.getConstructor(type);
         T instanceObj = null;
         try {
             instanceObj = constructor.newInstance(new Object[0]);
-            Set<Class<? extends OptionParameters>> classes = findAllExtendedClasses(type);
-            for (Class<? extends OptionParameters> clazz : classes) {
+            Set<Class<? extends Command>> classes = findAllExtendedClasses(type);
+            for (Class<? extends Command> clazz : classes) {
                 for (Field field : optGroup.getFieldList(clazz)) {
                     field.setAccessible(true);
                     OptionWithValues optWithValues = optGroup.getOptionOrArgument(field);
@@ -451,8 +453,8 @@ public class OptionBuilder {
         return instanceObj;
     }
     
-    protected static String findCommandName(Map<String, Class<? extends OptionParameters>> namedHashMap,
-                                            Class<? extends OptionParameters> command) {
+    protected static String findCommandName(Map<String, Class<? extends Command>> namedHashMap,
+                                            Class<? extends Command> command) {
         return namedHashMap.entrySet().stream()
                            .filter(entry -> entry.getValue().equals(command))
                            .map(Map.Entry::getKey).findFirst()
@@ -481,16 +483,16 @@ public class OptionBuilder {
     }
     
     @SuppressWarnings("unchecked")
-    protected static Set<Class<? extends OptionParameters>> findAllExtendedClasses(Class<? extends OptionParameters> type) {
-        Set<Class<? extends OptionParameters>> setClass = new LinkedHashSet<>();
+    protected static Set<Class<? extends Command>> findAllExtendedClasses(Class<? extends Command> type) {
+        Set<Class<? extends Command>> setClass = new LinkedHashSet<>();
         setClass.add(type);
         
         Class<?> superClass = type.getSuperclass();
         if (superClass == null || Object.class.equals(superClass))
             return setClass;
         
-        if (!OptionParameters.class.equals(superClass)) {
-            Class<? extends OptionParameters> classCast = (Class<? extends OptionParameters>) superClass;
+        if (!Command.class.equals(superClass)) {
+            Class<? extends Command> classCast = (Class<? extends Command>) superClass;
             setClass.addAll(findAllExtendedClasses(classCast));
         }
         
@@ -509,7 +511,7 @@ public class OptionBuilder {
         /**
          * Map of all shared-options.
          */
-        private Map<String, OptionValue> sharedOptions = new TreeMap<>();
+        private SortedMap<String, OptionValue> sharedOptions = new TreeMap<>();
         
         public void add(String optName, OptionValue value) throws Exception {
             if (sharedOptions.put(optName, value) != null)
@@ -525,7 +527,7 @@ public class OptionBuilder {
         }
         
         public Set<OptionValue> getOptions() {
-            Set<OptionValue> optSet = new TreeSet<>();
+            SortedSet<OptionValue> optSet = new TreeSet<>();
             for (OptionValue optionValue : sharedOptions.values())
                 optSet.add(optionValue);
             

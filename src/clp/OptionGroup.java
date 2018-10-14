@@ -18,6 +18,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 import java.util.stream.Collectors;
@@ -40,12 +42,12 @@ public final class OptionGroup {
     /**
      * Map of {@link Parameters @Parameters} types to their constructors.
      */
-    private Map<Class<? extends OptionParameters>, Constructor<? extends OptionParameters>> constructorsMap = new HashMap<>();
+    private Map<Class<? extends Command>, Constructor<? extends Command>> constructorsMap = new HashMap<>();
     
     /**
      * Map of option names to {@link Option @Option} fields.
      */
-    private Map<String, OptionValue> namedOptionMap = new TreeMap<>();
+    private SortedMap<String, OptionValue> namedOptionMap = new TreeMap<>();
     
     /**
      * Map of fields to {@link OptionValue}s and {@link PositionalValue}s.
@@ -55,14 +57,14 @@ public final class OptionGroup {
     /**
      * This map contains a collection of fields declared by a class or set of classes.
      */
-    private Map<Class<? extends OptionParameters>, List<Field>> classFieldMap = new HashMap<>();
+    private Map<Class<? extends Command>, List<Field>> classFieldMap = new HashMap<>();
 
     /**
      * List of {@link Argument @Argument} fields.
      */
     private List<PositionalValue> argumentList = new ArrayList<>();
     
-    public OptionGroup(Set<Class<? extends OptionParameters>> setClass) {
+    public OptionGroup(Set<Class<? extends Command>> setClass) {
         setClass = Assert.nonNull(setClass, "Set of classes cannot be null.");
         create(setClass);
     }
@@ -87,26 +89,26 @@ public final class OptionGroup {
         return argumentList;
     }
     
-    public Collection<Field> getFieldList(Class<? extends OptionParameters> type) {
+    public Collection<Field> getFieldList(Class<? extends Command> type) {
         return classFieldMap.get(type);
     }
     
     public Set<OptionValue> getUniqueOptions() {
-        Set<OptionValue> optSet = new TreeSet<>();
+        SortedSet<OptionValue> optSet = new TreeSet<>();
         for (OptionValue optionValue : namedOptionMap.values())
             optSet.add(optionValue);
         return optSet;
     }
     
-    public <T extends OptionParameters> Constructor<T> getConstructor(Class<T> type) {
+    public <T extends Command> Constructor<T> getConstructor(Class<T> type) {
         @SuppressWarnings("unchecked")
         Constructor<T> result = (Constructor<T>) constructorsMap.get(type);
         return result;
     }
     
-    public void create(Set<Class<? extends OptionParameters>> setClass) {
+    public void create(Set<Class<? extends Command>> setClass) {
         // Loop over all the class hierarchy if any
-        for (Class<? extends OptionParameters> type : setClass) {
+        for (Class<? extends Command> type : setClass) {
             // Parse all annotated fields
             List<Field> fields = findAnnotatedFields(type);
             for (Field field : fields) {
@@ -540,7 +542,7 @@ public final class OptionGroup {
                      .get();
     }
     
-    protected static List<Field> findAnnotatedFields(Class<? extends OptionParameters> type) {
+    protected static List<Field> findAnnotatedFields(Class<? extends Command> type) {
         List<Field> fields = Arrays.stream(type.getDeclaredFields())
                                    .filter(field -> isOption(field) || isArgument(field))
                                    .collect(Collectors.toList());
@@ -559,7 +561,7 @@ public final class OptionGroup {
         return field;
     }
     
-    protected static Constructor<? extends OptionParameters> findConstructor(Class<? extends OptionParameters> type) {
+    protected static Constructor<? extends Command> findConstructor(Class<? extends Command> type) {
         try {
             // This will fail if the extended class has no default constructor.
             // One must ALWAYS be provided!

@@ -1,8 +1,8 @@
 package clp;
 
 /**
- * The class {@link OptionParameters} serves as the base class for
- * all extended commands in ProcessJ.
+ * The class {@link Command} serves as the base class
+ * for all extended commands in ProcessJ.
  * <p>
  * See {@link Parameters @Parameters}.
  * </p>
@@ -11,7 +11,7 @@ package clp;
  * @version 08/11/2018
  * @since 1.2
  */
-public abstract class OptionParameters {
+public abstract class Command {
     
     @Override
     public final int hashCode() {
@@ -23,13 +23,10 @@ public abstract class OptionParameters {
     
     @Override
     public final boolean equals(Object obj) {
-        if (this == obj) {
+        if (this == obj)
             return true;
-        }
-
-        if (obj == null || getClass() != obj.getClass()) {
+        if (obj == null || getClass() != obj.getClass())
             return false;
-        }
         
         return true;
     }

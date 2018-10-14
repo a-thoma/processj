@@ -155,7 +155,7 @@ public class FormatterHelp {
     }
     public String buildUsage() {
         StringBuilder stringBuilder = new StringBuilder();
-        Map<Class<? extends OptionParameters>, OptionGroup> commandAndOptions = optionBuilder.getCommandAndOptionMap();
+        Map<Class<? extends Command>, OptionGroup> commandAndOptions = optionBuilder.getCommandAndOptionMap();
         boolean additionalCommands = commandAndOptions.size() > 1;
         // Grab the list of commands declared in the program
         List<String> commands = new ArrayList<>();
@@ -163,7 +163,7 @@ public class FormatterHelp {
         // For every option defined in a command
         for (String commandName : commands) {
             // Grab the option and append it to its command
-            Class<? extends OptionParameters> command = optionBuilder.getNamedAndCommandMap().get(commandName);
+            Class<? extends Command> command = optionBuilder.getNamedAndCommandMap().get(commandName);
             if (additionalCommands)
                 stringBuilder.append("[")
                              .append(OptionBuilder.findCommandName(optionBuilder.getNamedAndCommandMap(), command))
@@ -226,7 +226,7 @@ public class FormatterHelp {
     }
     
     public StringBuilder buildArguments(StringBuilder stringBuilder, int indent) {
-        Map<Class<? extends OptionParameters>, OptionGroup> commandAndOptionMap = optionBuilder.getCommandAndOptionMap();
+        Map<Class<? extends Command>, OptionGroup> commandAndOptionMap = optionBuilder.getCommandAndOptionMap();
         // For each argument part of the main command
         for (OptionGroup optionGroup : commandAndOptionMap.values()) {
             for (PositionalValue positionValue : optionGroup.getArguments()) {
@@ -242,14 +242,13 @@ public class FormatterHelp {
     }
     
     public StringBuilder buildCommandAndOptions(StringBuilder stringBuilder, int indent) {
-        Map<Class<? extends OptionParameters>, OptionGroup> commandAndOptionMap = optionBuilder.getCommandAndOptionMap();
-        Map<String, Class<? extends OptionParameters>> namedAndCommandMap = optionBuilder.getNamedAndCommandMap();
+        Map<Class<? extends Command>, OptionGroup> commandAndOptionMap = optionBuilder.getCommandAndOptionMap();
+        Map<String, Class<? extends Command>> namedAndCommandMap = optionBuilder.getNamedAndCommandMap();
         // For each command defined in the program
-        for (Map.Entry<Class<? extends OptionParameters>, OptionGroup> entry : commandAndOptionMap.entrySet()) {
+        for (Map.Entry<Class<? extends Command>, OptionGroup> entry : commandAndOptionMap.entrySet()) {
             // If we have more than one command, then append each individually
             if (commandAndOptionMap.size() > 1)
-                stringBuilder.append(">")
-                             .append(OptionBuilder.findCommandName(namedAndCommandMap, entry.getKey()) + ": ");
+                stringBuilder.append(OptionBuilder.findCommandName(namedAndCommandMap, entry.getKey()) + ":\n");
             List<OptionValue> optionList = new ArrayList<>();
             optionList.addAll(entry.getValue().getUniqueOptions());
             for (OptionValue optionValue : optionList) {
