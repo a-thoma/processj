@@ -93,11 +93,10 @@ public class OptionBuilder {
                 }
             } else if (isOption(argument)) {
                 OptionValue optionValue = optGroup.getOption(argument);
-                if (optionValue == null) {
-                    // Throw an error if the option does not belong to the invoked command type
+                // Throw an error if the option does not belong to the invoked command type
+                if (optionValue == null)
                     throw new RuntimeException(String.format("Unknown @Option '%s' for @Parameters '%s'.",
                                 argument, findCommandName(namedAndCommandMap, type)));
-                }
                 index = parseOption(optGroup, optionValue, index, args);
             } else if (isCommand(argument)) {
                 subParameters = true;
@@ -109,10 +108,9 @@ public class OptionBuilder {
                             String.join("\n", maybeList)));
             } else {
                 // Throw an error if the running command takes no arguments
-                if (optGroup.getArguments().size() == 0) {
+                if (optGroup.getArguments().size() == 0)
                     throw new RuntimeException(String.format("@Parameters '%s' takes zero arguments.",
                                 findCommandName(namedAndCommandMap, type)));
-                }
                 // Unparsed values are treated as positional arguments
                 positionArgs.add(argument);
                 ++index;
@@ -127,8 +125,8 @@ public class OptionBuilder {
             // Sub-commands are ALWAYS invoked last
             handleArgs(args, namedAndCommandMap.get(args[index]), index + 1, new ArrayList<>());
         
-        // Validate required options
-        validateRequired();
+        // Validate required command line options
+        validateRequiredOptions();
     }
     
     private int parseOption(OptionGroup optGroup,
@@ -290,7 +288,7 @@ public class OptionBuilder {
         return mainCommand;
     }
     
-    private void validateRequired() {
+    private void validateRequiredOptions() {
         List<String> optNames = new ArrayList<>();
         
         for (Class<? extends OptionParameters> type : invokedCommandList) {
@@ -421,7 +419,7 @@ public class OptionBuilder {
         return candidateList;
     }
     
-    public static MultiValueMap<Integer, String> sortCandidateOptions(MultiValueMap<Integer, String> options) {
+    protected static MultiValueMap<Integer, String> sortCandidateOptions(MultiValueMap<Integer, String> options) {
         MultiValueMap<Integer, String> sortedOptions = new MultiValueMap<>();
         List<Integer> keys = new ArrayList<>(options.keys());
         Collections.sort(keys);

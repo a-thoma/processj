@@ -60,7 +60,8 @@ public final class PositionalValue extends OptionWithValues {
         if (help.length() <= charLeft)
             return stringBuilder.append(help).toString();
         
-        List<String> words = Arrays.asList(help.split(" "));
+        String newHelp = defaultValue.isEmpty() ? help : help + " (default: " + defaultValue + ")";
+        List<String> words = Arrays.asList(newHelp.split(" "));
         int charCount = 0;
         for (Iterator<String> it = words.iterator(); it.hasNext(); ) {
             String word = it.next();

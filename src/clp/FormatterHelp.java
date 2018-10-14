@@ -119,7 +119,7 @@ public class FormatterHelp {
      *          The long and short names of an option.
      * @return The number of characters specified in the argument.
      */
-    public static int getOptionLength(OptionValue option) {
+    public int getOptionLength(OptionValue option) {
         int length = 1;
         for (String name : option.getNames()) {
             length += name.length();
@@ -168,7 +168,7 @@ public class FormatterHelp {
                 stringBuilder.append("[")
                              .append(OptionBuilder.findCommandName(optionBuilder.getNamedAndCommandMap(), command))
                              .append(": ");
-            // For each group of options, grab unique options
+            // For each group of options
             List<OptionValue> options = new ArrayList<>();
             options.addAll(commandAndOptions.get(command).getUniqueOptions());
             // Build a `usage' for this command and its options
@@ -184,7 +184,7 @@ public class FormatterHelp {
         // For every argument defined in the main command
         List<PositionalValue> arguments = new ArrayList<>();
         arguments.addAll(commandAndOptions.get(optionBuilder.getMainCommand()).getArguments());
-        // Finish the `usage' for the main command
+        // Build the `usage' (of positional arguments) for the main command
         for (Iterator<PositionalValue> it = arguments.iterator(); it.hasNext();) {
             PositionalValue positional = it.next();
             if (positional.getMetavar().isEmpty())
@@ -200,7 +200,6 @@ public class FormatterHelp {
     public String buildHeader() {
         Parameters parameter = optionBuilder.getMainCommand().getAnnotation(Parameters.class);
         StringBuilder stringBuilder = new StringBuilder();
-        
         int indent = findMaxLength(parameter.header());
         indent = (DEFAULT_WIDTH - indent) / 2;
         for (String header : parameter.header())
@@ -274,7 +273,7 @@ public class FormatterHelp {
         // `PositionalValues') are not taken into account
         int indent = 0;
         for (OptionValue optionValue : optionBuilder.getSharedOptions().getOptions()) {
-            int optionIndent = FormatterHelp.getOptionLength(optionValue);
+            int optionIndent = getOptionLength(optionValue);
             if (optionIndent > indent)
                 indent = optionIndent;
         }

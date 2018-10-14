@@ -28,6 +28,11 @@ public abstract class OptionWithValues implements Comparable<OptionWithValues> {
      * argument is.
      */
     protected String metavar;
+    
+    /**
+     * The default value for this option as a string.
+     */
+    protected String defaultValue;
 
     /**
      * Indicates whether an option or argument is required or not.
@@ -82,6 +87,7 @@ public abstract class OptionWithValues implements Comparable<OptionWithValues> {
         field = builder.field;
         parsers = builder.parsers;
         arity = builder.arity;
+        defaultValue = builder.defaultValue;
     }
 
     // -----------------------------------------------------------------------------
@@ -100,6 +106,10 @@ public abstract class OptionWithValues implements Comparable<OptionWithValues> {
 
     public final String getMetavar() {
         return metavar;
+    }
+    
+    public final String getDefaultValue() {
+        return defaultValue;
     }
 
     public final boolean isRequired() {
@@ -164,6 +174,7 @@ public abstract class OptionWithValues implements Comparable<OptionWithValues> {
         
         protected String help;
         protected String metavar;
+        protected String defaultValue;
         protected boolean required;
         protected boolean hidden;
         protected String split;
@@ -177,6 +188,7 @@ public abstract class OptionWithValues implements Comparable<OptionWithValues> {
         public Builder() {
             help = null;
             metavar = null;
+            defaultValue = null;
             required = false;
             hidden = false;
             split = null;
@@ -198,6 +210,11 @@ public abstract class OptionWithValues implements Comparable<OptionWithValues> {
         
         public B setMetavar(String metavar) {
             this.metavar = metavar;
+            return builder();
+        }
+        
+        public B setDefaultValue(String defaultValue) {
+            this.defaultValue = defaultValue;
             return builder();
         }
         

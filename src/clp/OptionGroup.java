@@ -265,6 +265,7 @@ public final class OptionGroup {
         builder.setHelp(annotation.help());
         builder.setValueSeparator(annotation.split());
         builder.setMetavar(annotation.metavar());
+        builder.setDefaultValue(annotation.defaultValue());
         
         // Build option and parse the value assigned to `defaultValue'
         OptionValue option = builder.build();
@@ -289,7 +290,7 @@ public final class OptionGroup {
         
         builder.setArity(order);
         
-        // Same as @Options, except that arguments cannot be of type Map.
+        // Same as @Options except that arguments cannot be of type Map.
         // Only one type should be returned and one parser instance should
         // be created. Complex data types such as user-defined types must
         // be explicitly specified
@@ -329,6 +330,7 @@ public final class OptionGroup {
         builder.setRequired(annotation.required());
         builder.setValueSeparator(annotation.split());
         builder.setMetavar(annotation.metavar());
+        builder.setDefaultValue(annotation.defaultValue());
         
         // Build argument and parse the value assigned to `defaultValue'
         PositionalValue argument = builder.build();
