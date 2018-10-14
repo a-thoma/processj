@@ -41,7 +41,7 @@ public final class PositionalValue extends OptionWithValues {
         return order;
     }
     
-    public String getOptionHelp(int indent, int width) {
+    public String getOptionOrArgumentHelp(int indent, int width) {
         int defaultLength = FormatterHelp.DEFAULT_LENGTH;
         defaultLength += help.length();
         StringBuilder stringBuilder = new StringBuilder(defaultLength);
@@ -75,6 +75,15 @@ public final class PositionalValue extends OptionWithValues {
         }
         
         return stringBuilder.toString();
+    }
+
+    @Override
+    public int compareTo(OptionWithValues o) {
+        PositionalValue p1 = (PositionalValue) this;
+        PositionalValue p2 = (PositionalValue) o;
+        String p1Name = p1.metavar.isEmpty()? p1.fieldName : p1.metavar;
+        String p2Name = p2.metavar.isEmpty()? p2.fieldName : p2.metavar;
+        return (p1Name.compareToIgnoreCase(p2Name));
     }
     
     @Override

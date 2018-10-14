@@ -170,9 +170,7 @@ public final class Util {
     
     /**
      * Find the Levenshtein distance between two Strings (Naive approach).
-     * TODO: change this to vector space model! 
      * 
-     * @see <a href="https://en.wikipedia.org/wiki/Levenshtein_distance">https://en.wikipedia.org/wiki/Levenshtein_distance</a>
      * @param src
      *          The source string.
      * @param target

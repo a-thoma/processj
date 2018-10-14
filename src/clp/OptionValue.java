@@ -41,7 +41,7 @@ public final class OptionValue extends OptionWithValues {
         return names;
     }
     
-    public String getOptionHelp(int indent, int width) {
+    public String getOptionOrArgumentHelp(int indent, int width) {
         StringBuilder stringBuilder = new StringBuilder(FormatterHelp.DEFAULT_LENGTH + help.length());
         stringBuilder.append(" ");
         
@@ -82,6 +82,11 @@ public final class OptionValue extends OptionWithValues {
         }
         
         return stringBuilder.toString();
+    }
+
+    @Override
+    public int compareTo(OptionWithValues o) {
+        return ((OptionValue) this).name.compareToIgnoreCase(((OptionValue) o).name);
     }
     
     @Override

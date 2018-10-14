@@ -2,8 +2,6 @@ package clp;
 
 import java.util.ArrayList;
 import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -27,8 +25,6 @@ public class FormatterHelp {
     public static final String PARAMETERS_PREFIX = "Parameters: ";
     
     public static final String OPTIONS_PREFIX = "Options: ";
-    
-    public static final String DEFAULT_SEPARATOR = " ";
     
     public boolean sorted = false;
     
@@ -66,7 +62,7 @@ public class FormatterHelp {
      */
     public int buildLine(StringBuilder stringBuilder, String word, int numWords) {
         if (numWords > 0)
-            stringBuilder.append(DEFAULT_SEPARATOR);
+            stringBuilder.append(" ");
         stringBuilder.append(word);
         
         return numWords + 1;
@@ -101,7 +97,7 @@ public class FormatterHelp {
                 int j = 0;
                 // Add spaces based on the amount needed for the line
                 while (j <= insertSpaces) {
-                    stringBuilder.append(DEFAULT_SEPARATOR);
+                    stringBuilder.append(" ");
                     ++j;
                 }
                 // Reduce number of spaces needed in the sentence
@@ -134,16 +130,36 @@ public class FormatterHelp {
         return length;
     }
     
+    
+    public String formatUsage(String usage) {
+        Parameters parameter = optionBuilder.getMainCommand().getAnnotation(Parameters.class); 
+        StringBuilder stringBuilder = new StringBuilder();        
+        List<String> words = Arrays.asList(usage.split(" "));
+        int indent = USAGE_PREFIX.length() + parameter.name().length() + 1;
+        int charLeft = DEFAULT_WIDTH - indent;
+        int charCount = 0;
+        stringBuilder.append(USAGE_PREFIX + parameter.name() + " ");
+        for (Iterator<String> it = words.iterator(); it.hasNext(); ) {
+            String word = it.next();
+            charCount += word.length() + 1;
+            if (charCount > charLeft) {
+                stringBuilder.append("\n").append(StringUtil.countSpaces(indent));
+                charCount = word.length() + 1;
+            }
+            stringBuilder.append(word);
+            if (it.hasNext())
+                stringBuilder.append(" ");
+        }
+        
+        return stringBuilder.toString();
+    }
     public String buildUsage() {
         StringBuilder stringBuilder = new StringBuilder();
-        
         Map<Class<? extends OptionParameters>, OptionGroup> commandAndOptions = optionBuilder.getCommandAndOptionMap();
         boolean additionalCommands = commandAndOptions.size() > 1;
-        
-        // Grab the list of commands and sort them
+        // Grab the list of commands declared in the program
         List<String> commands = new ArrayList<>();
         commands.addAll(optionBuilder.getNamedAndCommandMap().keySet());
-        Collections.sort(commands);
         // For every option defined in a command
         for (String commandName : commands) {
             // Grab the option and append it to its command
@@ -152,24 +168,22 @@ public class FormatterHelp {
                 stringBuilder.append("[")
                              .append(OptionBuilder.findCommandName(optionBuilder.getNamedAndCommandMap(), command))
                              .append(": ");
-            // For every group of options in the command, sort its list of
-            // options in lexicographic order
+            // For each group of options, grab unique options
             List<OptionValue> options = new ArrayList<>();
-            options.addAll(commandAndOptions.get(command).getOptionSet());
-            Collections.sort(options, OPTION_COMPARATOR);
+            options.addAll(commandAndOptions.get(command).getUniqueOptions());
             // Build a `usage' for this command and its options
             for (Iterator<OptionValue> it = options.iterator(); it.hasNext();) {
                 stringBuilder.append(buildOption(it.next()));
                 if (it.hasNext())
-                    stringBuilder.append(DEFAULT_SEPARATOR);
+                    stringBuilder.append(" ");
             }
             if (additionalCommands)
                 stringBuilder.append("] ");
         }
-        stringBuilder.append(DEFAULT_SEPARATOR);
+        stringBuilder.append(" ");
         // For every argument defined in the main command
         List<PositionalValue> arguments = new ArrayList<>();
-        arguments.addAll(commandAndOptions.get(optionBuilder.getMainCommand()).getPositionalArgs());
+        arguments.addAll(commandAndOptions.get(optionBuilder.getMainCommand()).getArguments());
         // Finish the `usage' for the main command
         for (Iterator<PositionalValue> it = arguments.iterator(); it.hasNext();) {
             PositionalValue positional = it.next();
@@ -178,12 +192,12 @@ public class FormatterHelp {
             else
                 stringBuilder.append(positional.getMetavar());
             if (it.hasNext())
-                stringBuilder.append(DEFAULT_SEPARATOR);
+                stringBuilder.append(" ");
         }
         return formatUsage(stringBuilder.toString());
     }
     
-    public String formatHeader() {
+    public String buildHeader() {
         Parameters parameter = optionBuilder.getMainCommand().getAnnotation(Parameters.class);
         StringBuilder stringBuilder = new StringBuilder();
         
@@ -202,7 +216,7 @@ public class FormatterHelp {
         return stringBuilder.append("\n").toString();
     }
     
-    public String formatFooter() {
+    public String buildFooter() {
         Parameters parameter = optionBuilder.getMainCommand().getAnnotation(Parameters.class);
         StringBuilder stringBuilder = new StringBuilder();
         for (String footer : parameter.footer())
@@ -212,92 +226,78 @@ public class FormatterHelp {
         return stringBuilder.append("\n").toString();
     }
     
-    public String formatUsage(String usage) {
-        StringBuilder stringBuilder = new StringBuilder();        
-        List<String> words = Arrays.asList(usage.split(" "));
-        int charLeft = DEFAULT_WIDTH - USAGE_PREFIX.length();
-        int charCount = 0;
-        stringBuilder.append(USAGE_PREFIX);
-        for (Iterator<String> it = words.iterator(); it.hasNext(); ) {
-            String word = it.next();
-            charCount += word.length() + 1;
-            if (charCount > charLeft) {
-                stringBuilder.append("\n").append(StringUtil.countSpaces(USAGE_PREFIX.length()));
-                charCount = word.length() + 1;
-            }
-            stringBuilder.append(word);
-            if (it.hasNext())
-                stringBuilder.append(DEFAULT_SEPARATOR);
-        }
-        
-        return stringBuilder.toString();
-    }
-    
-    public String usagePage() {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append("\n")
-                     .append(formatHeader())
-                     .append(buildUsage())
-                     .append("\n");
-        // Find maximum length
-        int indent = 0;
-        for (OptionValue optionValue : optionBuilder.getSharedOptions().getOptions()) {
-            int optionIndent = FormatterHelp.getOptionLength(optionValue);
-            if (optionIndent > indent)
-                indent = optionIndent;
-        }
-        
-        Map<String, Class<? extends OptionParameters>> namedAndCommandMap = optionBuilder.getNamedAndCommandMap();
+    public StringBuilder buildArguments(StringBuilder stringBuilder, int indent) {
         Map<Class<? extends OptionParameters>, OptionGroup> commandAndOptionMap = optionBuilder.getCommandAndOptionMap();
-        
-        stringBuilder.append("\n")
-                     .append(PARAMETERS_PREFIX)
-                     .append("\n");
+        // For each argument part of the main command
         for (OptionGroup optionGroup : commandAndOptionMap.values()) {
-            for (PositionalValue positionValue : optionGroup.getPositionalArgs()) {
-                String argumentHelp = positionValue.getOptionHelp(indent, DEFAULT_WIDTH);
+            for (PositionalValue positionValue : optionGroup.getArguments()) {
+                String argumentHelp = positionValue.getOptionOrArgumentHelp(indent, DEFAULT_WIDTH);
                 if (argumentHelp != null)
                     stringBuilder.append(argumentHelp)
                                  .append("\n");
             }
             stringBuilder.append("\n");
-        }
+        }        
         
-        // This is added for future commands that precede their options
-        // For example: command -option <arguments>
-        stringBuilder.append(OPTIONS_PREFIX)
-                     .append("\n");
+        return stringBuilder;
+    }
+    
+    public StringBuilder buildCommandAndOptions(StringBuilder stringBuilder, int indent) {
+        Map<Class<? extends OptionParameters>, OptionGroup> commandAndOptionMap = optionBuilder.getCommandAndOptionMap();
+        Map<String, Class<? extends OptionParameters>> namedAndCommandMap = optionBuilder.getNamedAndCommandMap();
+        // For each command defined in the program
         for (Map.Entry<Class<? extends OptionParameters>, OptionGroup> entry : commandAndOptionMap.entrySet()) {
+            // If we have more than one command, then append each individually
             if (commandAndOptionMap.size() > 1)
-                // If we have more than one command, then output each command individually
                 stringBuilder.append(">")
-                             .append(OptionBuilder.findCommandName(namedAndCommandMap, entry.getKey()) + ":");
-            
-            OptionGroup optionGroup = commandAndOptionMap.get(entry.getKey());
+                             .append(OptionBuilder.findCommandName(namedAndCommandMap, entry.getKey()) + ": ");
             List<OptionValue> optionList = new ArrayList<>();
-            optionList.addAll(optionGroup.getOptionSet());
-            Collections.sort(optionList, OPTION_COMPARATOR);
+            optionList.addAll(entry.getValue().getUniqueOptions());
             for (OptionValue optionValue : optionList) {
-                String optionHelp = optionValue.getOptionHelp(indent, DEFAULT_WIDTH);
+                String optionHelp = optionValue.getOptionOrArgumentHelp(indent, DEFAULT_WIDTH);
                 if (optionHelp != null)
                     stringBuilder.append(optionHelp)
                                  .append("\n");
             }
             stringBuilder.append("\n");
         }
-        
-        stringBuilder.append(formatFooter());
+        return stringBuilder;
+    }
+    
+    public String createUsagePage() {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append("\n")
+                     .append(buildHeader())
+                     .append(buildUsage())
+                     .append("\n");
+        // Find the maximum number of characters in an option. NOTE: arguments (or
+        // `PositionalValues') are not taken into account
+        int indent = 0;
+        for (OptionValue optionValue : optionBuilder.getSharedOptions().getOptions()) {
+            int optionIndent = FormatterHelp.getOptionLength(optionValue);
+            if (optionIndent > indent)
+                indent = optionIndent;
+        }
+        // Create and build the list of arguments
+        stringBuilder.append("\n")
+                     .append(PARAMETERS_PREFIX)
+                     .append("\n");
+        buildArguments(stringBuilder, indent);
+        // Create and build the list of commands and options
+        stringBuilder.append(OPTIONS_PREFIX)
+                     .append("\n");
+        buildCommandAndOptions(stringBuilder, indent);
+        stringBuilder.append(buildFooter());
         
         return stringBuilder.toString();
     }
     
     /**
-     * Builds a description of all the possible names that an option may
-     * take.
+     * Concatenates all possible names that an option may take.
      * 
      * @param optionValue
      *          The option a program takes.
-     * @return A description of an command line option.
+     * @return A string representing all possibles names of an option.
      */
     public String buildOption(OptionValue optionValue) {
         StringBuilder stringBuilder = new StringBuilder();
@@ -316,20 +316,11 @@ public class FormatterHelp {
             stringBuilder.append(optionValue.split)
                          .append(optionValue.metavar);
         else if (!optionValue.metavar.isEmpty())
-            stringBuilder.append(DEFAULT_SEPARATOR)
+            stringBuilder.append(" ")
                          .append(optionValue.metavar);
         if (!optionValue.isRequired())
             stringBuilder.append("]");
         
         return stringBuilder.toString();
     }
-    
-    private static final class OptionComparator implements Comparator<OptionValue> {
-        @Override
-        public int compare(OptionValue o1, OptionValue o2) {
-            return o1.getName().compareToIgnoreCase(o2.getName());
-        }
-    }
-    
-    private static final OptionComparator OPTION_COMPARATOR = new OptionComparator();
 }

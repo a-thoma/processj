@@ -88,7 +88,7 @@ public class ProcessJc {
         
         if (pjMain.help) {
             FormatterHelp formatHelp = new FormatterHelp(optionBuilder);
-            System.out.println(formatHelp.usagePage());
+            System.out.println(formatHelp.createUsagePage());
             System.exit(0);
         }
         

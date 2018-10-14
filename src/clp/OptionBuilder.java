@@ -7,7 +7,6 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
@@ -15,7 +14,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
+import java.util.TreeSet;
 
 import utilities.MultiValueMap;
 
@@ -110,7 +109,7 @@ public class OptionBuilder {
                             String.join("\n", maybeList)));
             } else {
                 // Throw an error if the running command takes no arguments
-                if (optGroup.getPositionalArgs().size() == 0) {
+                if (optGroup.getArguments().size() == 0) {
                     throw new RuntimeException(String.format("@Parameters '%s' takes zero arguments.",
                                 findCommandName(namedAndCommandMap, type)));
                 }
@@ -199,7 +198,7 @@ public class OptionBuilder {
                                List<String> argList) {
         // Current position of an argument
         int index = 0;
-        for (PositionalValue argument : optGroup.getPositionalArgs()) {
+        for (PositionalValue argument : optGroup.getArguments()) {
             ArityRange order = argument.getArity();
             // The minimum number of values to consume
             int getFrom = order.getFrom();
@@ -355,7 +354,7 @@ public class OptionBuilder {
         OptionValue optionValue = options.get(argName);
         
         if (optionValue != null)
-            return optionValue.getValueSeparator();
+            return optionValue.getSplit();
 
         return null;
     }
@@ -441,7 +440,7 @@ public class OptionBuilder {
             for (Class<? extends OptionParameters> clazz : classes) {
                 for (Field field : optGroup.getFieldList(clazz)) {
                     field.setAccessible(true);
-                    OptionWithValues optWithValues = optGroup.getOption(field);
+                    OptionWithValues optWithValues = optGroup.getOptionOrArgument(field);
                     if (optWithValues.getValue() != null)
                         field.set(instanceObj, optWithValues.getValue());
                 }
@@ -512,7 +511,7 @@ public class OptionBuilder {
         /**
          * Map of all shared-options.
          */
-        private Map<String, OptionValue> sharedOptions = new HashMap<>();
+        private Map<String, OptionValue> sharedOptions = new TreeMap<>();
         
         public void add(String optName, OptionValue value) throws Exception {
             if (sharedOptions.put(optName, value) != null)
@@ -528,7 +527,7 @@ public class OptionBuilder {
         }
         
         public Set<OptionValue> getOptions() {
-            Set<OptionValue> optSet = new HashSet<>();
+            Set<OptionValue> optSet = new TreeSet<>();
             for (OptionValue optionValue : sharedOptions.values())
                 optSet.add(optionValue);
             

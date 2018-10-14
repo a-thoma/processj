@@ -45,7 +45,7 @@ import utilities.Language;
             notes = {   "If called without options, the program may terminate. Use '-help' for a",
                         "list of possible commands and options"
                         },
-            footer = {  "Run 'pjc -about <arg>' for help with a specific command.\n",
+            footer = {  "Run 'pjc -about <arg>' for help with a specific command or option.\n",
                         "Full documentation at: https://processj.org",
                         "Bug reports, feedback, complains, love, food, etc, to matt.pedersen@unlv.edu"
                         },
@@ -79,8 +79,8 @@ public class PJMain extends OptionParameters {
             metavar = "<language>",
             help = "Specify the target language. C: C source code is written, compiled, "
                     + "and linked with the CSSP runtime; C++: C++ source code is generated "
-                    + "and compiled into an executable; JVM: JVM class files are written; "
-                    + "JS: JavaScript is written")
+                    + "and compiled into an executable; JVM: JVM class files are written "
+                    + "and compiled; JS: JavaScript is written")
     public Language target;
     
     @Option(names = {"-v", "-version"},
@@ -122,7 +122,7 @@ public class PJMain extends OptionParameters {
     public boolean topDeclsVisitor;
     
     @Option(names = "-about",
-            help = "Provide additional information about a specific option or command",
+            help = "Provide additional information about a specific command or option",
             metavar = "<arg>")
     public String info;
     
@@ -139,9 +139,13 @@ public class PJMain extends OptionParameters {
             split = "=")
     public int errorCode;
     
+    @Option(names = "-clp",
+            help = "ProcessJ command-line processor and conventions")
+    public boolean clp;
+    
     @Argument(metavar = "<file>",
               help = "The file (or files) to compile",
-              order = "0..*")
+              order = "1..*")
     public List<File> files;
     
     public static class VersionPrinter implements IVersionPrinter {

@@ -15,10 +15,11 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.TreeMap;
+import java.util.TreeSet;
 import java.util.stream.Collectors;
 
 import clp.parsers.EnumParser;
@@ -44,7 +45,7 @@ public final class OptionGroup {
     /**
      * Map of option names to {@link Option @Option} fields.
      */
-    private Map<String, OptionValue> namedOptionMap = new HashMap<>();
+    private Map<String, OptionValue> namedOptionMap = new TreeMap<>();
     
     /**
      * Map of fields to {@link OptionValue}s and {@link PositionalValue}s.
@@ -70,7 +71,7 @@ public final class OptionGroup {
         return namedOptionMap.get(optName);
     }
     
-    public OptionWithValues getOption(Field field) {
+    public OptionWithValues getOptionOrArgument(Field field) {
         return fieldOptionMap.get(field);
     }
 
@@ -82,7 +83,7 @@ public final class OptionGroup {
         return namedOptionMap.keySet();
     }
     
-    public List<PositionalValue> getPositionalArgs() {
+    public List<PositionalValue> getArguments() {
         return argumentList;
     }
     
@@ -90,8 +91,8 @@ public final class OptionGroup {
         return classFieldMap.get(type);
     }
     
-    public Set<OptionValue> getOptionSet() {
-        Set<OptionValue> optSet = new HashSet<>();
+    public Set<OptionValue> getUniqueOptions() {
+        Set<OptionValue> optSet = new TreeSet<>();
         for (OptionValue optionValue : namedOptionMap.values())
             optSet.add(optionValue);
         return optSet;

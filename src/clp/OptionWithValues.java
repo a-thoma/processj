@@ -11,7 +11,7 @@ import java.lang.reflect.Field;
  * @version 08/20/2018
  * @since 1.2
  */
-public abstract class OptionWithValues {
+public abstract class OptionWithValues implements Comparable<OptionWithValues> {
     
     /**
      * The descriptive text messaged used in the help information.
@@ -110,7 +110,7 @@ public abstract class OptionWithValues {
         return hidden;
     }
 
-    public final String getValueSeparator() {
+    public final String getSplit() {
         return split;
     }
 
@@ -147,7 +147,7 @@ public abstract class OptionWithValues {
         return arity;
     }
     
-    public abstract String getOptionHelp(int indent, int width);
+    public abstract String getOptionOrArgumentHelp(int indent, int width);
     
     /**
      * The class {@link Builder} uses descriptive methods to create options
