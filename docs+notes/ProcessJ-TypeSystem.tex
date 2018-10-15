@@ -70,16 +70,7 @@ If we count mobile procedures, ProcessJ has 6 constructed types; they are shown 
 
 \section{Helper Functions}
 
-\subsection{Ceiling}
-
-\[
-\lceil \alpha, \beta \rceil := \left\{
-\begin{array}{ll}
-\alpha & \beta \tle \alpha\\
-\beta  & \alpha \tlt \beta\\
-\bot   & \mbox{otherwise}
-\end{array}\right.
-\]
+A number of helper functions related to types are needed. These include type-versions of $<$ and $\leq$ as well as a ceiling function ($\lceil\ \rceil$). Furthermore, we need a number of {\it predicates}; a predicate -- in this context -- always has a subscript ? on it name. For example: {\it Numeric}$_{?}$.
 
 \subsection{$\tlt$}
 
@@ -175,6 +166,18 @@ Not sure what goes here yet.
 \[
 \alpha \tle \beta \Leftrightarrow (\alpha \teq \beta) \vee (\alpha \tle \beta)
 \]
+
+\subsection{Ceiling}
+
+\[
+\lceil \alpha, \beta \rceil := \left\{
+\begin{array}{ll}
+\alpha & \beta \tle \alpha\\
+\beta  & \alpha \tlt \beta\\
+\bot   & \mbox{otherwise}
+\end{array}\right.
+\]
+
 
 \section{Primitive Types}
 
