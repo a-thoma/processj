@@ -20,11 +20,13 @@ public class FormatterHelp {
     
     public static final int DEFAULT_LENGTH = 32;
     
-    public static final String USAGE_PREFIX = "Usage: ";
+    public static final int MAX_CHAR_COUNT = 27;
     
-    public static final String PARAMETERS_PREFIX = "Parameters: ";
+    public static final String USAGE_PREFIX = "USAGE: ";
     
-    public static final String OPTIONS_PREFIX = "Options: ";
+    public static final String PARAMETERS_PREFIX = "PARAMETERS: ";
+    
+    public static final String OPTIONS_PREFIX = "OPTIONS: ";
     
     public boolean sorted = false;
     
@@ -139,7 +141,7 @@ public class FormatterHelp {
         int charLeft = DEFAULT_WIDTH - indent;
         int charCount = 0;
         stringBuilder.append(USAGE_PREFIX + parameter.name() + " ");
-        for (Iterator<String> it = words.iterator(); it.hasNext(); ) {
+        for (Iterator<String> it = words.iterator(); it.hasNext();) {
             String word = it.next();
             charCount += word.length() + 1;
             if (charCount > charLeft) {
@@ -276,6 +278,10 @@ public class FormatterHelp {
             if (optionIndent > indent)
                 indent = optionIndent;
         }
+        
+        if (indent >= MAX_CHAR_COUNT)
+            indent = MAX_CHAR_COUNT;
+        
         // Create and build the list of arguments
         stringBuilder.append("\n")
                      .append(PARAMETERS_PREFIX)

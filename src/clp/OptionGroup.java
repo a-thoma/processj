@@ -546,9 +546,9 @@ public final class OptionGroup {
         List<Field> fields = Arrays.stream(type.getDeclaredFields())
                                    .filter(field -> isOption(field) || isArgument(field))
                                    .collect(Collectors.toList());
-        if (fields.isEmpty())
-            throw new RuntimeException("At least one field must have an annotation "
-                        + "attached to it.");
+//        if (fields.isEmpty())
+//            throw new RuntimeException("At least one field must have an annotation "
+//                        + "attached to it.");
         return fields;
     }
 

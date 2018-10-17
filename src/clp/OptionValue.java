@@ -1,6 +1,7 @@
 package clp;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -74,7 +75,8 @@ public final class OptionValue extends OptionWithValues {
             String word = it.next();
             charCount += word.length() + 1;
             if (charCount > charLeft) {
-                stringBuilder.append("\n").append(StringUtil.countSpaces(indent - 1));
+                stringBuilder.append("\n")
+                             .append(StringUtil.countSpaces(indent - 1));
                 charCount = word.length() + 1;
             }
             stringBuilder.append(word);
@@ -148,7 +150,9 @@ public final class OptionValue extends OptionWithValues {
         }
 
         public Builder setNames(String[] names) {
-            this.names = names;
+            List<String> sortedNames = Arrays.asList(names);
+            Collections.sort(sortedNames, StringUtil.SORT_BY_LENGTH);
+            this.names = sortedNames.toArray(new String[0]);
             return this;
         }
         

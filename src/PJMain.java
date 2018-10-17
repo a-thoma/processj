@@ -1,4 +1,7 @@
 import java.io.File;
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.Date;
 import java.util.List;
 
 import clp.Argument;
@@ -53,8 +56,6 @@ import utilities.Language;
             help = "The following options are available:",
             versionPrinter = PJMain.VersionPrinter.class)
 public class PJMain extends Command {
-    
-    public VersionPrinter versionPrinter = new VersionPrinter();
 
     // TODO: This is for imports (libraries, files, etc), pragmas, etc..
     @Option(names = {"-V", "-verbose"},
@@ -143,15 +144,28 @@ public class PJMain extends Command {
             help = "ProcessJ command-line processor and conventions")
     public boolean clp;
     
+    @Option(names = "-logfile",
+            help = "Use given file for log",
+            metavar = "<file>")
+    public String logFile;
+    
     @Argument(metavar = "<file>",
               help = "The file (or files) to compile",
               order = "1..*")
     public List<File> files;
     
-    public static class VersionPrinter implements IVersionPrinter {
+    public static class VersionPrinter extends Command implements IVersionPrinter {
         @Override
         public String[] getVersionPrinter() throws Exception {
-            return new String[] { "ProcessJ version 1.2" };
+            DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy");
+            Date date = new Date();
+            return new String[] { "ProcessJ version 1.2 compiled on " + dateFormat.format(date),
+                                  "java version \"" + System.getProperty("java.version") + "\"",
+                                  "Copyright(c) 2018" };
         }
+    }
+    
+    public VersionPrinter getVersion() throws InstantiationException, IllegalAccessException {
+        return (VersionPrinter) PJMain.class.getAnnotation(Parameters.class).versionPrinter().newInstance();
     }
 }

@@ -67,7 +67,8 @@ public final class PositionalValue extends OptionWithValues {
             String word = it.next();
             charCount += word.length() + 1;
             if (charCount > charLeft) {
-                stringBuilder.append("\n").append(StringUtil.countSpaces(indent - 1));
+                stringBuilder.append("\n")
+                             .append(StringUtil.countSpaces(indent - 1));
                 charCount = word.length() + 1;
             }
             stringBuilder.append(word);

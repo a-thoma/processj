@@ -263,8 +263,8 @@ public class OptionBuilder {
             try {
                 OptionValue optionValue = optGroup.getOption(optName);
                 options.add(optName, optionValue);
+                // Keep track of every required @Option
                 if (optionValue.isRequired())
-                    // Keep track of every required @Option
                     requiredOptionMap.put(optionValue.getName(), optionValue);
             } catch (Exception e) {
                 throw new RuntimeException(e.getMessage());
@@ -389,36 +389,32 @@ public class OptionBuilder {
     }
     
     private List<String> startWithOptionName(String argName) {
-        final int MAX_CANDIDATES = 4;
-        MultiValueMap<Integer, String> result = new MultiValueMap<>();
+        final int MAX_CANDIDATES = 5;
+        MultiValueMap<Integer, String> sortedOptions = new MultiValueMap<>();
         List<String> candidateList = new ArrayList<>();
+        // Check for possible matches
         for (String optName : options.getNames()) {
             if (optName.contains(argName)) {
                 candidateList.add(optName);
                 continue;
             }
         }
-        // Check for possible matches
         if (!candidateList.isEmpty()) {
             for (String candidate : candidateList)
-                result.put(Util.distance(candidate, argName), candidate);
-            result = sortCandidateOptions(result);
-            return new ArrayList<>(result.values());
+                sortedOptions.put(Util.distance(candidate, argName), candidate);
+            sortedOptions = sortCandidateOptions(sortedOptions);
+            return new ArrayList<>(sortedOptions.values());
         }
-        // Unknown option! Use Levenshtein to compute possible candidates
+        // None found! Use Levenshtein to compute possible candidates
         for (String optName : options.getNames()) {
-            String[] optSplit = optName.split("-");
-            result.put(Util.distance("-" + optSplit[1], argName), optName);
+            String[] optList = optName.split("-");
+            sortedOptions.put(Util.distance("-" + optList[1], argName), optName);
         }
-        result = sortCandidateOptions(result);
-        Collection<Integer> keys = result.keys();
-        for (Integer k : keys) {
-            for (String name : result.get(k))
-                candidateList.add(name);
-        }
-        if (candidateList.size() >= MAX_CANDIDATES)
-            return candidateList.subList(0, MAX_CANDIDATES);
-        return candidateList;
+        sortedOptions = sortCandidateOptions(sortedOptions);
+        Collection<Integer> keys = sortedOptions.keys();
+        for (Integer k : keys)
+            candidateList.addAll(sortedOptions.get(k));
+        return candidateList.subList(0, Math.min(MAX_CANDIDATES, candidateList.size()));
     }
     
     protected static MultiValueMap<Integer, String> sortCandidateOptions(MultiValueMap<Integer, String> options) {
@@ -515,7 +511,7 @@ public class OptionBuilder {
         
         public void add(String optName, OptionValue value) throws Exception {
             if (sharedOptions.put(optName, value) != null)
-                throw new RuntimeException(String.format("@Option '%s' found multiple times.", optName));
+                throw new RuntimeException(String.format("Option '%s' found multiple times.", optName));
         }
         
         public OptionValue get(String optName) {
@@ -530,7 +526,6 @@ public class OptionBuilder {
             SortedSet<OptionValue> optSet = new TreeSet<>();
             for (OptionValue optionValue : sharedOptions.values())
                 optSet.add(optionValue);
-            
             return optSet;
         }
     }

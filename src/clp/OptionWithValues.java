@@ -89,16 +89,14 @@ public abstract class OptionWithValues implements Comparable<OptionWithValues> {
         arity = builder.arity;
         defaultValue = builder.defaultValue;
     }
-
-    // -----------------------------------------------------------------------------
-    // SETTERS
+    
+    // S E T T E R S
     
     public void addValue(Object newValue) {
         value = newValue;
     }
-
-    // -----------------------------------------------------------------------------
-    // GETTERS
+    
+    // G E T T E R S
     
     public final String getHelp() {
         return help;

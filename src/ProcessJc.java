@@ -90,32 +90,22 @@ public class ProcessJc {
             FormatterHelp formatHelp = new FormatterHelp(optionBuilder);
             System.out.println(formatHelp.createUsagePage());
             System.exit(0);
-        }
-        
-        System.out.print(">> " + pjMain.errorCode);
-        
-        if (pjMain.version) {
+        } else if (pjMain.version) {
             try {
-                String[] list = pjMain.versionPrinter.getVersionPrinter();
-                for (String text : list)
-                    System.out.println(text);
+                String[] list = pjMain.getVersion().getVersionPrinter();
+                System.out.println(StringUtil.join(Arrays.asList(list), "\n"));
                 System.exit(0);
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
-        }
-        
-        if (!StringUtil.isStringEmpty(pjMain.info)) {
+        } else if (!StringUtil.isStringEmpty(pjMain.info)) {
             System.out.println(String.format("Information about @Option '%s' is not available.", pjMain.info));
             System.exit(0);
-        }
-        
-        if (files == null || files.isEmpty()) {
+        } else if (files == null || files.isEmpty()) {
             // At least one file must be provided otherwise throw an error
             // Throw error messages
             System.exit(0);
         }
-        
         // -----------------------------------------------------------------------------
         
         for (File inFile : files) {

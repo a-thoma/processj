@@ -2,6 +2,7 @@ package clp;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 
 /**
@@ -171,4 +172,19 @@ public final class StringUtil {
 
         return stringBuilder.toString();
     }
+    
+    /**
+     * Comparator used to sort strings by length.
+     * 
+     * @author Ben Cisneros
+     */
+    public static class SortByLength implements Comparator<String> {
+        
+        @Override
+        public int compare(String o1, String o2) {
+            return o1.length() - o2.length();
+        }
+    }
+    
+    public final static SortByLength SORT_BY_LENGTH = new SortByLength();
 }

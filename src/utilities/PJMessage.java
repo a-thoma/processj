@@ -11,13 +11,13 @@ import org.stringtemplate.v4.ST;
  * @version 10/07/2018
  * @since 1.2
  */
-public class ProcessJMessage {
+public class PJMessage {
     
     private ErrorMessage errorMessage;
     private Object[] arguments;
     private Throwable throwable;
     
-    public ProcessJMessage(ErrorMessage errorMessage, Throwable throwable, Object... arguments) {
+    public PJMessage(ErrorMessage errorMessage, Throwable throwable, Object... arguments) {
         this.errorMessage = errorMessage;
         this.throwable = throwable;
         this.arguments = arguments;
