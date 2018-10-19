@@ -13,7 +13,8 @@ public enum ErrorType {
     INFO        ("info"),
     WARNING     ("warning"),
     ERROR       ("error"),
-    FATAL       ("fatal");
+    FATAL       ("fatal")
+    ;
     
     private final String text;
     

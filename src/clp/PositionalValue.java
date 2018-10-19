@@ -42,7 +42,7 @@ public final class PositionalValue extends OptionWithValues {
     }
     
     public String getOptionOrArgumentHelp(int indent, int width) {
-        int defaultLength = FormatterHelp.DEFAULT_LENGTH;
+        int defaultLength = Formatter.DEFAULT_LENGTH;
         defaultLength += help.length();
         StringBuilder stringBuilder = new StringBuilder(defaultLength);
         stringBuilder.append(" ");
@@ -102,11 +102,11 @@ public final class PositionalValue extends OptionWithValues {
                 ", split=" + "\"" + split + "\"" +
                 ", handlers=" + Arrays.stream(handlers)
                                       .map(handler -> handler + "")
-                                      .collect(Collectors.joining()) +
+                                      .collect(Collectors.joining(",")) +
                 ", type=" + type +
-                ", handlers=" + Arrays.stream(parsers)
+                ", handlers={" + Arrays.stream(parsers)
                                       .map(parser -> parser + "")
-                                      .collect(Collectors.joining()) +
+                                      .collect(Collectors.joining(",")) + "}" +
                 ")";
     }
 

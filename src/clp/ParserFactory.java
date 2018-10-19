@@ -29,7 +29,8 @@ import clp.parsers.*;
  */
 public enum ParserFactory {
 
-    INSTANCE;
+    INSTANCE
+    ;
 
     /**
      * Maps all types of {@link OptionParser}.

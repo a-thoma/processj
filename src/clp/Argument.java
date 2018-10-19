@@ -48,7 +48,7 @@ public @interface Argument {
      * The position of this argument on the command line.
      * <p>
      * A field annotated with {@link Argument @Argument} must have a specific
-     * order, e.g. {@code order=0, order=1, ..., order=n <=> order=0..n}, in
+     * order, e.g. {@code order=0, order=1, ..., order=n or order=0..n}, in
      * order to grab the exact position of the positional argument from command
      * line.
      * </p>

@@ -392,7 +392,7 @@ public class OptionBuilder {
         final int MAX_CANDIDATES = 5;
         MultiValueMap<Integer, String> sortedOptions = new MultiValueMap<>();
         List<String> candidateList = new ArrayList<>();
-        // Check for possible matches
+        // Check for possible matches and store unique candidates
         for (String optName : options.getNames()) {
             if (optName.contains(argName)) {
                 candidateList.add(optName);

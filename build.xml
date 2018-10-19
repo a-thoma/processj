@@ -75,7 +75,7 @@
             </delete>
         </target>
 
-        <target name="run" depends="compile">
+        <target name="run">
                 <java classpath="${classpath}:${build}" classname="ProcessJc">
                 <arg value="${arg0}"/>
                 </java>

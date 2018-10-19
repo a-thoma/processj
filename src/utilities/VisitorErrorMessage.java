@@ -2,21 +2,20 @@ package utilities;
 
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.text.MessageFormat;
 import java.util.Properties;
 
 /**
- * The enum {@link ErrorMessage} all the error messages that
+ * The enum {@link VisitorErrorMessage} all the error messages that
  * the ProcessJ compiler can issue.
  * 
  * @author Ben Cisneros
  * @version 09/02/2018
  * @since 1.2
  */
-public enum ErrorMessage {
+public enum VisitorErrorMessage implements IErrorGetter {
     
     // -----------------------------------------------------------------------------
-    // RESOLVE IMPORTS (100-199)
+    // R E S O L V E  I M P O R T S (100-199)
     
     RESOLVE_IMPORTS_100(100, ErrorType.ERROR),
     RESOLVE_IMPORTS_101(101, ErrorType.ERROR),
@@ -26,7 +25,7 @@ public enum ErrorMessage {
     RESOLVE_IMPORTS_105(105, ErrorType.ERROR),
     
     // -----------------------------------------------------------------------------
-    // TOP LEVEL DECLS (200-299)
+    // T O P  L E V E L  D E C L S (200-299)
     
     TOP_LEVEL_DECLS_200(200, ErrorType.ERROR),
     TOP_LEVEL_DECLS_201(201, ErrorType.ERROR),
@@ -38,12 +37,12 @@ public enum ErrorMessage {
     TOP_LEVEL_DECLS_207(207, ErrorType.ERROR),
     
     // -----------------------------------------------------------------------------
-    // RESOLVE NAMED TYPES (300-399)
+    // R E S O L V E  N A M E D  T Y P E S (300-399)
     
-    // TODO
+    // TODO: Add error message type
     
     // -----------------------------------------------------------------------------
-    // RESOLVE NAMED TYPES (300-399)
+    // R E S O L V E  N A M E D  T Y P E S (300-399)
     
     NAME_CHECKER_400(400, ErrorType.ERROR),
     NAME_CHECKER_401(401, ErrorType.ERROR),
@@ -55,7 +54,7 @@ public enum ErrorMessage {
     NAME_CHECKER_407(407, ErrorType.ERROR),
     
     // -----------------------------------------------------------------------------
-    // ARRAY TYPE CONSTRUCTOR (500-599)
+    // A R R A Y  T Y P E  C O N S T R U C T O R (500-599)
     
     ARRAY_TYPE_CONSTRUCTOR_500(500, ErrorType.ERROR),
     ARRAY_TYPE_CONSTRUCTOR_501(501, ErrorType.ERROR),
@@ -64,7 +63,7 @@ public enum ErrorMessage {
     ARRAY_TYPE_CONSTRUCTOR_504(504, ErrorType.ERROR),
     
     // -----------------------------------------------------------------------------
-    // TYPE RESOLUTION (600-699)
+    // T Y P E  R E S O L U T I O N (600-699)
     
     TYPE_RESOLUTION_600(600, ErrorType.ERROR),
     TYPE_RESOLUTION_601(601, ErrorType.ERROR),
@@ -123,7 +122,7 @@ public enum ErrorMessage {
     TYPE_RESOLUTION_654(654, ErrorType.ERROR),
     
     // -----------------------------------------------------------------------------
-    // PARALLEL USAGE CHECKING (700-799)
+    // P A R A L L E L  U S A G E  C H E C K I N G (700-799)
     
     PARALLEL_USAGE_CHECKING_700(700, ErrorType.ERROR),
     PARALLEL_USAGE_CHECKING_701(701, ErrorType.ERROR),
@@ -144,6 +143,11 @@ public enum ErrorMessage {
     ;
     
     /**
+     * File loader.
+     */
+    private static Properties localizable;
+    
+    /**
      * The error number.
      */
     private final int number;
@@ -153,7 +157,7 @@ public enum ErrorMessage {
      */
     private ErrorType type;
     
-    private ErrorMessage(int number, ErrorType type) {
+    private VisitorErrorMessage(int number, ErrorType type) {
         this.number = number;
         this.type = type;
     }
@@ -166,15 +170,17 @@ public enum ErrorMessage {
         return type;
     }
     
-    public String format(Object... objects) {
-        // TODO: Make propsFile static
-        Properties property = new Properties();
+    public String getMessage() {
+        return localizable.getProperty(name());
+    }
+    
+    static {
+        localizable = new Properties();
         try {
-            FileInputStream propsFile = new FileInputStream("resources/properties/Messages.properties");
-            property.load(propsFile);
+            FileInputStream propsFile = new FileInputStream("resources/properties/VisitorMessages.properties");
+            localizable.load(propsFile);
         } catch (IOException e) {
             e.printStackTrace();
         }
-        return MessageFormat.format(property.getProperty(name()), objects);
     }
 }

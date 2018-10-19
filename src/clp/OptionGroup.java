@@ -546,9 +546,9 @@ public final class OptionGroup {
         List<Field> fields = Arrays.stream(type.getDeclaredFields())
                                    .filter(field -> isOption(field) || isArgument(field))
                                    .collect(Collectors.toList());
-//        if (fields.isEmpty())
-//            throw new RuntimeException("At least one field must have an annotation "
-//                        + "attached to it.");
+        if (fields.isEmpty())
+            throw new RuntimeException("At least one field must have an annotation "
+                        + "attached to it.");
         return fields;
     }
 
@@ -611,8 +611,8 @@ public final class OptionGroup {
     }
     
     /**
-     * Compares {@link Argument @Argument} fields by {@link Argument#order()}
-     * or, if their indices have the same values, by {@link Argument#order()}.
+     * Compares {@link Argument @Argument} fields by their index or, id
+     * their indices have the same values, by {@link Argument#order()}.
      * 
      * @author Ben Cisneros
      * @version 08/16/2018

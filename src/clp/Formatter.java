@@ -14,7 +14,7 @@ import java.util.Map;
  * @version 10/09/2018
  * @since 1.2
  */
-public class FormatterHelp {
+public class Formatter {
     
     public static final int DEFAULT_WIDTH = 80;
     
@@ -32,7 +32,7 @@ public class FormatterHelp {
     
     private OptionBuilder optionBuilder;
     
-    public FormatterHelp(OptionBuilder optionBuilder) {
+    public Formatter(OptionBuilder optionBuilder) {
         this.optionBuilder = optionBuilder;
     }
     
@@ -87,7 +87,6 @@ public class FormatterHelp {
         int extraSpaces = DEFAULT_WIDTH - line.length();
         // Amount of spaces needed for each word
         int insertSpaces = 0;
-        
         // Iterate through the sentence
         for (int i = 0; i < line.length(); ++i) {
             // Add a letter to the new line till a white space character
@@ -132,7 +131,12 @@ public class FormatterHelp {
         return length;
     }
     
-    
+    /**
+     * Neatly formats a string containing a list of (appended) options
+     * and returns a new string containing the following format:
+     * 
+     * USAGE: <main-command> [option0] [option1] [option2] ... [optionN]
+     */
     public String formatUsage(String usage) {
         Parameters parameter = optionBuilder.getMainCommand().getAnnotation(Parameters.class); 
         StringBuilder stringBuilder = new StringBuilder();        
@@ -152,41 +156,57 @@ public class FormatterHelp {
             if (it.hasNext())
                 stringBuilder.append(" ");
         }
-        
+        stringBuilder.append(" ");        
         return stringBuilder.toString();
     }
-    public String buildUsage() {
+    
+    /**
+     * Returns a string containing a list of options appended in the
+     * following format:
+     * 
+     * [option0] [option1] [option2 | options2] ... [optionN]
+     */
+    public String appendAllOptions() {
         StringBuilder stringBuilder = new StringBuilder();
         Map<Class<? extends Command>, OptionGroup> commandAndOptions = optionBuilder.getCommandAndOptionMap();
         boolean additionalCommands = commandAndOptions.size() > 1;
-        // Grab the list of commands declared in the program
+        // Grab the list of commands defined in the program
         List<String> commands = new ArrayList<>();
         commands.addAll(optionBuilder.getNamedAndCommandMap().keySet());
-        // For every option defined in a command
+        // For each command defined
         for (String commandName : commands) {
-            // Grab the option and append it to its command
+            // Grab the command
             Class<? extends Command> command = optionBuilder.getNamedAndCommandMap().get(commandName);
             if (additionalCommands)
                 stringBuilder.append("[")
                              .append(OptionBuilder.findCommandName(optionBuilder.getNamedAndCommandMap(), command))
                              .append(": ");
-            // For each group of options
             List<OptionValue> options = new ArrayList<>();
             options.addAll(commandAndOptions.get(command).getUniqueOptions());
-            // Build a `usage' for this command and its options
+            // Build and append all of its options to it
             for (Iterator<OptionValue> it = options.iterator(); it.hasNext();) {
-                stringBuilder.append(buildOption(it.next()));
+                stringBuilder.append(buildOptions(it.next()));
                 if (it.hasNext())
                     stringBuilder.append(" ");
             }
             if (additionalCommands)
                 stringBuilder.append("] ");
         }
-        stringBuilder.append(" ");
+        return formatUsage(stringBuilder.toString());
+    }
+    
+    /**
+     * Returns a list of arguments appended in the following format:
+     * 
+     * <arg0> <arg1> <arg2> ... <argN>
+     */
+    public String appendAllArguments() {
+        StringBuilder stringBuilder = new StringBuilder();
+        Map<Class<? extends Command>, OptionGroup> commandAndOptions = optionBuilder.getCommandAndOptionMap();
         // For every argument defined in the main command
         List<PositionalValue> arguments = new ArrayList<>();
         arguments.addAll(commandAndOptions.get(optionBuilder.getMainCommand()).getArguments());
-        // Build the `usage' (of positional arguments) for the main command
+        // Build and append all of its arguments to it
         for (Iterator<PositionalValue> it = arguments.iterator(); it.hasNext();) {
             PositionalValue positional = it.next();
             if (positional.getMetavar().isEmpty())
@@ -196,7 +216,7 @@ public class FormatterHelp {
             if (it.hasNext())
                 stringBuilder.append(" ");
         }
-        return formatUsage(stringBuilder.toString());
+        return stringBuilder.toString();
     }
     
     public String buildHeader() {
@@ -264,11 +284,12 @@ public class FormatterHelp {
         return stringBuilder;
     }
     
-    public String createUsagePage() {
+    public String buildUsagePage() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append("\n")
                      .append(buildHeader())
-                     .append(buildUsage())
+                     .append(appendAllOptions())
+                     .append(appendAllArguments())
                      .append("\n");
         // Find the maximum number of characters in an option. NOTE: arguments (or
         // `PositionalValues') are not taken into account
@@ -303,7 +324,7 @@ public class FormatterHelp {
      *          The option a program takes.
      * @return A string representing all possibles names of an option.
      */
-    public String buildOption(OptionValue optionValue) {
+    public String buildOptions(OptionValue optionValue) {
         StringBuilder stringBuilder = new StringBuilder();
         
         if (!optionValue.isRequired())

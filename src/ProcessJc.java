@@ -3,7 +3,7 @@ import java.util.*;
 
 import ast.AST;
 import ast.Compilation;
-import clp.FormatterHelp;
+import clp.Formatter;
 import clp.OptionBuilder;
 import clp.StringUtil;
 import codegeneratorjava.CodeGeneratorJava;
@@ -11,7 +11,7 @@ import library.Library;
 import parser.parser;
 import scanner.Scanner;
 import utilities.Error;
-import utilities.ErrorMessage;
+import utilities.VisitorErrorMessage;
 import utilities.Language;
 import utilities.Log;
 import utilities.Settings;
@@ -87,8 +87,8 @@ public class ProcessJc {
         List<File> files = pjMain.files;
         
         if (pjMain.help) {
-            FormatterHelp formatHelp = new FormatterHelp(optionBuilder);
-            System.out.println(formatHelp.createUsagePage());
+            Formatter formatHelp = new Formatter(optionBuilder);
+            System.out.println(formatHelp.buildUsagePage());
             System.exit(0);
         } else if (pjMain.version) {
             try {
@@ -292,7 +292,6 @@ public class ProcessJc {
             String msg = String.format("|%-25s\t|\t%15d\t|", name, size);
             Log.log(msg);
         }
-
         Log.log(dashLine);
     }
 }

@@ -43,7 +43,7 @@ public final class OptionValue extends OptionWithValues {
     }
     
     public String getOptionOrArgumentHelp(int indent, int width) {
-        StringBuilder stringBuilder = new StringBuilder(FormatterHelp.DEFAULT_LENGTH + help.length());
+        StringBuilder stringBuilder = new StringBuilder(Formatter.DEFAULT_LENGTH + help.length());
         stringBuilder.append(" ");
         
         Iterator<String> itNames = Arrays.asList(names).iterator();
@@ -96,7 +96,7 @@ public final class OptionValue extends OptionWithValues {
     public String toString() {
         return getClass().getSimpleName() +
                 "(name=" + name +
-                ", names=" + StringUtil.join(Arrays.asList(names), ", ") +
+                ", names=" + StringUtil.join(Arrays.asList(names), ",") +
                 ", help=" + help +
                 ", field= " + field.getName() +
                 ", nargs= " + arity +
@@ -104,13 +104,13 @@ public final class OptionValue extends OptionWithValues {
                 ", required=" + required +
                 ", hidden=" + hidden +
                 ", split=" + "\"" + split + "\"" +
-                ", handlers=" + Arrays.stream(handlers)
-                                      .map(handler -> handler + "")
-                                      .collect(Collectors.joining()) +
+                ", handlers={" + Arrays.stream(handlers)
+                                       .map(handler -> handler + "")
+                                       .collect(Collectors.joining(",")) + "}" +
                 ", type=" + type +
-                ", handlers=" + Arrays.stream(parsers)
-                                      .map(parser -> parser + "")
-                                      .collect(Collectors.joining()) +
+                ", handlers={" + Arrays.stream(parsers)
+                                       .map(parser -> parser + "")
+                                       .collect(Collectors.joining(",")) + "}" +
                 ")";
     }
 
@@ -151,7 +151,8 @@ public final class OptionValue extends OptionWithValues {
 
         public Builder setNames(String[] names) {
             List<String> sortedNames = Arrays.asList(names);
-            Collections.sort(sortedNames, StringUtil.SORT_BY_LENGTH);
+            if (names.length > 1)
+                Collections.sort(sortedNames, StringUtil.SORT_BY_LENGTH);
             this.names = sortedNames.toArray(new String[0]);
             return this;
         }
