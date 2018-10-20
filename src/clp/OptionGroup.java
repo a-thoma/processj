@@ -292,7 +292,7 @@ public final class OptionGroup {
         
         builder.addArity(order);
         
-        // Same as `@Options' except that arguments cannot be of type Map.
+        // Same as `Options' except that arguments cannot be of type Map.
         // Only one type should be returned and one parser instance should
         // be created. Complex data types such as user-defined types must
         // be explicitly specified

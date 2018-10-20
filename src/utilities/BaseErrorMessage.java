@@ -13,7 +13,7 @@ import ast.AST;
  * visitor pattern when processing the contents in a ProcessJ
  * file, for processing the syntax and/or semantics errors
  * when compiling or generating Java source code from a ProcessJ
- * file, or for processing the command line options and arguments.
+ * file, or when processing the command line options and arguments.
  * 
  * @author Ben Cisneros
  * @version 10/07/2018
@@ -95,10 +95,6 @@ public abstract class BaseErrorMessage {
         String str = "arg";
         for (int i = 0; i < argCount; ++i)
             message.add(str + i, arguments[i]);
-//        if (throwable != null) {
-//            message.add("exception", throwable.getCause() + "");
-//            message.add("stackTrace", throwable.getStackTrace());
-//        }
         return message;
     }
     
