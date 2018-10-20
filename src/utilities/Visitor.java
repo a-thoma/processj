@@ -73,6 +73,7 @@ import ast.WhileStat;
  * must be re-implemented for each traversal through the tree.
  *
  * @author Matt Pedersen
+ * @since 1.1
  *
  */
 public abstract class Visitor<T extends Object> {

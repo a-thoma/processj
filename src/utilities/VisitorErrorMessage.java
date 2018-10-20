@@ -5,8 +5,8 @@ import java.io.IOException;
 import java.util.Properties;
 
 /**
- * The enum {@link VisitorErrorMessage} all the error messages that
- * the ProcessJ compiler can issue.
+ * The enum {@link VisitorErrorMessage} represents the error
+ * messages produced by the visitor pattern.
  * 
  * @author Ben Cisneros
  * @version 09/02/2018
@@ -18,12 +18,12 @@ public enum VisitorErrorMessage implements IErrorGetter {
     // R E S O L V E   I M P O R T S (100-199)
     // ===========================================
     
-    RESOLVE_IMPORTS_100("resolve-imports", 100, ErrorType.ERROR),
-    RESOLVE_IMPORTS_101("resolve-imports", 101, ErrorType.ERROR),
-    RESOLVE_IMPORTS_102("resolve-imports", 102, ErrorType.ERROR),
-    RESOLVE_IMPORTS_103("resolve-imports", 103, ErrorType.ERROR),
-    RESOLVE_IMPORTS_104("resolve-imports", 104, ErrorType.ERROR),
-    RESOLVE_IMPORTS_105("resolve-imports", 105, ErrorType.ERROR),
+    RESOLVE_IMPORTS_100("imports", 100, ErrorType.ERROR),
+    RESOLVE_IMPORTS_101("imports", 101, ErrorType.ERROR),
+    RESOLVE_IMPORTS_102("imports", 102, ErrorType.ERROR),
+    RESOLVE_IMPORTS_103("imports", 103, ErrorType.ERROR),
+    RESOLVE_IMPORTS_104("imports", 104, ErrorType.ERROR),
+    RESOLVE_IMPORTS_105("imports", 105, ErrorType.ERROR),
 
     // ===========================================
     // T O P   L E V E L   D E C L S (200-299)

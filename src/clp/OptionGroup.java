@@ -258,7 +258,7 @@ public final class OptionGroup {
         OptionType type = OptionType.SINGLEVALUE;
         if (isCollectionOrMapOrArrayField(field.getType()))
             type = OptionType.MULTIVALUE;
-        else if (isBooleanField(field.getType()) && arity.hasFixedArity())
+        else if (isBooleanField(field.getType()) && arity.hasFixedArity() && (arity.getFrom() == 0))
             type = OptionType.NONE;
         
         builder.setOptionType(type);
