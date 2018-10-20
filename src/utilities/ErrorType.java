@@ -2,7 +2,7 @@ package utilities;
 
 /**
  * The enum {@link ErrorType} represents various types of
- * error messages in ProcessJ.
+ * `severity' error messages in ProcessJ.
  * 
  * @author Ben Cisneros
  * @version 09/02/2018
