@@ -3,15 +3,16 @@ package utilities;
 import java.util.HashSet;
 import java.util.Set;
 
-public enum ErrorBuilder {
+public enum StackErrorBuilder {
     
     INSTANCE
     ;
     
     private Set<IErrorGetter> messages;
     
-    ErrorBuilder() {
+    StackErrorBuilder() {
         messages = new HashSet<IErrorGetter>();
-        // TODO:
     }
+    
+    // TODO: Build a sequence of error messages in reversed order
 }

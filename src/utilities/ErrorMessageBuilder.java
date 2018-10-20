@@ -9,7 +9,7 @@ import org.stringtemplate.v4.ST;
 import ast.AST;
 
 /**
- * The class {@link MessageBuilder} is used to track down the
+ * The class {@link ErrorMessageBuilder} is used to track down the
  * visitor pattern when processing the contents in a ProcessJ
  * file, or for processing the syntax and/or semantics errors
  * when compiling or generating Java source code from a ProcessJ
@@ -19,7 +19,7 @@ import ast.AST;
  * @version 10/07/2018
  * @since 1.2
  */
-public class MessageBuilder {
+public class ErrorMessageBuilder {
     
     private AST ast;
     private IErrorGetter errorMessage;
@@ -28,23 +28,23 @@ public class MessageBuilder {
     private String fileName = "";
     private String packageName = "";
     
-    public MessageBuilder(Object... arguments) {
+    public ErrorMessageBuilder(Object... arguments) {
         this(null, null, null, arguments);
     }
     
-    public MessageBuilder(AST ast, Object... arguments) {
+    public ErrorMessageBuilder(AST ast, Object... arguments) {
         this(ast, null, null, arguments);
     }
     
-    public MessageBuilder(AST ast, IErrorGetter errorMessage) {
+    public ErrorMessageBuilder(AST ast, IErrorGetter errorMessage) {
         this(ast, errorMessage, null, new Object[0]);
     }
     
-    public MessageBuilder(AST ast, IErrorGetter errorMessage, Object... arguments) {
+    public ErrorMessageBuilder(AST ast, IErrorGetter errorMessage, Object... arguments) {
         this(ast, errorMessage, null, arguments);
     }
     
-    public MessageBuilder(AST ast, IErrorGetter errorMessage, Throwable throwable, Object... arguments) {
+    public ErrorMessageBuilder(AST ast, IErrorGetter errorMessage, Throwable throwable, Object... arguments) {
         this.ast = ast;
         this.errorMessage = errorMessage;
         this.throwable = throwable;
@@ -118,13 +118,5 @@ public class MessageBuilder {
                               throwable.getMessage()
                               : "none") +
                 ")";
-    }
-    
-    public static void main(String[] args) {
-        MessageBuilder messageBuilder = new MessageBuilder(null, VisitorErrorMessage.RESOLVE_IMPORTS_105,
-                new NullPointerException(), (Object[])new String[] {"blah1", "blah2"});
-//        System.out.println(new NullPointerException());
-        System.out.println("!!!! " + messageBuilder.getMessage().render());
-        System.out.println(messageBuilder + "");
     }
 }

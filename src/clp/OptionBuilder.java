@@ -66,10 +66,7 @@ public class OptionBuilder {
         return this;
     }
     
-    private void handleArgs(String[] args,
-                            Class<? extends Command> type,
-                            int currentIndex,
-                            List<String> positionArgs) {
+    private void handleArgs(String[] args, Class<? extends Command> type, int currentIndex, List<String> positionArgs) {
         int index = currentIndex;
         // Collect invoked commands - this is to validate required (individual)
         // options
@@ -131,10 +128,7 @@ public class OptionBuilder {
         validateRequiredOptions();
     }
     
-    private int parseOption(OptionGroup optGroup,
-                            OptionValue option,
-                            int index,
-                            String[] args) {
+    private int parseOption(OptionGroup optGroup, OptionValue option, int index, String[] args) {
         if (option.isFlagOption()) {
             optGroup.addValue(option, null);
             ++index;
@@ -194,8 +188,7 @@ public class OptionBuilder {
         return index;
     }
     
-    private void parseArgument(OptionGroup optGroup,
-                               List<String> argList) {
+    private void parseArgument(OptionGroup optGroup, List<String> argList) {
         // Current position of an argument
         int index = 0;
         for (PositionalValue argument : optGroup.getArguments()) {

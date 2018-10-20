@@ -22,12 +22,12 @@ public final class OptionValue extends OptionWithValues {
      * Default (long) name of this option.
      */
     private String name;
-
+    
     /**
      * The name (or names) of this option.
      */
     private String[] names;
-
+    
     private OptionValue(Builder builder) {
         super(builder);
         name = builder.name;

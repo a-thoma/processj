@@ -7,7 +7,7 @@ import java.io.File;
  * @since 1.2
  */
 public class Settings {
-
+    
     public static String absolutePath = new File("").getAbsolutePath() + "/";
     public static String includeDir = "include";
     public static Language targetLanguage = Language.JVM;

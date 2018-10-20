@@ -292,7 +292,7 @@ public final class OptionGroup {
         
         builder.setArity(order);
         
-        // Same as @Options except that arguments cannot be of type Map.
+        // Same as `@Options' except that arguments cannot be of type Map.
         // Only one type should be returned and one parser instance should
         // be created. Complex data types such as user-defined types must
         // be explicitly specified
@@ -413,14 +413,15 @@ public final class OptionGroup {
         try {
             OptionParser<?> parser = option.getParsers()[0];
             Object parsedValue = parser.parseValue(value);
-            // Grab the array and check if it was initialized to avoid object creation
+            // Grab the array and check if it was initialized to avoid
+            // object creation
             Object objArray = option.getValue();
             if (objArray == null) {
                 // No, then create a new array of size 1
                 objArray = Array.newInstance(option.getField().getType().getComponentType(), 1);
                 Array.set(objArray, 0, parsedValue);
             } else {
-                // Because arrays cannot be resized, an array of `length+1' size
+                // Because arrays cannot be resized, an array of `length + 1' size
                 // is created before the values are copied into this new array
                 int length = Array.getLength(objArray);
                 Object newObjArray = Array.newInstance(objArray.getClass().getComponentType(), length + 1);
@@ -611,8 +612,8 @@ public final class OptionGroup {
     }
     
     /**
-     * Compares {@link Argument @Argument} fields by their index or, id
-     * their indices have the same values, by {@link Argument#order()}.
+     * Compares {@link Argument @Argument} fields by their index or,
+     * id their indices have the same values, by {@link Argument#order()}.
      * 
      * @author Ben Cisneros
      * @version 08/16/2018

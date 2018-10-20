@@ -1,0 +1,22 @@
+
+//========================================================================================
+// TODO: Add ANSI escape functionality
+
+//========================================================================================
+StackTrace(trace) ::= "<trace; separator=\"\\n\">"
+
+//========================================================================================
+InitFile(fileName, lineNumber) ::= "|- <fileName><AddNumber(lineNumber)>"
+AddNumber(lineNumber) ::= "<if(lineNumber)>=<lineNumber><endif>"
+
+//========================================================================================
+InitError(tag, errorName, errorType) ::= <<
+<tag>[<if(<errorName>)><errorName>=<errorType><else>pj<endif>]
+>>
+
+//========================================================================================
+ErrorMessage(tag, errorMessage, location, stackInfo) ::= <<
+<tag><errorMessage>
+<location>
+<stackInfo>
+>>
