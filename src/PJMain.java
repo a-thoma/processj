@@ -117,6 +117,10 @@ public class PJMain extends Command {
             help = "Generate parse tree visitor when identifying and translating name symbols")
     public boolean nameCheckerVisitor;
     
+    @Option(names = "-visit-type-checker",
+            help = "Generate parse tree visitor when resolving names and types")
+    public boolean typeCheckerVisitor;
+    
     @Option(names = "-visit-top-decls",
             help = "Generate parse tree visitor when inserting all top-level declarations into "
                     + "symbol tables")

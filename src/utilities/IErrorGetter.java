@@ -6,9 +6,11 @@ public interface IErrorGetter {
         return ErrorType.INFO;
     }
     
-    default int getErrorNumber() {
+    default int getNumber() {
         return -1;
     }
+    
+    String getText();
     
     String getMessage();
 }

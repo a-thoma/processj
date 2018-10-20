@@ -3,14 +3,14 @@ package utilities;
 import java.util.HashSet;
 import java.util.Set;
 
-public enum StackErrorBuilder {
+public enum StackErrorMessage {
     
     INSTANCE
     ;
     
     private Set<IErrorGetter> messages;
     
-    StackErrorBuilder() {
+    StackErrorMessage() {
         messages = new HashSet<IErrorGetter>();
     }
     

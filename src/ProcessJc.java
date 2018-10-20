@@ -11,6 +11,8 @@ import library.Library;
 import parser.parser;
 import scanner.Scanner;
 import utilities.Error;
+import utilities.ErrorMessage;
+import utilities.BaseErrorMessage;
 import utilities.VisitorErrorMessage;
 import utilities.Language;
 import utilities.Log;
@@ -24,7 +26,11 @@ import utilities.SymbolTable;
  */
 public class ProcessJc {
     
-    private static final String HELP_ERROR_MSG = "What would you like me to do?";
+    /**
+     * Default message when the compiler does not understand the
+     * user's input.
+     */
+    private static final String WHAT_MESSAGE = "What would you like me to do?";
     
     /**
      * Pretty prints AST-like structures.
@@ -46,7 +52,7 @@ public class ProcessJc {
     }
     
     public static void whatMessage() {
-        System.err.println(HELP_ERROR_MSG);
+        System.err.println(WHAT_MESSAGE);
         System.exit(0);
     }
     
@@ -58,9 +64,12 @@ public class ProcessJc {
     
     public static void main(String[] args) {
         if (args.length == 0) {
-//            System.out.println("[" + ANSI_UNDERLINE + "INFO" + ANSI_RESET + "] pjc: " + ANSI_RED + "error: " + ANSI_RESET + "no input file(s)");
-//            System.out.println("-> " + ErrorMessage.RESOLVE_IMPORTS_100.format("Blah!!"));
-            whatMessage();
+            System.out.println(new ErrorMessage(null,
+                                                null,
+                                                VisitorErrorMessage.RESOLVE_IMPORTS_100,
+                                                null,
+                                                new Object[0]).renderMessage());
+            System.exit(0);
         }
         
         AST root = null;
