@@ -164,9 +164,9 @@ public final class OptionGroup {
         }
         
         String optName = findOptionLongName(field);
-        builder.setName(optName);
-        builder.setNames(annotation.names());
-        builder.setField(field);
+        builder.addName(optName);
+        builder.addNames(annotation.names());
+        builder.addField(field);
         
         if (annotation.hidden() && annotation.required()) {
             // Required arguments cannot be hidden, they should always be provided
@@ -174,8 +174,8 @@ public final class OptionGroup {
                         + "to '%s' cannot be hidden.", field.getName()));
         }
         
-        builder.setHidden(annotation.hidden());
-        builder.setRequired(annotation.required());
+        builder.addHidden(annotation.hidden());
+        builder.addRequired(annotation.required());
         
         // This is to retrieve information about the type of data each field
         // holds at compile-time or run-time. Basic types such as byte, short,
@@ -210,8 +210,8 @@ public final class OptionGroup {
             if (keyParser == null || valueParser == null)
                 throw new RuntimeException(String.format("A parser could not be created for '%s'.", optName));
             
-            builder.setParsers(new OptionParser<?>[] { keyParser, valueParser });
-            builder.setHandlers(handlerList.toArray(new Class[0]));
+            builder.addParsers(new OptionParser<?>[] { keyParser, valueParser });
+            builder.addHandlers(handlerList.toArray(new Class[0]));
         } else {
             // Must be some atomic or user-defined type
             Class<? extends OptionParser> handler = null;
@@ -234,8 +234,8 @@ public final class OptionGroup {
             if (parser == null)
                 throw new RuntimeException(String.format("A parser could not be created for '%s'.", optName));
             
-            builder.setParsers(new OptionParser<?>[] { parser });
-            builder.setHandlers(new Class[] { handler });
+            builder.addParsers(new OptionParser<?>[] { parser });
+            builder.addHandlers(new Class[] { handler });
         }
         
         ArityRange arity = null;
@@ -253,7 +253,7 @@ public final class OptionGroup {
             }
         }
         
-        builder.setArity(arity);
+        builder.addArity(arity);
 
         OptionType type = OptionType.SINGLEVALUE;
         if (isCollectionOrMapOrArrayField(field.getType()))
@@ -261,13 +261,13 @@ public final class OptionGroup {
         else if (isBooleanField(field.getType()) && arity.hasFixedArity() && (arity.getFrom() == 0))
             type = OptionType.NONE;
         
-        builder.setOptionType(type);
+        builder.addOptionType(type);
 
         // Build remaining attributes values
-        builder.setHelp(annotation.help());
-        builder.setValueSeparator(annotation.split());
-        builder.setMetavar(annotation.metavar());
-        builder.setDefaultValue(annotation.defaultValue());
+        builder.addHelp(annotation.help());
+        builder.addValueSeparator(annotation.split());
+        builder.addMetavar(annotation.metavar());
+        builder.addDefaultValue(annotation.defaultValue());
         
         // Build option and parse the value assigned to `defaultValue'
         OptionValue option = builder.build();
@@ -282,15 +282,15 @@ public final class OptionGroup {
         PositionalValue.Builder builder = new PositionalValue.Builder();
         Argument annotation = field.getAnnotation(Argument.class);
         String fieldName = field.getName();
-        builder.setName(fieldName);
-        builder.setField(field);
+        builder.addName(fieldName);
+        builder.addField(field);
         
         ArityRange order = ArityRange.createArity(annotation.order());
         if (!order.hasFixedArity() && !isCollectionOrMapOrArrayField(field.getType()))
             throw new RuntimeException(String.format("Multivalue @Argument '%s' must be assigned "
                     + "to a field of type List.", fieldName));
         
-        builder.setArity(order);
+        builder.addArity(order);
         
         // Same as `@Options' except that arguments cannot be of type Map.
         // Only one type should be returned and one parser instance should
@@ -316,23 +316,23 @@ public final class OptionGroup {
             if (parser == null)
                 throw new RuntimeException(String.format("A parser could not be created for '%s'.", fieldName));
             
-            builder.setParsers(new OptionParser<?>[] { parser });
-            builder.setHandlers(new Class[] { handler });
+            builder.addParsers(new OptionParser<?>[] { parser });
+            builder.addHandlers(new Class[] { handler });
         }
         
         OptionType type = OptionType.SINGLEVALUE;
         if (isCollectionOrMapOrArrayField(field.getType()))
             type = OptionType.MULTIVALUE;
         
-        builder.setOptionType(type);
+        builder.addOptionType(type);
 
         // Build remaining attributes values
-        builder.setHelp(annotation.help());
-        builder.setHidden(annotation.hidden());
-        builder.setRequired(annotation.required());
-        builder.setValueSeparator(annotation.split());
-        builder.setMetavar(annotation.metavar());
-        builder.setDefaultValue(annotation.defaultValue());
+        builder.addHelp(annotation.help());
+        builder.addHidden(annotation.hidden());
+        builder.addRequired(annotation.required());
+        builder.addValueSeparator(annotation.split());
+        builder.addMetavar(annotation.metavar());
+        builder.addDefaultValue(annotation.defaultValue());
         
         // Build argument and parse the value assigned to `defaultValue'
         PositionalValue argument = builder.build();

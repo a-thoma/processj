@@ -21,12 +21,12 @@ public final class OptionValue extends OptionWithValues {
     /**
      * Default (long) name of this option.
      */
-    private String name;
+    private final String name;
     
     /**
      * The name (or names) of this option.
      */
-    private String[] names;
+    private final String[] names;
     
     private OptionValue(Builder builder) {
         super(builder);
@@ -113,6 +113,10 @@ public final class OptionValue extends OptionWithValues {
                                        .collect(Collectors.joining(",")) + "}" +
                 ")";
     }
+    
+    // =====================
+    // B U I L D E R
+    // =====================
 
     /**
      * Builder for this {@link OptionValue}.
@@ -144,21 +148,16 @@ public final class OptionValue extends OptionWithValues {
             return option;
         }
         
-        public Builder setName(String name) {
+        public Builder addName(String name) {
             this.name = name;
             return this;
         }
 
-        public Builder setNames(String[] names) {
+        public Builder addNames(String[] names) {
             List<String> sortedNames = Arrays.asList(names);
             if (names.length > 1)
                 Collections.sort(sortedNames, StringUtil.SORT_BY_LENGTH);
             this.names = sortedNames.toArray(new String[0]);
-            return this;
-        }
-        
-        public Builder setArity(ArityRange arity) {
-            this.arity = arity;
             return this;
         }
     }

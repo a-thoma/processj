@@ -20,12 +20,12 @@ public final class PositionalValue extends OptionWithValues {
     /**
      * The name of an {@link Argument @Argument} field.
      */
-    private String fieldName;
+    private final String fieldName;
 
     /**
      * The position of this argument on the command line.
      */
-    private int order;
+    private final int order;
 
     protected PositionalValue(Builder builder) {
         super(builder);
@@ -109,6 +109,10 @@ public final class PositionalValue extends OptionWithValues {
                                       .collect(Collectors.joining(",")) + "}" +
                 ")";
     }
+    
+    // =====================
+    // B U I L D E R
+    // =====================
 
     /**
      * Builder for this {@link PositionalValue}.
@@ -139,18 +143,13 @@ public final class PositionalValue extends OptionWithValues {
             return argument;
         }
 
-        public Builder setName(String fieldName) {
+        public Builder addName(String fieldName) {
             this.fieldName = fieldName;
             return this;
         }
 
-        public Builder setOrder(int order) {
+        public Builder addOrder(int order) {
             this.order = order;
-            return this;
-        }
-        
-        public Builder setArity(ArityRange arity) {
-            this.arity = arity;
             return this;
         }
     }

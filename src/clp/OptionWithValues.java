@@ -16,60 +16,60 @@ public abstract class OptionWithValues implements Comparable<OptionWithValues> {
     /**
      * The descriptive text messaged used in the help information.
      */
-    protected String help;
+    protected final String help;
 
     /**
      * How many values an option or argument has to consume.
      */
-    protected ArityRange arity;
+    protected final ArityRange arity;
 
     /**
      * The string used to describe what the value of an option or
      * argument is.
      */
-    protected String metavar;
+    protected final String metavar;
     
     /**
      * The default value for this option as a string.
      */
-    protected String defaultValue;
+    protected final String defaultValue;
 
     /**
      * Indicates whether an option or argument is required or not.
      */
-    protected boolean required;
+    protected final boolean required;
 
     /**
      * Indicates whether an option or argument should be included in
      * the help information or not.
      */
-    protected boolean hidden;
+    protected final boolean hidden;
 
     /**
      * The separator between an option or argument and its actual value.
      */
-    protected String split;
+    protected final String split;
 
     /**
      * The handlers used to parse the values for this option or argument.
      */
     @SuppressWarnings("rawtypes")
-    protected Class<? extends OptionParser>[] handlers;
+    protected final Class<? extends OptionParser>[] handlers;
     
     /**
      * The instances used to parser the values of a field.
      */
-    protected OptionParser<?>[] parsers;
+    protected final OptionParser<?>[] parsers;
     
     /**
      * Indicates the type of an option.
      */
-    protected OptionType type;
+    protected final OptionType type;
     
     /**
      * The annotated-field.
      */
-    protected Field field;
+    protected final Field field;
     
     /**
      * The default value for this option or argument.
@@ -90,13 +90,17 @@ public abstract class OptionWithValues implements Comparable<OptionWithValues> {
         defaultValue = builder.defaultValue;
     }
     
+    // ================
     // S E T T E R S
+    // ================
     
     public void addValue(Object newValue) {
         value = newValue;
     }
     
+    // ================
     // G E T T E R S
+    // ================
     
     public final String getHelp() {
         return help;
@@ -157,6 +161,10 @@ public abstract class OptionWithValues implements Comparable<OptionWithValues> {
     
     public abstract String getOptionOrArgumentHelp(int indent, int width);
     
+    // =====================
+    // B U I L D E R
+    // =====================
+    
     /**
      * The class {@link Builder} uses descriptive methods to create options
      * with default or initial values.
@@ -201,57 +209,62 @@ public abstract class OptionWithValues implements Comparable<OptionWithValues> {
 
         protected abstract <O extends OptionWithValues> O build();
         
-        public B setHelp(String help) {
+        public B addHelp(String help) {
             this.help = help;
             return builder();
         }
         
-        public B setMetavar(String metavar) {
+        public B addMetavar(String metavar) {
             this.metavar = metavar;
             return builder();
         }
         
-        public B setDefaultValue(String defaultValue) {
+        public B addDefaultValue(String defaultValue) {
             this.defaultValue = defaultValue;
             return builder();
         }
         
-        public B setRequired(boolean required) {
+        public B addRequired(boolean required) {
             this.required = required;
             return builder();
         }
         
-        public B setHidden(boolean hidden) {
+        public B addHidden(boolean hidden) {
             this.hidden = hidden;
             return builder();
         }
         
-        public B setValueSeparator(String split) {
+        public B addValueSeparator(String split) {
             this.split = split;
             return builder();
         }
         
-        public B setHandlers(@SuppressWarnings("rawtypes") Class<? extends OptionParser>[] handlers) {
+        public B addHandlers(@SuppressWarnings("rawtypes") Class<? extends OptionParser>[] handlers) {
             this.handlers = handlers;
             return builder();
         }
         
-        public B setParsers(OptionParser<?>[] parsers) {
+        public B addParsers(OptionParser<?>[] parsers) {
             this.parsers = parsers;
             return builder();
         }
         
-        public B setOptionType(OptionType type) {
+        public B addOptionType(OptionType type) {
             this.type = type;
             return builder();
         }
         
-        public B setField(Field field) {
+        public B addField(Field field) {
             this.field = field;
             return builder();
         }
         
-        public B setArity(String arity) {
+        public B addArity(ArityRange arity) {
+            this.arity = arity;
+            return builder();
+        }
+        
+        public B addArity(String arity) {
             this.arity = ArityRange.createArity(arity);
             return builder();
         }

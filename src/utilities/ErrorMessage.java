@@ -4,8 +4,6 @@ import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
 
-import ast.AST;
-
 /**
  * @author Ben Cisneros
  * @since 1.2
@@ -17,16 +15,10 @@ public class ErrorMessage extends BaseErrorMessage {
      */
     private final String stErrorFile = "resources/stringtemplates/messages/errorTemplate.stg";
     
-    private final STGroup stGroup;
+    private final STGroup stGroup = new STGroupFile(stErrorFile);
     
-    private ErrorType errorType;
-    
-    public ErrorMessage(ErrorType errorType, AST ast, IErrorGetter errorMessage,
-                        Throwable throwable, Object... arguments) {
-        super(ast, errorMessage, throwable, arguments);
-        this.errorType = errorType;
-        stGroup = new STGroupFile(stErrorFile);
-        
+    public ErrorMessage(Builder builder) {
+        super(builder);
     }
     
     @Override
@@ -36,7 +28,7 @@ public class ErrorMessage extends BaseErrorMessage {
         ST stStackInfo = stGroup.getInstanceOf("StackInfo");
         ST stMessage = stGroup.getInstanceOf("Message");
         
-        if (!fileName.isEmpty())
+        if (fileName != null)
             stFile.add("fileName", fileName);
         if (ast != null)
             stFile.add("lineNumber", ast.line);
@@ -55,18 +47,35 @@ public class ErrorMessage extends BaseErrorMessage {
         
         return stMessage;
     }
-    
-    public ErrorType getErrorType() {
-        return errorType;
-    }
 
     @Override
     public String renderMessage() {
         return this.getMessage().render();
     }
     
-    //
-    public static class Builder {
-        // TODO:
+    // =====================
+    // B U I L D E R
+    // =====================
+    
+    /**
+     * Builder for this basic error message type.
+     * 
+     * @author Ben Cisneros
+     * @version 10/20/2018
+     * @since 1.2
+     */
+    public static final class Builder extends BaseErrorMessage.Builder<Builder> {
+
+        @Override
+        protected Builder builder() {
+            return this;
+        }
+
+        @Override
+        public <E extends BaseErrorMessage> E build() {
+            @SuppressWarnings("unchecked")
+            E error = (E) new ErrorMessage(this);
+            return error;
+        }
     }
 }

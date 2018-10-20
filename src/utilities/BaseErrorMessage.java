@@ -21,35 +21,47 @@ import ast.AST;
  */
 public abstract class BaseErrorMessage {
     
-    protected AST ast;
-    protected IErrorGetter errorMessage;
-    protected Object[] arguments;
-    protected Throwable throwable;
-    protected String fileName = "";
-    protected String packageName = "";
+    private static final Object[] EMPTY_ARGS = new Object[0];
     
-    public BaseErrorMessage(Object... arguments) {
-        this(null, null, null, arguments);
+    protected final AST ast;
+    protected final IErrorGetter errorMessage;
+    protected final Object[] arguments;
+    protected final Throwable throwable;
+    protected final String fileName;
+    protected final String packageName;
+    
+    public BaseErrorMessage(Builder<?> builder) {
+        ast = builder.ast;
+        errorMessage = builder.errorMessage;
+        arguments = builder.arguments;
+        throwable = builder.throwable;
+        fileName = builder.fileName;
+        packageName = builder.packageName;
     }
     
-    public BaseErrorMessage(AST ast, Object... arguments) {
-        this(ast, null, null, arguments);
+    public String createPackageName(String name) {
+        // First strip the `.pj' part
+        String str = name.replaceAll("\\.pj$", "");
+        // Now remove the absolute path
+        String absPath = new File("").getAbsolutePath() + "/";
+        str = str.replaceAll(absPath, "");
+        // Replace all `/' with .
+        str = str.replaceAll("/", "\\.");
+        return str;
     }
     
-    public BaseErrorMessage(AST ast, IErrorGetter errorMessage) {
-        this(ast, errorMessage, null, new Object[0]);
+    public String createFileName(String name) {
+        // Remove all double `//:'
+        String str = name.replaceAll("//","/");
+        // Now remove the absolute path
+        String absPath = new File("").getAbsolutePath() + "/";
+        str = str.replaceAll(absPath,"");
+        return str;
     }
     
-    public BaseErrorMessage(AST ast, IErrorGetter errorMessage, Object... arguments) {
-        this(ast, errorMessage, null, arguments);
-    }
-    
-    public BaseErrorMessage(AST ast, IErrorGetter errorMessage, Throwable throwable, Object... arguments) {
-        this.ast = ast;
-        this.errorMessage = errorMessage;
-        this.throwable = throwable;
-        this.arguments = arguments;
-    }
+    // ================
+    // G E T T E R S
+    // ================
     
     public AST getAST() {
         return ast;
@@ -67,24 +79,12 @@ public abstract class BaseErrorMessage {
         return throwable;
     }
     
-    public void setPackageName(String name) {
-        // First strip the `.pj' part
-        String str = name.replaceAll("\\.pj$", "");
-        // Now remove the absolute path
-        String absPath = new File("").getAbsolutePath() + "/";
-        str = str.replaceAll(absPath, "");
-        // Replace all `/' with .
-        str = str.replaceAll("/", "\\.");
-        packageName = str;
+    public String getFileName() {
+        return fileName;
     }
     
-    public void setFileName(String name) {
-        // Remove all double `//:'
-        String str = name.replaceAll("//","/");
-        // Now remove the absolute path
-        String absPath = new File("").getAbsolutePath() + "/";
-        str = str.replaceAll(absPath,"");
-        fileName = str;
+    public String getPackageName() {
+        return packageName;
     }
     
     public ST getMessage() {
@@ -120,5 +120,74 @@ public abstract class BaseErrorMessage {
                               throwable.getMessage()
                               : "none") +
                 ")";
+    }
+    
+    // =====================
+    // B U I L D E R
+    // =====================
+    
+    /**
+     * 
+     * The class {@link Builder} uses descriptive methods to create
+     * error messages with default or initial values.
+     * 
+     * @author Ben Cisneros
+     * @version 10/20/2018
+     * @since 1.2
+     *
+     * @param <B>
+     *            The builder type.
+     */
+    public static abstract class Builder<B> {
+        
+        protected AST ast;
+        protected IErrorGetter errorMessage;
+        protected Object[] arguments;
+        protected Throwable throwable;
+        protected String fileName;
+        protected String packageName;
+        
+        public Builder() {
+            ast = null;
+            errorMessage = null;
+            arguments = EMPTY_ARGS;
+            throwable = null;
+            fileName = null;
+            packageName = null;
+        }
+        
+        protected abstract B builder();
+        
+        public abstract <E extends BaseErrorMessage> E build();
+        
+        public B addAST(AST ast) {
+            this.ast = ast;
+            return builder();
+        }
+        
+        public B addErrorMessage(IErrorGetter errorMessage) {
+            this.errorMessage = errorMessage;
+            return builder();
+        }
+        
+        public B addArguments(Object... arguments) {
+            this.arguments = arguments;
+            return builder();
+        }
+        
+        public B addThrowable(Throwable throwable) {
+            this.throwable = throwable;
+            return builder();
+        }
+        
+        public B addFileName(String fileName) {
+            this.fileName = fileName;
+            return builder();
+        }
+        
+        public B addPackageName(String packageName) {
+            this.packageName = packageName;
+            return builder();
+        }
     }
 }

@@ -488,6 +488,10 @@ public class OptionBuilder {
         return setClass;
     }
     
+    // =====================
+    // B U I L D E R
+    // =====================
+    
     /**
      * Collections of shared-options between command types.
      * 

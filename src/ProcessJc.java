@@ -64,11 +64,14 @@ public class ProcessJc {
     
     public static void main(String[] args) {
         if (args.length == 0) {
-            System.out.println(new ErrorMessage(null,
-                                                null,
-                                                VisitorErrorMessage.RESOLVE_IMPORTS_100,
-                                                null,
-                                                new Object[0]).renderMessage());
+//            System.out.println(new ErrorMessage(null,
+//                                                null,
+//                                                VisitorErrorMessage.RESOLVE_IMPORTS_100,
+//                                                null,
+//                                                new Object[0]).renderMessage());
+            ErrorMessage.Builder builder = new ErrorMessage.Builder();
+            builder.addErrorMessage(VisitorErrorMessage.RESOLVE_IMPORTS_100);
+            System.out.println(builder.build().renderMessage());
             System.exit(0);
         }
         
