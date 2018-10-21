@@ -60,7 +60,7 @@ public class PJMain extends Command {
     // TODO: This is for imports (libraries, files, etc), pragmas, etc..
     @Option(names = {"-V", "-verbose"},
             help = "Output messages of the exact sequence of commands used to compile a "
-                    + "ProcessJ program")
+                   + "ProcessJ program")
     public boolean verbose;
     
     @Option(names = {"-g", "-debug"},

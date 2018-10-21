@@ -91,22 +91,22 @@ public final class PositionalValue extends OptionWithValues {
     @Override
     public String toString() {
         return getClass().getSimpleName() +
-                "(name=" + fieldName +
-                ", order=" + order +
-                ", help=" + help +
-                ", field= " + field.getName() +
-                ", arity= " + arity +
-                ", metavar=" + metavar +
-                ", required=" + required +
-                ", hidden=" + hidden +
-                ", split=" + "\"" + split + "\"" +
-                ", handlers=" + Arrays.stream(handlers)
-                                      .map(handler -> handler + "")
-                                      .collect(Collectors.joining(",")) +
-                ", type=" + type +
-                ", handlers={" + Arrays.stream(parsers)
-                                      .map(parser -> parser + "")
-                                      .collect(Collectors.joining(",")) + "}" +
+                "(name="        + fieldName +
+                ", order="      + order +
+                ", help="       + help +
+                ", field= "     + field.getName() +
+                ", arity= "     + arity +
+                ", metavar="    + metavar +
+                ", required="   + required +
+                ", hidden="     + hidden +
+                ", split="      + "\"" + split + "\"" +
+                ", handlers="   + Arrays.stream(handlers)
+                                        .map(handler -> handler + "")
+                                        .collect(Collectors.joining(",")) +
+                ", type="       + type +
+                ", handlers={"  + Arrays.stream(parsers)
+                                        .map(parser -> parser + "")
+                                        .collect(Collectors.joining(",")) + "}" +
                 ")";
     }
     

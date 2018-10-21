@@ -21,8 +21,8 @@ import ast.AST;
  */
 public abstract class BaseErrorMessage {
     
+    public static Builder<?> builder = null;
     private static final Object[] EMPTY_ARGS = new Object[0];
-    
     protected final AST ast;
     protected final IErrorGetter errorMessage;
     protected final Object[] arguments;
@@ -103,18 +103,18 @@ public abstract class BaseErrorMessage {
     @Override
     public String toString() {
         return getClass().getSimpleName() +
-                "(filename=" + (fileName.isEmpty() ? "none" : fileName) +
-                ", package=" + (packageName.isEmpty() ? "none" : packageName) +
-                ", errorNumber=" + errorMessage.getNumber() +
-                ", errorMessage=" + errorMessage.getMessage() +
-                ", arguments=" + (arguments != null ? "{" +
-                                 Arrays.stream(arguments)
-                                       .map(arg -> arg + "")
-                                       .collect(Collectors.joining(",")) + "}"
-                                 : "none") +
-                ", reason=" + (throwable != null ?
-                              throwable.getMessage()
-                              : "none") +
+                "(filename="        + (fileName.isEmpty() ? "none" : fileName) +
+                ", package="        + (packageName.isEmpty() ? "none" : packageName) +
+                ", errorNumber="    + errorMessage.getNumber() +
+                ", errorMessage="   + errorMessage.getMessage() +
+                ", arguments="      + (arguments != null ? "{" +
+                                      Arrays.stream(arguments)
+                                            .map(arg -> arg + "")
+                                            .collect(Collectors.joining(",")) + "}"
+                                            : "none") +
+                ", reason="         + (throwable != null ?
+                                            throwable.getMessage()
+                                            : "none") +
                 ")";
     }
     

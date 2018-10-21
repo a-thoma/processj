@@ -1,17 +1,17 @@
 package utilities;
 
-import java.util.HashSet;
-import java.util.Set;
+import java.util.ArrayList;
+import java.util.List;
 
 public enum StackErrorMessage {
     
     INSTANCE
     ;
     
-    private Set<IErrorGetter> messages;
+    private List<BaseErrorMessage> trace;
     
     StackErrorMessage() {
-        messages = new HashSet<IErrorGetter>();
+        trace = new ArrayList<>();
     }
     
     // TODO: Build a sequence of error messages in reversed order

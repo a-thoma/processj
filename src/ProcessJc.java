@@ -12,7 +12,6 @@ import parser.parser;
 import scanner.Scanner;
 import utilities.Error;
 import utilities.ErrorMessage;
-import utilities.BaseErrorMessage;
 import utilities.VisitorErrorMessage;
 import utilities.Language;
 import utilities.Log;
@@ -26,59 +25,18 @@ import utilities.SymbolTable;
  */
 public class ProcessJc {
     
-    /**
-     * Default message when the compiler does not understand the
-     * user's input.
-     */
-    private static final String WHAT_MESSAGE = "What would you like me to do?";
-    
-    /**
-     * Pretty prints AST-like structures.
-     * 
-     * @param c
-     *          A {@link Compilation} unit representation of an AST.
-     */
-    private static void writeTree(Compilation c) {
-        try {
-            FileOutputStream fileOut = new FileOutputStream("Tree.ser");
-            ObjectOutputStream out = new ObjectOutputStream(fileOut);
-            out.writeObject(c);
-            out.close();
-            fileOut.close();
-            System.out.printf("Serialized data is saved in Tree.ser");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    
-    public static void whatMessage() {
-        System.err.println(WHAT_MESSAGE);
-        System.exit(0);
-    }
-    
-    // TODO: Only for testing purposes!
-    public static final String ANSI_RESET = "\u001B[0m";
-    public static final String ANSI_RED = "\u001B[31m";
-    public static final String ANSI_UNDERLINE = "\033[4m";
-    //
-    
     public static void main(String[] args) {
         if (args.length == 0) {
-//            System.out.println(new ErrorMessage(null,
-//                                                null,
-//                                                VisitorErrorMessage.RESOLVE_IMPORTS_100,
-//                                                null,
-//                                                new Object[0]).renderMessage());
-            ErrorMessage.Builder builder = new ErrorMessage.Builder();
-            builder.addErrorMessage(VisitorErrorMessage.RESOLVE_IMPORTS_100);
-            System.out.println(builder.build().renderMessage());
+            System.out.println(new ErrorMessage.Builder()
+                                   .addErrorMessage(VisitorErrorMessage.RESOLVE_IMPORTS_100)
+                                   .build().renderMessage());
             System.exit(0);
         }
         
-        AST root = null;
+        // ===============================================
+        // C O M M A N D   L I N E   P R O C E S S O R
+        // ===============================================
         
-        // -----------------------------------------------------------------------------
-        // COMMAND LINE PROCESSOR
         OptionBuilder optionBuilder = null;
         PJMain pjMain = null;
         try {
@@ -88,7 +46,7 @@ public class ProcessJc {
             pjMain = optionBuilder.getCommand(PJMain.class);
         } catch(Exception e) {
             System.out.println(e.getMessage());
-            System.exit(1);
+            System.exit(0);
         }
         
         // These fields have default values, see PJMain.java for more information
@@ -110,15 +68,19 @@ public class ProcessJc {
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
-        } else if (!StringUtil.isStringEmpty(pjMain.info)) {
+        } else if (pjMain.info != null) {
             System.out.println(String.format("Information about @Option '%s' is not available.", pjMain.info));
             System.exit(0);
         } else if (files == null || files.isEmpty()) {
             // At least one file must be provided otherwise throw an error
-            // Throw error messages
+            // if none is given or (for now) if a file does not exists
+            System.out.println(new ErrorMessage.Builder()
+                                   .addErrorMessage(VisitorErrorMessage.RESOLVE_IMPORTS_100)
+                                   .build().renderMessage());
             System.exit(0);
         }
-        // -----------------------------------------------------------------------------
+        
+        AST root = null;
         
         for (File inFile : files) {
             Scanner s = null;
@@ -130,9 +92,12 @@ public class ProcessJc {
                 s = new Scanner(new java.io.FileReader(fileAbsolutePath));
                 p = new parser(s);
             } catch (java.io.FileNotFoundException e) {
-                // TODO: error message
-                System.err.println(String.format("File not found: \"%s\"", inFile));
-                System.exit(1);
+                // TODO: For now this won't execute! the error is handled above
+                System.out.println(new ErrorMessage.Builder()
+                                       .addErrorMessage(VisitorErrorMessage.RESOLVE_IMPORTS_102)
+                                       .addArguments(inFile.getName())
+                                       .build().renderMessage());
+                System.exit(0);
             } catch (Exception e) {
                 e.printStackTrace();
                 System.exit(1);
@@ -164,34 +129,35 @@ public class ProcessJc {
             SymbolTable globalTypeTable = new SymbolTable("Main file: " + Error.fileName);
 
             // Dump log messages
-            if (visitorAll) {
+            if (visitorAll)
                 Log.startLogging();
-            }
-
             // Dump the symbol table structure
-            if (sts) {
+            if (sts)
                 globalTypeTable.printStructure("");
-            }
-
-            // -----------------------------------------------------------------------------
-            // VISIT IMPORT DECLARATIONS
+            
+            // =====================================================
+            // V I S I T   I M P O R T   D E C L A R A T I O N S
+            // =====================================================
+            
             c.visit(new namechecker.ResolveImports<AST>(globalTypeTable));
             if (Error.errorCount != 0) {
                 System.out.println("** COMPILATION FAILED #0 **");
                 System.exit(1);
             }
-
-            // -----------------------------------------------------------------------------
-            // TOP LEVEL DECLARATIONS
+            
+            // ================================================
+            // T O P   L E V E L   D E C L A R A T I O N S
+            // ================================================
             
             c.visit(new namechecker.TopLevelDecls<AST>(globalTypeTable));
             globalTypeTable = SymbolTable.hook;
 
             // Resolve types from imported packages.
             c.visit(new namechecker.ResolvePackageTypes());
-
-            // -----------------------------------------------------------------------------
-            // NAME CHECKER
+            
+            // ===========================
+            // N A M E   C H E C K E R
+            // ===========================
             
             c.visit(new namechecker.NameChecker<AST>(globalTypeTable));
             if (Error.errorCount != 0) {
@@ -205,9 +171,10 @@ public class ProcessJc {
 
             // Re-construct Array Types correctly
             root.visit(new namechecker.ArrayTypeConstructor());
-
-            // -----------------------------------------------------------------------------
-            // TYPE CHECKER
+            
+            // ===========================
+            // T Y P E   C H E C K E R
+            // ===========================
             
             c.visit(new typechecker.TypeChecker(globalTypeTable));
 
@@ -219,9 +186,10 @@ public class ProcessJc {
                 System.out.println("** COMPILATION FAILED #2 **");
                 System.exit(1);
             }
-
-            // -----------------------------------------------------------------------------
-            // OTHER SEMANTIC CHECKS
+            
+            // =============================================
+            // O T H E R   S E M A N T I C   C H E C K S
+            // =============================================
             
             c.visit(new reachability.Reachability());
             c.visit(new parallel_usage_check.ParallelUsageCheck());
@@ -234,8 +202,9 @@ public class ProcessJc {
                 System.exit(1);
             }
             
-            // -----------------------------------------------------------------------------
-            // CODE GENERATOR
+            // ===============================
+            // C O D E   G E N E R A T O R
+            // ===============================
             
             if (Settings.targetLanguage == Language.JVM) {
 //                generateCodeJava(c, inFile, globalTypeTable);
@@ -251,10 +220,11 @@ public class ProcessJc {
     }
     
     /**
-     * Given a ProcessJ {@link Compilation} unit, e.g,. an abstract syntax tree
-     * object, we will generate the code for the JVM. The source range for this
-     * type of tree is the entire source file, not including leading and trailing
-     * whitespace characters and comments.
+     * Given a ProcessJ {@link Compilation} unit, e.g. an abstract
+     * syntax tree object, we will generate the code for the JVM.
+     * The source range for this type of tree is the entire source
+     * file, not including leading and trailing whitespace characters
+     * and comments.
      *
      * @param compilation
      *              A {@link Compilation} unit consisting of a single file.
@@ -264,7 +234,6 @@ public class ProcessJc {
      *              A symbol table consisting of all the top level types.
      */
     private static void generateCodeJava(Compilation compilation, File inFile, SymbolTable topLevelDecls) {
-
         // Read in and get the pathname of the input file
         String name = inFile.getName().substring(0, inFile.getName().lastIndexOf("."));
         Properties configFile = utilities.ConfigFileReader.getConfiguration();
@@ -284,26 +253,5 @@ public class ProcessJc {
 
         // Write the output to a file
 //        Helper.writeToFile(templateResult, generator.getSourceFile());
-    }
-
-    /**
-     * Pretty prints a hash table with fancy formatting.
-     *
-     * @param table
-     *          HashTable of values to print.
-     */
-    private static void printTable(Hashtable<String, Integer> table) {
-        String dashLine = "---------------------------------------------------------";
-        Log.log(dashLine);
-        Log.log(String.format("|%-25s\t|\t%15s\t|", "functionName", "Size"));
-        Log.log(dashLine);
-        Set<String> myKeys = table.keySet();
-
-        for (String name : myKeys) {
-            int size = table.get(name);
-            String msg = String.format("|%-25s\t|\t%15d\t|", name, size);
-            Log.log(msg);
-        }
-        Log.log(dashLine);
     }
 }

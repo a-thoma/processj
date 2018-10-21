@@ -5,7 +5,7 @@ import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
 
 /**
- * This class is used to create concrete error messages
+ * This class is used to create generic error messages
  * in ProcessJ.
  * 
  * @author Ben Cisneros
