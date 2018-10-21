@@ -40,8 +40,10 @@ public class ErrorMessage extends BaseErrorMessage {
             stTag.add("errorName", errorMessage.getText());
             stTag.add("errorType", errorMessage.getNumber());
         }
-        if (throwable != null)
+        if (throwable != null) {
+            stStackInfo.add("reason", throwable);
             stStackInfo.add("stack", throwable.getStackTrace());
+        }
         
         stMessage.add("tag", stTag.render())
                  .add("errorMessage", super.getMessage().render())
@@ -53,7 +55,9 @@ public class ErrorMessage extends BaseErrorMessage {
 
     @Override
     public String renderMessage() {
-        return this.getMessage().render();
+        // TODO: For additional esthetic look, make changes here
+        String renderMsg = getMessage().render();
+        return renderMsg;
     }
     
     // =====================
@@ -80,5 +84,13 @@ public class ErrorMessage extends BaseErrorMessage {
             E error = (E) new ErrorMessage(this);
             return error;
         }
+    }
+    
+    public static void main(String[] args) {
+        ErrorMessage.builder = new ErrorMessage.Builder();
+        builder.addErrorMessage(VisitorErrorMessage.RESOLVE_IMPORTS_105);
+        builder.addArguments("B.pj", "path/Pkg");
+        builder.addThrowable(new RuntimeException("<some text here>"));
+        System.out.println(ErrorMessage.builder.build().renderMessage());
     }
 }

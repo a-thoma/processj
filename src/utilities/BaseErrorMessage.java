@@ -22,7 +22,9 @@ import ast.AST;
 public abstract class BaseErrorMessage {
     
     public static Builder<?> builder = null;
-    private static final Object[] EMPTY_ARGS = new Object[0];
+    private static final Object[] EMPTY_ARGUMENTS = new Object[0];
+    private static final String EMPTY_STRING = "";
+    
     protected final AST ast;
     protected final IErrorGetter errorMessage;
     protected final Object[] arguments;
@@ -89,12 +91,15 @@ public abstract class BaseErrorMessage {
     
     public ST getMessage() {
         int argCount = 0;
-        ST message = new ST(errorMessage.getMessage());
+        ST message = null;
+        if (errorMessage != null)
+            message = new ST(errorMessage.getMessage());
+        else
+            message = new ST(EMPTY_STRING);
         if (arguments != null && arguments.length > 0)
             argCount = arguments.length;
-        String str = "arg";
         for (int i = 0; i < argCount; ++i)
-            message.add(str + i, arguments[i]);
+            message.add("arg" + i, arguments[i]);
         return message;
     }
     
@@ -146,7 +151,7 @@ public abstract class BaseErrorMessage {
         public Builder() {
             ast = null;
             errorMessage = null;
-            arguments = EMPTY_ARGS;
+            arguments = EMPTY_ARGUMENTS;
             throwable = null;
             fileName = null;
             packageName = null;

@@ -169,7 +169,7 @@ public class Formatter {
     public String appendAllOptions() {
         StringBuilder stringBuilder = new StringBuilder();
         Map<Class<? extends Command>, OptionGroup> commandAndOptions = optionBuilder.getCommandAndOptionMap();
-        boolean additionalCommands = commandAndOptions.size() > 1;
+        boolean hasCommands = commandAndOptions.size() > 1;
         // Grab the list of commands defined in the program
         List<String> commands = new ArrayList<>();
         commands.addAll(optionBuilder.getNamedAndCommandMap().keySet());
@@ -177,7 +177,7 @@ public class Formatter {
         for (String commandName : commands) {
             // Grab the command
             Class<? extends Command> command = optionBuilder.getNamedAndCommandMap().get(commandName);
-            if (additionalCommands)
+            if (hasCommands)
                 stringBuilder.append("[")
                              .append(OptionBuilder.findCommandName(optionBuilder.getNamedAndCommandMap(), command))
                              .append(": ");
@@ -189,7 +189,7 @@ public class Formatter {
                 if (it.hasNext())
                     stringBuilder.append(" ");
             }
-            if (additionalCommands)
+            if (hasCommands)
                 stringBuilder.append("] ");
         }
         return formatUsage(stringBuilder.toString());

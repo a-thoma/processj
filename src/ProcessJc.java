@@ -49,7 +49,8 @@ public class ProcessJc {
             System.exit(0);
         }
         
-        // These fields have default values, see PJMain.java for more information
+        // These fields have default values, see PJMain.java
+        // for more information
         Settings.includeDir = pjMain.include;
         Settings.targetLanguage = pjMain.target;
         boolean sts = pjMain.sts;
@@ -70,6 +71,9 @@ public class ProcessJc {
             }
         } else if (pjMain.info != null) {
             System.out.println(String.format("Information about @Option '%s' is not available.", pjMain.info));
+            System.exit(0);
+        } else if (pjMain.errorCode != null) {
+            System.out.println("map -> " + pjMain.errorCode);
             System.exit(0);
         } else if (files == null || files.isEmpty()) {
             // At least one file must be provided otherwise throw an error
@@ -92,7 +96,7 @@ public class ProcessJc {
                 s = new Scanner(new java.io.FileReader(fileAbsolutePath));
                 p = new parser(s);
             } catch (java.io.FileNotFoundException e) {
-                // TODO: For now this won't execute! the error is handled above
+                // TODO: For now this won't execute! The error is handled above
                 System.out.println(new ErrorMessage.Builder()
                                        .addErrorMessage(VisitorErrorMessage.RESOLVE_IMPORTS_102)
                                        .addArguments(inFile.getName())

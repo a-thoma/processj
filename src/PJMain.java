@@ -3,6 +3,7 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
+import java.util.Map;
 
 import clp.Argument;
 import clp.IVersionPrinter;
@@ -137,12 +138,10 @@ public class PJMain extends Command {
             split = "=")
     public boolean color;
     
-    // TODO: Change type to Enum instead!
     @Option(names = "-error-code",
             help = "What error code information do you want?",
-            metavar = "<number>",
-            split = "=")
-    public int errorCode;
+            metavar = "<number>")
+    public Map<String, Integer> errorCode;
     
     @Option(names = "-clp",
             help = "ProcessJ command-line processor and conventions")
