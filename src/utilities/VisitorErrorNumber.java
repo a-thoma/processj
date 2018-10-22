@@ -2,6 +2,7 @@ package utilities;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.util.Properties;
 
 /**
@@ -173,6 +174,9 @@ public enum VisitorErrorNumber implements IErrorGetter {
         this.text = text;
         this.number = number;
         this.type = type;
+        
+        //
+        init();
     }
     
     @Override
@@ -190,17 +194,33 @@ public enum VisitorErrorNumber implements IErrorGetter {
     
     @Override
     public String getMessage() {
-        return localizable.getProperty(name());
+//        return localizable.getProperty(name());
+        return "123";
     }
     
-    static {
-        localizable = new Properties();
-        try {
-            FileInputStream propsFile = new FileInputStream(
-                    "/Users/Ben/Desktop/processj/resources/properties/VisitorErrorMessages.properties");
-            localizable.load(propsFile);
-        } catch (IOException e) {
-            e.printStackTrace();
+    /////
+    private static final String PATH = "resources/properties/VisitorErrorMessages.properties";
+    private static Properties properties;
+    
+    private void init() {
+        if (properties == null) {
+            properties = new Properties();
+            try {
+                InputStream is = VisitorErrorNumber.class.getResourceAsStream(PATH);
+//                properties.load(VisitorErrorNumber.class.getResourceAsStream(PATH));
+            } catch (Exception e) {
+                System.out.println("Unable to load " + PATH);
+            }
         }
     }
+    
+//    static {
+//        localizable = new Properties();
+//        try {
+//            FileInputStream propsFile = new FileInputStream("resources/properties/VisitorErrorMessages.properties");
+//            localizable.load(propsFile);
+//        } catch (IOException e) {
+//            e.printStackTrace();
+//        }
+//    }
 }
