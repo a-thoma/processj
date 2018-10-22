@@ -46,7 +46,7 @@ public enum TraceErrorBuilder {
         case FATAL:
         case ERROR:
             // Terminate and dump trace
-            ++errorCount;
+//            ++errorCount;
             break;
         }
         trace.add(errorMsg);
