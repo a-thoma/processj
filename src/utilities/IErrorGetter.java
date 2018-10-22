@@ -24,8 +24,6 @@ public interface IErrorGetter {
         return -1;
     }
     
-    String getText();
-    
     String getMessage();
     
     public static URL getURL(String fileName) {

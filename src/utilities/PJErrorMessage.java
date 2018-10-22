@@ -11,7 +11,7 @@ import org.stringtemplate.v4.STGroupFile;
 import ast.AST;
 
 /**
- * The class {@link BaseErrorMessage} is used to track down the
+ * The class {@link PJErrorMessage} is used to track down the
  * visitor pattern when processing the contents in a ProcessJ
  * file, when processing the syntax and/or semantics errors
  * when compiling or generating Java source code from a ProcessJ
@@ -21,7 +21,7 @@ import ast.AST;
  * @version 10/07/2018
  * @since 1.2
  */
-public abstract class BaseErrorMessage {
+public abstract class PJErrorMessage {
     
     private static final Object[] EMPTY_ARGUMENTS = new Object[0];
     private static final String EMPTY_STRING = "";
@@ -66,7 +66,7 @@ public abstract class BaseErrorMessage {
      */
     protected final String packageName;
     
-    public BaseErrorMessage(Builder<?> builder) {
+    public PJErrorMessage(Builder<?> builder) {
         ast = builder.ast;
         errorMessage = builder.errorMessage;
         arguments = builder.arguments;
@@ -193,7 +193,7 @@ public abstract class BaseErrorMessage {
         
         protected abstract B builder();
         
-        public abstract <E extends BaseErrorMessage> E build();
+        public abstract <E extends PJErrorMessage> E build();
         
         public B addAST(AST ast) {
             this.ast = ast;

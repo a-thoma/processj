@@ -9,8 +9,8 @@ File(fileName, lineNumber) ::= "<if(fileName)>|- <fileName><AddNumber(lineNumber
 AddNumber(lineNumber) ::= "<if(lineNumber)>=<lineNumber><endif>"
 
 //========================================================================================
-Tag(tag, errorName, errorType) ::= <<
-<tag>[<if(errorName)><errorName>=<errorType><else>pj<endif>]: 
+Tag(tag, errorNumber) ::= <<
+<tag>[<if(errorNumber)><errorNumber><else>pj<endif>]: 
 >>
 
 //========================================================================================

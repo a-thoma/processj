@@ -9,7 +9,7 @@ import org.stringtemplate.v4.ST;
  * @author Ben Cisneros
  * @since 1.2
  */
-public class ErrorMessage extends BaseErrorMessage {
+public class ErrorMessage extends PJErrorMessage {
     
     public ErrorMessage(Builder builder) {
         super(builder);
@@ -28,8 +28,7 @@ public class ErrorMessage extends BaseErrorMessage {
             stFile.add("lineNumber", ast.line);
         if (errorMessage != null) {
             stTag.add("tag", errorMessage.getErrorSeverity());
-            stTag.add("errorName", errorMessage.getText());
-            stTag.add("errorType", errorMessage.getNumber());
+            stTag.add("errorNumber", errorMessage.getNumber());
         }
         if (throwable != null) {
             stStackInfo.add("reason", throwable);
@@ -46,7 +45,7 @@ public class ErrorMessage extends BaseErrorMessage {
 
     @Override
     public String renderMessage() {
-        // TODO: For additional esthetic look, make changes here
+        // TODO: Make additional changes here
         String renderMsg = getMessage().render();
         return renderMsg;
     }
@@ -62,7 +61,7 @@ public class ErrorMessage extends BaseErrorMessage {
      * @version 10/20/2018
      * @since 1.2
      */
-    public static final class Builder extends BaseErrorMessage.Builder<Builder> {
+    public static final class Builder extends PJErrorMessage.Builder<Builder> {
 
         @Override
         protected Builder builder() {
@@ -70,7 +69,7 @@ public class ErrorMessage extends BaseErrorMessage {
         }
 
         @Override
-        public <E extends BaseErrorMessage> E build() {
+        public <E extends PJErrorMessage> E build() {
             @SuppressWarnings("unchecked")
             E error = (E) new ErrorMessage(this);
             return error;
