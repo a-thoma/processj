@@ -27,4 +27,36 @@ public enum StackErrorMessage {
         errorCount = 0;
         trace = new ArrayList<>();
     }
+    
+    public void dump(BaseErrorMessage errorMsg) {
+        dump(null, errorMsg);
+    }
+    
+    public void dump(ErrorSeverity errorServerity, BaseErrorMessage errorMsg) {
+        if (errorServerity == null)
+            errorServerity = errorMsg.getErrorMessage().getErrorSeverity();
+        
+        switch (errorServerity) {
+        case INFO:
+            // Dump messages but don't terminate execution of program
+            break;
+        case WARNING:
+            // Don't dump message right away, just continue
+            break;
+        case FATAL:
+        case ERROR:
+            // Terminate and dump trace
+            ++errorCount;
+            break;
+        }
+        trace.add(errorMsg);
+    }
+    
+    public int getErrorCount() {
+        return errorCount;
+    }
+    
+    public List<BaseErrorMessage> getTrace() {
+        return trace;
+    }
 }

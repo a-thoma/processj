@@ -5,31 +5,69 @@ import java.util.Arrays;
 import java.util.stream.Collectors;
 
 import org.stringtemplate.v4.ST;
+import org.stringtemplate.v4.STGroup;
+import org.stringtemplate.v4.STGroupFile;
 
 import ast.AST;
 
 /**
  * The class {@link BaseErrorMessage} is used to track down the
  * visitor pattern when processing the contents in a ProcessJ
- * file, for processing the syntax and/or semantics errors
+ * file, when processing the syntax and/or semantics errors
  * when compiling or generating Java source code from a ProcessJ
- * file, or when processing the command line options and arguments.
+ * file, or when processing command line options and/or arguments.
  * 
  * @author Ben Cisneros
  * @version 10/07/2018
  * @since 1.2
  */
 public abstract class BaseErrorMessage {
+
+    /**
+     * String template file locator.
+     */
+    protected static final String stErrorFile = "resources/stringtemplates/messages/errorTemplate.stg";
     
-    public static Builder<?> builder = null;
+    /**
+     * Template for error messages.
+     */
+    protected static final STGroup stGroup = new STGroupFile(stErrorFile);
+    
+    /**
+     * Commonly used variables among error message builder objects.
+     */
     private static final Object[] EMPTY_ARGUMENTS = new Object[0];
+    
     private static final String EMPTY_STRING = "";
     
+    /**
+     * Current running AST.
+     */
     protected final AST ast;
+    
+    /**
+     * Type of error message.
+     */
     protected final IErrorGetter errorMessage;
+    
+    /**
+     * Attributes used in templates.
+     */
     protected final Object[] arguments;
+    
+    /**
+     * Reason for the error message.
+     */
     protected final Throwable throwable;
+    
+    /**
+     * Source of the error message.
+     */
     protected final String fileName;
+    
+    /**
+     * Source of the input file.
+     */
     protected final String packageName;
     
     public BaseErrorMessage(Builder<?> builder) {

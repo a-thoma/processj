@@ -32,7 +32,7 @@ import ast.Type;
 import ast.Var;
 import processj.runtime.PJBarrier;
 import processj.runtime.PJTimer;
-import utilities.ErrorType;
+import utilities.ErrorSeverity;
 import utilities.Log;
 import utilities.SymbolTable;
 import utilities.Visitor;
@@ -440,7 +440,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         Log.log(na.line + ": Visiting a Name (" + na.getname() + ")");
         
         if (Helper.isInvalidJavaIdentifier(na.getname())) {
-            Log.log(String.format("%s: Special keyword '%s' found.", ErrorType.WARNING, na.getname()));
+            Log.log(String.format("%s: Special keyword '%s' found.", ErrorSeverity.WARNING, na.getname()));
         }
         
         return (T) na.getname();

@@ -1,8 +1,6 @@
 package utilities;
 
 import org.stringtemplate.v4.ST;
-import org.stringtemplate.v4.STGroup;
-import org.stringtemplate.v4.STGroupFile;
 
 /**
  * This class is used to create generic error messages
@@ -12,13 +10,6 @@ import org.stringtemplate.v4.STGroupFile;
  * @since 1.2
  */
 public class ErrorMessage extends BaseErrorMessage {
-
-    /**
-     * String template file locator.
-     */
-    private final String stErrorFile = "resources/stringtemplates/messages/errorTemplate.stg";
-    
-    private final STGroup stGroup = new STGroupFile(stErrorFile);
     
     public ErrorMessage(Builder builder) {
         super(builder);
@@ -36,7 +27,7 @@ public class ErrorMessage extends BaseErrorMessage {
         if (ast != null)
             stFile.add("lineNumber", ast.line);
         if (errorMessage != null) {
-            stTag.add("tag", errorMessage.getErrorType());
+            stTag.add("tag", errorMessage.getErrorSeverity());
             stTag.add("errorName", errorMessage.getText());
             stTag.add("errorType", errorMessage.getNumber());
         }
@@ -87,10 +78,10 @@ public class ErrorMessage extends BaseErrorMessage {
     }
     
     public static void main(String[] args) {
-        ErrorMessage.builder = new ErrorMessage.Builder();
+        ErrorMessage.Builder builder = new ErrorMessage.Builder();
         builder.addErrorMessage(VisitorErrorMessage.RESOLVE_IMPORTS_105);
         builder.addArguments("B.pj", "path/Pkg");
         builder.addThrowable(new RuntimeException("<some text here>"));
-        System.out.println(ErrorMessage.builder.build().renderMessage());
+        System.out.println(builder.build().renderMessage());
     }
 }

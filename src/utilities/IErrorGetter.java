@@ -5,8 +5,8 @@ package utilities;
  * methods that when building useful error messages would
  * enforce {@code enum}s to provide an implementation for
  * both {@link #getText()} and {@link #getMessage()}, and
- * for {@link #getErrorType()} or {@link #getNumber()} if
- * needed.
+ * for {@link #getErrorSeverity()} or {@link #getNumber()}
+ * if needed.
  * 
  * @author Ben Cisneros
  * @version 10/21/2018
@@ -14,8 +14,8 @@ package utilities;
  */
 public interface IErrorGetter {
     
-    default ErrorType getErrorType() {
-        return ErrorType.INFO;
+    default ErrorSeverity getErrorSeverity() {
+        return ErrorSeverity.INFO;
     }
     
     default int getNumber() {

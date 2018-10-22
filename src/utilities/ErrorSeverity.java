@@ -1,24 +1,24 @@
 package utilities;
 
 /**
- * The enum {@link ErrorType} represents various types of
+ * The enum {@link ErrorSeverity} represents various types of
  * `severity' error messages in ProcessJ.
  * 
  * @author Ben Cisneros
  * @version 09/02/2018
  * @since 1.2
  */
-public enum ErrorType {
+public enum ErrorSeverity {
     
-    INFO        ("info"),
-    WARNING     ("warning"),
-    ERROR       ("error"),
-    FATAL       ("fatal")
+    INFO        ("INFO"),
+    WARNING     ("WARNING"),
+    ERROR       ("ERROR"),
+    FATAL       ("FATAL")
     ;
     
     private final String text;
     
-    ErrorType(String text) {
+    ErrorSeverity(String text) {
         this.text = text;
     }
     

@@ -84,6 +84,10 @@ public class ProcessJc {
             System.exit(0);
         }
         
+        // ===============================================
+        // P R O C C E S S I N G   F I L E S
+        // ===============================================
+        
         AST root = null;
         
         for (File inFile : files) {
@@ -211,8 +215,8 @@ public class ProcessJc {
             // ===============================
             
             if (Settings.targetLanguage == Language.JVM) {
-//                generateCodeJava(c, inFile, globalTypeTable);
-                System.out.println("NO CODE GENERATOR");
+                generateCodeJava(c, inFile, globalTypeTable);
+//                System.out.println("NO CODE GENERATOR");
                 System.exit(1);
             } else {
                 System.err.println(String.format("Unknown target language '%s' selected.", Settings.targetLanguage));
