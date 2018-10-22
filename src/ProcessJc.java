@@ -12,7 +12,7 @@ import parser.parser;
 import scanner.Scanner;
 import utilities.Error;
 import utilities.ErrorMessage;
-import utilities.VisitorErrorMessage;
+import utilities.VisitorErrorNumber;
 import utilities.Language;
 import utilities.Log;
 import utilities.Settings;
@@ -28,7 +28,7 @@ public class ProcessJc {
     public static void main(String[] args) {
         if (args.length == 0) {
             System.out.println(new ErrorMessage.Builder()
-                                   .addErrorMessage(VisitorErrorMessage.RESOLVE_IMPORTS_100)
+                                   .addErrorMessage(VisitorErrorNumber.RESOLVE_IMPORTS_100)
                                    .build().renderMessage());
             System.exit(0);
         }
@@ -79,7 +79,7 @@ public class ProcessJc {
             // At least one file must be provided otherwise throw an error
             // if none is given or (for now) if a file does not exists
             System.out.println(new ErrorMessage.Builder()
-                                   .addErrorMessage(VisitorErrorMessage.RESOLVE_IMPORTS_100)
+                                   .addErrorMessage(VisitorErrorNumber.RESOLVE_IMPORTS_100)
                                    .build().renderMessage());
             System.exit(0);
         }
@@ -102,7 +102,7 @@ public class ProcessJc {
             } catch (java.io.FileNotFoundException e) {
                 // TODO: For now this won't execute! The error is handled above
                 System.out.println(new ErrorMessage.Builder()
-                                       .addErrorMessage(VisitorErrorMessage.RESOLVE_IMPORTS_102)
+                                       .addErrorMessage(VisitorErrorNumber.RESOLVE_IMPORTS_102)
                                        .addArguments(inFile.getName())
                                        .build().renderMessage());
                 System.exit(0);

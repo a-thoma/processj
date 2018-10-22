@@ -8,7 +8,7 @@ import java.util.List;
  * @version 21/10/2018
  * @since 1.2
  */
-public enum TraceErrorMessage {
+public enum TraceErrorBuilder {
     
     INSTANCE
     ;
@@ -23,7 +23,7 @@ public enum TraceErrorMessage {
      */
     private List<BaseErrorMessage> trace;
     
-    TraceErrorMessage() {
+    TraceErrorBuilder() {
         errorCount = 0;
         trace = new ArrayList<>();
     }
