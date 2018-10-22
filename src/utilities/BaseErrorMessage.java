@@ -22,6 +22,9 @@ import ast.AST;
  * @since 1.2
  */
 public abstract class BaseErrorMessage {
+    
+    private static final Object[] EMPTY_ARGUMENTS = new Object[0];
+    private static final String EMPTY_STRING = "";
 
     /**
      * String template file locator.
@@ -32,13 +35,6 @@ public abstract class BaseErrorMessage {
      * Template for error messages.
      */
     protected static final STGroup stGroup = new STGroupFile(stErrorFile);
-    
-    /**
-     * Commonly used variables among error message builder objects.
-     */
-    private static final Object[] EMPTY_ARGUMENTS = new Object[0];
-    
-    private static final String EMPTY_STRING = "";
     
     /**
      * Current running AST.

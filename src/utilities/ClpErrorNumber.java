@@ -2,6 +2,7 @@ package utilities;
 
 import java.io.FileInputStream;
 import java.io.IOException;
+import java.net.URL;
 import java.util.Properties;
 
 /**
@@ -61,6 +62,11 @@ public enum ClpErrorNumber implements IErrorGetter {
     private static Properties localizable;
     
     /**
+     * Local path.
+     */
+    private final static String PATH = "resources/properties/VisitorErrorMessages.properties";
+    
+    /**
      * Tag name.
      */
     private final String text;
@@ -101,10 +107,13 @@ public enum ClpErrorNumber implements IErrorGetter {
     
     static {
         localizable = new Properties();
+        URL url = IErrorGetter.getURL(PATH);        
         try {
-            FileInputStream propsFile = new FileInputStream(
-                    "/Users/Ben/Desktop/processj/resources/properties/ClpErrorMessages.properties");
-            localizable.load(propsFile);
+            String path = PATH;
+            if (url != null)
+                path = url.toString();
+            path = path.substring(path.indexOf(":") + 1, path.length());
+            localizable.load(new FileInputStream(path));
         } catch (IOException e) {
             e.printStackTrace();
         }

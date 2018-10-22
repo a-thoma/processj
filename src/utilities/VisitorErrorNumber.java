@@ -1,8 +1,9 @@
 package utilities;
 
+import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
-import java.io.InputStream;
+import java.net.URL;
 import java.util.Properties;
 
 /**
@@ -156,6 +157,11 @@ public enum VisitorErrorNumber implements IErrorGetter {
     private static Properties localizable;
     
     /**
+     * Local path.
+     */
+    private final static String PATH = "resources/properties/VisitorErrorMessages.properties";
+    
+    /**
      * Tag name.
      */
     private final String text;
@@ -174,9 +180,6 @@ public enum VisitorErrorNumber implements IErrorGetter {
         this.text = text;
         this.number = number;
         this.type = type;
-        
-        //
-        init();
     }
     
     @Override
@@ -194,33 +197,20 @@ public enum VisitorErrorNumber implements IErrorGetter {
     
     @Override
     public String getMessage() {
-//        return localizable.getProperty(name());
-        return "123";
+        return localizable.getProperty(name());
     }
     
-    /////
-    private static final String PATH = "resources/properties/VisitorErrorMessages.properties";
-    private static Properties properties;
-    
-    private void init() {
-        if (properties == null) {
-            properties = new Properties();
-            try {
-                InputStream is = VisitorErrorNumber.class.getResourceAsStream(PATH);
-//                properties.load(VisitorErrorNumber.class.getResourceAsStream(PATH));
-            } catch (Exception e) {
-                System.out.println("Unable to load " + PATH);
-            }
+    static {
+        localizable = new Properties();
+        URL url = IErrorGetter.getURL(PATH);        
+        try {
+            String path = PATH;
+            if (url != null)
+                path = url.toString();
+            path = path.substring(path.indexOf(":") + 1, path.length());
+            localizable.load(new FileInputStream(path));
+        } catch (IOException e) {
+            e.printStackTrace();
         }
     }
-    
-//    static {
-//        localizable = new Properties();
-//        try {
-//            FileInputStream propsFile = new FileInputStream("resources/properties/VisitorErrorMessages.properties");
-//            localizable.load(propsFile);
-//        } catch (IOException e) {
-//            e.printStackTrace();
-//        }
-//    }
 }

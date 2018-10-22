@@ -1,5 +1,7 @@
 package utilities;
 
+import java.net.URL;
+
 /**
  * The interface {@code IErrorGetter} declares and defines
  * methods that when building useful error messages would
@@ -25,4 +27,15 @@ public interface IErrorGetter {
     String getText();
     
     String getMessage();
+    
+    public static URL getURL(String fileName) {
+        URL url;
+        ClassLoader cl = Thread.currentThread().getContextClassLoader();
+        url = cl.getResource(fileName);
+        if (url == null) {
+            cl = IErrorGetter.class.getClassLoader();
+            url = cl.getResource(fileName);
+        }
+        return url;
+    }
 }
