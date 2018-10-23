@@ -194,8 +194,7 @@ public enum VisitorErrorNumber implements IErrorGetter {
         try {
             String path = PATH;
             if (url != null)
-                path = url.toString();
-            path = path.substring(path.indexOf(":") + 1, path.length());
+                path = url.getFile();
             localizable.load(new FileInputStream(path));
         } catch (IOException e) {
             e.printStackTrace();

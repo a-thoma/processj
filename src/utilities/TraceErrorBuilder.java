@@ -72,6 +72,18 @@ public enum TraceErrorBuilder {
         }
     }
     
+    public void continuePrintDontStop(ErrorSeverity errorServerity, PJErrorMessage errorMsg) {
+        //
+    }
+    
+    public void continueDontPrintDontStop(ErrorSeverity errorServerity, PJErrorMessage errorMsg) {
+        //
+    }
+    
+    public void printAndStop(ErrorSeverity errorServerity, PJErrorMessage errorMsg) {
+        //
+    }
+    
     public int getErrorCount() {
         return errorCount;
     }

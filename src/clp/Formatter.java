@@ -5,6 +5,8 @@ import java.util.Arrays;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 /**
  * The format help message for command line options in
@@ -111,8 +113,9 @@ public class Formatter {
     }
     
     /**
-     * Count the numbers of characters in both the long name and short name of
-     * an option including the number of characters in the option's argument.
+     * Count the numbers of characters in both the long name and short
+     * name of an option including the number of characters in the option's
+     * argument.
      * 
      * @param option
      *          The long and short names of an option.
@@ -137,14 +140,20 @@ public class Formatter {
      */
     public String formatUsage(String usage) {
         Parameters parameter = optionBuilder.getMainCommand().getAnnotation(Parameters.class); 
-        StringBuilder stringBuilder = new StringBuilder();        
-        List<String> words = Arrays.asList(usage.split(" "));
+        StringBuilder stringBuilder = new StringBuilder();
+        // Split words by `[..]' or `word' or `<..>' 
+        Pattern pattern = Pattern.compile("\\[.*?\\]|\\<.*?\\>|\\w+");
+        Matcher matcher = pattern.matcher(usage);
+        List<String> words = new ArrayList<>();
+        while (matcher.find())
+            words.add(matcher.group());
+        
         int indent = USAGE_PREFIX.length() + parameter.name().length() + 1;
         int charLeft = DEFAULT_WIDTH - indent;
         int charCount = 0;
         stringBuilder.append(USAGE_PREFIX + parameter.name() + " ");
         for (Iterator<String> it = words.iterator(); it.hasNext();) {
-            String word = it.next();
+            String word = it.next().trim();
             charCount += word.length() + 1;
             if (charCount > charLeft) {
                 stringBuilder.append("\n")
@@ -160,8 +169,8 @@ public class Formatter {
     }
     
     /**
-     * Returns a string containing a list of options appended in the
-     * following format:
+     * Returns a string containing a list of options appended in
+     * the following format:
      * 
      * [option0] [option1] [option2 | options2] ... [optionN]
      */
@@ -324,12 +333,12 @@ public class Formatter {
                 stringBuilder.append(" | ");
         }
         
-        if (!optionValue.split.isEmpty())
-            stringBuilder.append(optionValue.split)
-                         .append(optionValue.metavar);
-        else if (!optionValue.metavar.isEmpty())
+        if (!optionValue.getSplit().isEmpty())
+            stringBuilder.append(optionValue.getSplit())
+                         .append(optionValue.getMetavar());
+        else if (!optionValue.getMetavar().isEmpty())
             stringBuilder.append(" ")
-                         .append(optionValue.metavar);
+                         .append(optionValue.getMetavar());
         if (!optionValue.isRequired())
             stringBuilder.append("]");
         

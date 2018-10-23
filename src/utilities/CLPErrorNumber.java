@@ -64,7 +64,7 @@ public enum CLPErrorNumber implements IErrorGetter {
     /**
      * Local path.
      */
-    private final static String PATH = "resources/properties/VisitorErrorMessages.properties";
+    private final static String PATH = "resources/properties/CLPErrorMessages.properties";
     
     /**
      * The error number.
@@ -100,8 +100,7 @@ public enum CLPErrorNumber implements IErrorGetter {
         try {
             String path = PATH;
             if (url != null)
-                path = url.toString();
-            path = path.substring(path.indexOf(":") + 1, path.length());
+                path = url.getFile();
             localizable.load(new FileInputStream(path));
         } catch (IOException e) {
             e.printStackTrace();

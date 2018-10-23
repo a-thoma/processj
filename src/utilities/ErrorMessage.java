@@ -75,12 +75,4 @@ public class ErrorMessage extends PJErrorMessage {
             return error;
         }
     }
-    
-    public static void main(String[] args) {
-        ErrorMessage.Builder builder = new ErrorMessage.Builder();
-        builder.addErrorMessage(VisitorErrorNumber.RESOLVE_IMPORTS_105);
-        builder.addArguments("B.pj", "path/Pkg");
-        builder.addThrowable(new RuntimeException("<some text here>"));
-        System.out.println(builder.build().renderMessage());
-    }
 }

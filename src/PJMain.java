@@ -47,7 +47,7 @@ import utilities.Language;
                         "                  %############                  "
                         },
             notes = {   "If called without options, the program may terminate. Use '-help' for a",
-                        "list of possible commands and options"
+                        "list of possible commands and options."
                         },
             footer = {  "Run 'pjc -about <arg>' for help with a specific command or option.\n",
                         "Full documentation at: https://processj.org",
@@ -68,10 +68,9 @@ public class PJMain extends Command {
             help = "Generate all debugging info")
     public boolean debug;
     
-    // TODO: defaultValue = "/opt/ProcessJ/include"
     @Option(names = {"-I", "-include"},
             metavar = "<dir>",
-            defaultValue = "/Users/Ben/Desktop/processj/include", // default include for testing!
+            defaultValue = "/Users/Ben/Desktop/processj/include", // Default included
             help = "Override the default include directory which is set to be the Include "
                     + "subdirectory of the ProcessJ directory")
     public String include;
@@ -140,7 +139,8 @@ public class PJMain extends Command {
     
     @Option(names = "-error-code",
             help = "What error code information do you want?",
-            metavar = "<number>")
+            metavar = "<number>",
+            split = "=")
     public Integer errorCode;
     
     @Option(names = "-clp",
