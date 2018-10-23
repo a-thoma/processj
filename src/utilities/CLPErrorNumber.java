@@ -96,7 +96,7 @@ public enum CLPErrorNumber implements IErrorGetter {
     
     static {
         localizable = new Properties();
-        URL url = IErrorGetter.getURL(PATH);        
+        URL url = PropertiesLoader.getURL(PATH);        
         try {
             String path = PATH;
             if (url != null)

@@ -141,7 +141,7 @@ public class PJMain extends Command {
     @Option(names = "-error-code",
             help = "What error code information do you want?",
             metavar = "<number>")
-    public Map<String, Integer> errorCode;
+    public Integer errorCode;
     
     @Option(names = "-clp",
             help = "ProcessJ command-line processor and conventions")
