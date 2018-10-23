@@ -235,7 +235,8 @@ public class ProcessJc {
      * and comments.
      *
      * @param compilation
-     *              A {@link Compilation} unit consisting of a single file.
+     *              A {@link Compilation} unit consisting of a single
+     *              file.
      * @param inFile
      *              The compiled file.
      * @param topLevelDecls

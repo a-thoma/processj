@@ -6,8 +6,8 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * The class {@link StringUtil} contains helper methods for classes
- * within the {@code cli} package.
+ * The class {@link StringUtil} contains helper methods for
+ * classes within the {@code cli} package.
  *
  * @author Ben Cisneros
  * @version 06/21/2018
@@ -63,8 +63,8 @@ public final class StringUtil {
     }
 
     /**
-     * Returns an array initialized with the list of string values that both
-     * {@code str1} and {@code str2} contain.
+     * Returns an array initialized with the list of string values that
+     * both {@code str1} and {@code str2} contain.
      *
      * @param str1
      *            An array of strings.

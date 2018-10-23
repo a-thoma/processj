@@ -5,8 +5,9 @@ import java.util.Collection;
 import java.util.Iterator;
 
 /**
- * The class {@link ArityRange} represents a list of indexes from
- * some starting position to some ending position on the command line.
+ * The class {@link ArityRange} represents a list of indexes
+ * from some starting position to some ending position on the
+ * command line.
  * 
  * @author Ben Cisneros
  * @version 08/23/2018
@@ -145,8 +146,12 @@ public class ArityRange extends AbstractList<Integer> {
         return "[" + from + ".." + to + "]";
     }
     
+    // =================
+    // H E L P E R S
+    // =================
+    
     /**
-     * NOTE: This iterator is not implemented.
+     * A helper iterator class.
      * 
      * @author Ben Cisneros
      * @version 08/23/2018

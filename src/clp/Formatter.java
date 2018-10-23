@@ -28,8 +28,6 @@ public class Formatter {
     
     public static final String OPTIONS_PREFIX = "OPTIONS: ";
     
-    public boolean sorted = false;
-    
     private OptionBuilder optionBuilder;
     
     public Formatter(OptionBuilder optionBuilder) {
@@ -149,7 +147,8 @@ public class Formatter {
             String word = it.next();
             charCount += word.length() + 1;
             if (charCount > charLeft) {
-                stringBuilder.append("\n").append(StringUtil.countSpaces(indent));
+                stringBuilder.append("\n")
+                             .append(StringUtil.countSpaces(indent));
                 charCount = word.length() + 1;
             }
             stringBuilder.append(word);
@@ -172,14 +171,14 @@ public class Formatter {
         boolean hasCommands = commandAndOptions.size() > 1;
         // Grab the list of commands defined in the program
         List<String> commands = new ArrayList<>();
-        commands.addAll(optionBuilder.getNamedAndCommandMap().keySet());
+        commands.addAll(optionBuilder.getCommandAndNameMap().values());
         // For each command defined
         for (String commandName : commands) {
             // Grab the command
-            Class<? extends Command> command = optionBuilder.getNamedAndCommandMap().get(commandName);
+            Class<? extends Command> command = optionBuilder.getCommandByName(commandName);
             if (hasCommands)
                 stringBuilder.append("[")
-                             .append(OptionBuilder.findCommandName(optionBuilder.getNamedAndCommandMap(), command))
+                             .append(commandName)
                              .append(": ");
             List<OptionValue> options = new ArrayList<>();
             options.addAll(commandAndOptions.get(command).getUniqueOptions());
@@ -265,12 +264,11 @@ public class Formatter {
     
     public StringBuilder buildCommandAndOptions(StringBuilder stringBuilder, int indent) {
         Map<Class<? extends Command>, OptionGroup> commandAndOptionMap = optionBuilder.getCommandAndOptionMap();
-        Map<String, Class<? extends Command>> namedAndCommandMap = optionBuilder.getNamedAndCommandMap();
         // For each command defined in the program
         for (Map.Entry<Class<? extends Command>, OptionGroup> entry : commandAndOptionMap.entrySet()) {
             // If we have more than one command, then append each individually
             if (commandAndOptionMap.size() > 1)
-                stringBuilder.append(OptionBuilder.findCommandName(namedAndCommandMap, entry.getKey()) + ":\n");
+                stringBuilder.append(optionBuilder.getCommandAndNameMap().get(entry.getKey()) + ":\n");
             List<OptionValue> optionList = new ArrayList<>();
             optionList.addAll(entry.getValue().getUniqueOptions());
             for (OptionValue optionValue : optionList) {
@@ -291,27 +289,16 @@ public class Formatter {
                      .append(appendAllOptions())
                      .append(appendAllArguments())
                      .append("\n");
-        // Find the maximum number of characters in an option. NOTE: arguments (or
-        // `PositionalValues') are not taken into account
-        int indent = 0;
-        for (OptionValue optionValue : optionBuilder.getSharedOptions().getOptions()) {
-            int optionIndent = getOptionLength(optionValue);
-            if (optionIndent > indent)
-                indent = optionIndent;
-        }
-        
-        if (indent >= MAX_CHAR_COUNT)
-            indent = MAX_CHAR_COUNT;
         
         // Create and build the list of arguments
         stringBuilder.append("\n")
                      .append(PARAMETERS_PREFIX)
                      .append("\n");
-        buildArguments(stringBuilder, indent);
+        buildArguments(stringBuilder, MAX_CHAR_COUNT);
         // Create and build the list of commands and options
         stringBuilder.append(OPTIONS_PREFIX)
                      .append("\n");
-        buildCommandAndOptions(stringBuilder, indent);
+        buildCommandAndOptions(stringBuilder, MAX_CHAR_COUNT);
         stringBuilder.append(buildFooter());
         
         return stringBuilder.toString();

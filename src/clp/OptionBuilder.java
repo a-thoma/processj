@@ -21,6 +21,8 @@ import java.util.TreeSet;
 import utilities.MultiValueMap;
 
 /**
+ * Responsible for building the options and arguments.
+ * 
  * @author Ben Cisneros
  * @version 07/21/2018
  * @since 1.2
@@ -35,7 +37,7 @@ public class OptionBuilder {
     /**
      * Map of names to command types.
      */
-    private Map<String, Class<? extends Command>> namedAndCommandMap = new HashMap<>();
+    private Map<Class<? extends Command>, String> commandAndNameMap = new HashMap<>();
     
     /**
      * Map of command types to option group.
@@ -95,7 +97,7 @@ public class OptionBuilder {
                 // Throw an error if the option does not belong to the invoked command type
                 if (optionValue == null)
                     throw new RuntimeException(String.format("Unknown @Option '%s' for @Parameters '%s'.",
-                                argument, findCommandName(namedAndCommandMap, type)));
+                                  argument, commandAndNameMap.get(type)));
                 index = parseOption(optGroup, optionValue, index, args);
             } else if (isCommand(argument)) {
                 subParameters = true;
@@ -103,26 +105,26 @@ public class OptionBuilder {
             } else if (argument.startsWith("-")) {
                 List<String> maybeList = startWithOptionName(argument);
                 throw new RuntimeException(String.format("Unknown @Option '%s' for @Parameters '%s'. "
-                            + "Did you mean to say?\n%s", argument, findCommandName(namedAndCommandMap, type),
+                            + "Did you mean to say?\n%s", argument, commandAndNameMap.get(type),
                             String.join("\n", maybeList)));
             } else {
                 // Throw an error if the running command takes no arguments
                 if (optGroup.getArguments().size() == 0)
                     throw new RuntimeException(String.format("@Parameters '%s' takes zero arguments.",
-                                findCommandName(namedAndCommandMap, type)));
+                                  commandAndNameMap.get(type)));
                 // Unparsed values are treated as positional arguments
                 positionArgs.add(argument);
                 ++index;
             }
         }
         
+        // Parse positional arguments if any
         if (!positionArgs.isEmpty())
-            // Parse positional arguments if any
             parseArgument(optGroup, positionArgs);
         
+        // Sub-commands are ALWAYS invoked last
         if (subParameters)
-            // Sub-commands are ALWAYS invoked last
-            handleArgs(args, namedAndCommandMap.get(args[index]), index + 1, new ArrayList<>());
+            handleArgs(args, getCommandByName(args[index]), index + 1, new ArrayList<>());
         
         // Validate required command line options
         validateRequiredOptions();
@@ -241,7 +243,7 @@ public class OptionBuilder {
 
         // Register command type by name
         String paramsName = parameters.name();
-        if (namedAndCommandMap.put(paramsName, type) != null)
+        if (commandAndNameMap.put(type, paramsName) != null)
             throw new RuntimeException(String.format("Name '%s' with possible duplicate @Parameters "
                         + "have been found.", paramsName));
         
@@ -256,7 +258,7 @@ public class OptionBuilder {
             try {
                 OptionValue optionValue = optGroup.getOption(optName);
                 options.add(optName, optionValue);
-                // Keep track of every required @Option
+                // Keep track of every required `Option'
                 if (optionValue.isRequired())
                     requiredOptionMap.put(optionValue.getName(), optionValue);
             } catch (Exception e) {
@@ -267,8 +269,8 @@ public class OptionBuilder {
         return this;
     }
     
-    public Map<String, Class<? extends Command>> getNamedAndCommandMap() {
-        return namedAndCommandMap;
+    public Map<Class<? extends Command>, String> getCommandAndNameMap() {
+        return commandAndNameMap;
     }
     
     public Map<Class<? extends Command>, OptionGroup> getCommandAndOptionMap() {
@@ -302,7 +304,7 @@ public class OptionBuilder {
                 }
                 
                 if (!names.isEmpty())
-                    optNames.add(findCommandName(namedAndCommandMap, type) + String.format(":\n%3s", " ")
+                    optNames.add(commandAndNameMap.get(type) + String.format(":\n%3s", " ")
                                 + String.join(",", names));
             }
         }
@@ -378,7 +380,7 @@ public class OptionBuilder {
         if (StringUtil.isStringEmpty(paramsName))
             return false;
         
-        return namedAndCommandMap.get(paramsName) != null;
+        return getCommandByName(paramsName) != null;
     }
     
     private List<String> startWithOptionName(String argName) {
@@ -442,12 +444,13 @@ public class OptionBuilder {
         return instanceObj;
     }
     
-    protected static String findCommandName(Map<String, Class<? extends Command>> namedHashMap,
-                                            Class<? extends Command> command) {
-        return namedHashMap.entrySet().stream()
-                           .filter(entry -> entry.getValue().equals(command))
-                           .map(Map.Entry::getKey).findFirst()
-                           .orElse("<UNKNOWN>");
+    protected Class<? extends Command> getCommandByName(String name) {
+        for (Map.Entry<Class<? extends Command>, String> entry : commandAndNameMap.entrySet()) {
+            if (entry.getValue().equals(name))
+                return entry.getKey();
+        }
+        
+        return null;
     }
     
     protected static <T> T createNewInstance(Class<T> objClass) {
@@ -489,7 +492,7 @@ public class OptionBuilder {
     }
     
     // =====================
-    // B U I L D E R
+    // O P T I O N S
     // =====================
     
     /**

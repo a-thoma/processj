@@ -63,8 +63,22 @@ public final class PositionalValue extends OptionWithValues {
         String newHelp = defaultValue.isEmpty() ? help : help + " (default: " + defaultValue + ")";
         List<String> words = Arrays.asList(newHelp.split(" "));
         int charCount = 0;
-        for (Iterator<String> it = words.iterator(); it.hasNext(); ) {
+        
+        // Move the definition to the next line if we exceed the
+        // minimum limits of characters
+        boolean nextLine = false;
+        if (stringBuilder.length() >= Formatter.MAX_CHAR_COUNT) {
+            charLeft = width - Formatter.MAX_CHAR_COUNT;
+            nextLine = true;
+        }
+        
+        for (Iterator<String> it = words.iterator(); it.hasNext();) {
             String word = it.next();
+            if (nextLine) {
+                stringBuilder.append("\n")
+                             .append(StringUtil.countSpaces(indent - 1));
+                nextLine = false;
+            }
             charCount += word.length() + 1;
             if (charCount > charLeft) {
                 stringBuilder.append("\n")
