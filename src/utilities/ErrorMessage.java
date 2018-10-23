@@ -81,6 +81,6 @@ public class ErrorMessage extends PJErrorMessage {
         builder.addErrorMessage(VisitorErrorNumber.RESOLVE_IMPORTS_105);
         builder.addArguments("B.pj", "path/Pkg");
         builder.addThrowable(new RuntimeException("<some text here>"));
-        System.out.println(builder.build().renderMessage());
+        System.out.println(builder.build().renderMessage());//
     }
 }
