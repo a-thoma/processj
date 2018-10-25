@@ -3,7 +3,6 @@ import java.text.DateFormat;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
-import java.util.Map;
 
 import clp.Argument;
 import clp.IVersionPrinter;
@@ -169,6 +168,7 @@ public class PJMain extends Command {
     }
     
     public VersionPrinter getVersion() throws InstantiationException, IllegalAccessException {
-        return (VersionPrinter) PJMain.class.getAnnotation(Parameters.class).versionPrinter().newInstance();
+        return (VersionPrinter) PJMain.class.getAnnotation(Parameters.class)
+                                            .versionPrinter().newInstance();
     }
 }

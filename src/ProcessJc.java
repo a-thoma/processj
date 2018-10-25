@@ -28,8 +28,8 @@ public class ProcessJc {
     public static void main(String[] args) {
         if (args.length == 0) {
             System.out.println(new ErrorMessage.Builder()
-                                   .addErrorMessage(VisitorErrorNumber.RESOLVE_IMPORTS_100)
-                                   .build().renderMessage());
+                                   .addError(VisitorErrorNumber.RESOLVE_IMPORTS_100)
+                                   .build().getST().render());
             System.exit(0);
         }
         
@@ -79,8 +79,8 @@ public class ProcessJc {
             // At least one file must be provided otherwise throw an error
             // if none is given or (for now) if a file does not exists
             System.out.println(new ErrorMessage.Builder()
-                                   .addErrorMessage(VisitorErrorNumber.RESOLVE_IMPORTS_100)
-                                   .build().renderMessage());
+                                   .addError(VisitorErrorNumber.RESOLVE_IMPORTS_100)
+                                   .build().getST().render());
             System.exit(0);
         }
         
@@ -102,9 +102,9 @@ public class ProcessJc {
             } catch (java.io.FileNotFoundException e) {
                 // TODO: For now this won't execute! The error is handled above
                 System.out.println(new ErrorMessage.Builder()
-                                       .addErrorMessage(VisitorErrorNumber.RESOLVE_IMPORTS_102)
+                                       .addError(VisitorErrorNumber.RESOLVE_IMPORTS_102)
                                        .addArguments(inFile.getName())
-                                       .build().renderMessage());
+                                       .build().getST().render());
                 System.exit(0);
             } catch (Exception e) {
                 e.printStackTrace();

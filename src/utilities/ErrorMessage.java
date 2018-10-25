@@ -16,7 +16,7 @@ public class ErrorMessage extends PJErrorMessage {
     }
     
     @Override
-    public ST getMessage() {
+    public ST getST() {
         ST stFile = stGroup.getInstanceOf("File");
         ST stTag = stGroup.getInstanceOf("Tag");
         ST stStackInfo = stGroup.getInstanceOf("StackInfo");
@@ -26,28 +26,22 @@ public class ErrorMessage extends PJErrorMessage {
             stFile.add("fileName", fileName);
         if (ast != null)
             stFile.add("lineNumber", ast.line);
-        if (errorMessage != null) {
-            stTag.add("tag", errorMessage.getErrorSeverity());
-            stTag.add("errorNumber", errorMessage.getNumber());
+        if (error != null) {
+            stTag.add("tag", error.getErrorSeverity());
+            stTag.add("number", error.getNumber());
         }
+        
         if (throwable != null) {
             stStackInfo.add("reason", throwable);
             stStackInfo.add("stack", throwable.getStackTrace());
         }
         
         stMessage.add("tag", stTag.render())
-                 .add("errorMessage", super.getMessage().render())
+                 .add("message", super.getST().render())
                  .add("location", stFile.render())
-                 .add("stackInfo", stStackInfo.render());
+                 .add("stack", stStackInfo.render());
         
         return stMessage;
-    }
-
-    @Override
-    public String renderMessage() {
-        // TODO: Make additional changes here
-        String renderMsg = getMessage().render();
-        return renderMsg;
     }
     
     // =====================

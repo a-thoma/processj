@@ -44,7 +44,7 @@ public abstract class PJErrorMessage {
     /**
      * Type of error message.
      */
-    protected final IErrorGetter errorMessage;
+    protected final IErrorGetter error;
     
     /**
      * Attributes used in templates.
@@ -68,7 +68,7 @@ public abstract class PJErrorMessage {
     
     public PJErrorMessage(Builder<?> builder) {
         ast = builder.ast;
-        errorMessage = builder.errorMessage;
+        error = builder.error;
         arguments = builder.arguments;
         throwable = builder.throwable;
         fileName = builder.fileName;
@@ -103,8 +103,8 @@ public abstract class PJErrorMessage {
         return ast;
     }
     
-    public IErrorGetter getErrorMessage() {
-        return errorMessage;
+    public IErrorGetter getError() {
+        return error;
     }
     
     public Object[] getArguments() {
@@ -123,11 +123,11 @@ public abstract class PJErrorMessage {
         return packageName;
     }
     
-    public ST getMessage() {
+    public ST getST() {
         int argCount = 0;
         ST message = null;
-        if (errorMessage != null)
-            message = new ST(errorMessage.getMessage());
+        if (error != null)
+            message = new ST(error.getMessage());
         else
             message = new ST(EMPTY_STRING);
         if (arguments != null && arguments.length > 0)
@@ -137,15 +137,13 @@ public abstract class PJErrorMessage {
         return message;
     }
     
-    public abstract String renderMessage();
-    
     @Override
     public String toString() {
         return getClass().getSimpleName() +
                 "(filename="        + (fileName.isEmpty() ? "none" : fileName) +
                 ", package="        + (packageName.isEmpty() ? "none" : packageName) +
-                ", errorNumber="    + errorMessage.getNumber() +
-                ", errorMessage="   + errorMessage.getMessage() +
+                ", errorNumber="    + error.getNumber() +
+                ", errorMessage="   + error.getMessage() +
                 ", arguments="      + (arguments != null ? "{" +
                                       Arrays.stream(arguments)
                                             .map(arg -> arg + "")
@@ -176,7 +174,7 @@ public abstract class PJErrorMessage {
     public static abstract class Builder<B> {
         
         protected AST ast;
-        protected IErrorGetter errorMessage;
+        protected IErrorGetter error;
         protected Object[] arguments;
         protected Throwable throwable;
         protected String fileName;
@@ -184,7 +182,7 @@ public abstract class PJErrorMessage {
         
         public Builder() {
             ast = null;
-            errorMessage = null;
+            error = null;
             arguments = EMPTY_ARGUMENTS;
             throwable = null;
             fileName = null;
@@ -200,8 +198,8 @@ public abstract class PJErrorMessage {
             return builder();
         }
         
-        public B addErrorMessage(IErrorGetter errorMessage) {
-            this.errorMessage = errorMessage;
+        public B addError(IErrorGetter error) {
+            this.error = error;
             return builder();
         }
         

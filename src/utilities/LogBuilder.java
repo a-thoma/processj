@@ -3,12 +3,14 @@ package utilities;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.stringtemplate.v4.ST;
+
 /**
  * @author Ben Cisneros
  * @version 21/10/2018
  * @since 1.2
  */
-public enum TraceErrorBuilder {
+public enum LogBuilder {
     
     INSTANCE
     ;
@@ -26,7 +28,7 @@ public enum TraceErrorBuilder {
     /**
      * List of errors messages.
      */
-    private List<PJErrorMessage> traceList;
+    private List<PJErrorMessage> errorList;
     
     /**
      * List of warning messages.
@@ -34,54 +36,52 @@ public enum TraceErrorBuilder {
     private List<PJErrorMessage> warningList;
     
     /**
-     * List of info messages.
+     * List of `about' messages.
      */
     private List<PJErrorMessage> infoList;
     
-    TraceErrorBuilder() {
+    LogBuilder() {
         errorCount = 0;
         warningCount = 0;
-        traceList = new ArrayList<>();
+        errorList = new ArrayList<>();
         warningList = new ArrayList<>();
         infoList = new ArrayList<>();
     }
     
-    public void dump(PJErrorMessage errorMsg) {
-        dump(null, errorMsg);
-    }
-    
-    public void dump(ErrorSeverity errorServerity, PJErrorMessage errorMsg) {
-        if (errorServerity == null)
-            errorServerity = errorMsg.getErrorMessage().getErrorSeverity();
-        
-        switch (errorServerity) {
+    public void addError(PJErrorMessage errorMsg) {
+        IErrorGetter error = errorMsg.getError();
+        switch (error.getErrorSeverity()) {
         case INFO:
-            // Dump messages but don't terminate execution of program
             infoList.add(errorMsg);
             break;
         case WARNING:
-            // Don't dump message right away, just continue
             warningList.add(errorMsg);
             ++warningCount;
             break;
         case ERROR:
-            // Terminate and dump trace
-            traceList.add(errorMsg);
+            errorList.add(errorMsg);
             ++errorCount;
+            break;
+        default:
             break;
         }
     }
     
-    public void continuePrintDontStop(ErrorSeverity errorServerity, PJErrorMessage errorMsg) {
-        //
+    public void printContinue(PJErrorMessage errorMsg) {
+        ST msg = errorMsg.getST();
+        System.out.println(msg.render());
+        addError(errorMsg);
     }
     
-    public void continueDontPrintDontStop(ErrorSeverity errorServerity, PJErrorMessage errorMsg) {
-        //
+    public void dontPrintContinue(PJErrorMessage errorMsg) {
+        addError(errorMsg);
     }
     
-    public void printAndStop(ErrorSeverity errorServerity, PJErrorMessage errorMsg) {
-        //
+    public void printStop(PJErrorMessage errorMsg) {
+        addError(errorMsg);
+        ST msg = errorMsg.getST();
+        System.out.println(msg.render());
+        System.exit(0);
     }
     
     public int getErrorCount() {
@@ -93,7 +93,7 @@ public enum TraceErrorBuilder {
     }
     
     public List<PJErrorMessage> getTrace() {
-        return traceList;
+        return errorList;
     }
     
     public List<PJErrorMessage> getWarnings() {
@@ -107,7 +107,7 @@ public enum TraceErrorBuilder {
     public void reset() {
         errorCount = 0;
         warningCount = 0;
-        traceList.clear();
+        errorList.clear();
         warningList.clear();
         infoList.clear();
     }

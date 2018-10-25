@@ -13,9 +13,12 @@ import ast.Sequence;
 import parser.parser;
 import scanner.Scanner;
 import utilities.Error;
+import utilities.ErrorMessage;
 import utilities.Log;
+import utilities.LogBuilder;
 import utilities.SymbolTable;
 import utilities.Visitor;
+import utilities.VisitorErrorNumber;
 
 public class ResolveImports<T extends Object> extends Visitor<T> {
     // Symbol table associated with this file. Set in the constructor.
@@ -70,27 +73,31 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
             parser p1 = new parser(s1);
             java_cup.runtime.Symbol r = p1.parse();
             
-            // TODO: THIS WILL EXECUTE AND VALIDATE THE EXTENSION (PATH) OF IMPORTED
+            // THIS WILL EXECUTE AND VALIDATE THE EXTENSION (PATH) OF IMPORTED
             // FILES!!
             
-            // Checks the path of the imported file and compares the import statements found
-            // in `fileName' against this file path format. An error is thrown if the import
-            // statements do not match the path of the package name in which `fileName' exists
+            // Check the path of the imported file and compare the *import*
+            // statements found in `fileName' against the imported file path
+            // format. Throw an error if the import statements do not match
+            // the path of the package name in which `fileName' exists
             String packageName = packageNameToString(((Compilation) r.value).packageName());
             String importPathDot = importPath.replaceAll(File.separator, "\\.");
-            System.out.println("|-" + packageName + " && " + importPathDot);
             if (!importPathDot.equals(packageName)) {
-                Error.error(a, "Invalid package name found! Path string `" + packageName
-                        + "' may contain invalid characters or the path string does not "
-                        + "match the import statement `" + importPathDot
-                        + "'.");
+                LogBuilder.INSTANCE.printStop(new ErrorMessage.Builder()
+                                             .addError(VisitorErrorNumber.RESOLVE_IMPORTS_103)
+                                             .addArguments(packageName)
+                                             .build());
             }
             
             TopLevelDecls.alreadyImportedFiles.put(fileName,
                     (Compilation) r.value);
             return (Compilation) r.value;
         } catch (java.io.FileNotFoundException e) {
-            Error.error(a, "File not found : " + fileName, true, 2104);
+//            Error.error(a, "File not found : " + fileName, true, 2104);
+            LogBuilder.INSTANCE.printStop(new ErrorMessage.Builder()
+                                          .addError(VisitorErrorNumber.RESOLVE_IMPORTS_102)
+                                          .addArguments(fileName)
+                                          .build());
         } catch (Exception e) {
             Error.error(a, "Something went wrong while trying to parse "
                     + fileName, true, 2105);
@@ -196,7 +203,11 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
                     // Oh no, the directory wasn't found at all!
                     String packageName = path.replaceAll("/", ".");
                     packageName = packageName.substring(0, packageName.length() - 1);
-                    Error.error(im, " Package '" + packageName + "' does not exist.", false, 2106);
+//                    Error.error(im, " Package '" + packageName + "' does not exist.", false, 2106);
+                    LogBuilder.INSTANCE.printContinue(new ErrorMessage.Builder()
+                                                      .addError(VisitorErrorNumber.RESOLVE_IMPORTS_103)
+                                                      .addArguments(packageName)
+                                                      .build());
                 }
             }
             Log.log("visitImport(): About to import `" + im.file().getname() + ".pj'");
@@ -220,11 +231,19 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
                 } else {
                     // Nope, nothing found!
                     if (path.equals("")) {
-                        Error.error(im, "File '" + im.file().getname() + "' not found.", false, 2107);
+//                        Error.error(im, "File '" + im.file().getname() + "' not found.", false, 2107);
+                        LogBuilder.INSTANCE.printContinue(new ErrorMessage.Builder()
+                                                          .addError(VisitorErrorNumber.RESOLVE_IMPORTS_102)
+                                                          .addArguments(im.file().getname())
+                                                          .build());
                     } else {
                         String packageName = path.replaceAll("/", ".");
                         packageName = packageName.substring(0, packageName.length() - 1);
-                        Error.error(im, "File '" + im.file().getname() + "' not found in package '" + path + "'.", false, 2108);
+//                        Error.error(im, "File '" + im.file().getname() + "' not found in package '" + path + "'.", false, 2108);
+                        LogBuilder.INSTANCE.printContinue(new ErrorMessage.Builder()
+                                                          .addError(VisitorErrorNumber.RESOLVE_IMPORTS_105)
+                                                          .addArguments(im.file().getname(), path)
+                                                          .build());
                     }
                 }
             }
