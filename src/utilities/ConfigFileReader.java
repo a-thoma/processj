@@ -12,7 +12,6 @@ public class ConfigFileReader {
         InputStream input = null;
 
         try {
-
             String home = System.getProperty("user.home");
             String configFile = home + "/.pjconfig";
             input = new FileInputStream(configFile);

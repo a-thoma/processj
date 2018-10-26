@@ -1,7 +1,6 @@
 package utilities;
 
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.File;
 import java.net.URL;
 import java.util.Properties;
 
@@ -95,15 +94,10 @@ public enum CLPErrorNumber implements IErrorGetter {
     }
     
     static {
-        localizable = new Properties();
         URL url = PropertiesLoader.getURL(PATH);        
-        try {
-            String path = PATH;
-            if (url != null)
-                path = url.getFile();
-            localizable.load(new FileInputStream(path));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        String path = PATH;
+        if (url != null)
+            path = url.getFile();
+        localizable = PropertiesLoader.loadProperties(new File(path));
     }
 }

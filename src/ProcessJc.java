@@ -15,6 +15,7 @@ import utilities.ErrorMessage;
 import utilities.VisitorErrorNumber;
 import utilities.Language;
 import utilities.Log;
+import utilities.ErrorTracker;
 import utilities.Settings;
 import utilities.SymbolTable;
 
@@ -95,6 +96,10 @@ public class ProcessJc {
             parser p = null;
             try {
                 String fileAbsolutePath = inFile.getAbsolutePath();
+                // Set package and filename
+                ErrorTracker.INSTANCE.setFileName(fileAbsolutePath);
+                ErrorTracker.INSTANCE.setPackageName(fileAbsolutePath);
+                
                 Error.setFileName(fileAbsolutePath);
                 Error.setPackageName(fileAbsolutePath);
                 s = new Scanner(new java.io.FileReader(fileAbsolutePath));

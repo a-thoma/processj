@@ -1,7 +1,6 @@
 package utilities;
 
-import java.io.FileInputStream;
-import java.io.IOException;
+import java.io.File;
 import java.net.URL;
 import java.util.Properties;
 
@@ -143,11 +142,11 @@ public enum VisitorErrorNumber implements IErrorGetter {
     PARALLEL_USAGE_CHECK_708(708, ErrorSeverity.ERROR),
     PARALLEL_USAGE_CHECK_709(709, ErrorSeverity.ERROR),
     PARALLEL_USAGE_CHECK_710(710, ErrorSeverity.ERROR),
-    PARALLEL_USAGE_CHECK_711(711, ErrorSeverity.ERROR),
+    PARALLEL_USAGE_CHECK_711(711, ErrorSeverity.WARNING),
     PARALLEL_USAGE_CHECK_712(712, ErrorSeverity.ERROR),
     PARALLEL_USAGE_CHECK_713(713, ErrorSeverity.ERROR),
     PARALLEL_USAGE_CHECK_714(714, ErrorSeverity.ERROR),
-    PARALLEL_USAGE_CHECK_715(715, ErrorSeverity.ERROR)
+    PARALLEL_USAGE_CHECK_715(715, ErrorSeverity.WARNING)
     ;
     
     /**
@@ -189,15 +188,10 @@ public enum VisitorErrorNumber implements IErrorGetter {
     }
     
     static {
-        localizable = new Properties();
         URL url = PropertiesLoader.getURL(PATH);        
-        try {
-            String path = PATH;
-            if (url != null)
-                path = url.getFile();
-            localizable.load(new FileInputStream(path));
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
+        String path = PATH;
+        if (url != null)
+            path = url.getFile();
+        localizable = PropertiesLoader.loadProperties(new File(path));
     }
 }

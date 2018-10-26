@@ -22,10 +22,10 @@ public class ErrorMessage extends PJErrorMessage {
         ST stStackInfo = stGroup.getInstanceOf("StackInfo");
         ST stMessage = stGroup.getInstanceOf("Message");
         
-        if (fileName != null)
+        if (ast != null) {
             stFile.add("fileName", fileName);
-        if (ast != null)
             stFile.add("lineNumber", ast.line);
+        }
         if (error != null) {
             stTag.add("tag", error.getErrorSeverity());
             stTag.add("number", error.getNumber());
@@ -42,6 +42,10 @@ public class ErrorMessage extends PJErrorMessage {
                  .add("stack", stStackInfo.render());
         
         return stMessage;
+    }
+    
+    public String render() {
+        return getST().render();
     }
     
     // =====================

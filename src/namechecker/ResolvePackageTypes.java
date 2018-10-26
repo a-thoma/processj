@@ -9,10 +9,13 @@ import ast.NamedType;
 import ast.Sequence;
 import ast.DefineTopLevelDecl;
 import utilities.Error;
+import utilities.ErrorMessage;
+import utilities.ErrorTracker;
 import utilities.Log;
 import utilities.Settings;
 import utilities.SymbolTable;
 import utilities.Visitor;
+import utilities.VisitorErrorNumber;
 
 public class ResolvePackageTypes extends Visitor<AST> {
 
@@ -64,12 +67,15 @@ public class ResolvePackageTypes extends Visitor<AST> {
                     // don't do anything just continue after the if.
                 } else {
                     // It was neither a local nor a library file - throw an error...
-                    Error.error(pa, "Cannot resolve file `"
-                            + makeImportFileName(pa)
-                            + "' as a local or library file.", true, 2150);
+                    ErrorTracker.INSTANCE.printStop(new ErrorMessage.Builder()
+                                .addAST(pa)
+                                .addFileName(ErrorTracker.INSTANCE.fileName)
+                                .addError(VisitorErrorNumber.RESOLVE_IMPORTS_101)
+                                .addArguments(makeImportFileName(pa))
+                                .build());
                 }
             }
-            Error.setFileName(fileName);
+            ErrorTracker.INSTANCE.setFileName(fileName);
             // Now import it
             comp = ResolveImports.importFile(pa.child(0), fileName, makeImportFileName(pa));
 
@@ -81,7 +87,7 @@ public class ResolvePackageTypes extends Visitor<AST> {
                 comp.visit(new NameChecker<AST>(st));
                 // TODO: should we type check here?
             }
-            Error.setFileName(oldCurrentFileName);
+            ErrorTracker.INSTANCE.setFileName(oldCurrentFileName);
             st = SymbolTable.hook;
             // TODO: this should do a proper find if its a symb ol table that comes back
             // but we probably need Type checking for that !

@@ -1,6 +1,5 @@
 package utilities;
 
-import java.io.File;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -75,26 +74,6 @@ public abstract class PJErrorMessage {
         packageName = builder.packageName;
     }
     
-    public String createPackageName(String name) {
-        // First strip the `.pj' part
-        String str = name.replaceAll("\\.pj$", "");
-        // Now remove the absolute path
-        String absPath = new File("").getAbsolutePath() + "/";
-        str = str.replaceAll(absPath, "");
-        // Replace all `/' with .
-        str = str.replaceAll("/", "\\.");
-        return str;
-    }
-    
-    public String createFileName(String name) {
-        // Remove all double `//:'
-        String str = name.replaceAll("//","/");
-        // Now remove the absolute path
-        String absPath = new File("").getAbsolutePath() + "/";
-        str = str.replaceAll(absPath,"");
-        return str;
-    }
-    
     // ================
     // G E T T E R S
     // ================
@@ -136,6 +115,8 @@ public abstract class PJErrorMessage {
             message.add("arg" + i, arguments[i]);
         return message;
     }
+    
+    public abstract String render();
     
     @Override
     public String toString() {

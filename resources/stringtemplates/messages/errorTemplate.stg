@@ -5,8 +5,8 @@ StackInfo(reason, stack) ::= <<
 >>
 
 //========================================================================================
-File(fileName, lineNumber) ::= "<if(fileName)>|- <fileName><AddNumber(lineNumber)><endif>"
-AddNumber(lineNumber) ::= "<if(lineNumber)>=<lineNumber><endif>"
+File(fileName, lineNumber) ::= "<if(fileName)>--> <fileName><AddNumber(lineNumber)><endif>"
+AddNumber(lineNumber) ::= "<if(lineNumber)>:<lineNumber><endif>"
 
 //========================================================================================
 Tag(tag, number) ::= <<
