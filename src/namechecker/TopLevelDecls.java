@@ -18,9 +18,12 @@ import ast.RecordTypeDecl;
 import parser.parser;
 import scanner.Scanner;
 import utilities.Error;
+import utilities.ErrorMessage;
+import utilities.ErrorTracker;
 import utilities.Log;
 import utilities.SymbolTable;
 import utilities.Visitor;
+import utilities.VisitorErrorNumber;
 
 // Error message number range: [2100 - 2199]
 // Used 2100 - 2104
@@ -109,8 +112,12 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
         Log.log(cd.line + ": Visiting a ConstantDecl "
                 + cd.var().name().getname());
         if (!symtab.put(cd.var().name().getname(), cd))
-            Error.error(cd, "Type with name '" + cd.var().name().getname()
-                    + "' already declared in this scope.", false, 2100);
+            ErrorTracker.INSTANCE.printContinue(new ErrorMessage.Builder()
+                        .addAST(cd)
+                        .addFileName(ErrorTracker.INSTANCE.fileName)
+                        .addError(VisitorErrorNumber.TOP_LEVEL_DECLS_200)
+                        .addArguments(cd.var().name().getname())
+                        .build());
         return null;
     }
 
@@ -121,8 +128,12 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
         // another symbol table which is indexed by signature.
         if (Modifier.hasModifierSet(pd.modifiers(), Modifier.MOBILE))
             if (!pd.returnType().isVoidType())
-                Error.error(pd, "Mobile procedure '" + pd.name().getname()
-                        + "' must have void return type.", false, 2109); // TODO error number
+                ErrorTracker.INSTANCE.printContinue(new ErrorMessage.Builder()
+                            .addAST(pd)
+                            .addFileName(ErrorTracker.INSTANCE.fileName)
+                            .addError(VisitorErrorNumber.TOP_LEVEL_DECLS_205)
+                            .addArguments(pd.name().getname())
+                            .build());
 
         // Mobile procedure may NOT be overloaded.
         // If a symbol table contains a mobile the field isMobileProcedure is true.
@@ -139,11 +150,14 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
                 SymbolTable st = (SymbolTable) s;
                 if (Modifier.hasModifierSet(pd.modifiers(), Modifier.MOBILE)) {
                     if (st.isMobileProcedure)
-                        Error.error(pd,
-                                "Only one declaration of mobile procedure '"
-                                        + pd.name().getname() + "' may exist.",
-                                false, 2110);
+                        ErrorTracker.INSTANCE.printContinue(new ErrorMessage.Builder()
+                                    .addAST(pd)
+                                    .addFileName(ErrorTracker.INSTANCE.fileName)
+                                    .addError(VisitorErrorNumber.TOP_LEVEL_DECLS_206)
+                                    .addArguments(pd.name().getname())
+                                    .build());
                     else
+                        // WHAT TYPE OF ERROR??
                         Error.error(pd, "Non-mobile proecdure '"
                                         + pd.name().getname() + "' already exists.",
                                 false, 2111);
@@ -160,8 +174,12 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
     public T visitRecordTypeDecl(RecordTypeDecl rd) {
         Log.log(rd.line + ": Visiting a RecordTypeDecl " + rd.name().getname());
         if (!symtab.put(rd.name().getname(), rd))
-            Error.error(rd, "Type with name '" + rd.name().getname()
-                    + "' already declared in this scope.", false, 2102);
+            ErrorTracker.INSTANCE.printContinue(new ErrorMessage.Builder()
+                        .addAST(rd)
+                        .addFileName(ErrorTracker.INSTANCE.fileName)
+                        .addError(VisitorErrorNumber.TOP_LEVEL_DECLS_207)
+                        .addArguments(rd.name().getname())
+                        .build());
         return null;
     }
 
@@ -170,8 +188,12 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
         Log.log(pd.line + ": Visiting a ProtocolTypeDecl "
                 + pd.name().getname());
         if (!symtab.put(pd.name().getname(), pd))
-            Error.error(pd, "Type with name '" + pd.name().getname()
-                    + "' already declared in this scope.", false, 2103);
+            ErrorTracker.INSTANCE.printContinue(new ErrorMessage.Builder()
+                        .addAST(pd)
+                        .addFileName(ErrorTracker.INSTANCE.fileName)
+                        .addError(VisitorErrorNumber.TOP_LEVEL_DECLS_207)
+                        .addArguments(pd.name().getname())
+                        .build());
         return null;
     }
 
@@ -179,8 +201,12 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
     public T visitNamedType(NamedType nt) {
         Log.log("Toplevel Named Type:" + nt);
         if (!symtab.put(nt.name().getname(), nt))
-            Error.error(nt, "Type with name '" + nt.name().getname()
-                    + "' already declared in this scope.", false, 2111);
+            ErrorTracker.INSTANCE.printContinue(new ErrorMessage.Builder()
+                        .addAST(nt)
+                        .addFileName(ErrorTracker.INSTANCE.fileName)
+                        .addError(VisitorErrorNumber.TOP_LEVEL_DECLS_207)
+                        .addArguments(nt.name().getname())
+                        .build());
         return null;
     }
 
