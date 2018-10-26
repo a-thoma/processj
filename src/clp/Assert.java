@@ -3,8 +3,8 @@ package clp;
 import java.util.Collection;
 
 /**
- * The class {@link Assert} provides a convenient way for checking
- * {@code null} objects.
+ * The class {@link Assert} provides a convenient way for
+ * checking {@code null} objects.
  * 
  * @author Ben Cisneros
  * @version 08/06/2018

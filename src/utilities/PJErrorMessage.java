@@ -10,11 +10,12 @@ import org.stringtemplate.v4.STGroupFile;
 import ast.AST;
 
 /**
- * The class {@link PJErrorMessage} is used to track down the
- * visitor pattern when processing the contents in a ProcessJ
- * file, when processing the syntax and/or semantics errors
- * when compiling or generating Java source code from a ProcessJ
- * file, or when processing command line options and/or arguments.
+ * The class {@link PJErrorMessage} is used to create messages
+ * for the visitor pattern when processing the contents in a
+ * ProcessJ file, when processing the syntax and/or semantics
+ * errors when compiling or generating Java source code from a
+ * ProcessJ file, or when processing command line options and/or
+ * arguments.
  * 
  * @author Ben Cisneros
  * @version 10/07/2018

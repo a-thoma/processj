@@ -7,6 +7,9 @@ import java.util.Stack;
 import org.stringtemplate.v4.ST;
 
 /**
+ * The class {@link ErrorTracker} is used to track down various
+ * types of error messages generated at compile-time or run-time.
+ * 
  * @author Ben Cisneros
  * @version 21/10/2018
  * @since 1.2
@@ -41,35 +44,18 @@ public enum ErrorTracker {
         errorTrace = new Stack<>();
     }
     
-    // TODO: This needs to changed!
-    public void addError(PJErrorMessage errorMsg) {
-        IErrorGetter error = errorMsg.getError();
-        switch (error.getErrorSeverity()) {
-        case INFO:
-            break;
-        case WARNING:
-            break;
-        case ERROR:
-            errorTrace.add(errorMsg);
-            ++errorCount;
-            break;
-        default:
-            break;
-        }
-    }
-    
     public void printContinue(PJErrorMessage errorMsg) {
         ST msg = errorMsg.getST();
         System.out.println(msg.render());
-        addError(errorMsg);
+        errorTrace.push(errorMsg);
     }
     
     public void dontPrintContinue(PJErrorMessage errorMsg) {
-        addError(errorMsg);
+        errorTrace.push(errorMsg);
     }
     
     public void printStop(PJErrorMessage errorMsg) {
-        addError(errorMsg);
+        errorTrace.push(errorMsg);
         ST msg = errorMsg.getST();
         System.out.println(msg.render());
         System.exit(0);
