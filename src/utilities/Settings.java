@@ -2,7 +2,7 @@ package utilities;
 import java.io.File;
 
 /**
- * @author Ben Cisneros
+ * @author Ben
  * @version 08/30/2018
  * @since 1.2
  */

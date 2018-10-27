@@ -14,8 +14,7 @@ import utilities.Language;
 /**
  * ProcessJ command line.
  * 
- * @see {@link Language}
- * @author Ben Cisneros
+ * @author Ben
  * @version 08/27/2018
  * @since 1.2
  */

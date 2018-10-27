@@ -17,7 +17,7 @@ import ast.AST;
  * ProcessJ file, or when processing command line options and/or
  * arguments.
  * 
- * @author Ben Cisneros
+ * @author Ben
  * @version 10/07/2018
  * @since 1.2
  */

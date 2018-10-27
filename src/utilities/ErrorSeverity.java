@@ -4,7 +4,7 @@ package utilities;
  * The enum {@link ErrorSeverity} represents various types of
  * `severity' error messages in ProcessJ.
  * 
- * @author Ben Cisneros
+ * @author Ben
  * @version 09/02/2018
  * @since 1.2
  */

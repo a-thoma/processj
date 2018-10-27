@@ -6,7 +6,7 @@ import org.stringtemplate.v4.ST;
  * This class is used to create generic error messages
  * in ProcessJ.
  * 
- * @author Ben Cisneros
+ * @author Ben
  * @since 1.2
  */
 public class ErrorMessage extends PJErrorMessage {

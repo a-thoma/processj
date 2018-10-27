@@ -3,7 +3,7 @@ package clp.parsers;
 import clp.OptionParser;
 
 /**
- * @author Ben Cisneros
+ * @author Ben
  * @version 08/30/2018
  * @since 1.2
  *

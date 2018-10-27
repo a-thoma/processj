@@ -8,7 +8,7 @@ package utilities;
  * for {@link #getErrorSeverity()} or {@link #getNumber()}
  * if needed.
  * 
- * @author Ben Cisneros
+ * @author Ben
  * @version 10/21/2018
  * @since 1.2
  */

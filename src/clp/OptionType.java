@@ -8,7 +8,7 @@ package clp;
  * and type {@link OptionType#SINGLEVALUE} defines single value options
  * that take only one value.
  * 
- * @author Ben Cisneros
+ * @author Ben
  * @version 08/14/2018
  * @since 1.2
  */

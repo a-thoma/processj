@@ -8,7 +8,7 @@ import java.lang.annotation.Target;
 /**
  * Useful when creating complex commands that required subcommands.
  * 
- * @author Ben Cisneros
+ * @author Ben
  * @version 10/14/2018
  * @since 1.2
  */

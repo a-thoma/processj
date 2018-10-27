@@ -26,7 +26,7 @@ import java.lang.annotation.Target;
  * <li>{@link Argument#handler()}</li>
  * </ul>
  * 
- * @author Ben Cisneros
+ * @author Ben
  * @version 07/11/2018
  * @since 1.2
  */

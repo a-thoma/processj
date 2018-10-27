@@ -23,7 +23,7 @@ import utilities.MultiValueMap;
 /**
  * Responsible for building the options and arguments.
  * 
- * @author Ben Cisneros
+ * @author Ben
  * @version 07/21/2018
  * @since 1.2
  */

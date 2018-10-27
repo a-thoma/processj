@@ -4,7 +4,7 @@ package clp;
  * The enum {@link ExitCode} is used to determine the exit status
  * of the command line parser.
  * 
- * @author Ben Cisneros
+ * @author Ben
  * @version 08/14/2018
  * @since 1.2
  */

@@ -33,7 +33,7 @@ import clp.parsers.MapParser;
  * updated the values that {@link Option @Option} fields and
  * {@link Argument @Argument} fields hold at compile or runtime.
  * 
- * @author Ben Cisneros
+ * @author Ben
  * @version 06/21/2018
  * @since 1.2
  */

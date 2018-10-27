@@ -7,7 +7,7 @@ package clp;
  * See {@link Parameters @Parameters}.
  * </p>
  * 
- * @author Ben Cisneros
+ * @author Ben
  * @version 08/11/2018
  * @since 1.2
  */

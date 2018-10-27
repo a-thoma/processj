@@ -46,7 +46,7 @@ import utilities.Visitor;
  * 			A visitor interface used to perform operations across a
  *          collection of different objects.
  *
- * @author Ben Cisneros
+ * @author Ben
  * @version 06/10/2018
  * @since 1.2
  */

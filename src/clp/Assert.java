@@ -6,7 +6,7 @@ import java.util.Collection;
  * The class {@link Assert} provides a convenient way for
  * checking {@code null} objects.
  * 
- * @author Ben Cisneros
+ * @author Ben
  * @version 08/06/2018
  * @since 1.2
  */

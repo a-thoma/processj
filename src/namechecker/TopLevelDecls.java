@@ -1,22 +1,15 @@
 package namechecker;
 
-import java.io.File;
-import java.io.FilenameFilter;
-import java.util.ArrayList;
 import java.util.Hashtable;
 
 import ast.AST;
 import ast.Compilation;
 import ast.ConstantDecl;
-import ast.Import;
 import ast.Modifier;
-import ast.Name;
 import ast.NamedType;
 import ast.ProcTypeDecl;
 import ast.ProtocolTypeDecl;
 import ast.RecordTypeDecl;
-import parser.parser;
-import scanner.Scanner;
 import utilities.Error;
 import utilities.ErrorMessage;
 import utilities.ErrorTracker;
@@ -25,14 +18,11 @@ import utilities.SymbolTable;
 import utilities.Visitor;
 import utilities.VisitorErrorNumber;
 
-// Error message number range: [2100 - 2199]
-// Used 2100 - 2104
-
 /**
  * ToplevelDecls.java:
  *
- * Inserts all top-level declarations into a symbol table. When an import
- * statement is encountered.
+ * Inserts all top-level declarations into a symbol table. When
+ * an import statement is encountered.
  *
  */
 public class TopLevelDecls<T extends AST> extends Visitor<T> {
@@ -59,9 +49,11 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
     // TODO: locally imported files should not be in packages .... what about 'this' file ? what about its package ... this must be sorted out
 
     /**
-     * Establishes a symbol table with the top-level declarations declared in the file associated with this compilation
-     * inserted. Also causes the creation of a symbol table chain for imported files that is available through the
-     * `importParent' field of the symbol table. This chain can be traversed through its parent links.
+     * Establishes a symbol table with the top-level declarations declared
+     * in the file associated with this compilation inserted. Also causes
+     * the creation of a symbol table chain for imported files that is
+     * available through the `importParent' field of the symbol table. This
+     * chain can be traversed through its parent links.
      *
      * @param co
      *            a Compilation parse tree node.
@@ -69,7 +61,7 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
     public T visitCompilation(Compilation co) {
         Log.log(" Defining forward referencable names (" + Error.fileName
                 + ").");
-        // 'symtab' is either passed in here from the driver (ProcessJ.java) or from
+        // `symtab' is either passed in here from the driver (ProcessJ.java) or from
         // the visitImport() method in this file. Save it cause we need to put all
         // the types and constants for this compilation into it after we handle
         // the imports.
@@ -164,8 +156,12 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
                 } else
                     st.put(pd.signature(), pd);
             } else
-                Error.error(pd, "Non-procedure type with name '" + pd.getname()
-                        + "' already declared in this scope", false, 2101);
+                ErrorTracker.INSTANCE.printContinue(new ErrorMessage.Builder()
+                            .addAST(pd)
+                            .addFileName(ErrorTracker.INSTANCE.fileName)
+                            .addError(VisitorErrorNumber.TOP_LEVEL_DECLS_201)
+                            .addArguments(pd.getname())
+                            .build());
         }
         return null;
     }

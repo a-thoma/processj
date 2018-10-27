@@ -10,7 +10,7 @@ import org.stringtemplate.v4.ST;
  * The class {@link ErrorTracker} is used to track down various
  * types of error messages generated at compile-time or run-time.
  * 
- * @author Ben Cisneros
+ * @author Ben
  * @version 21/10/2018
  * @since 1.2
  */

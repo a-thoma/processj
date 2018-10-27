@@ -10,7 +10,7 @@ import java.util.List;
  * The class {@link Util} contains helper methods for classes within
  * the command line processor package.
  *
- * @author Ben Cisneros
+ * @author Ben
  * @version 06/21/2018
  * @since 1.2
  */

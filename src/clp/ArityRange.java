@@ -9,7 +9,7 @@ import java.util.Iterator;
  * from some starting position to some ending position on the
  * command line.
  * 
- * @author Ben Cisneros
+ * @author Ben
  * @version 08/23/2018
  * @since 1.2
  */

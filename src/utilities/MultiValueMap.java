@@ -13,7 +13,7 @@ import java.util.Map;
  * The class {@link MultiValueMap} represents a collection of values
  * associated with a key.
  * 
- * @author Ben Cisneros
+ * @author Ben
  * @version 09/04/2018
  * @since 1.2
  */

@@ -71,7 +71,8 @@ import utilities.Log;
 import utilities.Visitor;
 
 /**
- * Adds the annotation [yield=true] to all procs that may issue a yield call.
+ * Adds the annotation [yield=true] to all procs that
+ * may issue a yield call.
  *
  * @author Matt Pedersen
  */

@@ -20,7 +20,7 @@ import utilities.Settings;
 import utilities.SymbolTable;
 
 /**
- * @author Ben Cisneros
+ * @author Ben
  * @version 07/01/2018
  * @since 1.2
  */
@@ -130,9 +130,6 @@ public class ProcessJc {
             // Cast the result from the parse to a Compilation - this is the root of the tree
             Compilation c = (Compilation) root;
 
-            // SYNTAX TREE PRINTER
-//            c.visit(new Printers.ParseTreePrinter());
-
             // Decode pragmas - these are used for generating stubs from libraries.
             // No regular program would have them.
             Library.decodePragmas(c);
@@ -153,65 +150,119 @@ public class ProcessJc {
             // =====================================================
             
             c.visit(new namechecker.ResolveImports<AST>(globalTypeTable));
-            if (Error.errorCount != 0) {
-                System.out.println("** COMPILATION FAILED #0 **");
+            
+            if (ErrorTracker.INSTANCE.getErrorCount() != 0) {
+                System.out.println("---------- Error Report ----------");
+                System.out.println(String.format("%d errors in import declarations", ErrorTracker.INSTANCE.getErrorCount()));
+                ErrorTracker.INSTANCE.printTrace();
                 System.exit(1);
             }
             
-            // ================================================
-            // T O P   L E V E L   D E C L A R A T I O N S
-            // ================================================
+            // ===========================================================
+            // V I S I T   T O P   L E V E L   D E C L A R A T I O N S
+            // ===========================================================
             
             c.visit(new namechecker.TopLevelDecls<AST>(globalTypeTable));
+
+            if (ErrorTracker.INSTANCE.getErrorCount() != 0) {
+                System.out.println("---------- Error Report ----------");
+                System.out.println(String.format("%d errors in top level declarations", ErrorTracker.INSTANCE.getErrorCount()));
+                ErrorTracker.INSTANCE.printTrace();
+                System.exit(1);
+            }
+            
             globalTypeTable = SymbolTable.hook;
+            
+            // ========================================================
+            // V I S I T R E S O L V E   P A C K A G E   T Y P E S
+            // ========================================================
 
             // Resolve types from imported packages.
             c.visit(new namechecker.ResolvePackageTypes());
             
-            // ===========================
-            // N A M E   C H E C K E R
-            // ===========================
-            
-            c.visit(new namechecker.NameChecker<AST>(globalTypeTable));
-            if (Error.errorCount != 0) {
-//                System.out.println("---------- Error Report ----------");
-//                System.out.println(String.format("%d errors in symbol resolution - fix these before type checking.",
-//                        Error.errorCount));
-//                System.out.println(Error.errors);
-                System.out.println("** COMPILATION FAILED #1 **");
+            if (ErrorTracker.INSTANCE.getErrorCount() != 0) {
+                System.out.println("---------- Error Report ----------");
+                System.out.println(String.format("%d errors in package types", ErrorTracker.INSTANCE.getErrorCount()));
+                ErrorTracker.INSTANCE.printTrace();
                 System.exit(1);
             }
+            
+            // =======================================
+            // V I S I T   N A M E   C H E C K E R
+            // =======================================
+            
+            c.visit(new namechecker.NameChecker<AST>(globalTypeTable));
+            
+            if (ErrorTracker.INSTANCE.getErrorCount() != 0) {
+                System.out.println("---------- Error Report ----------");
+                System.out.println(String.format("%d errors in name checker", ErrorTracker.INSTANCE.getErrorCount()));
+                ErrorTracker.INSTANCE.printTrace();
+                System.exit(1);
+            }
+            
+            // =======================================
+            // V I S I T   A R R A Y   T Y P E S
+            // =======================================
 
             // Re-construct Array Types correctly
             root.visit(new namechecker.ArrayTypeConstructor());
             
-            // ===========================
-            // T Y P E   C H E C K E R
-            // ===========================
-            
-            c.visit(new typechecker.TypeChecker(globalTypeTable));
-
-            if (Error.errorCount != 0) {
-//                System.out.println("---------- Error Report ----------");
-//                System.out.println(String.format("%d errors in type checking - fix these before code generation.",
-//                        Error.errorCount));
-//                System.out.println(Error.errors);
-                System.out.println("** COMPILATION FAILED #2 **");
+            if (ErrorTracker.INSTANCE.getErrorCount() != 0) {
+                System.out.println("---------- Error Report ----------");
+                System.out.println(String.format("%d errors in array types constructor", ErrorTracker.INSTANCE.getErrorCount()));
+                ErrorTracker.INSTANCE.printTrace();
                 System.exit(1);
             }
             
-            // =============================================
-            // O T H E R   S E M A N T I C   C H E C K S
-            // =============================================
+            // ========================================
+            // V I S I T   T Y P E   C H E C K E R
+            // ========================================
+            
+            c.visit(new typechecker.TypeChecker(globalTypeTable));
+            
+            if (ErrorTracker.INSTANCE.getErrorCount() != 0) {
+                System.out.println("---------- Error Report ----------");
+                System.out.println(String.format("%d errors in type checking", ErrorTracker.INSTANCE.getErrorCount()));
+                ErrorTracker.INSTANCE.printTrace();
+                System.exit(1);
+            }
+            
+            // ========================================
+            // V I S I T   R E A C H A B I L I T Y
+            // ========================================
             
             c.visit(new reachability.Reachability());
+            
+            if (ErrorTracker.INSTANCE.getErrorCount() != 0) {
+                System.out.println("---------- Error Report ----------");
+                System.out.println(String.format("%d errors in reachability", ErrorTracker.INSTANCE.getErrorCount()));
+                ErrorTracker.INSTANCE.printTrace();
+                System.exit(1);
+            }
+            
+            // ===========================================
+            // V I S I T   P A R A L L E L   U S A G E
+            // ===========================================
+            
             c.visit(new parallel_usage_check.ParallelUsageCheck());
+            
+            if (ErrorTracker.INSTANCE.getErrorCount() != 0) {
+                System.out.println("---------- Error Report ----------");
+                System.out.println(String.format("%d errors in parallel usage checking", ErrorTracker.INSTANCE.getErrorCount()));
+                ErrorTracker.INSTANCE.printTrace();
+                System.exit(1);
+            }
+            
+            // ==========================
+            // V I S I T   Y I E L D
+            // ==========================
+            
             c.visit(new yield.Yield());
-
-            if (Error.errorCount != 0) {
-//                System.out.println("---------- Error Report ----------");
-//                System.out.println(Error.errors);
-                System.out.println("** COMPILATION FAILED #3 **");
+            
+            if (ErrorTracker.INSTANCE.getErrorCount() != 0) {
+                System.out.println("---------- Error Report ----------");
+                System.out.println(String.format("%d errors in yield", ErrorTracker.INSTANCE.getErrorCount()));
+                ErrorTracker.INSTANCE.printTrace();
                 System.exit(1);
             }
             

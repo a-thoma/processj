@@ -1,10 +1,10 @@
 package utilities;
 
 /**
- * The enum {@link Language} defines various types of programming
- * languages available in ProcessJ.
+ * The enum {@link Language} defines various types of
+ * programming languages available in ProcessJ.
  * 
- * @author Ben Cisneros
+ * @author Ben
  * @version 08/30/2018
  * @since 1.2
  */

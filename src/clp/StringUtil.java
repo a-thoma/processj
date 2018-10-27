@@ -9,7 +9,7 @@ import java.util.List;
  * The class {@link StringUtil} contains helper methods for
  * classes within the {@code cli} package.
  *
- * @author Ben Cisneros
+ * @author Ben
  * @version 06/21/2018
  * @since 1.2
  */

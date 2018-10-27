@@ -12,7 +12,7 @@ import java.util.regex.Pattern;
  * The format help message for command line options in
  * ProcessJ.
  * 
- * @author Ben Cisneros
+ * @author Ben
  * @version 10/09/2018
  * @since 1.2
  */

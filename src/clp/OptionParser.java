@@ -10,7 +10,7 @@ package clp;
  * @param <T>
  *          The type which a {@code String} should be parsed to.
  *
- * @author Ben Cisneros
+ * @author Ben
  * @version 06/21/2018
  * @since 1.2
  */

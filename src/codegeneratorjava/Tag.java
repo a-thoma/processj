@@ -9,7 +9,7 @@ import java.util.stream.Collectors;
  * as procedures, methods, parameters, local variables, protocols,
  * records, channels, etc.
  *
- * @author Ben Cisneros
+ * @author Ben
  * @version 06/15/2018
  * @since 1.2
  */

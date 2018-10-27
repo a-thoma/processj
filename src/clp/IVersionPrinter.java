@@ -13,7 +13,7 @@ package clp;
  * <li>{@link #getVersionPrinter()}</li>
  * </ul>
  * 
- * @author Ben Cisneros
+ * @author Ben
  * @version 07/11/2018
  * @since 1.2
  */

@@ -23,7 +23,7 @@ import clp.parsers.*;
  * <li>{@link #addParserTypeForClassType(Class, Class)}</li>
  * </ul>
  *
- * @author Ben Cisneros
+ * @author Ben
  * @version 06/21/2018
  * @since 1.2
  */

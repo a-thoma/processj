@@ -24,7 +24,7 @@ import java.lang.annotation.*;
  * <li>{@link Parameters#order()}</li>
  * </ul>
  *
- * @author Ben Cisneros
+ * @author Ben
  * @version 06/14/2018
  * @since 1.2
  */

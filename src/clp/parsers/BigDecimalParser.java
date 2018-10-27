@@ -5,7 +5,7 @@ import java.math.BigDecimal;
 import clp.OptionParser;
 
 /**
- * @author Ben Cisneros
+ * @author Ben
  * @version 07/13/2018
  * @since 1.2
  */

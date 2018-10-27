@@ -1,8 +1,8 @@
 package utilities;
 
 /**
- * The class {@link Pair} represents a pair of two elements of the
- * same or different data type.
+ * The class {@link Pair} represents a pair of two elements
+ * of the same or different data type.
  *
  * @see Tuple
  * @param <K>
@@ -10,7 +10,7 @@ package utilities;
  * @param <V>
  *            The right element type.
  *
- * @author Ben Cisneros
+ * @author Ben
  * @version 09/04/2018
  * @since 1.2
  */

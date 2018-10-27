@@ -7,7 +7,7 @@ import java.lang.reflect.Field;
  * as the base class for all shared attributes that belong to
  * {@link OptionValue} and {@link PositionalValue}.
  * 
- * @author Ben Cisneros
+ * @author Ben
  * @version 08/20/2018
  * @since 1.2
  */

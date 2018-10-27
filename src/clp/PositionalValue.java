@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
  * about a the annotation and each of its elements can be accessed
  * dynamically through this wrapper class.
  * 
- * @author Ben Cisneros
+ * @author Ben
  * @version 08/05/2018
  * @since 1.2
  */

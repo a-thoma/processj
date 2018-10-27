@@ -21,7 +21,7 @@ package utilities;
  * </ul>
  * </p>
  * 
- * @author Ben Cisneros
+ * @author Ben
  * @version 10/06/2018
  * @since 1.2
  */
