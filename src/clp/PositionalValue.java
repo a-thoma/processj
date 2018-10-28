@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  * @version 08/05/2018
  * @since 1.2
  */
-public final class PositionalValue extends OptionWithValues {
+public final class PositionalValue extends OptionWithValue {
 
     /**
      * The name of an {@link Argument @Argument} field.
@@ -94,7 +94,7 @@ public final class PositionalValue extends OptionWithValues {
     }
 
     @Override
-    public int compareTo(OptionWithValues o) {
+    public int compareTo(OptionWithValue o) {
         PositionalValue p1 = (PositionalValue) this;
         PositionalValue p2 = (PositionalValue) o;
         String p1Name = p1.metavar.isEmpty()? p1.fieldName : p1.metavar;
@@ -135,7 +135,7 @@ public final class PositionalValue extends OptionWithValues {
      * @version 08/05/2018
      * @author Ben Cisneros
      */
-    public static final class Builder extends OptionWithValues.Builder<Builder> {
+    public static final class Builder extends OptionWithValue.Builder<Builder> {
 
         private String fieldName;
         private int order;
@@ -151,7 +151,7 @@ public final class PositionalValue extends OptionWithValues {
         }
 
         @Override
-        protected <O extends OptionWithValues> O build() {
+        protected <O extends OptionWithValue> O build() {
             @SuppressWarnings("unchecked")
             O argument = (O) new PositionalValue(this);
             return argument;

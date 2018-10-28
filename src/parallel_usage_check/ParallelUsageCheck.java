@@ -56,7 +56,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
             if (writeSet.containsKey(name)) {
 //                Error.error(ra, "Parallel read and write access to record member '"
 //                        + name + "' illegal.", false, 5100);
-                ErrorTracker.INSTANCE.printContinue(new ErrorMessage.Builder()
+                ErrorTracker.INSTANCE.printAndContinue(new ErrorMessage.Builder()
                             .addAST(ra)
                             .addFileName(ErrorTracker.INSTANCE.fileName)
                             .addError(VisitorErrorNumber.PARALLEL_USAGE_CHECK_700)
@@ -77,7 +77,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
             if (writeSet.containsKey(name)) {
 //                Error.error(aae, "Parallel read and write access to array member '"
 //                        + name + "' illegal.", false, 5101);
-                ErrorTracker.INSTANCE.printContinue(new ErrorMessage.Builder()
+                ErrorTracker.INSTANCE.printAndContinue(new ErrorMessage.Builder()
                             .addAST(aae)
                             .addFileName(ErrorTracker.INSTANCE.fileName)
                             .addError(VisitorErrorNumber.PARALLEL_USAGE_CHECK_701)
@@ -87,7 +87,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                 Log.log(aae, "ArrayAccessExpr: '" + name + "' is added to the read set.");
                 readSet.put(name, aae);
 //                Error.warning(aae, "Parallel usage checking is not fully implemented for array access.", 5102);
-                ErrorTracker.INSTANCE.printContinue(new ErrorMessage.Builder()
+                ErrorTracker.INSTANCE.printAndContinue(new ErrorMessage.Builder()
                             .addAST(aae)
                             .addFileName(ErrorTracker.INSTANCE.fileName)
                             .addError(VisitorErrorNumber.PARALLEL_USAGE_CHECK_701)
@@ -120,7 +120,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                 String name = ((NameExpr) as.left()).name().getname();
                 if (writeSet.containsKey(name))
 //                    Error.error(as, "Parallel write access to variable '" + name + "' illegal.", false, 5103);
-                    ErrorTracker.INSTANCE.printContinue(new ErrorMessage.Builder()
+                    ErrorTracker.INSTANCE.printAndContinue(new ErrorMessage.Builder()
                                 .addAST(as)
                                 .addFileName(ErrorTracker.INSTANCE.fileName)
                                 .addError(VisitorErrorNumber.PARALLEL_USAGE_CHECK_703)
@@ -135,7 +135,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                 String name = as.left().toString();
                 if (writeSet.containsKey(name))
 //                    Error.error(as, "Parallel write access to record member '" + name + "' illegal.", false, 5104);
-                    ErrorTracker.INSTANCE.printContinue(new ErrorMessage.Builder()
+                    ErrorTracker.INSTANCE.printAndContinue(new ErrorMessage.Builder()
                                 .addAST(as)
                                 .addFileName(ErrorTracker.INSTANCE.fileName)
                                 .addError(VisitorErrorNumber.PARALLEL_USAGE_CHECK_704)
@@ -150,7 +150,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                 String name = as.left().toString();
                 if (writeSet.containsKey(name))
 //                    Error.error(as, "Parallel write access to array member '" + name + "' illegal.", false, 5105);
-                    ErrorTracker.INSTANCE.printContinue(new ErrorMessage.Builder()
+                    ErrorTracker.INSTANCE.printAndContinue(new ErrorMessage.Builder()
                                 .addAST(as)
                                 .addFileName(ErrorTracker.INSTANCE.fileName)
                                 .addError(VisitorErrorNumber.PARALLEL_USAGE_CHECK_705)
@@ -160,7 +160,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                     Log.log(as, "ArrayAccessExpr: '" + name + "' is added to the write set.");
                     writeSet.put(name, as.left());
 //                    Error.warning(as.left(), "Parallel usage checking is not fully implemented for array access.", 5106);
-                    ErrorTracker.INSTANCE.printContinue(new ErrorMessage.Builder()
+                    ErrorTracker.INSTANCE.printAndContinue(new ErrorMessage.Builder()
                                 .addAST(as.left())
                                 .addFileName(ErrorTracker.INSTANCE.fileName)
                                 .addError(VisitorErrorNumber.PARALLEL_USAGE_CHECK_706)
@@ -179,7 +179,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
             String name = ne.name().getname();
             if (writeSet.containsKey(name))
 //                Error.error(ne, "Parallel read and write access to variable '" + name + "' illegal.", false, 5107);
-                ErrorTracker.INSTANCE.printContinue(new ErrorMessage.Builder()
+                ErrorTracker.INSTANCE.printAndContinue(new ErrorMessage.Builder()
                             .addAST(ne)
                             .addFileName(ErrorTracker.INSTANCE.fileName)
                             .addError(VisitorErrorNumber.PARALLEL_USAGE_CHECK_707)
@@ -200,7 +200,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                 String name = ((NameExpr) up.expr()).name().getname();
                 if (writeSet.containsKey(name))
 //                    Error.error(up, "Parallel write access to variable '" + name + "' illegal.", false, 5108);
-                    ErrorTracker.INSTANCE.printContinue(new ErrorMessage.Builder()
+                    ErrorTracker.INSTANCE.printAndContinue(new ErrorMessage.Builder()
                                 .addAST(up)
                                 .addFileName(ErrorTracker.INSTANCE.fileName)
                                 .addError(VisitorErrorNumber.PARALLEL_USAGE_CHECK_708)
@@ -215,7 +215,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                 String name = up.expr().toString();
                 if (writeSet.containsKey(name))
 //                    Error.error(up, "Parallel write access to record member '" + name + "' illegal.", false, 5109);
-                    ErrorTracker.INSTANCE.printContinue(new ErrorMessage.Builder()
+                    ErrorTracker.INSTANCE.printAndContinue(new ErrorMessage.Builder()
                                 .addAST(up)
                                 .addFileName(ErrorTracker.INSTANCE.fileName)
                                 .addError(VisitorErrorNumber.PARALLEL_USAGE_CHECK_709)
@@ -230,7 +230,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                 String name = up.expr().toString();
                 if (writeSet.containsKey(name))
 //                    Error.error(up, "Parallel write access to array member '" + name + "' illegal.", false, 5110);
-                    ErrorTracker.INSTANCE.printContinue(new ErrorMessage.Builder()
+                    ErrorTracker.INSTANCE.printAndContinue(new ErrorMessage.Builder()
                                 .addAST(up)
                                 .addFileName(ErrorTracker.INSTANCE.fileName)
                                 .addError(VisitorErrorNumber.PARALLEL_USAGE_CHECK_710)
@@ -240,7 +240,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                     Log.log(up, "ArrayAccessExpr: '" + name + "' is added to the write set.");
                     writeSet.put(name, up.expr());
 //                    Error.warning(up.expr(), "Parallel usage checking is not fully implemented for array access.", 5111);
-                    ErrorTracker.INSTANCE.printContinue(new ErrorMessage.Builder()
+                    ErrorTracker.INSTANCE.printAndContinue(new ErrorMessage.Builder()
                                 .addAST(up.expr())
                                 .addFileName(ErrorTracker.INSTANCE.fileName)
                                 .addError(VisitorErrorNumber.PARALLEL_USAGE_CHECK_711)
@@ -261,7 +261,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                     String name = ((NameExpr) up.expr()).name().getname();
                     if (writeSet.containsKey(name))
 //                        Error.error(up, "Parallel write access to variable '" + name + "' illegal.", false, 5112);
-                        ErrorTracker.INSTANCE.printContinue(new ErrorMessage.Builder()
+                        ErrorTracker.INSTANCE.printAndContinue(new ErrorMessage.Builder()
                                     .addAST(up)
                                     .addFileName(ErrorTracker.INSTANCE.fileName)
                                     .addError(VisitorErrorNumber.PARALLEL_USAGE_CHECK_712)
@@ -276,7 +276,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                     String name = up.expr().toString();
                     if (writeSet.containsKey(name))
 //                        Error.error(up, "Parallel write access to record member '" + name + "' illegal.", false, 5113);
-                        ErrorTracker.INSTANCE.printContinue(new ErrorMessage.Builder()
+                        ErrorTracker.INSTANCE.printAndContinue(new ErrorMessage.Builder()
                                     .addAST(up)
                                     .addFileName(ErrorTracker.INSTANCE.fileName)
                                     .addError(VisitorErrorNumber.PARALLEL_USAGE_CHECK_713)
@@ -291,7 +291,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                     String name = up.expr().toString();
                     if (writeSet.containsKey(name))
 //                        Error.error(up, "Parallel write access to array member '" + name + "' illegal.", false, 5114);
-                        ErrorTracker.INSTANCE.printContinue(new ErrorMessage.Builder()
+                        ErrorTracker.INSTANCE.printAndContinue(new ErrorMessage.Builder()
                                     .addAST(up)
                                     .addFileName(ErrorTracker.INSTANCE.fileName)
                                     .addError(VisitorErrorNumber.PARALLEL_USAGE_CHECK_714)
@@ -301,7 +301,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                         Log.log(up, "ArrayAccessExpr: '" + name + "' is added to the write set.");
                         writeSet.put(name, up.expr());
 //                        Error.warning(up.expr(), "Parallel usage checking is not fully implemented for array access.", 5115);
-                        ErrorTracker.INSTANCE.printContinue(new ErrorMessage.Builder()
+                        ErrorTracker.INSTANCE.printAndContinue(new ErrorMessage.Builder()
                                     .addAST(up.expr())
                                     .addFileName(ErrorTracker.INSTANCE.fileName)
                                     .addError(VisitorErrorNumber.PARALLEL_USAGE_CHECK_715)

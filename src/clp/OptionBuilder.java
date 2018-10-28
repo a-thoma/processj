@@ -431,7 +431,7 @@ public class OptionBuilder {
             for (Class<? extends Command> clazz : classes) {
                 for (Field field : optGroup.getFieldList(clazz)) {
                     field.setAccessible(true);
-                    OptionWithValues optWithValues = optGroup.getOptionOrArgument(field);
+                    OptionWithValue optWithValues = optGroup.getOptionOrArgument(field);
                     if (optWithValues.getValue() != null)
                         field.set(instanceObj, optWithValues.getValue());
                 }

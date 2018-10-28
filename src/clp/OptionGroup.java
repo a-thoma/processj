@@ -52,7 +52,7 @@ public final class OptionGroup {
     /**
      * Map of fields to {@link OptionValue}s and {@link PositionalValue}s.
      */
-    private Map<Field, OptionWithValues> fieldOptionMap = new HashMap<>();
+    private Map<Field, OptionWithValue> fieldOptionMap = new HashMap<>();
     
     /**
      * This map contains a collection of fields declared by a class or set of classes.
@@ -73,7 +73,7 @@ public final class OptionGroup {
         return namedOptionMap.get(optName);
     }
     
-    public OptionWithValues getOptionOrArgument(Field field) {
+    public OptionWithValue getOptionOrArgument(Field field) {
         return fieldOptionMap.get(field);
     }
 
@@ -342,7 +342,7 @@ public final class OptionGroup {
         return argument;
     }
 
-    public void addValue(OptionWithValues option, String value) {
+    public void addValue(OptionWithValue option, String value) {
         Class<?> type = option.getField().getType();
         if (option.isFlagOption()) {
             addBooleanValue(option, value);
@@ -359,7 +359,7 @@ public final class OptionGroup {
         }
     }
 
-    private void addBooleanValue(OptionWithValues option, String value) {
+    private void addBooleanValue(OptionWithValue option, String value) {
         try {
             // If `null' then this could be a stand alone option, e.g. a flag
             // option that doesn't consume values
@@ -385,7 +385,7 @@ public final class OptionGroup {
     }
 
     @SuppressWarnings("unchecked")
-    private void addListValue(OptionWithValues option, String value) {
+    private void addListValue(OptionWithValue option, String value) {
         try {
             OptionParser<?> parser = option.getParsers()[0];
             Object parsedValue = parser.parseValue(value);
@@ -409,7 +409,7 @@ public final class OptionGroup {
         }
     }
     
-    private void addArrayValue(OptionWithValues option, String value) {
+    private void addArrayValue(OptionWithValue option, String value) {
         try {
             OptionParser<?> parser = option.getParsers()[0];
             Object parsedValue = parser.parseValue(value);
@@ -435,7 +435,7 @@ public final class OptionGroup {
         }
     }
     
-    private void addMapValue(OptionWithValues option, String keyAndValue) {
+    private void addMapValue(OptionWithValue option, String keyAndValue) {
         try {
             String[] splitKeyValue = MapParser.PARSER.parseValue(keyAndValue);
             OptionParser<?> keyParser = option.getParsers()[0];
@@ -456,7 +456,7 @@ public final class OptionGroup {
         }
     }
 
-    private void addValueType(OptionWithValues option, String value) {
+    private void addValueType(OptionWithValue option, String value) {
         try {
             OptionParser<?> parser = option.getParsers()[0];
             Object parsedValue = parser.parseValue(value);
@@ -498,7 +498,7 @@ public final class OptionGroup {
         if (fieldType instanceof ParameterizedType) {
             ParameterizedType parameterizedType = (ParameterizedType) fieldType;
             if (parameterizedType.getRawType() == List.class || parameterizedType.getRawType() == Map.class) {
-                // Retrieve the actual type declared in List or Map
+                // Retrieve the type(s) declared in a List or Map
                 fieldTypeResult = findFieldGenericTypes(field);
             } else {
                 throw new RuntimeException(String.format("Unknow type for a multivalue field. Found "

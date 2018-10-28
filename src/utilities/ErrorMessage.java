@@ -36,8 +36,14 @@ public class ErrorMessage extends PJErrorMessage {
             stStackInfo.add("stack", throwable.getStackTrace());
         }
         
-        stMessage.add("tag", stTag.render())
-                 .add("message", super.getST().render())
+        // Apply colour code if allowed on terminal. The attribute
+        // must be set to either `yes' or `no'
+        if (Settings.isAnsiColour)
+            stMessage.add("tag", ColorCodes.colorTag(stTag.render(), error.getErrorSeverity()));
+        else
+            stMessage.add("tag", stTag.render());
+        
+        stMessage.add("message", super.getST().render())
                  .add("location", stFile.render())
                  .add("stack", stStackInfo.render());
         
@@ -45,7 +51,11 @@ public class ErrorMessage extends PJErrorMessage {
     }
     
     public String render() {
-        return getST().render();
+        ST stResult = getST();
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(stResult.render());
+        // TODO: Add stack trace if needed
+        return stringBuilder.toString();
     }
     
     // =====================
@@ -55,7 +65,7 @@ public class ErrorMessage extends PJErrorMessage {
     /**
      * Builder for this basic error message type.
      * 
-     * @author Ben Cisneros
+     * @author Ben
      * @version 10/20/2018
      * @since 1.2
      */

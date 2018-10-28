@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
  * @version 08/05/2018
  * @since 1.2
  */
-public final class OptionValue extends OptionWithValues {
+public final class OptionValue extends OptionWithValue {
     
     /**
      * Default (long) name of this option.
@@ -99,7 +99,7 @@ public final class OptionValue extends OptionWithValues {
     }
 
     @Override
-    public int compareTo(OptionWithValues o) {
+    public int compareTo(OptionWithValue o) {
         return ((OptionValue) this).name.compareToIgnoreCase(((OptionValue) o).name);
     }
     
@@ -136,7 +136,7 @@ public final class OptionValue extends OptionWithValues {
      * @version 08/05/2018
      * @since 1.2
      */
-    public static final class Builder extends OptionWithValues.Builder<Builder> {
+    public static final class Builder extends OptionWithValue.Builder<Builder> {
 
         private String name;
         private String[] names;
@@ -153,7 +153,7 @@ public final class OptionValue extends OptionWithValues {
         }
 
         @Override
-        protected <O extends OptionWithValues> O build() {
+        protected <O extends OptionWithValue> O build() {
             @SuppressWarnings("unchecked")
             O option = (O) new OptionValue(this);
             return option;

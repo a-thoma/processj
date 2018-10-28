@@ -92,7 +92,7 @@ public class PJMain extends Command {
     
     @Option(names = "-sts",
             help = "Dump global symbol table structure")
-    public boolean sts;
+    public boolean symbolTable;
     
     @Option(names = "-visit-all",
             help = "Generate all parse tree visitors (not default)")
@@ -133,7 +133,7 @@ public class PJMain extends Command {
             help = "Try and use color on terminals that support ANSI espace codes",
             metavar = "<flag>",
             split = "=")
-    public boolean color;
+    public Boolean ansiColour;
     
     @Option(names = "-error-code",
             help = "What error code information do you want?",

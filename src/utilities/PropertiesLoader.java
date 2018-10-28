@@ -10,7 +10,7 @@ import java.util.Properties;
 /**
  * Loads properties from a file.
  * 
- * @author Ben Cisneros
+ * @author Ben
  * @version 10/22/2018
  * @since 1.2
  */

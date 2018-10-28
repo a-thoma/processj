@@ -10,6 +10,7 @@ import codegeneratorjava.CodeGeneratorJava;
 import library.Library;
 import parser.parser;
 import scanner.Scanner;
+import utilities.ConfigFileReader;
 import utilities.Error;
 import utilities.ErrorMessage;
 import utilities.VisitorErrorNumber;
@@ -38,6 +39,7 @@ public class ProcessJc {
         // C O M M A N D   L I N E   P R O C E S S O R
         // ===============================================
         
+        // Build options and arguments with user input
         OptionBuilder optionBuilder = null;
         PJMain pjMain = null;
         try {
@@ -50,40 +52,68 @@ public class ProcessJc {
             System.exit(0);
         }
         
-        // These fields have default values, see PJMain.java
-        // for more information
+        boolean isExitCode = false;
+        Properties config = ConfigFileReader.openConfiguration();
+        
+        // These fields have default values, but could be updated
+        // with user input (see `PJMain.java' for more information)
         Settings.includeDir = pjMain.include;
         Settings.targetLanguage = pjMain.target;
-        boolean sts = pjMain.sts;
+        boolean symbolTable = pjMain.symbolTable;
         boolean visitorAll = pjMain.visitorAll;
         List<File> files = pjMain.files;
         
+        // Turn on/off colour mode
+        if (pjMain.ansiColour == null) {
+            // Only set the colour mode if the default value in
+            // properties file is `yes'
+            if (config.getProperty("colour").equalsIgnoreCase("yes"))
+                Settings.isAnsiColour = true;
+        } else {
+            Settings.isAnsiColour = pjMain.ansiColour;
+            String ansiColorvalue = "no";
+            if (Settings.isAnsiColour)
+                ansiColorvalue = "yes";
+            // Update `colour' code value in properties file
+            config.setProperty("colour", ansiColorvalue);
+            ConfigFileReader.closeConfiguration(config);
+            isExitCode = true;
+        }
+        
+        // Display usage page
         if (pjMain.help) {
             Formatter formatHelp = new Formatter(optionBuilder);
             System.out.println(formatHelp.buildUsagePage());
-            System.exit(0);
-        } else if (pjMain.version) {
+            isExitCode = true;
+        }
+        // Display version
+        else if (pjMain.version) {
             try {
                 String[] list = pjMain.getVersion().getVersionPrinter();
                 System.out.println(StringUtil.join(Arrays.asList(list), "\n"));
-                System.exit(0);
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
-        } else if (pjMain.info != null) {
-            System.out.println(String.format("Information about @Option '%s' is not available.", pjMain.info));
-            System.exit(0);
-        } else if (pjMain.errorCode != null) {
+            isExitCode = true;
+        }
+        // TODO: Display error code information
+        else if (pjMain.errorCode != null) {
             System.out.println("map -> " + pjMain.errorCode);
-            System.exit(0);
-        } else if (files == null || files.isEmpty()) {
-            // At least one file must be provided otherwise throw an error
-            // if none is given or (for now) if a file does not exists
+            isExitCode = true;
+        }
+        // Check for input file(s)
+        else if (!isExitCode && (files == null || files.isEmpty())) {
+            // At least one file must be provided. Otherwise, throw an error
+            // if none is given, or (for now) if a file does not exists
             System.out.println(new ErrorMessage.Builder()
                                    .addError(VisitorErrorNumber.RESOLVE_IMPORTS_100)
                                    .build().getST().render());
-            System.exit(0);
+            isExitCode = true;
         }
+        
+        // Terminate program's execution
+        if (isExitCode)
+            System.exit(0);
         
         // ===============================================
         // P R O C C E S S I N G   F I L E S
@@ -105,12 +135,8 @@ public class ProcessJc {
                 s = new Scanner(new java.io.FileReader(fileAbsolutePath));
                 p = new parser(s);
             } catch (java.io.FileNotFoundException e) {
-                // TODO: For now this won't execute! The error is handled above
-                System.out.println(new ErrorMessage.Builder()
-                                       .addError(VisitorErrorNumber.RESOLVE_IMPORTS_102)
-                                       .addArguments(inFile.getName())
-                                       .build().getST().render());
-                System.exit(0);
+                // This won't execute! The error is handled above
+                // by the command
             } catch (Exception e) {
                 e.printStackTrace();
                 System.exit(1);
@@ -142,7 +168,7 @@ public class ProcessJc {
             if (visitorAll)
                 Log.startLogging();
             // Dump the symbol table structure
-            if (sts)
+            if (symbolTable)
                 globalTypeTable.printStructure("");
             
             // =====================================================
@@ -152,9 +178,7 @@ public class ProcessJc {
             c.visit(new namechecker.ResolveImports<AST>(globalTypeTable));
             
             if (ErrorTracker.INSTANCE.getErrorCount() != 0) {
-                System.out.println("---------- Error Report ----------");
-                System.out.println(String.format("%d errors in import declarations", ErrorTracker.INSTANCE.getErrorCount()));
-                ErrorTracker.INSTANCE.printTrace();
+                ErrorTracker.INSTANCE.printTrace("import declarations");
                 System.exit(1);
             }
             
@@ -165,9 +189,7 @@ public class ProcessJc {
             c.visit(new namechecker.TopLevelDecls<AST>(globalTypeTable));
 
             if (ErrorTracker.INSTANCE.getErrorCount() != 0) {
-                System.out.println("---------- Error Report ----------");
-                System.out.println(String.format("%d errors in top level declarations", ErrorTracker.INSTANCE.getErrorCount()));
-                ErrorTracker.INSTANCE.printTrace();
+                ErrorTracker.INSTANCE.printTrace("top level declarations");
                 System.exit(1);
             }
             
@@ -181,9 +203,7 @@ public class ProcessJc {
             c.visit(new namechecker.ResolvePackageTypes());
             
             if (ErrorTracker.INSTANCE.getErrorCount() != 0) {
-                System.out.println("---------- Error Report ----------");
-                System.out.println(String.format("%d errors in package types", ErrorTracker.INSTANCE.getErrorCount()));
-                ErrorTracker.INSTANCE.printTrace();
+                ErrorTracker.INSTANCE.printTrace("package types");
                 System.exit(1);
             }
             
@@ -194,9 +214,7 @@ public class ProcessJc {
             c.visit(new namechecker.NameChecker<AST>(globalTypeTable));
             
             if (ErrorTracker.INSTANCE.getErrorCount() != 0) {
-                System.out.println("---------- Error Report ----------");
-                System.out.println(String.format("%d errors in name checker", ErrorTracker.INSTANCE.getErrorCount()));
-                ErrorTracker.INSTANCE.printTrace();
+                ErrorTracker.INSTANCE.printTrace("name checker");
                 System.exit(1);
             }
             
@@ -208,9 +226,7 @@ public class ProcessJc {
             root.visit(new namechecker.ArrayTypeConstructor());
             
             if (ErrorTracker.INSTANCE.getErrorCount() != 0) {
-                System.out.println("---------- Error Report ----------");
-                System.out.println(String.format("%d errors in array types constructor", ErrorTracker.INSTANCE.getErrorCount()));
-                ErrorTracker.INSTANCE.printTrace();
+                ErrorTracker.INSTANCE.printTrace("array types constructor");
                 System.exit(1);
             }
             
@@ -221,9 +237,7 @@ public class ProcessJc {
             c.visit(new typechecker.TypeChecker(globalTypeTable));
             
             if (ErrorTracker.INSTANCE.getErrorCount() != 0) {
-                System.out.println("---------- Error Report ----------");
-                System.out.println(String.format("%d errors in type checking", ErrorTracker.INSTANCE.getErrorCount()));
-                ErrorTracker.INSTANCE.printTrace();
+                ErrorTracker.INSTANCE.printTrace("type checking");
                 System.exit(1);
             }
             
@@ -234,9 +248,7 @@ public class ProcessJc {
             c.visit(new reachability.Reachability());
             
             if (ErrorTracker.INSTANCE.getErrorCount() != 0) {
-                System.out.println("---------- Error Report ----------");
-                System.out.println(String.format("%d errors in reachability", ErrorTracker.INSTANCE.getErrorCount()));
-                ErrorTracker.INSTANCE.printTrace();
+                ErrorTracker.INSTANCE.printTrace("reachability");
                 System.exit(1);
             }
             
@@ -247,9 +259,7 @@ public class ProcessJc {
             c.visit(new parallel_usage_check.ParallelUsageCheck());
             
             if (ErrorTracker.INSTANCE.getErrorCount() != 0) {
-                System.out.println("---------- Error Report ----------");
-                System.out.println(String.format("%d errors in parallel usage checking", ErrorTracker.INSTANCE.getErrorCount()));
-                ErrorTracker.INSTANCE.printTrace();
+                ErrorTracker.INSTANCE.printTrace("parallel usage checking");
                 System.exit(1);
             }
             
@@ -260,9 +270,7 @@ public class ProcessJc {
             c.visit(new yield.Yield());
             
             if (ErrorTracker.INSTANCE.getErrorCount() != 0) {
-                System.out.println("---------- Error Report ----------");
-                System.out.println(String.format("%d errors in yield", ErrorTracker.INSTANCE.getErrorCount()));
-                ErrorTracker.INSTANCE.printTrace();
+                ErrorTracker.INSTANCE.printTrace("yield");
                 System.exit(1);
             }
             
@@ -272,14 +280,12 @@ public class ProcessJc {
             
             if (Settings.targetLanguage == Language.JVM) {
                 generateCodeJava(c, inFile, globalTypeTable);
-//                System.out.println("NO CODE GENERATOR");
-                System.exit(1);
             } else {
                 System.err.println(String.format("Unknown target language '%s' selected.", Settings.targetLanguage));
                 System.exit(1);
             }
 
-            System.out.println("** COMPILATION SUCCEEDED **");
+            System.out.println(String.format("*** File '%s' was compiled successfully ***", inFile.getName()));
         }
     }
     
@@ -301,7 +307,7 @@ public class ProcessJc {
     private static void generateCodeJava(Compilation compilation, File inFile, SymbolTable topLevelDecls) {
         // Read in and get the pathname of the input file
         String name = inFile.getName().substring(0, inFile.getName().lastIndexOf("."));
-        Properties configFile = utilities.ConfigFileReader.getConfiguration();
+        Properties config = utilities.ConfigFileReader.openConfiguration();
 
         // Run the code generator to decode pragmas, generate libraries, resolve
         // types, and set the symbol table for top level declarations

@@ -30,12 +30,15 @@ public class ColorCodes {
     public static final String ANSI_PREFIX = "\033[";
     public static final String ANSI_POSTFIX = "m";
     public static final String ANSI_COMMA = ";";
+    public static final String ANSI_RESET = "\033[0m";
     
     /**
-     * The enum {@code AnsiForeground} represents each ANSI
+     * The enum {@link AnsiForeground} represents each ANSI
      * foreground colour code.
      * 
-     * @author Ben Cisneros
+     * @author Ben
+     * @version 10/06/2018
+     * @since 1.2
      */
     public enum AnsiForeground {
         
@@ -63,10 +66,12 @@ public class ColorCodes {
     }
     
     /**
-     * The enum {@code AnsiForeground} represents each ANSI
+     * The enum {@link AnsiForeground} represents each ANSI
      * background colour code.
      * 
-     * @author Ben Cisneros
+     * @author Ben
+     * @version 10/06/2018
+     * @since 1.2
      */
     public enum AnsiBackground {
         
@@ -94,10 +99,12 @@ public class ColorCodes {
     }
     
     /**
-     * The enum {@code Attribute} represents each ANSI
+     * The enum {@link Attribute} represents each ANSI
      * attribute colour code.
      * 
-     * @author Ben Cisneros
+     * @author Ben
+     * @version 10/06/2018
+     * @since 1.2
      */
     public enum Attribute {
         
@@ -120,5 +127,27 @@ public class ColorCodes {
         public String toString() {
             return code;
         }
+    }
+    
+    public static String colorTag(String tag, ErrorSeverity severity) {
+        StringBuilder stringBuilder = new StringBuilder();
+        stringBuilder.append(ANSI_PREFIX)
+                     .append(Attribute.BOLD.toString())
+                     .append(ANSI_COMMA);
+        
+        switch (severity) {
+        case WARNING:
+            stringBuilder.append(AnsiForeground.YELLOW.toString());
+            break;
+        case ERROR:
+            stringBuilder.append(AnsiForeground.RED.toString());
+            break;
+        default:
+            break;
+        }
+        stringBuilder.append(ANSI_POSTFIX)
+                     .append(tag)
+                     .append(ANSI_RESET);
+        return stringBuilder.toString();
     }
 }

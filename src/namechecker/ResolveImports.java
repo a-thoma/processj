@@ -46,7 +46,9 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
     }
     
     /**
-     * Imports (by scanning, parsing and tree building) one file.
+     * Imports (by scanning, parsing, and building a tree) one file, checks
+     * its path format, and then validates the extension (path) of all the
+     * *import* statements found in the given file.
      *
      * @param a
      *          An AST node - just used for line number information.
@@ -66,7 +68,7 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
             return c;
         }
         try {
-            // Set package name
+            // Set the package name
             ErrorTracker.INSTANCE.setPackageName(fileName);
             
             Log.log(a.line + " Starting import of file: `" + fileName + "'");
@@ -74,17 +76,14 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
             parser p1 = new parser(s1);
             java_cup.runtime.Symbol r = p1.parse();
             
-            // THIS WILL EXECUTE AND VALIDATE THE EXTENSION (PATH) OF IMPORTED
-            // FILES!!
-            
             // Check the path of the imported file and compare the *import*
-            // statements found in `fileName' against the imported file path
-            // format. Throw an error if the import statements do not match
-            // the path of the package name in which `fileName' exists
+            // statements found in it with the imported file's path
+            // format. Throw an error if the *import* statements do not
+            // match the path of the package name in which `fileName' exists
             String packageName = packageNameToString(((Compilation) r.value).packageName());
-            String importPathDot = importPath.replaceAll(File.separator, "\\.");
-            if (!importPathDot.equals(packageName)) {
-                ErrorTracker.INSTANCE.printStop(new ErrorMessage.Builder()
+            String importPathWithDot = importPath.replaceAll(File.separator, "\\.");
+            if (!importPathWithDot.equals(packageName)) {
+                ErrorTracker.INSTANCE.printAndStop(new ErrorMessage.Builder()
                             .addAST(a)
                             .addFileName(ErrorTracker.INSTANCE.fileName)
                             .addError(VisitorErrorNumber.RESOLVE_IMPORTS_103)
@@ -96,14 +95,14 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
                     (Compilation) r.value);
             return (Compilation) r.value;
         } catch (java.io.FileNotFoundException e) {
-            ErrorTracker.INSTANCE.printStop(new ErrorMessage.Builder()
+            ErrorTracker.INSTANCE.printAndStop(new ErrorMessage.Builder()
                         .addAST(a)
                         .addFileName(ErrorTracker.INSTANCE.fileName)
                         .addError(VisitorErrorNumber.RESOLVE_IMPORTS_102)
                         .addArguments(fileName)
                         .build());
         } catch (Exception e) {
-            ErrorTracker.INSTANCE.printStop(new ErrorMessage.Builder()
+            ErrorTracker.INSTANCE.printAndStop(new ErrorMessage.Builder()
                         .addAST(a)
                         .addFileName(ErrorTracker.INSTANCE.fileName)
                         .addError(VisitorErrorNumber.TOP_LEVEL_DECLS_204)
@@ -150,7 +149,7 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
                 list.add(directory + "/" + s);
             }
         }
-        // 'list' now contains all the appropriate files in 'directory' - now
+        // `list' now contains all the appropriate files in `directory' - now
         // handle the subdirectories in order.
         entries = new File(directory).list();
         for (String s : entries) {
@@ -175,7 +174,7 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
     }
 
     /**
-     * visitImport will read and parse an import statement. The chain of symbol tables
+     * VisitImport will read and parse an import statement. The chain of symbol tables
      * will be left in the `symtab' field. The parentage of multiple files imported in
      * the same import is also through the parent link.
      */
@@ -212,7 +211,7 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
                     // Oh no, the directory wasn't found at all!
                     String packageName = path.replaceAll("/", ".");
                     packageName = packageName.substring(0, packageName.length() - 1);
-                    ErrorTracker.INSTANCE.printContinue(new ErrorMessage.Builder()
+                    ErrorTracker.INSTANCE.printAndContinue(new ErrorMessage.Builder()
                                 .addAST(im)
                                 .addFileName(ErrorTracker.INSTANCE.fileName)
                                 .addError(VisitorErrorNumber.RESOLVE_IMPORTS_103)
@@ -242,7 +241,7 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
                 } else {
                     // Nope, nothing found!
                     if (path.equals("")) {
-                        ErrorTracker.INSTANCE.printContinue(new ErrorMessage.Builder()
+                        ErrorTracker.INSTANCE.printAndContinue(new ErrorMessage.Builder()
                                     .addAST(im)
                                     .addFileName(ErrorTracker.INSTANCE.fileName)
                                     .addError(VisitorErrorNumber.RESOLVE_IMPORTS_102)
@@ -251,7 +250,7 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
                     } else {
                         String packageName = path.replaceAll("/", ".");
                         packageName = packageName.substring(0, packageName.length() - 1);
-                        ErrorTracker.INSTANCE.printContinue(new ErrorMessage.Builder()
+                        ErrorTracker.INSTANCE.printAndContinue(new ErrorMessage.Builder()
                                     .addAST(im)
                                     .addFileName(ErrorTracker.INSTANCE.fileName)
                                     .addError(VisitorErrorNumber.RESOLVE_IMPORTS_105)
@@ -262,7 +261,7 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
             }
         }
 
-        // 'fileList' now contains the list of all the files that this import caused to be imported
+        // `fileList' now contains the list of all the files that this import caused to be imported
         for (String fn : fileList) {
             // Scan, parse and build tree.
             String oldCurrentFileName = currentFileName;

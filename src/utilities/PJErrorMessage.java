@@ -146,7 +146,7 @@ public abstract class PJErrorMessage {
      * The class {@link Builder} uses descriptive methods to create
      * error messages with default or initial values.
      * 
-     * @author Ben Cisneros
+     * @author Ben
      * @version 10/20/2018
      * @since 1.2
      *

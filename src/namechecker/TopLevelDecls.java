@@ -104,7 +104,7 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
         Log.log(cd.line + ": Visiting a ConstantDecl "
                 + cd.var().name().getname());
         if (!symtab.put(cd.var().name().getname(), cd))
-            ErrorTracker.INSTANCE.printContinue(new ErrorMessage.Builder()
+            ErrorTracker.INSTANCE.printAndContinue(new ErrorMessage.Builder()
                         .addAST(cd)
                         .addFileName(ErrorTracker.INSTANCE.fileName)
                         .addError(VisitorErrorNumber.TOP_LEVEL_DECLS_200)
@@ -120,7 +120,7 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
         // another symbol table which is indexed by signature.
         if (Modifier.hasModifierSet(pd.modifiers(), Modifier.MOBILE))
             if (!pd.returnType().isVoidType())
-                ErrorTracker.INSTANCE.printContinue(new ErrorMessage.Builder()
+                ErrorTracker.INSTANCE.printAndContinue(new ErrorMessage.Builder()
                             .addAST(pd)
                             .addFileName(ErrorTracker.INSTANCE.fileName)
                             .addError(VisitorErrorNumber.TOP_LEVEL_DECLS_205)
@@ -142,7 +142,7 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
                 SymbolTable st = (SymbolTable) s;
                 if (Modifier.hasModifierSet(pd.modifiers(), Modifier.MOBILE)) {
                     if (st.isMobileProcedure)
-                        ErrorTracker.INSTANCE.printContinue(new ErrorMessage.Builder()
+                        ErrorTracker.INSTANCE.printAndContinue(new ErrorMessage.Builder()
                                     .addAST(pd)
                                     .addFileName(ErrorTracker.INSTANCE.fileName)
                                     .addError(VisitorErrorNumber.TOP_LEVEL_DECLS_206)
@@ -156,7 +156,7 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
                 } else
                     st.put(pd.signature(), pd);
             } else
-                ErrorTracker.INSTANCE.printContinue(new ErrorMessage.Builder()
+                ErrorTracker.INSTANCE.printAndContinue(new ErrorMessage.Builder()
                             .addAST(pd)
                             .addFileName(ErrorTracker.INSTANCE.fileName)
                             .addError(VisitorErrorNumber.TOP_LEVEL_DECLS_201)
@@ -170,7 +170,7 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
     public T visitRecordTypeDecl(RecordTypeDecl rd) {
         Log.log(rd.line + ": Visiting a RecordTypeDecl " + rd.name().getname());
         if (!symtab.put(rd.name().getname(), rd))
-            ErrorTracker.INSTANCE.printContinue(new ErrorMessage.Builder()
+            ErrorTracker.INSTANCE.printAndContinue(new ErrorMessage.Builder()
                         .addAST(rd)
                         .addFileName(ErrorTracker.INSTANCE.fileName)
                         .addError(VisitorErrorNumber.TOP_LEVEL_DECLS_207)
@@ -184,7 +184,7 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
         Log.log(pd.line + ": Visiting a ProtocolTypeDecl "
                 + pd.name().getname());
         if (!symtab.put(pd.name().getname(), pd))
-            ErrorTracker.INSTANCE.printContinue(new ErrorMessage.Builder()
+            ErrorTracker.INSTANCE.printAndContinue(new ErrorMessage.Builder()
                         .addAST(pd)
                         .addFileName(ErrorTracker.INSTANCE.fileName)
                         .addError(VisitorErrorNumber.TOP_LEVEL_DECLS_207)
@@ -197,7 +197,7 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
     public T visitNamedType(NamedType nt) {
         Log.log("Toplevel Named Type:" + nt);
         if (!symtab.put(nt.name().getname(), nt))
-            ErrorTracker.INSTANCE.printContinue(new ErrorMessage.Builder()
+            ErrorTracker.INSTANCE.printAndContinue(new ErrorMessage.Builder()
                         .addAST(nt)
                         .addFileName(ErrorTracker.INSTANCE.fileName)
                         .addError(VisitorErrorNumber.TOP_LEVEL_DECLS_207)

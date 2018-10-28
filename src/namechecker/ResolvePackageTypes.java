@@ -67,7 +67,7 @@ public class ResolvePackageTypes extends Visitor<AST> {
                     // don't do anything just continue after the if.
                 } else {
                     // It was neither a local nor a library file - throw an error...
-                    ErrorTracker.INSTANCE.printStop(new ErrorMessage.Builder()
+                    ErrorTracker.INSTANCE.printAndStop(new ErrorMessage.Builder()
                                 .addAST(pa)
                                 .addFileName(ErrorTracker.INSTANCE.fileName)
                                 .addError(VisitorErrorNumber.RESOLVE_IMPORTS_101)

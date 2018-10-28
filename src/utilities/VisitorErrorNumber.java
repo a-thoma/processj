@@ -188,7 +188,7 @@ public enum VisitorErrorNumber implements IErrorGetter {
     }
     
     static {
-        URL url = PropertiesLoader.getURL(PATH);        
+        URL url = PropertiesLoader.getURL(PATH);
         String path = PATH;
         if (url != null)
             path = url.getFile();

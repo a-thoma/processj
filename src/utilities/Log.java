@@ -26,7 +26,7 @@ public class Log {
         if (doLog)
             System.out.println(Error.fileName + ":" + a.line + " " + s);
     }
-
+    
     public static void logHeader(String s) {
         if (doLog)
             System.out.println(s);

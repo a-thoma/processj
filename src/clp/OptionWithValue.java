@@ -3,7 +3,7 @@ package clp;
 import java.lang.reflect.Field;
 
 /**
- * The class {@link OptionWithValues} is a wrapper class that serves
+ * The class {@link OptionWithValue} is a wrapper class that serves
  * as the base class for all shared attributes that belong to
  * {@link OptionValue} and {@link PositionalValue}.
  * 
@@ -11,7 +11,7 @@ import java.lang.reflect.Field;
  * @version 08/20/2018
  * @since 1.2
  */
-public abstract class OptionWithValues implements Comparable<OptionWithValues> {
+public abstract class OptionWithValue implements Comparable<OptionWithValue> {
     
     /**
      * The descriptive text messaged used in the help information.
@@ -76,7 +76,7 @@ public abstract class OptionWithValues implements Comparable<OptionWithValues> {
      */
     protected Object value;
     
-    public OptionWithValues(Builder<?> builder) {
+    public OptionWithValue(Builder<?> builder) {
         help = builder.help;
         metavar = builder.metavar;
         required = builder.required;
@@ -207,7 +207,7 @@ public abstract class OptionWithValues implements Comparable<OptionWithValues> {
         
         protected abstract B builder();
 
-        protected abstract <O extends OptionWithValues> O build();
+        protected abstract <O extends OptionWithValue> O build();
         
         public B addHelp(String help) {
             this.help = help;
