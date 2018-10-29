@@ -21,13 +21,13 @@ import java.util.TreeSet;
 import utilities.MultiValueMap;
 
 /**
- * Responsible for building the options and arguments.
+ * Responsible for building options and arguments.
  * 
  * @author Ben
  * @version 07/21/2018
  * @since 1.2
  */
-public class OptionBuilder {
+public class ClpBuilder {
     
     /**
      * The first ever registered command is the parent command.
@@ -59,11 +59,11 @@ public class OptionBuilder {
      */
     private Options options = new Options();
     
-    public OptionBuilder() {
+    public ClpBuilder() {
         // Nothing to do
     }
     
-    public OptionBuilder handlerArgs(String[] args) {
+    public ClpBuilder handlerArgs(String[] args) {
         handleArgs(expandArgs(args), mainCommand, 0, new ArrayList<>());
         return this;
     }
@@ -149,7 +149,7 @@ public class OptionBuilder {
                 // Throw error if there are missing arguments
                 if (index >= args.length)
                     throw new RuntimeException(String.format("@Option '%s' requires at least %d value.",
-                            option.getName(), arity.getFrom()));
+                            option.getSimpleName(), arity.getFrom()));
                 // Consume single value
                 optGroup.addValue(option, args[index++]);
             } else {
@@ -168,7 +168,7 @@ public class OptionBuilder {
                 // Have we consumed all required values?
                 if (j < endIndex)
                     throw new RuntimeException(String.format("@Option '%s' requires at least %d value(s), "
-                                + "only %d value(s) consumed.", option.getName(), arity.getFrom(), consumedArgs));
+                                + "only %d value(s) consumed.", option.getSimpleName(), arity.getFrom(), consumedArgs));
                 
                 // Consume remaining values if any is available and can be parsed
                 while (j < arity.getTo() && index < args.length && !consumedValue) {
@@ -185,7 +185,7 @@ public class OptionBuilder {
             }
         }
         // Remove required option after successfully parsing its value
-        requiredOptionMap.remove(option.getName());
+        requiredOptionMap.remove(option.getSimpleName());
         
         return index;
     }
@@ -220,7 +220,7 @@ public class OptionBuilder {
                 // Have we consumed all required values?
                 if (getFrom < index && getTo != Integer.MAX_VALUE)
                     throw new RuntimeException(String.format("@Argument '%s' requires %s value(s), "
-                                + "only %d value(s) consumed.", argument.getName(), order, consumedArgs));
+                                + "only %d value(s) consumed.", argument.getSimpleName(), order, consumedArgs));
             }
         }
         
@@ -229,7 +229,7 @@ public class OptionBuilder {
                         + "arguments.", index, argList.size() - index));
     }
     
-    public OptionBuilder addCommand(Class<? extends Command> type) {
+    public ClpBuilder addCommand(Class<? extends Command> type) {
         type = Assert.nonNull(type, "The specified class cannot be null.");
         Parameters parameters = type.getAnnotation(Parameters.class);
         
@@ -260,7 +260,7 @@ public class OptionBuilder {
                 options.add(optName, optionValue);
                 // Keep track of every required `Option'
                 if (optionValue.isRequired())
-                    requiredOptionMap.put(optionValue.getName(), optionValue);
+                    requiredOptionMap.put(optionValue.getSimpleName(), optionValue);
             } catch (Exception e) {
                 throw new RuntimeException(e.getMessage());
             }
@@ -299,7 +299,7 @@ public class OptionBuilder {
                 
                 List<String> names = new ArrayList<>();
                 for (OptionValue optValue : optSet) {
-                    if (requiredOptionMap.get(optValue.getName()) != null)
+                    if (requiredOptionMap.get(optValue.getSimpleName()) != null)
                         names.add("[" + String.join("|", optValue.getNames()) + "]");
                 }
                 
@@ -498,7 +498,7 @@ public class OptionBuilder {
     /**
      * Collections of shared-options between command types.
      * 
-     * @author Ben Cisneros
+     * @author Ben
      * @version 08/15/2018
      * @since 1.2
      */
@@ -511,7 +511,7 @@ public class OptionBuilder {
         
         public void add(String optName, OptionValue value) throws Exception {
             if (sharedOptions.put(optName, value) != null)
-                throw new RuntimeException(String.format("Option '%s' found multiple times.", optName));
+                throw new RuntimeException(String.format("@Option '%s' found multiple times.", optName));
         }
         
         public OptionValue get(String optName) {

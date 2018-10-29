@@ -19,23 +19,13 @@ import java.util.stream.Collectors;
 public final class OptionValue extends OptionWithValue {
     
     /**
-     * Default (long) name of this option.
-     */
-    private final String name;
-    
-    /**
      * The name (or names) of this option.
      */
     private final String[] names;
     
     private OptionValue(Builder builder) {
         super(builder);
-        name = builder.name;
         names = builder.names;
-    }
-    
-    public String getName() {
-        return name;
     }
     
     public String[] getNames() {
@@ -44,7 +34,10 @@ public final class OptionValue extends OptionWithValue {
     
     public String getOptionOrArgumentHelp(int indent, int width) {
         StringBuilder stringBuilder = new StringBuilder(Formatter.DEFAULT_LENGTH + help.length());
-        stringBuilder.append(" ");
+        if (required)
+            stringBuilder.append("*");
+        else
+            stringBuilder.append("  ");
         
         Iterator<String> itNames = Arrays.asList(names).iterator();
         while (itNames.hasNext()) {
@@ -63,50 +56,22 @@ public final class OptionValue extends OptionWithValue {
         while (indent > stringBuilder.length() + 2)
             stringBuilder.append(" ");
         stringBuilder.append(" ");
-        
-        int charLeft = width - stringBuilder.length();        
-        String newHelp = defaultValue.isEmpty() ? help : help + " (default: " + defaultValue + ")";
+
+        String newHelp = defaultValue.isEmpty() ? help : help + " (default=" + defaultValue + ")";
         List<String> words = Arrays.asList(newHelp.split(" "));
-        int charCount = 0;
         
-        // Move the definition to the next line if we exceed the
-        // minimum limits of characters
-        boolean nextLine = false;
-        if (stringBuilder.length() >= Formatter.MAX_CHAR_COUNT) {
-            charLeft = width - Formatter.MAX_CHAR_COUNT;
-            nextLine = true;
-        }
-        
-        for (Iterator<String> it = words.iterator(); it.hasNext();) {
-            String word = it.next();
-            if (nextLine) {
-                stringBuilder.append("\n")
-                             .append(StringUtil.countSpaces(indent - 1));
-                nextLine = false;
-            }
-            charCount += word.length() + 1;
-            if (charCount > charLeft) {
-                stringBuilder.append("\n")
-                             .append(StringUtil.countSpaces(indent - 1));
-                charCount = word.length() + 1;
-            }
-            stringBuilder.append(word);
-            if (it.hasNext())
-                stringBuilder.append(" ");
-        }
-        
-        return stringBuilder.toString();
+        return getFilledParagraph(stringBuilder, words, indent, width);
     }
 
     @Override
     public int compareTo(OptionWithValue o) {
-        return ((OptionValue) this).name.compareToIgnoreCase(((OptionValue) o).name);
+        return ((OptionValue) this).simpleName.compareToIgnoreCase(((OptionValue) o).simpleName);
     }
     
     @Override
     public String toString() {
         return getClass().getSimpleName() +
-                "(name="        + name +
+                "(name="        + simpleName +
                 ", names="      + StringUtil.join(Arrays.asList(names), ",") +
                 ", help="       + help +
                 ", field= "     + field.getName() +
@@ -132,18 +97,16 @@ public final class OptionValue extends OptionWithValue {
     /**
      * Builder for this {@link OptionValue}.
      * 
-     * @author Ben Cisneros
+     * @author Ben
      * @version 08/05/2018
      * @since 1.2
      */
     public static final class Builder extends OptionWithValue.Builder<Builder> {
-
-        private String name;
+        
         private String[] names;
 
         public Builder() {
             super();
-            name = null;
             names = null;
         }
 
@@ -157,11 +120,6 @@ public final class OptionValue extends OptionWithValue {
             @SuppressWarnings("unchecked")
             O option = (O) new OptionValue(this);
             return option;
-        }
-        
-        public Builder addName(String name) {
-            this.name = name;
-            return this;
         }
 
         public Builder addNames(String[] names) {

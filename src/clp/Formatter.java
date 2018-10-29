@@ -24,15 +24,15 @@ public class Formatter {
     
     public static final int MAX_CHAR_COUNT = 27;
     
-    public static final String USAGE_PREFIX = "USAGE: ";
+    public static final String USAGE_PREFIX = "Usage: ";
     
-    public static final String PARAMETERS_PREFIX = "PARAMETERS: ";
+    public static final String PARAMETERS_PREFIX = "Parameters: ";
     
-    public static final String OPTIONS_PREFIX = "OPTIONS: ";
+    public static final String OPTIONS_PREFIX = "Options: ";
     
-    private OptionBuilder optionBuilder;
+    private ClpBuilder optionBuilder;
     
-    public Formatter(OptionBuilder optionBuilder) {
+    public Formatter(ClpBuilder optionBuilder) {
         this.optionBuilder = optionBuilder;
     }
     
@@ -81,11 +81,8 @@ public class Formatter {
      * @return A newly-formatted string.
      */
     public String justifyLine(String line, int numWords) {
-        // The formatted sentence
         StringBuilder stringBuilder = new StringBuilder();
-        // Amount of spaces needed
         int extraSpaces = DEFAULT_WIDTH - line.length();
-        // Amount of spaces needed for each word
         int insertSpaces = 0;
         // Iterate through the sentence
         for (int i = 0; i < line.length(); ++i) {
@@ -133,7 +130,7 @@ public class Formatter {
     }
     
     /**
-     * Neatly formats a string containing a list of (appended) options
+     * Neatly format a string containing a list of (appended) options
      * and returns a new string containing the following format:
      * 
      * USAGE: <main-command> [option0] [option1] [option2] ... [optionN]
@@ -141,7 +138,7 @@ public class Formatter {
     public String formatUsage(String usage) {
         Parameters parameter = optionBuilder.getMainCommand().getAnnotation(Parameters.class); 
         StringBuilder stringBuilder = new StringBuilder();
-        // Split words by `[..]' or `word' or `<..>' 
+        // Split words by `[..]', or by `<..>', or by `word'
         Pattern pattern = Pattern.compile("\\[.*?\\]|\\<.*?\\>|\\w+");
         Matcher matcher = pattern.matcher(usage);
         List<String> words = new ArrayList<>();
@@ -181,9 +178,9 @@ public class Formatter {
         // Grab the list of commands defined in the program
         List<String> commands = new ArrayList<>();
         commands.addAll(optionBuilder.getCommandAndNameMap().values());
-        // For each command defined
+        // For each command defined in the program
         for (String commandName : commands) {
-            // Grab the command
+            // Grab the command (by name)
             Class<? extends Command> command = optionBuilder.getCommandByName(commandName);
             if (hasCommands)
                 stringBuilder.append("[")
@@ -218,7 +215,7 @@ public class Formatter {
         for (Iterator<PositionalValue> it = arguments.iterator(); it.hasNext();) {
             PositionalValue positional = it.next();
             if (positional.getMetavar().isEmpty())
-                stringBuilder.append(positional.getName());
+                stringBuilder.append(positional.getSimpleName());
             else
                 stringBuilder.append(positional.getMetavar());
             if (it.hasNext())
@@ -251,7 +248,6 @@ public class Formatter {
         for (String footer : parameter.footer())
             stringBuilder.append(footer)
                          .append("\n");
-        
         return stringBuilder.append("\n").toString();
     }
     
@@ -271,13 +267,62 @@ public class Formatter {
         return stringBuilder;
     }
     
+    public StringBuilder buildCommand(int indent, Class<? extends Command> command) {
+        Parameters param = command.getAnnotation(Parameters.class);
+        StringBuilder stringBuilder = new StringBuilder(Formatter.DEFAULT_LENGTH + param.help().length());
+        stringBuilder.append(" ")
+                     .append(param.name())
+                     .append(" ")
+                     .append("[options]...");
+        
+        while (indent > stringBuilder.length() + 2)
+            stringBuilder.append(" ");
+        stringBuilder.append(" ");
+        
+        int charLeft = DEFAULT_WIDTH - stringBuilder.length();
+        int charCount = 0;
+        List<String> words = null;
+        
+        if (!param.help().isEmpty())
+            words = Arrays.asList(param.help().split(" "));
+        
+        // Move the definition to the next line if we exceed the
+        // minimum limits of characters
+        boolean nextLine = false;
+        if (stringBuilder.length() >= Formatter.MAX_CHAR_COUNT) {
+            charLeft = DEFAULT_WIDTH - Formatter.MAX_CHAR_COUNT;
+            nextLine = true;
+        }
+        
+        for (Iterator<String> it = words.iterator(); it.hasNext();) {
+            String word = it.next();
+            if (nextLine) {
+                stringBuilder.append("\n")
+                             .append(StringUtil.countSpaces(indent - 1));
+                nextLine = false;
+            }
+            charCount += word.length() + 1;
+            if (charCount > charLeft) {
+                stringBuilder.append("\n")
+                             .append(StringUtil.countSpaces(indent - 1));
+                charCount = word.length() + 1;
+            }
+            stringBuilder.append(word);
+            if (it.hasNext())
+                stringBuilder.append(" ");
+        }
+        
+        return stringBuilder;
+    }
+    
     public StringBuilder buildCommandAndOptions(StringBuilder stringBuilder, int indent) {
         Map<Class<? extends Command>, OptionGroup> commandAndOptionMap = optionBuilder.getCommandAndOptionMap();
         // For each command defined in the program
         for (Map.Entry<Class<? extends Command>, OptionGroup> entry : commandAndOptionMap.entrySet()) {
             // If we have more than one command, then append each individually
             if (commandAndOptionMap.size() > 1)
-                stringBuilder.append(optionBuilder.getCommandAndNameMap().get(entry.getKey()) + ":\n");
+                stringBuilder.append(buildCommand(indent, entry.getKey()))
+                             .append("\n");
             List<OptionValue> optionList = new ArrayList<>();
             optionList.addAll(entry.getValue().getUniqueOptions());
             for (OptionValue optionValue : optionList) {

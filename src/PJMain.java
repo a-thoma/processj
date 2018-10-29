@@ -48,11 +48,11 @@ import utilities.Language;
                         "list of possible commands and options."
                         },
             footer = {  "Run 'pjc -about <arg>' for help with a specific command or option.\n",
-                        "Full documentation at: https://processj.org",
+                        "See https://processj.org for more details.",
                         "Bug reports, feedback, complains, love, food, etc, to matt.pedersen@unlv.edu"
                         },
             name = "pjc",
-            help = "The following options are available:",
+            help = "The primary command in ProcessJ",
             versionPrinter = PJMain.VersionPrinter.class)
 public class PJMain extends Command {
 
@@ -124,7 +124,7 @@ public class PJMain extends Command {
                     + "symbol tables")
     public boolean topDeclsVisitor;
     
-    @Option(names = "-about",
+    @Option(names = "-info",
             help = "Provide additional information about a specific command or option",
             metavar = "<arg>")
     public String info;
@@ -152,7 +152,8 @@ public class PJMain extends Command {
     
     @Argument(metavar = "<file>",
               help = "The file (or files) to compile",
-              order = "1..*")
+              order = "+",
+              required = true)
     public List<File> files;
     
     public static class VersionPrinter extends Command implements IVersionPrinter {

@@ -69,6 +69,9 @@ public class ArityRange extends AbstractList<Integer> {
                 toValue = Integer.parseInt(range.substring(separatorIndex + 2));
             else
                 toValue = Integer.MAX_VALUE;
+        } else if (range.equals("+")) {
+            fromValue = 1;
+            toValue = Integer.MAX_VALUE;
         } else {
             fromValue = Integer.parseInt(range);
             toValue = fromValue;

@@ -4,7 +4,7 @@ import java.util.*;
 import ast.AST;
 import ast.Compilation;
 import clp.Formatter;
-import clp.OptionBuilder;
+import clp.ClpBuilder;
 import clp.StringUtil;
 import codegeneratorjava.CodeGeneratorJava;
 import library.Library;
@@ -40,10 +40,10 @@ public class ProcessJc {
         // ===============================================
         
         // Build options and arguments with user input
-        OptionBuilder optionBuilder = null;
+        ClpBuilder optionBuilder = null;
         PJMain pjMain = null;
         try {
-            optionBuilder = new OptionBuilder()
+            optionBuilder = new ClpBuilder()
                                 .addCommand(PJMain.class)
                                 .handlerArgs(args);
             pjMain = optionBuilder.getCommand(PJMain.class);
@@ -52,7 +52,6 @@ public class ProcessJc {
             System.exit(0);
         }
         
-        boolean isExitCode = false;
         Properties config = ConfigFileReader.openConfiguration();
         
         // These fields have default values, but could be updated
@@ -77,14 +76,14 @@ public class ProcessJc {
             // Update `colour' code value in properties file
             config.setProperty("colour", ansiColorvalue);
             ConfigFileReader.closeConfiguration(config);
-            isExitCode = true;
+            System.exit(0);
         }
         
         // Display usage page
         if (pjMain.help) {
             Formatter formatHelp = new Formatter(optionBuilder);
             System.out.println(formatHelp.buildUsagePage());
-            isExitCode = true;
+            System.exit(0);
         }
         // Display version
         else if (pjMain.version) {
@@ -94,26 +93,22 @@ public class ProcessJc {
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
-            isExitCode = true;
+            System.exit(0);
         }
         // TODO: Display error code information
         else if (pjMain.errorCode != null) {
-            System.out.println("map -> " + pjMain.errorCode);
-            isExitCode = true;
+            System.out.println("Not available..");
+            System.exit(0);
         }
         // Check for input file(s)
-        else if (!isExitCode && (files == null || files.isEmpty())) {
+        else if (files == null || files.isEmpty()) {
             // At least one file must be provided. Otherwise, throw an error
             // if none is given, or (for now) if a file does not exists
             System.out.println(new ErrorMessage.Builder()
                                    .addError(VisitorErrorNumber.RESOLVE_IMPORTS_100)
                                    .build().getST().render());
-            isExitCode = true;
-        }
-        
-        // Terminate program's execution
-        if (isExitCode)
             System.exit(0);
+        }
         
         // ===============================================
         // P R O C C E S S I N G   F I L E S

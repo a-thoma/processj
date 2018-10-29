@@ -1,6 +1,8 @@
 package clp;
 
 import java.lang.reflect.Field;
+import java.util.Iterator;
+import java.util.List;
 
 /**
  * The class {@link OptionWithValue} is a wrapper class that serves
@@ -12,6 +14,11 @@ import java.lang.reflect.Field;
  * @since 1.2
  */
 public abstract class OptionWithValue implements Comparable<OptionWithValue> {
+    
+    /**
+     * Default name.
+     */
+    protected final String simpleName;
     
     /**
      * The descriptive text messaged used in the help information.
@@ -77,6 +84,7 @@ public abstract class OptionWithValue implements Comparable<OptionWithValue> {
     protected Object value;
     
     public OptionWithValue(Builder<?> builder) {
+        simpleName = builder.simpleName;
         help = builder.help;
         metavar = builder.metavar;
         required = builder.required;
@@ -101,6 +109,10 @@ public abstract class OptionWithValue implements Comparable<OptionWithValue> {
     // ================
     // G E T T E R S
     // ================
+    
+    public final String getSimpleName() {
+        return simpleName;
+    }
     
     public final String getHelp() {
         return help;
@@ -161,6 +173,39 @@ public abstract class OptionWithValue implements Comparable<OptionWithValue> {
     
     public abstract String getOptionOrArgumentHelp(int indent, int width);
     
+    public String getFilledParagraph(StringBuilder stringBuilder, List<String> words, int indent, int width) {
+        int charLeft = width - stringBuilder.length();
+        int charCount = 0;
+        
+        // Move the definition to the next line if we exceed the
+        // minimum limits of characters
+        boolean nextLine = false;
+        if (stringBuilder.length() >= Formatter.MAX_CHAR_COUNT) {
+            charLeft = width - Formatter.MAX_CHAR_COUNT;
+            nextLine = true;
+        }
+        
+        for (Iterator<String> it = words.iterator(); it.hasNext();) {
+            String word = it.next();
+            if (nextLine) {
+                stringBuilder.append("\n")
+                             .append(StringUtil.countSpaces(indent - 1));
+                nextLine = false;
+            }
+            charCount += word.length() + 1;
+            if (charCount > charLeft) {
+                stringBuilder.append("\n")
+                             .append(StringUtil.countSpaces(indent - 1));
+                charCount = word.length() + 1;
+            }
+            stringBuilder.append(word);
+            if (it.hasNext())
+                stringBuilder.append(" ");
+        }
+        
+        return stringBuilder.toString();
+    }
+    
     // =====================
     // B U I L D E R
     // =====================
@@ -178,6 +223,7 @@ public abstract class OptionWithValue implements Comparable<OptionWithValue> {
      */
     public static abstract class Builder<B> {
         
+        protected String simpleName;
         protected String help;
         protected String metavar;
         protected String defaultValue;
@@ -192,6 +238,7 @@ public abstract class OptionWithValue implements Comparable<OptionWithValue> {
         protected ArityRange arity;
         
         public Builder() {
+            simpleName = null;
             help = null;
             metavar = null;
             defaultValue = null;
@@ -208,6 +255,11 @@ public abstract class OptionWithValue implements Comparable<OptionWithValue> {
         protected abstract B builder();
 
         protected abstract <O extends OptionWithValue> O build();
+        
+        public B addSimpleName(String simpleName) {
+            this.simpleName = simpleName;
+            return builder();
+        }
         
         public B addHelp(String help) {
             this.help = help;

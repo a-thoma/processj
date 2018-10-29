@@ -47,7 +47,7 @@ public @interface Parameters {
     /**
      * The descriptive text messaged used in help information.
      */
-    String[] help() default {};
+    String help() default "";
 
     /**
      * Optional summary description of this command.

@@ -10,7 +10,6 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
@@ -22,14 +21,13 @@ import java.util.SortedMap;
 import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
-import java.util.stream.Collectors;
 
 import clp.parsers.EnumParser;
 import clp.parsers.MapParser;
 
 /**
  * The class {@link OptionGroup} represents a collection of command
- * line options that {@link OptionBuilder} instantiates in order to
+ * line options that {@link ClpBuilder} instantiates in order to
  * updated the values that {@link Option @Option} fields and
  * {@link Argument @Argument} fields hold at compile or runtime.
  * 
@@ -164,7 +162,7 @@ public final class OptionGroup {
         }
         
         String optName = findOptionLongName(field);
-        builder.addName(optName);
+        builder.addSimpleName(optName);
         builder.addNames(annotation.names());
         builder.addField(field);
         
@@ -180,7 +178,7 @@ public final class OptionGroup {
         // This is to retrieve information about the type of data each field
         // holds at compile-time or run-time. Basic types such as byte, short,
         // int, long, float, double, String and parameterized fields (of basic
-        // types) can be inferred at runtime. Complex data types such as user-defined
+        // types) can be inferred. Complex data types such as user-defined
         // types must be explicitly specified
         Class<?>[] fieldFinalTypes = findFieldFinalTypes(field);
         if (fieldFinalTypes.length == 2) {
@@ -282,7 +280,7 @@ public final class OptionGroup {
         PositionalValue.Builder builder = new PositionalValue.Builder();
         Argument annotation = field.getAnnotation(Argument.class);
         String fieldName = field.getName();
-        builder.addName(fieldName);
+        builder.addSimpleName(fieldName);
         builder.addField(field);
         
         ArityRange order = ArityRange.createArity(annotation.order());
@@ -471,7 +469,7 @@ public final class OptionGroup {
                                                 Class<? extends OptionParser> handler,
                                                 String optName) {
         if (OptionParser.class == handler)
-            throw new RuntimeException(String.format("Illegal handler type found. Illegal '%s' type "
+            throw new RuntimeException(String.format("Illegal handler type found! Illegal '%s' type "
                         + "assigned to field '%s'.", Util.getTypeName(handler), fieldName));
         
         // Is this handler an Enum type? Yes, then create a parser for this Enum type
@@ -538,15 +536,19 @@ public final class OptionGroup {
     
     protected static String findOptionLongName(Field field) {
         Option annotation = field.getAnnotation(Option.class);
-        return Arrays.stream(annotation.names())
-                     .max(Comparator.comparingInt(String::length))
-                     .get();
+        String name = "";
+        for (String n : annotation.names())
+            if (n.length() > name.length())
+                name = n;
+        return name;
     }
     
     protected static List<Field> findAnnotatedFields(Class<? extends Command> type) {
-        List<Field> fields = Arrays.stream(type.getDeclaredFields())
-                                   .filter(field -> isOption(field) || isArgument(field))
-                                   .collect(Collectors.toList());
+        List<Field> fields = new ArrayList<>();
+        for (Field field : type.getDeclaredFields())
+            if (isOption(field) || isArgument(field))
+                fields.add(field);
+        
         if (fields.isEmpty())
             throw new RuntimeException("At least one field must have an annotation "
                         + "attached to it.");
@@ -615,7 +617,7 @@ public final class OptionGroup {
      * Compares {@link Argument @Argument} fields by their index or,
      * id their indices have the same values, by {@link Argument#order()}.
      * 
-     * @author Ben Cisneros
+     * @author Ben
      * @version 08/16/2018
      * @since 1.2
      */
