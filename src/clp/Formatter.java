@@ -86,8 +86,8 @@ public class Formatter {
         int insertSpaces = 0;
         // Iterate through the sentence
         for (int i = 0; i < line.length(); ++i) {
-            // Add a letter to the new line till a white space character
-            // is encountered
+            // Add a letter to the new line till a white space
+            // character is encountered
             if (line.charAt(i) != ' ')
                 stringBuilder.append(line.charAt(i));
             else {
@@ -133,7 +133,7 @@ public class Formatter {
      * Neatly format a string containing a list of (appended) options
      * and returns a new string containing the following format:
      * 
-     * USAGE: <main-command> [option0] [option1] [option2] ... [optionN]
+     * Usage: <main-command> [option0] [option1] [option2] ... [optionN]
      */
     public String formatUsage(String usage) {
         Parameters parameter = optionBuilder.getMainCommand().getAnnotation(Parameters.class); 
@@ -233,7 +233,6 @@ public class Formatter {
             stringBuilder.append(StringUtil.countSpaces(indent - 1))
                          .append(header)
                          .append("\n");
-        
         stringBuilder.append("\n");
         for (String note : parameter.notes())
             stringBuilder.append(note)
@@ -343,7 +342,6 @@ public class Formatter {
                      .append(appendAllOptions())
                      .append(appendAllArguments())
                      .append("\n");
-        
         // Create and build the list of arguments
         stringBuilder.append("\n")
                      .append(PARAMETERS_PREFIX)
