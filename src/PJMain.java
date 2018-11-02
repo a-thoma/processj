@@ -47,7 +47,8 @@ import utilities.Language;
             notes = {   "If called without options, the program may terminate. Use '-help' for a",
                         "list of possible commands and options."
                         },
-            footer = {  "Run 'pjc -about <arg>' for help with a specific command or option.\n",
+            footer = {  "Run 'pjc -info <command>' or 'pjc -info <option>' for help with a specific\n" +
+                        "subcommand or option.\n",
                         "See https://processj.org for more details.",
                         "Bug reports, feedback, complains, love, food, etc, to matt.pedersen@unlv.edu"
                         },
@@ -150,10 +151,9 @@ public class PJMain extends Command {
             metavar = "<file>")
     public String logFile;
     
-    @Argument(metavar = "<file>",
+    @Argument(metavar = "<args>",
               help = "The file (or files) to compile",
-              order = "+",
-              required = true)
+              order = "+")
     public List<File> files;
     
     public static class VersionPrinter extends Command implements IVersionPrinter {
@@ -161,9 +161,11 @@ public class PJMain extends Command {
         public String[] getVersionPrinter() throws Exception {
             DateFormat dateFormat = new SimpleDateFormat("dd MMMM yyyy");
             Date date = new Date();
-            return new String[] { "ProcessJ version 1.2 compiled on " + dateFormat.format(date),
-                                  "java version \"" + System.getProperty("java.version") + "\"",
-                                  "Copyright(c) 2018" };
+            return new String[] { "ProcessJ version 1.2 - compiled on " + dateFormat.format(date) + ".",
+                                  "Java version \"" + System.getProperty("java.version") + "\"",
+                                  "Copyright(c) 2018 Matt Pedersen, Ben Cisneros, and others.",
+                                  "This release is maintained by Matt Pedersen.",
+                                  "Please report bugs to <matt.pedersen@unlv.edu>."};
         }
     }
     

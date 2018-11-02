@@ -1,18 +1,17 @@
 package utilities;
 
 /**
- * The interface {@code IErrorGetter} declares and defines
- * methods that when building useful error messages would
+ * The interface {@link IMessageNumber} declares and defines
+ * methods that when building useful compiler messages would
  * enforce {@code enum}s to provide an implementation for
- * both {@link #getText()} and {@link #getMessage()}, and
- * for {@link #getErrorSeverity()} or {@link #getNumber()}
- * if needed.
+ * {@link #getMessage()}, and for {@link #getErrorSeverity()}
+ * or {@link #getNumber()} if needed.
  * 
  * @author Ben
  * @version 10/21/2018
  * @since 1.2
  */
-public interface IErrorGetter {
+public interface IMessageNumber {
     
     default ErrorSeverity getErrorSeverity() {
         return ErrorSeverity.INFO;

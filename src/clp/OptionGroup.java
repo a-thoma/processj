@@ -27,7 +27,7 @@ import clp.parsers.MapParser;
 
 /**
  * The class {@link OptionGroup} represents a collection of command
- * line options that {@link ClpBuilder} instantiates in order to
+ * line options that {@link CLPBuilder} instantiates in order to
  * updated the values that {@link Option @Option} fields and
  * {@link Argument @Argument} fields hold at compile or runtime.
  * 

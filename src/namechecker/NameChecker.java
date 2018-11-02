@@ -25,9 +25,12 @@ import ast.RecordTypeDecl;
 import ast.SwitchLabel;
 import ast.DefineTopLevelDecl;
 import utilities.Error;
+import utilities.PJMessage;
+import utilities.CompilerMessageManager;
 import utilities.Log;
 import utilities.SymbolTable;
 import utilities.Visitor;
+import utilities.VisitorMessageNumber;
 
 // Error message number range: [2200 - 2299]
 
@@ -160,11 +163,18 @@ public class NameChecker<T extends Object> extends Visitor<T> {
             // ...::f()
             Object o = resolveName(in.procedureName());
             if (o == null)
-                Error.error(in, "Procedure '" + in.procedureName().getname()
-                        + "' not found", false, 2207);
+                CompilerMessageManager.INSTANCE.printAndContinue(new PJMessage.Builder()
+                            .addAST(in)
+                            .addError(VisitorMessageNumber.NAME_CHECKER_403)
+                            .addArguments(in.procedureName().getname())
+                            .build());
             if (!(o instanceof SymbolTable))
-                Error.error(in, "Cannot invoke non-procedure '"
-                        + in.procedureName().getname() + "'.", false, 2208);
+                CompilerMessageManager.INSTANCE.printAndContinue(new PJMessage.Builder()
+                            .addAST(in)
+                            .addError(VisitorMessageNumber.NAME_CHECKER_404)
+                            .addArguments(in.procedureName().getname())
+                            .build());
+                
             else
                 in.candidateMethods = (SymbolTable) o;
         } else {
@@ -182,8 +192,11 @@ public class NameChecker<T extends Object> extends Visitor<T> {
         Log.log(ld.line + ": Visting LocalDecl (" + ld.type().typeName() + " "
                 + ld.var().name().getname() + ")");
         if (!currentScope.put(ld.name(), ld))
-            Error.error(ld, "'" + ld.name()
-                    + "' already declared in this scope.", false, 2202);
+            CompilerMessageManager.INSTANCE.printAndContinue(new PJMessage.Builder()
+                        .addAST(ld)
+                        .addError(VisitorMessageNumber.NAME_CHECKER_400)
+                        .addArguments(ld.name())
+                        .build());
         ld.var().myDecl = ld;
         super.visitLocalDecl(ld);
         return null;
@@ -198,11 +211,17 @@ public class NameChecker<T extends Object> extends Visitor<T> {
         Object o;
         o = resolveName(nt.name());
         if (o == null)
-            Error.error(nt, "Symbol '" + nt.name().getname() + "' not found.",
-                    false, 2203);
+            CompilerMessageManager.INSTANCE.printAndContinue(new PJMessage.Builder()
+                        .addAST(nt)
+                        .addError(VisitorMessageNumber.NAME_CHECKER_401)
+                        .addArguments(nt.name().getname())
+                        .build());
         if (o instanceof ConstantDecl) {
-            Error.error(nt, "Symbol '" + nt.name().getname()
-                    + "' is not a type.", false, 2209);
+            CompilerMessageManager.INSTANCE.printAndContinue(new PJMessage.Builder()
+                        .addAST(nt)
+                        .addError(VisitorMessageNumber.NAME_CHECKER_407)
+                        .addArguments(nt.name().getname())
+                        .build());
         }
         Log.log("NamedType: o = " + o);
         // TODO: consider the import hierarchy back for similiarly named procs
@@ -228,8 +247,11 @@ public class NameChecker<T extends Object> extends Visitor<T> {
 
         Object o = resolveName(ne.name());
         if (o == null)
-            Error.error(ne, "Symbol '" + ne.name().getname() + "' not found.",
-                    false, 2210);
+            CompilerMessageManager.INSTANCE.printAndContinue(new PJMessage.Builder()
+                        .addAST(ne)
+                        .addError(VisitorMessageNumber.NAME_CHECKER_405)
+                        .addArguments(ne.name().getname())
+                        .build());
         else
             ne.myDecl = (AST) o;
         return null;
@@ -242,8 +264,11 @@ public class NameChecker<T extends Object> extends Visitor<T> {
 
         Object o = resolveName(nm.name());
         if (o == null)
-            Error.error(nm, "Symbol '" + nm.name().getname() + "' not found.",
-                    false, 2211);
+            CompilerMessageManager.INSTANCE.printAndContinue(new PJMessage.Builder()
+                    .addAST(nm)
+                    .addError(VisitorMessageNumber.NAME_CHECKER_406)
+                    .addArguments(nm.name().getname())
+                    .build());
         else
             nm.myDecl = (DefineTopLevelDecl) o;
         return null;
@@ -254,8 +279,11 @@ public class NameChecker<T extends Object> extends Visitor<T> {
                 + ").");
         // TODO: just delete Object o = currentScope.get(pd.name());
         if (!currentScope.put(pd.name(), pd))
-            Error.error(pd, pd.name() + " already declared in this scope.",
-                    false, 2206);
+            CompilerMessageManager.INSTANCE.printAndContinue(new PJMessage.Builder()
+                        .addAST(pd)
+                        .addError(VisitorMessageNumber.NAME_CHECKER_402)
+                        .addArguments(pd.name())
+                        .build());
         super.visitParamDecl(pd);
         return null;
     }
@@ -284,14 +312,20 @@ public class NameChecker<T extends Object> extends Visitor<T> {
         for (Name name : pd.implement()) {
             Object o = resolveName(name);
             if (o == null)
-                Error.error(pd, "Symbol '" + name.getname() + "' not found.",
-                        false, 2212);
+                CompilerMessageManager.INSTANCE.printAndContinue(new PJMessage.Builder()
+                            .addAST(pd)
+                            .addError(VisitorMessageNumber.NAME_CHECKER_408)
+                            .addArguments(name.getname())
+                            .build());
                 // We do not test for ProcTypeDecl because the top level scope contains a
                 // SymbolTable for each procedure as we might have multiple declarations of
                 // procedures with the same name.
             else if (!(o instanceof SymbolTable))
-                Error.error(pd, "Symbol '" + name.getname()
-                        + "' not a procedure.", false, 2213);
+                CompilerMessageManager.INSTANCE.printAndContinue(new PJMessage.Builder()
+                        .addAST(pd)
+                        .addError(VisitorMessageNumber.NAME_CHECKER_410)
+                        .addArguments(name.getname())
+                        .build());
         }
         if (pd.body() != null)
             pd.body().visit(this);
@@ -306,11 +340,17 @@ public class NameChecker<T extends Object> extends Visitor<T> {
 
         Object o = resolveName(pl.name());
         if (o == null)
-            Error.error(pl, "Symbol '" + pl.name().getname() + "' not found.",
-                    false, 2214);
+            CompilerMessageManager.INSTANCE.printAndContinue(new PJMessage.Builder()
+                        .addAST(pl)
+                        .addError(VisitorMessageNumber.NAME_CHECKER_409)
+                        .addArguments(pl.name().getname())
+                        .build());
         else if (!(o instanceof ProtocolTypeDecl))
-            Error.error(pl, "Symbol '" + pl.name().getname()
-                    + "' is not a protocol type.", false, 2215);
+            CompilerMessageManager.INSTANCE.printAndContinue(new PJMessage.Builder()
+                    .addAST(pl)
+                    .addError(VisitorMessageNumber.NAME_CHECKER_412)
+                    .addArguments(pl.name().getname())
+                    .build());
 
         // Check if the tag is OK now.
         pl.myTypeDecl = (ProtocolTypeDecl) o;
@@ -322,9 +362,11 @@ public class NameChecker<T extends Object> extends Visitor<T> {
                 return null;
             }
         }
-        Error.error(pl, "Undefined protocol tag name '" + pl.tag().getname()
-                + "' in literal of protocol type '" + pl.name().getname()
-                + "'.", false, 2216);
+        CompilerMessageManager.INSTANCE.printAndContinue(new PJMessage.Builder()
+                .addAST(pl)
+                .addError(VisitorMessageNumber.NAME_CHECKER_413)
+                .addArguments(pl.tag().getname(), pl.name().getname())
+                .build());
 
         return null;
     }
@@ -338,15 +380,17 @@ public class NameChecker<T extends Object> extends Visitor<T> {
         for (Name n : pd.extend()) {
             Object o = resolveName(n);
             if (o == null)
-                Error.error(n, "Symbol '" + n.getname() + "' not found.",
-                        false, 2217);
+                CompilerMessageManager.INSTANCE.printAndContinue(new PJMessage.Builder()
+                        .addAST(n)
+                        .addError(VisitorMessageNumber.NAME_CHECKER_414)
+                        .addArguments(n.getname())
+                        .build());
             else if (!(o instanceof ProtocolTypeDecl))
-                Error.error(
-                        n,
-                        "'"
-                                + n.getname()
-                                + "' cannot be extended as a protocol as it is not of protocol type.",
-                        false, 2218);
+                CompilerMessageManager.INSTANCE.printAndContinue(new PJMessage.Builder()
+                        .addAST(n)
+                        .addError(VisitorMessageNumber.NAME_CHECKER_415)
+                        .addArguments(n.getname())
+                        .build());
             n.myDecl = (AST) o;
         }
         // TODO: make sure we don't repreat names in the 'extend' part.
@@ -361,11 +405,17 @@ public class NameChecker<T extends Object> extends Visitor<T> {
 
         Object o = resolveName(rl.name());
         if (o == null)
-            Error.error(rl, "Symbol '" + rl.name().getname() + "' not found.",
-                    false, 2219);
+            CompilerMessageManager.INSTANCE.printAndContinue(new PJMessage.Builder()
+                    .addAST(rl)
+                    .addError(VisitorMessageNumber.NAME_CHECKER_416)
+                    .addArguments(rl.name().getname())
+                    .build());
         else if (!(o instanceof RecordTypeDecl))
-            Error.error(rl, "Symbol '" + rl.name().getname()
-                    + "' is not a record type.", false, 2220);
+            CompilerMessageManager.INSTANCE.printAndContinue(new PJMessage.Builder()
+                    .addAST(rl)
+                    .addError(VisitorMessageNumber.NAME_CHECKER_417)
+                    .addArguments(rl.name().getname())
+                    .build());
         else
             rl.myTypeDecl = (RecordTypeDecl) o;
         return null;
@@ -379,24 +429,28 @@ public class NameChecker<T extends Object> extends Visitor<T> {
         for (Name n : rt.extend()) {
             Object o = resolveName(n);
             if (o == null)
-                Error.error(n, "Symbol '" + n.getname() + "' not found.",
-                        false, 2221);
+                CompilerMessageManager.INSTANCE.printAndContinue(new PJMessage.Builder()
+                        .addAST(n)
+                        .addError(VisitorMessageNumber.NAME_CHECKER_418)
+                        .addArguments(n.getname())
+                        .build());
             else if (!(o instanceof RecordTypeDecl))
-                Error.error(
-                        n,
-                        "'"
-                                + n.getname()
-                                + "' cannot be extended as a record as it is not of record type.",
-                        false, 2222);
+                CompilerMessageManager.INSTANCE.printAndContinue(new PJMessage.Builder()
+                        .addAST(n)
+                        .addError(VisitorMessageNumber.NAME_CHECKER_419)
+                        .addArguments(n.getname())
+                        .build());
         }
         // Make sure we don't repeat names in the 'extends' part.
         // TODO: Remove 'extends' from records.
         HashSet<String> hs = new HashSet<String>();
         for (Name name : rt.extend()) {
             if (hs.contains(name.getname()))
-                Error.error(rt, "'" + name.getname()
-                        + "' repeated in extends clause of record type '"
-                        + rt.name().getname() + "'.", false, 2223);
+                CompilerMessageManager.INSTANCE.printAndContinue(new PJMessage.Builder()
+                        .addAST(rt)
+                        .addError(VisitorMessageNumber.NAME_CHECKER_420)
+                        .addArguments(name.getname(), rt.name().getname())
+                        .build());
             hs.add(name.getname());
         }
         rt.body().visit(this);
@@ -418,11 +472,11 @@ public class NameChecker<T extends Object> extends Visitor<T> {
         Log.log(sl.line + ": Visiting SwitchLabel (" + sl.expr() + ").");
         // A SwitchLabel should be a PrimitiveLiteral OR a NameExpression
         if (!sl.isDefault())
-            if (!(sl.expr() instanceof PrimitiveLiteral)
-                    && !(sl.expr() instanceof NameExpr))
-                Error.error(sl,
-                        "Switch label must be constant or a protocol tag.",
-                        false, 2224);
+            if (!(sl.expr() instanceof PrimitiveLiteral) && !(sl.expr() instanceof NameExpr))
+                CompilerMessageManager.INSTANCE.printAndContinue(new PJMessage.Builder()
+                        .addAST(sl)
+                        .addError(VisitorMessageNumber.NAME_CHECKER_421)
+                        .build());
         return null;
     }
 

@@ -5,9 +5,9 @@ import java.util.Iterator;
 import java.util.List;
 
 /**
- * The class {@link OptionWithValue} is a wrapper class that serves
- * as the base class for all shared attributes that belong to
- * {@link OptionValue} and {@link PositionalValue}.
+ * The class {@link OptionWithValue} is a wrapper class that
+ * serves as the base class for all shared attributes that
+ * belong to {@link OptionValue} and {@link PositionalValue}.
  * 
  * @author Ben
  * @version 08/20/2018
@@ -176,7 +176,6 @@ public abstract class OptionWithValue implements Comparable<OptionWithValue> {
     public String getFilledParagraph(StringBuilder stringBuilder, List<String> words, int indent, int width) {
         int charLeft = width - stringBuilder.length();
         int charCount = 0;
-        
         // Move the definition to the next line if we exceed the
         // minimum limits of characters
         boolean nextLine = false;
@@ -189,13 +188,13 @@ public abstract class OptionWithValue implements Comparable<OptionWithValue> {
             String word = it.next();
             if (nextLine) {
                 stringBuilder.append("\n")
-                             .append(StringUtil.countSpaces(indent - 1));
+                             .append(StringUtil.addSpaces(indent - 1));
                 nextLine = false;
             }
             charCount += word.length() + 1;
             if (charCount > charLeft) {
                 stringBuilder.append("\n")
-                             .append(StringUtil.countSpaces(indent - 1));
+                             .append(StringUtil.addSpaces(indent - 1));
                 charCount = word.length() + 1;
             }
             stringBuilder.append(word);
@@ -211,10 +210,10 @@ public abstract class OptionWithValue implements Comparable<OptionWithValue> {
     // =====================
     
     /**
-     * The class {@link Builder} uses descriptive methods to create options
-     * with default or initial values.
+     * The class {@link Builder} uses descriptive methods to
+     * create options with default or initial values.
      * 
-     * @author Ben Cisneros
+     * @author Ben
      * @version 08/20/2018
      * @since 1.2
      *

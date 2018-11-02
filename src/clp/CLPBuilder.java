@@ -27,7 +27,7 @@ import utilities.MultiValueMap;
  * @version 07/21/2018
  * @since 1.2
  */
-public class ClpBuilder {
+public class CLPBuilder {
     
     /**
      * The first ever registered command is the parent command.
@@ -59,11 +59,11 @@ public class ClpBuilder {
      */
     private Options options = new Options();
     
-    public ClpBuilder() {
+    public CLPBuilder() {
         // Nothing to do
     }
     
-    public ClpBuilder handlerArgs(String[] args) {
+    public CLPBuilder handlerArgs(String[] args) {
         handleArgs(expandArgs(args), mainCommand, 0, new ArrayList<>());
         return this;
     }
@@ -229,7 +229,7 @@ public class ClpBuilder {
                         + "arguments.", index, argList.size() - index));
     }
     
-    public ClpBuilder addCommand(Class<? extends Command> type) {
+    public CLPBuilder addCommand(Class<? extends Command> type) {
         type = Assert.nonNull(type, "The specified class cannot be null.");
         Parameters parameters = type.getAnnotation(Parameters.class);
         

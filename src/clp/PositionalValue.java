@@ -46,10 +46,6 @@ public final class PositionalValue extends OptionWithValue {
             stringBuilder.append(" ");
         stringBuilder.append(" ");
         
-        int charLeft = width - stringBuilder.length();
-        if (help.length() <= charLeft)
-            return stringBuilder.append(help).toString();
-        
         String newHelp = defaultValue.isEmpty() ? help : help + " (default=" + defaultValue + ")";
         List<String> words = Arrays.asList(newHelp.split(" "));
         
@@ -60,8 +56,8 @@ public final class PositionalValue extends OptionWithValue {
     public int compareTo(OptionWithValue o) {
         PositionalValue p1 = (PositionalValue) this;
         PositionalValue p2 = (PositionalValue) o;
-        String p1Name = p1.metavar.isEmpty()? p1.simpleName : p1.metavar;
-        String p2Name = p2.metavar.isEmpty()? p2.simpleName : p2.metavar;
+        String p1Name = p1.metavar.isEmpty() ? p1.simpleName : p1.metavar;
+        String p2Name = p2.metavar.isEmpty() ? p2.simpleName : p2.metavar;
         return p1Name.compareToIgnoreCase(p2Name);
     }
     

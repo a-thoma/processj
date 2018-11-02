@@ -11,12 +11,12 @@ import ast.ProcTypeDecl;
 import ast.ProtocolTypeDecl;
 import ast.RecordTypeDecl;
 import utilities.Error;
-import utilities.ErrorMessage;
-import utilities.ErrorTracker;
+import utilities.PJMessage;
+import utilities.CompilerMessageManager;
 import utilities.Log;
 import utilities.SymbolTable;
 import utilities.Visitor;
-import utilities.VisitorErrorNumber;
+import utilities.VisitorMessageNumber;
 
 /**
  * ToplevelDecls.java:
@@ -31,7 +31,7 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
 
     public static String currentFileName = Error.fileName;
 
-    // All imported files are kept in this list - indexed by absolute path and name.
+    // All imported files are kept in this table - indexed by absolute path and name.
     public static Hashtable<String, Compilation> alreadyImportedFiles = new Hashtable<String, Compilation>();
 
     public TopLevelDecls(SymbolTable symtab) {
@@ -104,10 +104,9 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
         Log.log(cd.line + ": Visiting a ConstantDecl "
                 + cd.var().name().getname());
         if (!symtab.put(cd.var().name().getname(), cd))
-            ErrorTracker.INSTANCE.printAndContinue(new ErrorMessage.Builder()
+            CompilerMessageManager.INSTANCE.printAndContinue(new PJMessage.Builder()
                         .addAST(cd)
-                        .addFileName(ErrorTracker.INSTANCE.fileName)
-                        .addError(VisitorErrorNumber.TOP_LEVEL_DECLS_200)
+                        .addError(VisitorMessageNumber.TOP_LEVEL_DECLS_200)
                         .addArguments(cd.var().name().getname())
                         .build());
         return null;
@@ -120,10 +119,9 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
         // another symbol table which is indexed by signature.
         if (Modifier.hasModifierSet(pd.modifiers(), Modifier.MOBILE))
             if (!pd.returnType().isVoidType())
-                ErrorTracker.INSTANCE.printAndContinue(new ErrorMessage.Builder()
+                CompilerMessageManager.INSTANCE.printAndContinue(new PJMessage.Builder()
                             .addAST(pd)
-                            .addFileName(ErrorTracker.INSTANCE.fileName)
-                            .addError(VisitorErrorNumber.TOP_LEVEL_DECLS_205)
+                            .addError(VisitorMessageNumber.TOP_LEVEL_DECLS_205)
                             .addArguments(pd.name().getname())
                             .build());
 
@@ -142,10 +140,9 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
                 SymbolTable st = (SymbolTable) s;
                 if (Modifier.hasModifierSet(pd.modifiers(), Modifier.MOBILE)) {
                     if (st.isMobileProcedure)
-                        ErrorTracker.INSTANCE.printAndContinue(new ErrorMessage.Builder()
+                        CompilerMessageManager.INSTANCE.printAndContinue(new PJMessage.Builder()
                                     .addAST(pd)
-                                    .addFileName(ErrorTracker.INSTANCE.fileName)
-                                    .addError(VisitorErrorNumber.TOP_LEVEL_DECLS_206)
+                                    .addError(VisitorMessageNumber.TOP_LEVEL_DECLS_206)
                                     .addArguments(pd.name().getname())
                                     .build());
                     else
@@ -156,10 +153,9 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
                 } else
                     st.put(pd.signature(), pd);
             } else
-                ErrorTracker.INSTANCE.printAndContinue(new ErrorMessage.Builder()
+                CompilerMessageManager.INSTANCE.printAndContinue(new PJMessage.Builder()
                             .addAST(pd)
-                            .addFileName(ErrorTracker.INSTANCE.fileName)
-                            .addError(VisitorErrorNumber.TOP_LEVEL_DECLS_201)
+                            .addError(VisitorMessageNumber.TOP_LEVEL_DECLS_201)
                             .addArguments(pd.getname())
                             .build());
         }
@@ -170,10 +166,9 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
     public T visitRecordTypeDecl(RecordTypeDecl rd) {
         Log.log(rd.line + ": Visiting a RecordTypeDecl " + rd.name().getname());
         if (!symtab.put(rd.name().getname(), rd))
-            ErrorTracker.INSTANCE.printAndContinue(new ErrorMessage.Builder()
+            CompilerMessageManager.INSTANCE.printAndContinue(new PJMessage.Builder()
                         .addAST(rd)
-                        .addFileName(ErrorTracker.INSTANCE.fileName)
-                        .addError(VisitorErrorNumber.TOP_LEVEL_DECLS_207)
+                        .addError(VisitorMessageNumber.TOP_LEVEL_DECLS_202)
                         .addArguments(rd.name().getname())
                         .build());
         return null;
@@ -184,10 +179,9 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
         Log.log(pd.line + ": Visiting a ProtocolTypeDecl "
                 + pd.name().getname());
         if (!symtab.put(pd.name().getname(), pd))
-            ErrorTracker.INSTANCE.printAndContinue(new ErrorMessage.Builder()
+            CompilerMessageManager.INSTANCE.printAndContinue(new PJMessage.Builder()
                         .addAST(pd)
-                        .addFileName(ErrorTracker.INSTANCE.fileName)
-                        .addError(VisitorErrorNumber.TOP_LEVEL_DECLS_207)
+                        .addError(VisitorMessageNumber.TOP_LEVEL_DECLS_203)
                         .addArguments(pd.name().getname())
                         .build());
         return null;
@@ -197,10 +191,9 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
     public T visitNamedType(NamedType nt) {
         Log.log("Toplevel Named Type:" + nt);
         if (!symtab.put(nt.name().getname(), nt))
-            ErrorTracker.INSTANCE.printAndContinue(new ErrorMessage.Builder()
+            CompilerMessageManager.INSTANCE.printAndContinue(new PJMessage.Builder()
                         .addAST(nt)
-                        .addFileName(ErrorTracker.INSTANCE.fileName)
-                        .addError(VisitorErrorNumber.TOP_LEVEL_DECLS_207)
+                        .addError(VisitorMessageNumber.TOP_LEVEL_DECLS_207)
                         .addArguments(nt.name().getname())
                         .build());
         return null;

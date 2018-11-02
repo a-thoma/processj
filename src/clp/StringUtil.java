@@ -160,7 +160,7 @@ public final class StringUtil {
      *            The number of whitespace characters.
      * @return A {@code String} containing a sequence of whitespace characters.
      */
-    public static String countSpaces(int count) {
+    public static String addSpaces(int count) {
         if (count < 1)
             throw new IllegalArgumentException("The number of whitespace characters "
                     + "mut be greater than zero.");

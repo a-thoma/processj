@@ -9,13 +9,13 @@ import ast.NamedType;
 import ast.Sequence;
 import ast.DefineTopLevelDecl;
 import utilities.Error;
-import utilities.ErrorMessage;
-import utilities.ErrorTracker;
+import utilities.PJMessage;
+import utilities.CompilerMessageManager;
 import utilities.Log;
 import utilities.Settings;
 import utilities.SymbolTable;
 import utilities.Visitor;
-import utilities.VisitorErrorNumber;
+import utilities.VisitorMessageNumber;
 
 public class ResolvePackageTypes extends Visitor<AST> {
 
@@ -67,15 +67,14 @@ public class ResolvePackageTypes extends Visitor<AST> {
                     // don't do anything just continue after the if.
                 } else {
                     // It was neither a local nor a library file - throw an error...
-                    ErrorTracker.INSTANCE.printAndStop(new ErrorMessage.Builder()
+                    CompilerMessageManager.INSTANCE.printAndStop(new PJMessage.Builder()
                                 .addAST(pa)
-                                .addFileName(ErrorTracker.INSTANCE.fileName)
-                                .addError(VisitorErrorNumber.RESOLVE_IMPORTS_101)
+                                .addError(VisitorMessageNumber.RESOLVE_IMPORTS_101)
                                 .addArguments(makeImportFileName(pa))
                                 .build());
                 }
             }
-            ErrorTracker.INSTANCE.setFileName(fileName);
+            CompilerMessageManager.INSTANCE.setFileName(fileName);
             // Now import it
             comp = ResolveImports.importFile(pa.child(0), fileName, makeImportFileName(pa));
 
@@ -87,7 +86,7 @@ public class ResolvePackageTypes extends Visitor<AST> {
                 comp.visit(new NameChecker<AST>(st));
                 // TODO: should we type check here?
             }
-            ErrorTracker.INSTANCE.setFileName(oldCurrentFileName);
+            CompilerMessageManager.INSTANCE.setFileName(oldCurrentFileName);
             st = SymbolTable.hook;
             // TODO: this should do a proper find if its a symb ol table that comes back
             // but we probably need Type checking for that !
@@ -118,7 +117,6 @@ public class ResolvePackageTypes extends Visitor<AST> {
         if (packages.size() > 0) {
             resolveTypeOrConstant(nt.name());
         }
-
         return null;
     }
 }

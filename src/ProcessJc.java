@@ -4,7 +4,7 @@ import java.util.*;
 import ast.AST;
 import ast.Compilation;
 import clp.Formatter;
-import clp.ClpBuilder;
+import clp.CLPBuilder;
 import clp.StringUtil;
 import codegeneratorjava.CodeGeneratorJava;
 import library.Library;
@@ -12,40 +12,43 @@ import parser.parser;
 import scanner.Scanner;
 import utilities.ConfigFileReader;
 import utilities.Error;
-import utilities.ErrorMessage;
-import utilities.VisitorErrorNumber;
+import utilities.PJMessage;
+import utilities.VisitorMessageNumber;
 import utilities.Language;
 import utilities.Log;
-import utilities.ErrorTracker;
+import utilities.CompilerMessageManager;
 import utilities.Settings;
 import utilities.SymbolTable;
 
 /**
+ * ProcessJ JVM Compiler.
+ * 
  * @author Ben
  * @version 07/01/2018
  * @since 1.2
  */
 public class ProcessJc {
     
+    public static CLPBuilder optionBuilder = new CLPBuilder().addCommand(PJMain.class);
+    
+    public static void help() {
+        Formatter formatHelp = new Formatter(optionBuilder);
+        System.out.println(formatHelp.buildUsagePage());
+        System.exit(0);
+    }
+    
     public static void main(String[] args) {
-        if (args.length == 0) {
-            System.out.println(new ErrorMessage.Builder()
-                                   .addError(VisitorErrorNumber.RESOLVE_IMPORTS_100)
-                                   .build().getST().render());
-            System.exit(0);
-        }
+        if (args.length == 0)
+            help();
         
         // ===============================================
         // C O M M A N D   L I N E   P R O C E S S O R
         // ===============================================
         
         // Build options and arguments with user input
-        ClpBuilder optionBuilder = null;
         PJMain pjMain = null;
         try {
-            optionBuilder = new ClpBuilder()
-                                .addCommand(PJMain.class)
-                                .handlerArgs(args);
+            optionBuilder.handlerArgs(args);
             pjMain = optionBuilder.getCommand(PJMain.class);
         } catch(Exception e) {
             System.out.println(e.getMessage());
@@ -80,11 +83,8 @@ public class ProcessJc {
         }
         
         // Display usage page
-        if (pjMain.help) {
-            Formatter formatHelp = new Formatter(optionBuilder);
-            System.out.println(formatHelp.buildUsagePage());
-            System.exit(0);
-        }
+        if (pjMain.help)
+            help();
         // Display version
         else if (pjMain.version) {
             try {
@@ -104,8 +104,8 @@ public class ProcessJc {
         else if (files == null || files.isEmpty()) {
             // At least one file must be provided. Otherwise, throw an error
             // if none is given, or (for now) if a file does not exists
-            System.out.println(new ErrorMessage.Builder()
-                                   .addError(VisitorErrorNumber.RESOLVE_IMPORTS_100)
+            System.out.println(new PJMessage.Builder()
+                                   .addError(VisitorMessageNumber.RESOLVE_IMPORTS_100)
                                    .build().getST().render());
             System.exit(0);
         }
@@ -122,8 +122,8 @@ public class ProcessJc {
             try {
                 String fileAbsolutePath = inFile.getAbsolutePath();
                 // Set package and filename
-                ErrorTracker.INSTANCE.setFileName(fileAbsolutePath);
-                ErrorTracker.INSTANCE.setPackageName(fileAbsolutePath);
+                CompilerMessageManager.INSTANCE.setFileName(fileAbsolutePath);
+                CompilerMessageManager.INSTANCE.setPackageName(fileAbsolutePath);
                 
                 Error.setFileName(fileAbsolutePath);
                 Error.setPackageName(fileAbsolutePath);
@@ -172,8 +172,8 @@ public class ProcessJc {
             
             c.visit(new namechecker.ResolveImports<AST>(globalTypeTable));
             
-            if (ErrorTracker.INSTANCE.getErrorCount() != 0) {
-                ErrorTracker.INSTANCE.printTrace("import declarations");
+            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
+                CompilerMessageManager.INSTANCE.printTrace("import declarations");
                 System.exit(1);
             }
             
@@ -183,8 +183,8 @@ public class ProcessJc {
             
             c.visit(new namechecker.TopLevelDecls<AST>(globalTypeTable));
 
-            if (ErrorTracker.INSTANCE.getErrorCount() != 0) {
-                ErrorTracker.INSTANCE.printTrace("top level declarations");
+            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
+                CompilerMessageManager.INSTANCE.printTrace("top level declarations");
                 System.exit(1);
             }
             
@@ -197,8 +197,8 @@ public class ProcessJc {
             // Resolve types from imported packages.
             c.visit(new namechecker.ResolvePackageTypes());
             
-            if (ErrorTracker.INSTANCE.getErrorCount() != 0) {
-                ErrorTracker.INSTANCE.printTrace("package types");
+            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
+                CompilerMessageManager.INSTANCE.printTrace("package types");
                 System.exit(1);
             }
             
@@ -208,8 +208,8 @@ public class ProcessJc {
             
             c.visit(new namechecker.NameChecker<AST>(globalTypeTable));
             
-            if (ErrorTracker.INSTANCE.getErrorCount() != 0) {
-                ErrorTracker.INSTANCE.printTrace("name checker");
+            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
+                CompilerMessageManager.INSTANCE.printTrace("name checker");
                 System.exit(1);
             }
             
@@ -220,8 +220,8 @@ public class ProcessJc {
             // Re-construct Array Types correctly
             root.visit(new namechecker.ArrayTypeConstructor());
             
-            if (ErrorTracker.INSTANCE.getErrorCount() != 0) {
-                ErrorTracker.INSTANCE.printTrace("array types constructor");
+            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
+                CompilerMessageManager.INSTANCE.printTrace("array types constructor");
                 System.exit(1);
             }
             
@@ -231,8 +231,8 @@ public class ProcessJc {
             
             c.visit(new typechecker.TypeChecker(globalTypeTable));
             
-            if (ErrorTracker.INSTANCE.getErrorCount() != 0) {
-                ErrorTracker.INSTANCE.printTrace("type checking");
+            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
+                CompilerMessageManager.INSTANCE.printTrace("type checking");
                 System.exit(1);
             }
             
@@ -242,8 +242,8 @@ public class ProcessJc {
             
             c.visit(new reachability.Reachability());
             
-            if (ErrorTracker.INSTANCE.getErrorCount() != 0) {
-                ErrorTracker.INSTANCE.printTrace("reachability");
+            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
+                CompilerMessageManager.INSTANCE.printTrace("reachability");
                 System.exit(1);
             }
             
@@ -253,8 +253,8 @@ public class ProcessJc {
             
             c.visit(new parallel_usage_check.ParallelUsageCheck());
             
-            if (ErrorTracker.INSTANCE.getErrorCount() != 0) {
-                ErrorTracker.INSTANCE.printTrace("parallel usage checking");
+            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
+                CompilerMessageManager.INSTANCE.printTrace("parallel usage checking");
                 System.exit(1);
             }
             
@@ -264,8 +264,8 @@ public class ProcessJc {
             
             c.visit(new yield.Yield());
             
-            if (ErrorTracker.INSTANCE.getErrorCount() != 0) {
-                ErrorTracker.INSTANCE.printTrace("yield");
+            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
+                CompilerMessageManager.INSTANCE.printTrace("yield");
                 System.exit(1);
             }
             

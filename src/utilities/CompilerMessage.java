@@ -10,7 +10,7 @@ import org.stringtemplate.v4.STGroupFile;
 import ast.AST;
 
 /**
- * The class {@link PJErrorMessage} is used to create messages
+ * The class {@link CompilerMessage} is used to create messages
  * for the visitor pattern when processing the contents in a
  * ProcessJ file, when processing the syntax and/or semantics
  * errors when compiling or generating Java source code from a
@@ -21,7 +21,7 @@ import ast.AST;
  * @version 10/07/2018
  * @since 1.2
  */
-public abstract class PJErrorMessage {
+public abstract class CompilerMessage {
     
     private static final Object[] EMPTY_ARGUMENTS = new Object[0];
     private static final String EMPTY_STRING = "";
@@ -44,7 +44,7 @@ public abstract class PJErrorMessage {
     /**
      * Type of error message.
      */
-    protected final IErrorGetter error;
+    protected final IMessageNumber error;
     
     /**
      * Attributes used in templates.
@@ -57,22 +57,27 @@ public abstract class PJErrorMessage {
     protected final Throwable throwable;
     
     /**
-     * Source of the error message.
+     * Source of the message.
      */
     protected final String fileName;
     
     /**
-     * Source of the input file.
+     * Location of the input file.
      */
     protected final String packageName;
     
-    public PJErrorMessage(Builder<?> builder) {
+    protected int myRow;
+    protected int myColumn;
+    
+    public CompilerMessage(Builder<?> builder) {
         ast = builder.ast;
         error = builder.error;
         arguments = builder.arguments;
         throwable = builder.throwable;
-        fileName = builder.fileName;
-        packageName = builder.packageName;
+        fileName = builder.fileName == null ? CompilerMessageManager.INSTANCE.fileName : builder.fileName;
+        packageName = builder.packageName == null ? CompilerMessageManager.INSTANCE.fileName : builder.packageName;
+        myRow = builder.myRow;
+        myColumn = builder.myColumn;
     }
     
     // ================
@@ -83,7 +88,7 @@ public abstract class PJErrorMessage {
         return ast;
     }
     
-    public IErrorGetter getError() {
+    public IMessageNumber getMessageNumber() {
         return error;
     }
     
@@ -103,6 +108,14 @@ public abstract class PJErrorMessage {
         return packageName;
     }
     
+    public int getRow() {
+        return myRow;
+    }
+    
+    public int getColumn() {
+        return myColumn;
+    }
+    
     public ST getST() {
         int argCount = 0;
         ST message = null;
@@ -117,7 +130,7 @@ public abstract class PJErrorMessage {
         return message;
     }
     
-    public abstract String render();
+    public abstract String renderMessage();
     
     @Override
     public String toString() {
@@ -156,11 +169,13 @@ public abstract class PJErrorMessage {
     public static abstract class Builder<B> {
         
         protected AST ast;
-        protected IErrorGetter error;
+        protected IMessageNumber error;
         protected Object[] arguments;
         protected Throwable throwable;
         protected String fileName;
         protected String packageName;
+        protected int myRow;
+        protected int myColumn;
         
         public Builder() {
             ast = null;
@@ -173,14 +188,14 @@ public abstract class PJErrorMessage {
         
         protected abstract B builder();
         
-        public abstract <E extends PJErrorMessage> E build();
+        public abstract <E extends CompilerMessage> E build();
         
         public B addAST(AST ast) {
             this.ast = ast;
             return builder();
         }
         
-        public B addError(IErrorGetter error) {
+        public B addError(IMessageNumber error) {
             this.error = error;
             return builder();
         }
@@ -202,6 +217,16 @@ public abstract class PJErrorMessage {
         
         public B addPackageName(String packageName) {
             this.packageName = packageName;
+            return builder();
+        }
+        
+        public B addRow(int myRow) {
+            this.myRow = myRow;
+            return builder();
+        }
+        
+        public B addColumn(int myColumn) {
+            this.myColumn = myColumn;
             return builder();
         }
     }

@@ -24,15 +24,15 @@ public class Formatter {
     
     public static final int MAX_CHAR_COUNT = 27;
     
-    public static final String USAGE_PREFIX = "Usage: ";
+    public static final String USAGE_PREFIX = "usage: ";
     
-    public static final String PARAMETERS_PREFIX = "Parameters: ";
+    public static final String PARAMETERS_PREFIX = "parameters: ";
     
-    public static final String OPTIONS_PREFIX = "Options: ";
+    public static final String OPTIONS_PREFIX = "options: ";
     
-    private ClpBuilder optionBuilder;
+    private CLPBuilder optionBuilder;
     
-    public Formatter(ClpBuilder optionBuilder) {
+    public Formatter(CLPBuilder optionBuilder) {
         this.optionBuilder = optionBuilder;
     }
     
@@ -100,8 +100,8 @@ public class Formatter {
                 }
                 // Reduce number of spaces needed in the sentence
                 extraSpaces -= insertSpaces;
-                // Decrement the number of words as we justify the
-                // sentence
+                // Decrement the number of words as we justify
+                // the sentence
                 --numWords;
             }
         }
@@ -154,7 +154,7 @@ public class Formatter {
             charCount += word.length() + 1;
             if (charCount > charLeft) {
                 stringBuilder.append("\n")
-                             .append(StringUtil.countSpaces(indent));
+                             .append(StringUtil.addSpaces(indent));
                 charCount = word.length() + 1;
             }
             stringBuilder.append(word);
@@ -167,9 +167,7 @@ public class Formatter {
     
     /**
      * Returns a string containing a list of options appended in
-     * the following format:
-     * 
-     * [option0] [option1] [option2 | options2] ... [optionN]
+     * the following format: [option0] [option1] [option2 |...] ... [optionN]
      */
     public String appendAllOptions() {
         StringBuilder stringBuilder = new StringBuilder();
@@ -201,9 +199,8 @@ public class Formatter {
     }
     
     /**
-     * Returns a list of arguments appended in the following format:
-     * 
-     * <arg0> <arg1> <arg2> ... <argN>
+     * Returns a list of arguments appended in the following
+     * format: <arg0> <arg1> <arg2> ... <argN>
      */
     public String appendAllArguments() {
         StringBuilder stringBuilder = new StringBuilder();
@@ -213,11 +210,7 @@ public class Formatter {
         arguments.addAll(commandAndOptions.get(optionBuilder.getMainCommand()).getArguments());
         // Build and append all of its arguments to it
         for (Iterator<PositionalValue> it = arguments.iterator(); it.hasNext();) {
-            PositionalValue positional = it.next();
-            if (positional.getMetavar().isEmpty())
-                stringBuilder.append(positional.getSimpleName());
-            else
-                stringBuilder.append(positional.getMetavar());
+            stringBuilder.append(buildArguments(it.next()));
             if (it.hasNext())
                 stringBuilder.append(" ");
         }
@@ -230,7 +223,7 @@ public class Formatter {
         int indent = findMaxLength(parameter.header());
         indent = (DEFAULT_WIDTH - indent) / 2;
         for (String header : parameter.header())
-            stringBuilder.append(StringUtil.countSpaces(indent - 1))
+            stringBuilder.append(StringUtil.addSpaces(indent - 1))
                          .append(header)
                          .append("\n");
         stringBuilder.append("\n");
@@ -261,7 +254,7 @@ public class Formatter {
                                  .append("\n");
             }
             stringBuilder.append("\n");
-        }        
+        }
         
         return stringBuilder;
     }
@@ -271,8 +264,7 @@ public class Formatter {
         StringBuilder stringBuilder = new StringBuilder(Formatter.DEFAULT_LENGTH + param.help().length());
         stringBuilder.append(" ")
                      .append(param.name())
-                     .append(" ")
-                     .append("[options]...");
+                     .append(" [options]...");
         
         while (indent > stringBuilder.length() + 2)
             stringBuilder.append(" ");
@@ -297,13 +289,13 @@ public class Formatter {
             String word = it.next();
             if (nextLine) {
                 stringBuilder.append("\n")
-                             .append(StringUtil.countSpaces(indent - 1));
+                             .append(StringUtil.addSpaces(indent - 1));
                 nextLine = false;
             }
             charCount += word.length() + 1;
             if (charCount > charLeft) {
                 stringBuilder.append("\n")
-                             .append(StringUtil.countSpaces(indent - 1));
+                             .append(StringUtil.addSpaces(indent - 1));
                 charCount = word.length() + 1;
             }
             stringBuilder.append(word);
@@ -356,8 +348,25 @@ public class Formatter {
         return stringBuilder.toString();
     }
     
+    public String buildArguments(PositionalValue positionalValue) {
+        StringBuilder stringBuilder = new StringBuilder();
+        
+        if (!positionalValue.isRequired())
+            stringBuilder.append("[");
+        
+        if (!positionalValue.getMetavar().isEmpty())
+            stringBuilder.append(positionalValue.getMetavar());
+        else
+            stringBuilder.append(positionalValue.getSimpleName());
+        
+        if (!positionalValue.isRequired())
+            stringBuilder.append("]");
+        
+        return stringBuilder.toString();
+    }
+    
     /**
-     * Concatenates all possible names that an option may take.
+     * Concatenates the name (or names) used to reference an option.
      * 
      * @param optionValue
      *          The option a program takes.

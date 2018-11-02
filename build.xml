@@ -12,9 +12,13 @@
         <property name="jflexJar" location="resources/jars/JFlex.jar"/>
         <property name="stringtemplatejar" location="resources/jars/ST-4.0.7.jar"/>
         <property name="asmjar" location="resources/jars/asm-all-3.3.1.jar"/>
+	
+	  <!-- =================================================================== -->
+	  <!-- classpath to use within project                                     -->
+	  <!-- =================================================================== -->
     <property name="classpath" value="${cupJar}:${cupRuntimeJar}:${jflexJar}:${stringtemplatejar}:${asmjar}:."/>
         <description>
-                Build File for Processj Compiler Project
+                Build File for ProcessJ Compiler Project
         </description>
 
         <target name="javac" depends="init, scanner, parser, pjc">
@@ -65,6 +69,9 @@
             </delete>
         </target>
 
+	  <!-- =================================================================== -->
+	  <!-- Clean targets                                                       -->
+	  <!-- =================================================================== -->
         <target name="clean">
                 <delete dir="${build}" />
                 <delete file="${src}/parser/parser.java"/>
@@ -75,6 +82,9 @@
             </delete>
         </target>
 
+	  <!-- =================================================================== -->
+	  <!-- Compiles the source directory                                       -->
+	  <!-- =================================================================== -->
         <target name="run">
                 <java classpath="${classpath}:${build}" classname="ProcessJc">
                 <arg value="${arg0}"/>

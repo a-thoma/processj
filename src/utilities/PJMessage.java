@@ -3,15 +3,15 @@ package utilities;
 import org.stringtemplate.v4.ST;
 
 /**
- * This class is used to create generic error messages
+ * This class is used to create generic messages
  * in ProcessJ.
  * 
  * @author Ben
  * @since 1.2
  */
-public class ErrorMessage extends PJErrorMessage {
+public class PJMessage extends CompilerMessage {
     
-    public ErrorMessage(Builder builder) {
+    public PJMessage(Builder builder) {
         super(builder);
     }
     
@@ -38,19 +38,18 @@ public class ErrorMessage extends PJErrorMessage {
         
         // Apply colour code if allowed on terminal. The attribute
         // must be set to either `yes' or `no'
+        String tag = stTag.render();
         if (Settings.isAnsiColour)
-            stMessage.add("tag", ColorCodes.colorTag(stTag.render(), error.getErrorSeverity()));
-        else
-            stMessage.add("tag", stTag.render());
-        
-        stMessage.add("message", super.getST().render())
+            tag = ColorCodes.colorTag(stTag.render(), error.getErrorSeverity());        
+        stMessage.add("tag", tag)
+                 .add("message", super.getST().render())
                  .add("location", stFile.render())
                  .add("stack", stStackInfo.render());
         
         return stMessage;
     }
     
-    public String render() {
+    public String renderMessage() {
         ST stResult = getST();
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(stResult.render());
@@ -69,7 +68,7 @@ public class ErrorMessage extends PJErrorMessage {
      * @version 10/20/2018
      * @since 1.2
      */
-    public static final class Builder extends PJErrorMessage.Builder<Builder> {
+    public static final class Builder extends CompilerMessage.Builder<Builder> {
 
         @Override
         protected Builder builder() {
@@ -77,9 +76,9 @@ public class ErrorMessage extends PJErrorMessage {
         }
 
         @Override
-        public <E extends PJErrorMessage> E build() {
+        public <E extends CompilerMessage> E build() {
             @SuppressWarnings("unchecked")
-            E error = (E) new ErrorMessage(this);
+            E error = (E) new PJMessage(this);
             return error;
         }
     }

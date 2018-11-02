@@ -65,7 +65,11 @@ public final class OptionValue extends OptionWithValue {
 
     @Override
     public int compareTo(OptionWithValue o) {
-        return ((OptionValue) this).simpleName.compareToIgnoreCase(((OptionValue) o).simpleName);
+        OptionValue o1 = (OptionValue) this;
+        OptionValue o2 = (OptionValue) o;
+        String o1Name = o1.simpleName;
+        String o2Name = o2.simpleName;
+        return o1Name.compareToIgnoreCase(o2Name);
     }
     
     @Override
