@@ -101,7 +101,7 @@ public class Helper {
 
         switch (type) {
         case MAIN_NAME:
-            // TODO: Nothing to do
+            // Ignore
             break;
         case PROCEDURE_NAME:
             varName = PROCEDURE_NAME.getTag() + name;
@@ -251,6 +251,7 @@ public class Helper {
     }
     
     public static void writeToFile(String output, String sourceFile) {
+        // TODO: Write to home folder
         String javafile = "/Users/Ben/Documents/" + sourceFile + ".java";
         Writer writer = null;
 
