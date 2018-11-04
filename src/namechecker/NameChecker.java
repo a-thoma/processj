@@ -24,7 +24,6 @@ import ast.RecordLiteral;
 import ast.RecordTypeDecl;
 import ast.SwitchLabel;
 import ast.DefineTopLevelDecl;
-import utilities.Error;
 import utilities.PJMessage;
 import utilities.CompilerMessageManager;
 import utilities.Log;

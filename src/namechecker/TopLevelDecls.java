@@ -10,7 +10,6 @@ import ast.NamedType;
 import ast.ProcTypeDecl;
 import ast.ProtocolTypeDecl;
 import ast.RecordTypeDecl;
-import utilities.Error;
 import utilities.PJMessage;
 import utilities.CompilerMessageManager;
 import utilities.Log;
@@ -29,7 +28,7 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
     // Symbol table associated with this file. Set in the constructor.
     private SymbolTable symtab;
 
-    public static String currentFileName = Error.fileName;
+    public static String currentFileName = CompilerMessageManager.INSTANCE.fileName;
 
     // All imported files are kept in this table - indexed by absolute path and name.
     public static Hashtable<String, Compilation> alreadyImportedFiles = new Hashtable<String, Compilation>();
@@ -38,7 +37,7 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
         Log.logHeader("==============================================================");
         Log.logHeader("*                  T O P   L E V E L   D E C L S             *");
         Log.logHeader("*       -----------------------------------------------      *");
-        Log.logHeader("*       File: " + Error.fileName);
+        Log.logHeader("*       File: " + CompilerMessageManager.INSTANCE.fileName);
         Log.logHeader("");
         this.symtab = symtab;
     }
@@ -59,7 +58,7 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
      *            a Compilation parse tree node.
      */
     public T visitCompilation(Compilation co) {
-        Log.log(" Defining forward referencable names (" + Error.fileName
+        Log.log(" Defining forward referencable names (" + CompilerMessageManager.INSTANCE.fileName
                 + ").");
         // `symtab' is either passed in here from the driver (ProcessJ.java) or from
         // the visitImport() method in this file. Save it cause we need to put all
@@ -69,9 +68,9 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
 
         // reset the symbol table to null so we get a fresh chain for these imports.
         symtab = null;
-        Log.log(" Visit Imports in " + Error.fileName + ":");
+        Log.log(" Visit Imports in " + CompilerMessageManager.INSTANCE.fileName + ":");
         co.imports().visit(this);
-        Log.log(" Visit Imports in " + Error.fileName + " - done!");
+        Log.log(" Visit Imports in " + CompilerMessageManager.INSTANCE.fileName + " - done!");
         // symtab now contains a chain through the parent link of all the imports for this compilation.
         // set the 'importParent' of this compilation's symbol table to point to the
         // import chain of symbol tables.
@@ -79,14 +78,14 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
         // re-establish this compilation's table
         symtab = myGlobals;
         // now vist all the type declarations and the constants in this compilation
-        Log.log(" Visiting type declarations for " + Error.fileName);
+        Log.log(" Visiting type declarations for " + CompilerMessageManager.INSTANCE.fileName);
         co.typeDecls().visit(this);
         // hook the symbol table so it can be grabbed from who ever called us.
         SymbolTable.hook = symtab;
         Log.logHeader("");
         Log.logHeader("*                  T O P   L E V E L   D E C L S             *");
         Log.logHeader("*                           D O N E                          *");
-        Log.logHeader("*       File: " + Error.fileName);
+        Log.logHeader("*       File: " + CompilerMessageManager.INSTANCE.fileName);
         Log.logHeader("==============================================================");
 
         return null;
@@ -146,10 +145,11 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
                                     .addArguments(pd.name().getname())
                                     .build());
                     else
-                        // WHAT TYPE OF ERROR??
-                        Error.error(pd, "Non-mobile proecdure '"
-                                        + pd.name().getname() + "' already exists.",
-                                false, 2111);
+                        CompilerMessageManager.INSTANCE.printAndContinue(new PJMessage.Builder()
+                                .addAST(pd)
+                                .addError(VisitorMessageNumber.TOP_LEVEL_DECLS_208)
+                                .addArguments(pd.name().getname())
+                                .build());
                 } else
                     st.put(pd.signature(), pd);
             } else

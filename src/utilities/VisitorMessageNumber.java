@@ -38,6 +38,7 @@ public enum VisitorMessageNumber implements IMessageNumber {
     TOP_LEVEL_DECLS_205(205, ErrorSeverity.ERROR),
     TOP_LEVEL_DECLS_206(206, ErrorSeverity.ERROR),
     TOP_LEVEL_DECLS_207(207, ErrorSeverity.ERROR),
+    TOP_LEVEL_DECLS_208(208, ErrorSeverity.ERROR),
 
     // ==================================================
     // R E S O L V E   N A M E D   T Y P E S (300-399)

@@ -8,7 +8,6 @@ import ast.Name;
 import ast.NamedType;
 import ast.Sequence;
 import ast.DefineTopLevelDecl;
-import utilities.Error;
 import utilities.PJMessage;
 import utilities.CompilerMessageManager;
 import utilities.Log;
@@ -23,7 +22,7 @@ public class ResolvePackageTypes extends Visitor<AST> {
         Log.logHeader("==============================================================");
         Log.logHeader("*       P A C K A G E D   T Y P E   R E S O L U T I O N      *");
         Log.logHeader("*       -----------------------------------------------      *");
-        Log.logHeader("*       File: " + Error.fileName);
+        Log.logHeader("*       File: " + CompilerMessageManager.INSTANCE.fileName);
         Log.logHeader("==============================================================");
     }
 
@@ -43,14 +42,15 @@ public class ResolvePackageTypes extends Visitor<AST> {
     public void resolveTypeOrConstant(Name na) {
         Log.log("ResolvePackagedTypes: Resolving `" + na + "'");
         Sequence<Name> pa = na.packageAccess();
-        String fileName = "", oldCurrentFileName = "";
+        String fileName = "";
+        String oldCurrentFileName = "";
         Compilation comp = null;
         // pa is the sequence of names before the :: (if any)
         // if there is no package access then the name must be a
         // name declared locally or in an imported file - both will
         // be correctly resolved at name checking time.
         if (pa.size() > 0) {
-            oldCurrentFileName = Error.fileName;
+            oldCurrentFileName = CompilerMessageManager.INSTANCE.fileName;
             // Turn X.Y.Z::f into X/Y/Z.pj
             fileName = Settings.absolutePath + makeImportFileName(pa);
             // Does X/Y/Z.pj exist?
