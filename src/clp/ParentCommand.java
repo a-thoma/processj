@@ -6,7 +6,8 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * Useful when creating complex commands that required subcommands.
+ * Useful when creating complex commands that
+ * required subcommands.
  * 
  * @author Ben
  * @version 10/14/2018

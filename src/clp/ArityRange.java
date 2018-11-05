@@ -4,6 +4,8 @@ import java.util.AbstractList;
 import java.util.Collection;
 import java.util.Iterator;
 
+import utilities.Assert;
+
 /**
  * The class {@link ArityRange} represents a list of indexes
  * from some starting position to some ending position on the
@@ -64,6 +66,7 @@ public class ArityRange extends AbstractList<Integer> {
         if (separatorIndex != -1) {
             if (separatorIndex == 0)
                 throw new RuntimeException("Invalid range. A range must be of the form \"0..n\".");
+            // TODO: Validate range!
             fromValue = Integer.parseInt(range.substring(0, separatorIndex));
             if (!takesUnlimitedArgs)
                 toValue = Integer.parseInt(range.substring(separatorIndex + 2));
@@ -156,7 +159,7 @@ public class ArityRange extends AbstractList<Integer> {
     /**
      * A helper iterator class.
      * 
-     * @author Ben Cisneros
+     * @author Ben
      * @version 08/23/2018
      * @since 1.2
      */
@@ -179,7 +182,7 @@ public class ArityRange extends AbstractList<Integer> {
         
         @Override
         public boolean hasNext() {
-            return position < numValues;
+            return position < numValues && numValues > 0;
         }
 
         @Override

@@ -176,7 +176,9 @@ public final class StringUtil {
     /**
      * Comparator used to sort strings by length.
      * 
-     * @author Ben Cisneros
+     * @author Ben
+     * @version 08/21/2018
+     * @since 1.2
      */
     public static class SortByLength implements Comparator<String> {
         

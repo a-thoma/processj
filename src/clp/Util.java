@@ -1,14 +1,13 @@
 package clp;
 
-import java.io.File;
 import java.lang.reflect.AccessibleObject;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 /**
- * The class {@link Util} contains helper methods for classes within
- * the command line processor package.
+ * The class {@link Util} contains helper methods for classes
+ * within the command line processor package.
  *
  * @author Ben
  * @version 06/21/2018
@@ -145,27 +144,6 @@ public final class Util {
      */
     public static boolean objectEquals(Object lhs, Object rhs) {
         return lhs == null && rhs == null || lhs != null && lhs.equals(rhs);
-    }
-    
-    /**
-     * Returns {@code true} if the running environment is Windows or {@code false}
-     * otherwise.
-     * 
-     * @return {@code true} if the running environment is Windows.
-     */
-    public static boolean isWindows() {
-        return System.getProperty("os.name").contains("indows");
-    }
-    
-    /**
-     * Returns a string representing the location of the JVM version running on
-     * an environment.
-     * 
-     * @return A {@code String} containing the location of the JVM.
-     */
-    public static String getCurrentJVM() {
-        return System.getProperty("java.home") + File.separator + "bin" + File.separator
-                + "java" + (isWindows() ? ".exe" : "");
     }
     
     /**

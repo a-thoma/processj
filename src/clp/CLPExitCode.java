@@ -1,14 +1,14 @@
 package clp;
 
 /**
- * The enum {@link ExitCode} is used to determine the exit status
- * of the command line parser.
+ * The enum {@link CLPExitCode} is used to determine the
+ * exit status of the command line parser.
  * 
  * @author Ben
  * @version 08/14/2018
  * @since 1.2
  */
-public enum ExitCode {
+public enum CLPExitCode {
     OK                  ("OK"),
     COMPILATION_ERROR   ("Compilation Error"),
     INTERNAL_ERROR      ("Internal Error"),
@@ -17,7 +17,7 @@ public enum ExitCode {
     
     private final String code;
     
-    ExitCode(String code) {
+    CLPExitCode(String code) {
         this.code = code;
     }
     

@@ -3,8 +3,8 @@ package processj.runtime;
 /**
  * The runtime representation of a one-to-one channel.
  * 
+ * @author Ben
  * @author Cabel Shrestha
- * @author Ben Cisneros
  * @version 08/29/2018
  * @since 1.2
  */

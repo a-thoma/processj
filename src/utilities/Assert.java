@@ -1,6 +1,8 @@
-package clp;
+package utilities;
 
 import java.util.Collection;
+
+import clp.StringUtil;
 
 /**
  * The class {@link Assert} provides a convenient way for

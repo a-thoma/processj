@@ -18,10 +18,12 @@ import java.util.SortedSet;
 import java.util.TreeMap;
 import java.util.TreeSet;
 
+import utilities.Assert;
 import utilities.MultiValueMap;
 
 /**
- * Responsible for building options and arguments.
+ * Responsible for building {@link OptionValue} and
+ * {@link PositionalValue}.
  * 
  * @author Ben
  * @version 07/21/2018
@@ -387,12 +389,10 @@ public class CLPBuilder {
         final int MAX_CANDIDATES = 5;
         MultiValueMap<Integer, String> sortedOptions = new MultiValueMap<>();
         List<String> candidateList = new ArrayList<>();
-        // Check for possible matches and store unique candidates
+        // Check for possible matches
         for (String optName : options.getNames()) {
-            if (optName.contains(argName)) {
+            if (optName.contains(argName))
                 candidateList.add(optName);
-                continue;
-            }
         }
         if (!candidateList.isEmpty()) {
             for (String candidate : candidateList)

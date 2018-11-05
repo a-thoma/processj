@@ -20,7 +20,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import ast.ProcTypeDecl;
-import clp.Assert;
+import utilities.Assert;
 import utilities.Settings;
 
 /**

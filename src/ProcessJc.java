@@ -57,8 +57,8 @@ public class ProcessJc {
         
         Properties config = ConfigFileReader.openConfiguration();
         
-        // These fields have default values, but could be updated
-        // with user input (see `PJMain.java' for more information)
+        // These fields have default values that could be updated
+        // with user input (see PJMain.java for more info)
         Settings.includeDir = pjMain.include;
         Settings.targetLanguage = pjMain.target;
         boolean symbolTable = pjMain.symbolTable;

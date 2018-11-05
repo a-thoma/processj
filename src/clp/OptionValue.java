@@ -21,14 +21,15 @@ public final class OptionValue extends OptionWithValue {
     /**
      * The name (or names) of this option.
      */
-    private final String[] names;
+//    private final String[] names;
+    private final List<String> names;
     
     private OptionValue(Builder builder) {
         super(builder);
         names = builder.names;
     }
     
-    public String[] getNames() {
+    public List<String> getNames() {
         return names;
     }
     
@@ -39,7 +40,7 @@ public final class OptionValue extends OptionWithValue {
         else
             stringBuilder.append("  ");
         
-        Iterator<String> itNames = Arrays.asList(names).iterator();
+        Iterator<String> itNames = names.iterator();
         while (itNames.hasNext()) {
             stringBuilder.append(itNames.next());
             if (itNames.hasNext())
@@ -76,7 +77,7 @@ public final class OptionValue extends OptionWithValue {
     public String toString() {
         return getClass().getSimpleName() +
                 "(name="        + simpleName +
-                ", names="      + StringUtil.join(Arrays.asList(names), ",") +
+                ", names="      + StringUtil.join(names, ",") +
                 ", help="       + help +
                 ", field= "     + field.getName() +
                 ", nargs= "     + arity +
@@ -107,7 +108,7 @@ public final class OptionValue extends OptionWithValue {
      */
     public static final class Builder extends OptionWithValue.Builder<Builder> {
         
-        private String[] names;
+        private List<String> names;
 
         public Builder() {
             super();
@@ -130,7 +131,7 @@ public final class OptionValue extends OptionWithValue {
             List<String> sortedNames = Arrays.asList(names);
             if (names.length > 1)
                 Collections.sort(sortedNames, StringUtil.SORT_BY_LENGTH);
-            this.names = sortedNames.toArray(new String[0]);
+            this.names = sortedNames;
             return this;
         }
     }

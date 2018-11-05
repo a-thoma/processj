@@ -110,26 +110,6 @@ public class Formatter {
     }
     
     /**
-     * Count the numbers of characters in both the long name and short
-     * name of an option including the number of characters in the option's
-     * argument.
-     * 
-     * @param option
-     *          The long and short names of an option.
-     * @return The number of characters specified in the argument.
-     */
-    public int getOptionLength(OptionValue option) {
-        int length = 1;
-        for (String name : option.getNames()) {
-            length += name.length();
-            length += 1;
-        }
-        length += option.getMetavar().length();
-        length += 4;
-        return length;
-    }
-    
-    /**
      * Neatly format a string containing a list of (appended) options
      * and returns a new string containing the following format:
      * 
@@ -173,11 +153,8 @@ public class Formatter {
         StringBuilder stringBuilder = new StringBuilder();
         Map<Class<? extends Command>, OptionGroup> commandAndOptions = optionBuilder.getCommandAndOptionMap();
         boolean hasCommands = commandAndOptions.size() > 1;
-        // Grab the list of commands defined in the program
-        List<String> commands = new ArrayList<>();
-        commands.addAll(optionBuilder.getCommandAndNameMap().values());
         // For each command defined in the program
-        for (String commandName : commands) {
+        for (String commandName : optionBuilder.getCommandAndNameMap().values()) {
             // Grab the command (by name)
             Class<? extends Command> command = optionBuilder.getCommandByName(commandName);
             if (hasCommands)
@@ -206,8 +183,7 @@ public class Formatter {
         StringBuilder stringBuilder = new StringBuilder();
         Map<Class<? extends Command>, OptionGroup> commandAndOptions = optionBuilder.getCommandAndOptionMap();
         // For every argument defined in the main command
-        List<PositionalValue> arguments = new ArrayList<>();
-        arguments.addAll(commandAndOptions.get(optionBuilder.getMainCommand()).getArguments());
+        List<PositionalValue> arguments = commandAndOptions.get(optionBuilder.getMainCommand()).getArguments();
         // Build and append all of its arguments to it
         for (Iterator<PositionalValue> it = arguments.iterator(); it.hasNext();) {
             stringBuilder.append(buildArguments(it.next()));
@@ -378,7 +354,7 @@ public class Formatter {
         if (!optionValue.isRequired())
             stringBuilder.append("[");
         
-        Iterator<String> it = Arrays.asList(optionValue.getNames()).iterator();
+        Iterator<String> it = optionValue.getNames().iterator();
         while (it.hasNext()) {
             stringBuilder.append(it.next());
             if (it.hasNext())
