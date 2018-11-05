@@ -21,7 +21,6 @@ public final class OptionValue extends OptionWithValue {
     /**
      * The name (or names) of this option.
      */
-//    private final String[] names;
     private final List<String> names;
     
     private OptionValue(Builder builder) {

@@ -27,6 +27,11 @@ public enum CompilerMessageManager {
     private int errorCount;
     
     /**
+     * Last registered message
+     */
+    private CompilerMessage myPostPonedMessage = null;
+    
+    /**
      * List of errors/warning messages.
      */
     private Stack<CompilerMessage> stackTrace;
@@ -37,7 +42,7 @@ public enum CompilerMessageManager {
     public String fileName = "";
     
     /**
-     * Namespace for input file.
+     * Location of input file.
      */
     public String packageName = "";
     
@@ -46,8 +51,8 @@ public enum CompilerMessageManager {
         stackTrace = new Stack<>();
     }
     
-    public void add(CompilerMessage errorMessage) {
-        ErrorSeverity severity = errorMessage.getMessageNumber().getErrorSeverity();
+    public void add(CompilerMessage cm) {
+        ErrorSeverity severity = cm.getMessageNumber().getErrorSeverity();
         switch (severity) {
         case INFO:
         case WARNING:
@@ -56,7 +61,8 @@ public enum CompilerMessageManager {
             ++errorCount;
             break;
         }
-        stackTrace.push(errorMessage);
+        stackTrace.push(cm);
+        myPostPonedMessage = cm;
     }
     
     public void printAndContinue(CompilerMessage errorMessage) {
@@ -74,6 +80,27 @@ public enum CompilerMessageManager {
         ST msg = errorMessage.getST();
         System.out.println(msg.render());
         System.exit(0);
+    }
+    
+    public void reportMessage(CompilerMessage cm, MessageType mt) {
+        cm = Assert.nonNull(cm, "Compiler message cannot be null.");
+        boolean doStop = false;
+        add(cm);
+        
+        switch(mt) {
+        case PRINT_STOP:
+            doStop = true;
+        case PRINT_CONTINUE:
+            // Throw the first error that occurred
+            if (myPostPonedMessage == null)
+                myPostPonedMessage = cm;
+            ST msg = cm.getST();
+            System.out.println(msg.render());
+            if (doStop)
+                System.exit(0);
+        case DONT_PRINT_CONTINUE:
+            break;
+        }
     }
     
     public int getErrorCount() {

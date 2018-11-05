@@ -11,8 +11,11 @@ import org.stringtemplate.v4.ST;
  */
 public class PJMessage extends CompilerMessage {
     
+    private boolean doStackTrace = false;
+    
     public PJMessage(Builder builder) {
         super(builder);
+        doStackTrace = builder.doStackTrace;
     }
     
     @Override
@@ -40,21 +43,26 @@ public class PJMessage extends CompilerMessage {
         // must be set to either `yes' or `no'
         String tag = stTag.render();
         if (Settings.isAnsiColour)
-            tag = ColorCodes.colorTag(stTag.render(), error.getErrorSeverity());        
-        stMessage.add("tag", tag)
-                 .add("message", super.getST().render())
-                 .add("location", stFile.render())
-                 .add("stack", stStackInfo.render());
+            tag = ColorCodes.colorTag(stTag.render(), error.getErrorSeverity());
         
-        return stMessage;
+        return stMessage.add("tag", tag)
+                        .add("message", super.getST().render())
+                        .add("location", stFile.render())
+                        .add("stack", stStackInfo.render());
     }
     
     public String renderMessage() {
         ST stResult = getST();
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(stResult.render());
-        // TODO: Add stack trace if needed
+        // TODO: Add Java's stack trace if needed
+        if (doStackTrace)
+            ;
         return stringBuilder.toString();
+    }
+    
+    public boolean hasStackTrace() {
+        return doStackTrace;
     }
     
     // =====================
@@ -69,6 +77,12 @@ public class PJMessage extends CompilerMessage {
      * @since 1.2
      */
     public static final class Builder extends CompilerMessage.Builder<Builder> {
+        
+        protected boolean doStackTrace;
+        
+        public Builder() {
+            doStackTrace = false;
+        }
 
         @Override
         protected Builder builder() {
@@ -80,6 +94,11 @@ public class PJMessage extends CompilerMessage {
             @SuppressWarnings("unchecked")
             E error = (E) new PJMessage(this);
             return error;
+        }
+        
+        public Builder addStackTrace(boolean doStackTrace) {
+            this.doStackTrace = doStackTrace;
+            return builder();
         }
     }
 }

@@ -133,8 +133,7 @@ public class Formatter {
             String word = it.next().trim();
             charCount += word.length() + 1;
             if (charCount > charLeft) {
-                stringBuilder.append("\n")
-                             .append(StringUtil.addSpaces(indent));
+                stringBuilder.append("\n").append(StringUtil.addSpaces(indent));
                 charCount = word.length() + 1;
             }
             stringBuilder.append(word);
@@ -158,9 +157,7 @@ public class Formatter {
             // Grab the command (by name)
             Class<? extends Command> command = optionBuilder.getCommandByName(commandName);
             if (hasCommands)
-                stringBuilder.append("[")
-                             .append(commandName)
-                             .append(": ");
+                stringBuilder.append("[").append(commandName).append(": ");
             List<OptionValue> options = new ArrayList<>();
             options.addAll(commandAndOptions.get(command).getUniqueOptions());
             // Build and append all of its options to it
@@ -199,13 +196,10 @@ public class Formatter {
         int indent = findMaxLength(parameter.header());
         indent = (DEFAULT_WIDTH - indent) / 2;
         for (String header : parameter.header())
-            stringBuilder.append(StringUtil.addSpaces(indent - 1))
-                         .append(header)
-                         .append("\n");
+            stringBuilder.append(StringUtil.addSpaces(indent - 1)).append(header).append("\n");
         stringBuilder.append("\n");
         for (String note : parameter.notes())
-            stringBuilder.append(note)
-                         .append("\n");
+            stringBuilder.append(note).append("\n");
         
         return stringBuilder.append("\n").toString();
     }
@@ -214,8 +208,7 @@ public class Formatter {
         Parameters parameter = optionBuilder.getMainCommand().getAnnotation(Parameters.class);
         StringBuilder stringBuilder = new StringBuilder();
         for (String footer : parameter.footer())
-            stringBuilder.append(footer)
-                         .append("\n");
+            stringBuilder.append(footer).append("\n");
         return stringBuilder.append("\n").toString();
     }
     
@@ -226,8 +219,7 @@ public class Formatter {
             for (PositionalValue positionValue : optionGroup.getArguments()) {
                 String argumentHelp = positionValue.getOptionOrArgumentHelp(indent, DEFAULT_WIDTH);
                 if (argumentHelp != null)
-                    stringBuilder.append(argumentHelp)
-                                 .append("\n");
+                    stringBuilder.append(argumentHelp).append("\n");
             }
             stringBuilder.append("\n");
         }
@@ -238,9 +230,7 @@ public class Formatter {
     public StringBuilder buildCommand(int indent, Class<? extends Command> command) {
         Parameters param = command.getAnnotation(Parameters.class);
         StringBuilder stringBuilder = new StringBuilder(Formatter.DEFAULT_LENGTH + param.help().length());
-        stringBuilder.append(" ")
-                     .append(param.name())
-                     .append(" [options]...");
+        stringBuilder.append(" ").append(param.name()).append(" [options]...");
         
         while (indent > stringBuilder.length() + 2)
             stringBuilder.append(" ");
@@ -264,14 +254,12 @@ public class Formatter {
         for (Iterator<String> it = words.iterator(); it.hasNext();) {
             String word = it.next();
             if (nextLine) {
-                stringBuilder.append("\n")
-                             .append(StringUtil.addSpaces(indent - 1));
+                stringBuilder.append("\n").append(StringUtil.addSpaces(indent - 1));
                 nextLine = false;
             }
             charCount += word.length() + 1;
             if (charCount > charLeft) {
-                stringBuilder.append("\n")
-                             .append(StringUtil.addSpaces(indent - 1));
+                stringBuilder.append("\n").append(StringUtil.addSpaces(indent - 1));
                 charCount = word.length() + 1;
             }
             stringBuilder.append(word);
@@ -288,15 +276,13 @@ public class Formatter {
         for (Map.Entry<Class<? extends Command>, OptionGroup> entry : commandAndOptionMap.entrySet()) {
             // If we have more than one command, then append each individually
             if (commandAndOptionMap.size() > 1)
-                stringBuilder.append(buildCommand(indent, entry.getKey()))
-                             .append("\n");
+                stringBuilder.append(buildCommand(indent, entry.getKey())).append("\n");
             List<OptionValue> optionList = new ArrayList<>();
             optionList.addAll(entry.getValue().getUniqueOptions());
             for (OptionValue optionValue : optionList) {
                 String optionHelp = optionValue.getOptionOrArgumentHelp(indent, DEFAULT_WIDTH);
                 if (optionHelp != null)
-                    stringBuilder.append(optionHelp)
-                                 .append("\n");
+                    stringBuilder.append(optionHelp).append("\n");
             }
             stringBuilder.append("\n");
         }
@@ -311,13 +297,10 @@ public class Formatter {
                      .append(appendAllArguments())
                      .append("\n");
         // Create and build the list of arguments
-        stringBuilder.append("\n")
-                     .append(PARAMETERS_PREFIX)
-                     .append("\n");
+        stringBuilder.append("\n").append(PARAMETERS_PREFIX).append("\n");
         buildArguments(stringBuilder, MAX_CHAR_COUNT);
         // Create and build the list of commands and options
-        stringBuilder.append(OPTIONS_PREFIX)
-                     .append("\n");
+        stringBuilder.append(OPTIONS_PREFIX).append("\n");
         buildCommandAndOptions(stringBuilder, MAX_CHAR_COUNT);
         stringBuilder.append(buildFooter());
         
@@ -362,11 +345,9 @@ public class Formatter {
         }
         
         if (!optionValue.getSplit().isEmpty())
-            stringBuilder.append(optionValue.getSplit())
-                         .append(optionValue.getMetavar());
+            stringBuilder.append(optionValue.getSplit()).append(optionValue.getMetavar());
         else if (!optionValue.getMetavar().isEmpty())
-            stringBuilder.append(" ")
-                         .append(optionValue.getMetavar());
+            stringBuilder.append(" ").append(optionValue.getMetavar());
         if (!optionValue.isRequired())
             stringBuilder.append("]");
         

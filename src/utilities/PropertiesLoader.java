@@ -21,7 +21,7 @@ public class PropertiesLoader {
         ClassLoader cl = Thread.currentThread().getContextClassLoader();
         url = cl.getResource(fileName);
         if (url == null) {
-            cl = IMessageNumber.class.getClassLoader();
+            cl = PropertiesLoader.class.getClassLoader();
             url = cl.getResource(fileName);
         }
         return url;

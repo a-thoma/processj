@@ -1,7 +1,8 @@
 package processj.runtime;
 
 /**
- * The {@link PJChannelType} represents channel type constants.
+ * The {@link PJChannelType} represents channel type constants
+ * describing various forms of communication between {@link PJProcess}s.
  * A channel of type {@code ONE2ONE} specifies a one-to-one
  * channel object for use by one writer and one reader; type
  * {@code ONE2MANY} specifies a one-to-many channel object for

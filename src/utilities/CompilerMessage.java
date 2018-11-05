@@ -66,8 +66,15 @@ public abstract class CompilerMessage {
      */
     protected final String packageName;
     
-    protected int myRow;
-    protected int myColumn;
+    /**
+     * Line in file.
+     */
+    protected int rowNum;
+    
+    /**
+     * Character that generated the error/warning.
+     */
+    protected int columnNum;
     
     public CompilerMessage(Builder<?> builder) {
         ast = builder.ast;
@@ -76,8 +83,8 @@ public abstract class CompilerMessage {
         throwable = builder.throwable;
         fileName = builder.fileName == null ? CompilerMessageManager.INSTANCE.fileName : builder.fileName;
         packageName = builder.packageName == null ? CompilerMessageManager.INSTANCE.fileName : builder.packageName;
-        myRow = builder.myRow;
-        myColumn = builder.myColumn;
+        rowNum = builder.myRow;
+        columnNum = builder.myColumn;
     }
     
     // ================
@@ -108,12 +115,12 @@ public abstract class CompilerMessage {
         return packageName;
     }
     
-    public int getRow() {
-        return myRow;
+    public int getLine() {
+        return rowNum;
     }
     
     public int getColumn() {
-        return myColumn;
+        return columnNum;
     }
     
     public ST getST() {
@@ -147,7 +154,48 @@ public abstract class CompilerMessage {
                 ", reason="         + (throwable != null ?
                                             throwable.getMessage()
                                             : "none") +
+                ", row="            + rowNum +
+                ", column="         + columnNum +
                 ")";
+    }
+    
+    @Override
+    public final int hashCode() {
+        final int prime = 31;
+        int result = 1;
+        result = prime + result + ast.hashCode();
+        result = prime + result + error.hashCode();
+        result = prime + result + Arrays.hashCode(arguments);
+        result = prime + result + throwable.hashCode();
+        result = prime + result + fileName.hashCode();
+        result = prime + result + packageName.hashCode();
+        result = prime + result + rowNum;
+        result = prime + result + columnNum;
+        return result;
+    }
+    
+    @Override
+    public final boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (obj == null || getClass() != obj.getClass())
+            return false;
+        
+        CompilerMessage other = (CompilerMessage) obj;
+        if (this.rowNum != other.rowNum || this.columnNum != other.columnNum)
+            return false;
+        if (!this.fileName.equals(other.fileName) || !this.packageName.equals(other.packageName))
+            return false;
+        if (this.ast != other.ast) // This is ok!
+            return false;
+        if (!this.error.equals(other.error))
+            return false;
+        if (!Arrays.equals(this.arguments, other.arguments))
+            return false;
+        if (!this.throwable.equals(other.throwable))
+            return false;
+        
+        return true;
     }
     
     // =====================
@@ -156,8 +204,8 @@ public abstract class CompilerMessage {
     
     /**
      * 
-     * The class {@link Builder} uses descriptive methods to create
-     * error messages with default or initial values.
+     * The class {@link Builder} uses descriptive methods to
+     * create error messages with default or initial values.
      * 
      * @author Ben
      * @version 10/20/2018

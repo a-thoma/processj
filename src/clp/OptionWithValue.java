@@ -177,7 +177,7 @@ public abstract class OptionWithValue implements Comparable<OptionWithValue> {
         int charLeft = width - stringBuilder.length();
         int charCount = 0;
         // Move the definition to the next line if we exceed the
-        // minimum limits of characters
+        // minimum limit of characters
         boolean nextLine = false;
         if (stringBuilder.length() >= Formatter.MAX_CHAR_COUNT) {
             charLeft = width - Formatter.MAX_CHAR_COUNT;
@@ -187,14 +187,12 @@ public abstract class OptionWithValue implements Comparable<OptionWithValue> {
         for (Iterator<String> it = words.iterator(); it.hasNext();) {
             String word = it.next();
             if (nextLine) {
-                stringBuilder.append("\n")
-                             .append(StringUtil.addSpaces(indent - 1));
+                stringBuilder.append("\n").append(StringUtil.addSpaces(indent - 1));
                 nextLine = false;
             }
             charCount += word.length() + 1;
             if (charCount > charLeft) {
-                stringBuilder.append("\n")
-                             .append(StringUtil.addSpaces(indent - 1));
+                stringBuilder.append("\n").append(StringUtil.addSpaces(indent - 1));
                 charCount = word.length() + 1;
             }
             stringBuilder.append(word);
