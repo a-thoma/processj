@@ -55,9 +55,8 @@ public class PJMessage extends CompilerMessage {
         ST stResult = getST();
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(stResult.render());
-        // TODO: Add Java's stack trace if needed
-        if (doStackTrace)
-            ;
+        if (doStackTrace && throwable != null)
+            stringBuilder.append(throwable.toString());
         return stringBuilder.toString();
     }
     

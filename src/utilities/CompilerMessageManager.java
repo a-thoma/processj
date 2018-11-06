@@ -77,8 +77,7 @@ public enum CompilerMessageManager {
             // Throw the first error that occurred
             if (myPostPonedMessage == null)
                 myPostPonedMessage = cm;
-            ST msg = cm.getST();
-            System.out.println(msg.render());
+            System.out.println(cm.renderMessage());
             if (doStop)
                 System.exit(0);
         case DONT_PRINT_CONTINUE:
