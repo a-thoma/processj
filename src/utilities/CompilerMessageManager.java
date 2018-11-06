@@ -65,23 +65,6 @@ public enum CompilerMessageManager {
         myPostPonedMessage = cm;
     }
     
-    public void printAndContinue(CompilerMessage errorMessage) {
-        ST msg = errorMessage.getST();
-        System.out.println(msg.render());
-        add(errorMessage);
-    }
-    
-    public void dontPrintJustContinue(CompilerMessage errorMessage) {
-        add(errorMessage);
-    }
-    
-    public void printAndStop(CompilerMessage errorMessage) {
-        add(errorMessage);
-        ST msg = errorMessage.getST();
-        System.out.println(msg.render());
-        System.exit(0);
-    }
-    
     public void reportMessage(CompilerMessage cm, MessageType mt) {
         cm = Assert.nonNull(cm, "Compiler message cannot be null.");
         boolean doStop = false;

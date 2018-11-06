@@ -14,6 +14,7 @@ import parser.parser;
 import scanner.Scanner;
 import utilities.PJMessage;
 import utilities.Log;
+import utilities.MessageType;
 import utilities.CompilerMessageManager;
 import utilities.SymbolTable;
 import utilities.Visitor;
@@ -83,28 +84,28 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
             String packageName = packageNameToString(((Compilation) r.value).packageName());
             String importPathWithDot = importPath.replaceAll(File.separator, "\\.");
             if (!importPathWithDot.equals(packageName)) {
-                CompilerMessageManager.INSTANCE.printAndStop(new PJMessage.Builder()
+                CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                             .addAST(a)
                             .addError(VisitorMessageNumber.RESOLVE_IMPORTS_103)
                             .addArguments(packageName)
-                            .build());
+                            .build(), MessageType.PRINT_STOP);
             }
             
             TopLevelDecls.alreadyImportedFiles.put(fileName,
                     (Compilation) r.value);
             return (Compilation) r.value;
         } catch (java.io.FileNotFoundException e) {
-            CompilerMessageManager.INSTANCE.printAndStop(new PJMessage.Builder()
+            CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                         .addAST(a)
                         .addError(VisitorMessageNumber.RESOLVE_IMPORTS_102)
                         .addArguments(fileName)
-                        .build());
+                        .build(), MessageType.PRINT_STOP);
         } catch (Exception e) {
-            CompilerMessageManager.INSTANCE.printAndStop(new PJMessage.Builder()
+            CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                         .addAST(a)
                         .addError(VisitorMessageNumber.RESOLVE_IMPORTS_106)
                         .addArguments(fileName)
-                        .build());
+                        .build(), MessageType.PRINT_STOP);
         }
         return null;
     }
@@ -208,11 +209,11 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
                     // Oh no, the directory wasn't found at all!
                     String packageName = path.replaceAll("/", ".");
                     packageName = packageName.substring(0, packageName.length() - 1);
-                    CompilerMessageManager.INSTANCE.printAndContinue(new PJMessage.Builder()
+                    CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                                 .addAST(im)
                                 .addError(VisitorMessageNumber.RESOLVE_IMPORTS_103)
                                 .addArguments(packageName)
-                                .build());
+                                .build(), MessageType.PRINT_CONTINUE);
                 }
             }
             Log.log("visitImport(): About to import `" + im.file().getname() + ".pj'");
@@ -237,19 +238,19 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
                 } else {
                     // Nope, nothing found!
                     if (path.equals("")) {
-                        CompilerMessageManager.INSTANCE.printAndContinue(new PJMessage.Builder()
+                        CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                                     .addAST(im)
                                     .addError(VisitorMessageNumber.RESOLVE_IMPORTS_102)
                                     .addArguments(im.file().getname())
-                                    .build());
+                                    .build(), MessageType.PRINT_CONTINUE);
                     } else {
                         String packageName = path.replaceAll("/", ".");
                         packageName = packageName.substring(0, packageName.length() - 1);
-                        CompilerMessageManager.INSTANCE.printAndContinue(new PJMessage.Builder()
+                        CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                                     .addAST(im)
                                     .addError(VisitorMessageNumber.RESOLVE_IMPORTS_105)
                                     .addArguments(im.file().getname(), path)
-                                    .build());
+                                    .build(), MessageType.PRINT_CONTINUE);
                     }
                 }
             }

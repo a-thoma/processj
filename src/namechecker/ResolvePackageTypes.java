@@ -11,6 +11,7 @@ import ast.DefineTopLevelDecl;
 import utilities.PJMessage;
 import utilities.CompilerMessageManager;
 import utilities.Log;
+import utilities.MessageType;
 import utilities.Settings;
 import utilities.SymbolTable;
 import utilities.Visitor;
@@ -67,11 +68,11 @@ public class ResolvePackageTypes extends Visitor<AST> {
                     // don't do anything just continue after the if.
                 } else {
                     // It was neither a local nor a library file - throw an error...
-                    CompilerMessageManager.INSTANCE.printAndStop(new PJMessage.Builder()
+                    CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                                 .addAST(pa)
                                 .addError(VisitorMessageNumber.RESOLVE_IMPORTS_101)
                                 .addArguments(makeImportFileName(pa))
-                                .build());
+                                .build(), MessageType.PRINT_STOP);
                 }
             }
             CompilerMessageManager.INSTANCE.setFileName(fileName);
