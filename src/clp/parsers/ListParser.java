@@ -8,7 +8,7 @@ import clp.OptionParser;
 /**
  * Default parser for multiple string values.
  * 
- * @author Ben Cisneros
+ * @author Ben
  * @version 07/11/2018
  * @since 1.2
  */

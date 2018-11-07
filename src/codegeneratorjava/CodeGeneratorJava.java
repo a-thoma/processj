@@ -32,7 +32,7 @@ import ast.Type;
 import ast.Var;
 import processj.runtime.PJBarrier;
 import processj.runtime.PJTimer;
-import utilities.ErrorType;
+import utilities.ErrorSeverity;
 import utilities.Log;
 import utilities.SymbolTable;
 import utilities.Visitor;
@@ -46,7 +46,7 @@ import utilities.Visitor;
  * 			A visitor interface used to perform operations across a
  *          collection of different objects.
  *
- * @author Ben Cisneros
+ * @author Ben
  * @version 06/10/2018
  * @since 1.2
  */
@@ -56,7 +56,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
     /**
      * String template file locator.
      */
-    private final String stGammarFile_ = "stringtemplates/java/grammarTemplatesJava.stg";
+    private final String stGammarFile_ = "resources/stringtemplates/java/grammarTemplatesJava.stg";
     
     /**
      * Current java version.
@@ -440,7 +440,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         Log.log(na.line + ": Visiting a Name (" + na.getname() + ")");
         
         if (Helper.isInvalidJavaIdentifier(na.getname())) {
-            Log.log(String.format("%s: Special keyword '%s' found.", ErrorType.WARNING, na.getname()));
+            Log.log(String.format("%s: Special keyword '%s' found.", ErrorSeverity.WARNING, na.getname()));
         }
         
         return (T) na.getname();

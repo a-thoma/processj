@@ -5,9 +5,10 @@ import java.util.LinkedList;
 /**
  * The runtime representation of a many-to-many channel.
  *
+ * @author Ben
  * @author Cabel Shrestha
- * @version 1.0
- * @since 2016-05-01
+ * @version 08/29/2018
+ * @since 1.2
  */
 
 public class PJMany2ManyChannel<T> extends PJChannel<T> {

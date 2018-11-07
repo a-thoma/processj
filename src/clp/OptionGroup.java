@@ -10,27 +10,29 @@ import java.lang.reflect.ParameterizedType;
 import java.lang.reflect.Type;
 import java.lang.reflect.WildcardType;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.stream.Collectors;
+import java.util.SortedMap;
+import java.util.SortedSet;
+import java.util.TreeMap;
+import java.util.TreeSet;
 
 import clp.parsers.EnumParser;
 import clp.parsers.MapParser;
+import utilities.Assert;
 
 /**
  * The class {@link OptionGroup} represents a collection of command
- * line options that {@link OptionBuilder} instantiates in order to
+ * line options that {@link CLPBuilder} instantiates in order to
  * updated the values that {@link Option @Option} fields and
  * {@link Argument @Argument} fields hold at compile or runtime.
  * 
- * @author Ben Cisneros
+ * @author Ben
  * @version 06/21/2018
  * @since 1.2
  */
@@ -39,29 +41,29 @@ public final class OptionGroup {
     /**
      * Map of {@link Parameters @Parameters} types to their constructors.
      */
-    private Map<Class<? extends OptionParameters>, Constructor<? extends OptionParameters>> constructorsMap = new HashMap<>();
+    private Map<Class<? extends Command>, Constructor<? extends Command>> constructorsMap = new HashMap<>();
     
     /**
      * Map of option names to {@link Option @Option} fields.
      */
-    private Map<String, OptionValue> namedOptionMap = new HashMap<>();
+    private SortedMap<String, OptionValue> namedOptionMap = new TreeMap<>();
     
     /**
      * Map of fields to {@link OptionValue}s and {@link PositionalValue}s.
      */
-    private Map<Field, OptionWithValues> fieldOptionMap = new HashMap<>();
+    private Map<Field, OptionWithValue> fieldOptionMap = new HashMap<>();
     
     /**
      * This map contains a collection of fields declared by a class or set of classes.
      */
-    private Map<Class<? extends OptionParameters>, List<Field>> classFieldMap = new HashMap<>();
+    private Map<Class<? extends Command>, List<Field>> classFieldMap = new HashMap<>();
 
     /**
      * List of {@link Argument @Argument} fields.
      */
     private List<PositionalValue> argumentList = new ArrayList<>();
     
-    public OptionGroup(Set<Class<? extends OptionParameters>> setClass) {
+    public OptionGroup(Set<Class<? extends Command>> setClass) {
         setClass = Assert.nonNull(setClass, "Set of classes cannot be null.");
         create(setClass);
     }
@@ -70,7 +72,7 @@ public final class OptionGroup {
         return namedOptionMap.get(optName);
     }
     
-    public OptionWithValues getOption(Field field) {
+    public OptionWithValue getOptionOrArgument(Field field) {
         return fieldOptionMap.get(field);
     }
 
@@ -82,30 +84,30 @@ public final class OptionGroup {
         return namedOptionMap.keySet();
     }
     
-    public List<PositionalValue> getPositionalArgs() {
+    public List<PositionalValue> getArguments() {
         return argumentList;
     }
     
-    public Collection<Field> getFieldList(Class<? extends OptionParameters> type) {
+    public Collection<Field> getFieldList(Class<? extends Command> type) {
         return classFieldMap.get(type);
     }
     
-    public Set<OptionValue> getOptionSet() {
-        Set<OptionValue> optSet = new HashSet<>();
+    public Set<OptionValue> getUniqueOptions() {
+        SortedSet<OptionValue> optSet = new TreeSet<>();
         for (OptionValue optionValue : namedOptionMap.values())
             optSet.add(optionValue);
         return optSet;
     }
     
-    public <T extends OptionParameters> Constructor<T> getConstructor(Class<T> type) {
+    public <T extends Command> Constructor<T> getConstructor(Class<T> type) {
         @SuppressWarnings("unchecked")
         Constructor<T> result = (Constructor<T>) constructorsMap.get(type);
         return result;
     }
     
-    public void create(Set<Class<? extends OptionParameters>> setClass) {
+    public void create(Set<Class<? extends Command>> setClass) {
         // Loop over all the class hierarchy if any
-        for (Class<? extends OptionParameters> type : setClass) {
+        for (Class<? extends Command> type : setClass) {
             // Parse all annotated fields
             List<Field> fields = findAnnotatedFields(type);
             for (Field field : fields) {
@@ -151,19 +153,17 @@ public final class OptionGroup {
         Option annotation = field.getAnnotation(Option.class);
         
         if (Util.isArrayEmpty(annotation.names()))
-            throw new RuntimeException(String.format("The \"names\" attribute for @Option field "
+            throw new RuntimeException(String.format("The 'names' attribute for @Option field "
                         + "'%s' cannot be empty.", field.getName()));
         
         for (String name : annotation.names()) {
             if (!name.startsWith("-"))
                 throw new RuntimeException(String.format("Annotated options must start with a single "
-                            + "\"-\". Found @Option '%s'.", name));
+                            + "'-'. Found @Option '%s'.", name));
         }
         
         String optName = findOptionLongName(field);
-        builder.setName(optName);
-        builder.setNames(annotation.names());
-        builder.setField(field);
+        builder.addSimpleName(optName).addNames(annotation.names()).addField(field);
         
         if (annotation.hidden() && annotation.required()) {
             // Required arguments cannot be hidden, they should always be provided
@@ -171,13 +171,12 @@ public final class OptionGroup {
                         + "to '%s' cannot be hidden.", field.getName()));
         }
         
-        builder.setHidden(annotation.hidden());
-        builder.setRequired(annotation.required());
+        builder.addHidden(annotation.hidden()).addRequired(annotation.required());
         
         // This is to retrieve information about the type of data each field
         // holds at compile-time or run-time. Basic types such as byte, short,
         // int, long, float, double, String and parameterized fields (of basic
-        // types) can be inferred at runtime. Complex data types such as user-defined
+        // types) can be inferred. Complex data types such as user-defined
         // types must be explicitly specified
         Class<?>[] fieldFinalTypes = findFieldFinalTypes(field);
         if (fieldFinalTypes.length == 2) {
@@ -207,8 +206,7 @@ public final class OptionGroup {
             if (keyParser == null || valueParser == null)
                 throw new RuntimeException(String.format("A parser could not be created for '%s'.", optName));
             
-            builder.setParsers(new OptionParser<?>[] { keyParser, valueParser });
-            builder.setHandlers(handlerList.toArray(new Class[0]));
+            builder.addParsers(new OptionParser<?>[] { keyParser, valueParser }).addHandlers(handlerList.toArray(new Class[0]));
         } else {
             // Must be some atomic or user-defined type
             Class<? extends OptionParser> handler = null;
@@ -231,8 +229,7 @@ public final class OptionGroup {
             if (parser == null)
                 throw new RuntimeException(String.format("A parser could not be created for '%s'.", optName));
             
-            builder.setParsers(new OptionParser<?>[] { parser });
-            builder.setHandlers(new Class[] { handler });
+            builder.addParsers(new OptionParser<?>[] { parser }).addHandlers(new Class[] { handler });
         }
         
         ArityRange arity = null;
@@ -250,20 +247,20 @@ public final class OptionGroup {
             }
         }
         
-        builder.setArity(arity);
+        builder.addArity(arity);
 
         OptionType type = OptionType.SINGLEVALUE;
         if (isCollectionOrMapOrArrayField(field.getType()))
             type = OptionType.MULTIVALUE;
-        else if (isBooleanField(field.getType()) && arity.hasFixedArity())
+        else if (isBooleanField(field.getType()) && arity.hasFixedArity() && (arity.getFrom() == 0))
             type = OptionType.NONE;
-        
-        builder.setOptionType(type);
 
         // Build remaining attributes values
-        builder.setHelp(annotation.help());
-        builder.setValueSeparator(annotation.split());
-        builder.setMetavar(annotation.metavar());
+        builder.addOptionType(type)
+               .addHelp(annotation.help())
+               .addValueSeparator(annotation.split())
+               .addMetavar(annotation.metavar())
+               .addDefaultValue(annotation.defaultValue());
         
         // Build option and parse the value assigned to `defaultValue'
         OptionValue option = builder.build();
@@ -278,17 +275,16 @@ public final class OptionGroup {
         PositionalValue.Builder builder = new PositionalValue.Builder();
         Argument annotation = field.getAnnotation(Argument.class);
         String fieldName = field.getName();
-        builder.setName(fieldName);
-        builder.setField(field);
+        builder.addSimpleName(fieldName).addField(field);
         
         ArityRange order = ArityRange.createArity(annotation.order());
         if (!order.hasFixedArity() && !isCollectionOrMapOrArrayField(field.getType()))
             throw new RuntimeException(String.format("Multivalue @Argument '%s' must be assigned "
                     + "to a field of type List.", fieldName));
         
-        builder.setArity(order);
+        builder.addArity(order);
         
-        // Same as @Options, except that arguments cannot be of type Map.
+        // Same as `Options' except that arguments cannot be of type Map.
         // Only one type should be returned and one parser instance should
         // be created. Complex data types such as user-defined types must
         // be explicitly specified
@@ -312,22 +308,21 @@ public final class OptionGroup {
             if (parser == null)
                 throw new RuntimeException(String.format("A parser could not be created for '%s'.", fieldName));
             
-            builder.setParsers(new OptionParser<?>[] { parser });
-            builder.setHandlers(new Class[] { handler });
+            builder.addParsers(new OptionParser<?>[] { parser }).addHandlers(new Class[] { handler });
         }
         
         OptionType type = OptionType.SINGLEVALUE;
         if (isCollectionOrMapOrArrayField(field.getType()))
             type = OptionType.MULTIVALUE;
-        
-        builder.setOptionType(type);
 
-        // Build remaining attributes values
-        builder.setHelp(annotation.help());
-        builder.setHidden(annotation.hidden());
-        builder.setRequired(annotation.required());
-        builder.setValueSeparator(annotation.split());
-        builder.setMetavar(annotation.metavar());
+        // Build remaining attributes
+        builder.addOptionType(type)
+               .addHelp(annotation.help())
+               .addHidden(annotation.hidden())
+               .addRequired(annotation.required())
+               .addValueSeparator(annotation.split())
+               .addMetavar(annotation.metavar())
+               .addDefaultValue(annotation.defaultValue());
         
         // Build argument and parse the value assigned to `defaultValue'
         PositionalValue argument = builder.build();
@@ -337,7 +332,7 @@ public final class OptionGroup {
         return argument;
     }
 
-    public void addValue(OptionWithValues option, String value) {
+    public void addValue(OptionWithValue option, String value) {
         Class<?> type = option.getField().getType();
         if (option.isFlagOption()) {
             addBooleanValue(option, value);
@@ -354,7 +349,7 @@ public final class OptionGroup {
         }
     }
 
-    private void addBooleanValue(OptionWithValues option, String value) {
+    private void addBooleanValue(OptionWithValue option, String value) {
         try {
             // If `null' then this could be a stand alone option, e.g. a flag
             // option that doesn't consume values
@@ -380,7 +375,7 @@ public final class OptionGroup {
     }
 
     @SuppressWarnings("unchecked")
-    private void addListValue(OptionWithValues option, String value) {
+    private void addListValue(OptionWithValue option, String value) {
         try {
             OptionParser<?> parser = option.getParsers()[0];
             Object parsedValue = parser.parseValue(value);
@@ -394,28 +389,28 @@ public final class OptionGroup {
                 @SuppressWarnings("rawtypes")
                 Collection parsedResult = (Collection) parsedValue;
                 collection.addAll(parsedResult);
-            } else {
+            } else
                 // No, then it is a single value
                 collection.add(parsedValue);
-            }
             option.addValue(collection);
         } catch (Exception e) {
             throw new RuntimeException(e.getMessage());
         }
     }
     
-    private void addArrayValue(OptionWithValues option, String value) {
+    private void addArrayValue(OptionWithValue option, String value) {
         try {
             OptionParser<?> parser = option.getParsers()[0];
             Object parsedValue = parser.parseValue(value);
-            // Grab the array and check if it was initialized to avoid object creation
+            // Grab the array and check if it was initialized to avoid
+            // object creation
             Object objArray = option.getValue();
             if (objArray == null) {
                 // No, then create a new array of size 1
                 objArray = Array.newInstance(option.getField().getType().getComponentType(), 1);
                 Array.set(objArray, 0, parsedValue);
             } else {
-                // Because arrays cannot be resized, an array of `length+1' size
+                // Because arrays cannot be resized, an array of `length + 1' size
                 // is created before the values are copied into this new array
                 int length = Array.getLength(objArray);
                 Object newObjArray = Array.newInstance(objArray.getClass().getComponentType(), length + 1);
@@ -429,7 +424,7 @@ public final class OptionGroup {
         }
     }
     
-    private void addMapValue(OptionWithValues option, String keyAndValue) {
+    private void addMapValue(OptionWithValue option, String keyAndValue) {
         try {
             String[] splitKeyValue = MapParser.PARSER.parseValue(keyAndValue);
             OptionParser<?> keyParser = option.getParsers()[0];
@@ -437,8 +432,8 @@ public final class OptionGroup {
             Object keyMap = keyParser.parseValue(splitKeyValue[0]);
             Object valueMap = valueParser.parseValue(splitKeyValue[1]);
             // Grab the map and check if it was initialized to avoid object creation
-            @SuppressWarnings("unchecked")
-            Map<Object, Object> objMap = (Map<Object, Object>) option.getValue();
+            @SuppressWarnings({ "unchecked", "rawtypes" })
+            Map<Object, Object> objMap = (Map) option.getValue();
             if (objMap == null)
                 objMap = new HashMap<>();
             // NOTE: This will override previous values for keys that occurred
@@ -450,7 +445,7 @@ public final class OptionGroup {
         }
     }
 
-    private void addValueType(OptionWithValues option, String value) {
+    private void addValueType(OptionWithValue option, String value) {
         try {
             OptionParser<?> parser = option.getParsers()[0];
             Object parsedValue = parser.parseValue(value);
@@ -465,7 +460,7 @@ public final class OptionGroup {
                                                 Class<? extends OptionParser> handler,
                                                 String optName) {
         if (OptionParser.class == handler)
-            throw new RuntimeException(String.format("Illegal handler type found. Illegal '%s' type "
+            throw new RuntimeException(String.format("Illegal handler type found! Illegal '%s' type "
                         + "assigned to field '%s'.", Util.getTypeName(handler), fieldName));
         
         // Is this handler an Enum type? Yes, then create a parser for this Enum type
@@ -492,7 +487,7 @@ public final class OptionGroup {
         if (fieldType instanceof ParameterizedType) {
             ParameterizedType parameterizedType = (ParameterizedType) fieldType;
             if (parameterizedType.getRawType() == List.class || parameterizedType.getRawType() == Map.class) {
-                // Retrieve the actual type declared in List or Map
+                // Retrieve the type(s) declared in a List or Map
                 fieldTypeResult = findFieldGenericTypes(field);
             } else {
                 throw new RuntimeException(String.format("Unknow type for a multivalue field. Found "
@@ -532,15 +527,19 @@ public final class OptionGroup {
     
     protected static String findOptionLongName(Field field) {
         Option annotation = field.getAnnotation(Option.class);
-        return Arrays.stream(annotation.names())
-                     .max(Comparator.comparingInt(String::length))
-                     .get();
+        String name = annotation.names()[0];
+        for (String n : annotation.names())
+            if (n.length() > name.length())
+                name = n;
+        return name;
     }
     
-    protected static List<Field> findAnnotatedFields(Class<? extends OptionParameters> type) {
-        List<Field> fields = Arrays.stream(type.getDeclaredFields())
-                                   .filter(field -> isOption(field) || isArgument(field))
-                                   .collect(Collectors.toList());
+    protected static List<Field> findAnnotatedFields(Class<? extends Command> type) {
+        List<Field> fields = new ArrayList<>();
+        for (Field field : type.getDeclaredFields())
+            if (isOption(field) || isArgument(field))
+                fields.add(field);
+        
         if (fields.isEmpty())
             throw new RuntimeException("At least one field must have an annotation "
                         + "attached to it.");
@@ -556,7 +555,7 @@ public final class OptionGroup {
         return field;
     }
     
-    protected static Constructor<? extends OptionParameters> findConstructor(Class<? extends OptionParameters> type) {
+    protected static Constructor<? extends Command> findConstructor(Class<? extends Command> type) {
         try {
             // This will fail if the extended class has no default constructor.
             // One must ALWAYS be provided!
@@ -606,10 +605,10 @@ public final class OptionGroup {
     }
     
     /**
-     * Compares {@link Argument @Argument} fields by {@link Argument#order()}
-     * or, if their indices have the same values, by {@link Argument#order()}.
+     * Compares {@link Argument @Argument} fields by their index or,
+     * id their indices have the same values, by {@link Argument#order()}.
      * 
-     * @author Ben Cisneros
+     * @author Ben
      * @version 08/16/2018
      * @since 1.2
      */

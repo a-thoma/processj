@@ -2,13 +2,14 @@ package clp;
 
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Comparator;
 import java.util.List;
 
 /**
- * The class {@link StringUtil} contains helper methods for classes
- * within the {@code cli} package.
+ * The class {@link StringUtil} contains helper methods for
+ * classes within the {@code cli} package.
  *
- * @author Ben Cisneros
+ * @author Ben
  * @version 06/21/2018
  * @since 1.2
  */
@@ -62,8 +63,8 @@ public final class StringUtil {
     }
 
     /**
-     * Returns an array initialized with the list of string values that both
-     * {@code str1} and {@code str2} contain.
+     * Returns an array initialized with the list of string values that
+     * both {@code str1} and {@code str2} contain.
      *
      * @param str1
      *            An array of strings.
@@ -159,7 +160,7 @@ public final class StringUtil {
      *            The number of whitespace characters.
      * @return A {@code String} containing a sequence of whitespace characters.
      */
-    public static String countSpaces(int count) {
+    public static String addSpaces(int count) {
         if (count < 1)
             throw new IllegalArgumentException("The number of whitespace characters "
                     + "mut be greater than zero.");
@@ -171,4 +172,21 @@ public final class StringUtil {
 
         return stringBuilder.toString();
     }
+    
+    /**
+     * Comparator used to sort strings by length.
+     * 
+     * @author Ben
+     * @version 08/21/2018
+     * @since 1.2
+     */
+    public static class SortByLength implements Comparator<String> {
+        
+        @Override
+        public int compare(String o1, String o2) {
+            return o1.length() - o2.length();
+        }
+    }
+    
+    public final static SortByLength SORT_BY_LENGTH = new SortByLength();
 }

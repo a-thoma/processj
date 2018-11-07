@@ -12,16 +12,19 @@ import ast.Name;
 import ast.Sequence;
 import parser.parser;
 import scanner.Scanner;
-import utilities.Error;
+import utilities.PJMessage;
 import utilities.Log;
+import utilities.MessageType;
+import utilities.CompilerMessageManager;
 import utilities.SymbolTable;
 import utilities.Visitor;
+import utilities.VisitorMessageNumber;
 
 public class ResolveImports<T extends Object> extends Visitor<T> {
     // Symbol table associated with this file. Set in the constructor.
     private SymbolTable symtab;
 
-    public static String currentFileName = Error.fileName;
+    public static String currentFileName = CompilerMessageManager.INSTANCE.fileName;
     
     public ResolveImports(SymbolTable symtab) {
         this.symtab = symtab;
@@ -44,7 +47,9 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
     }
     
     /**
-     * Imports (by scanning, parsing and tree building) one file.
+     * Imports (by scanning, parsing, and building a tree) one file, checks
+     * its path format, and then validates the extension (path) of all the
+     * *import* statements found in the given file.
      *
      * @param a
      *          An AST node - just used for line number information.
@@ -64,36 +69,43 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
             return c;
         }
         try {
-            Error.setPackageName(fileName);
+            // Set the package name
+            CompilerMessageManager.INSTANCE.setPackageName(fileName);
+            
             Log.log(a.line + " Starting import of file: `" + fileName + "'");
             Scanner s1 = new Scanner(new java.io.FileReader(fileName));
             parser p1 = new parser(s1);
             java_cup.runtime.Symbol r = p1.parse();
             
-            // TODO: THIS WILL EXECUTE AND VALIDATE THE EXTENSION (PATH) OF IMPORTED
-            // FILES!!
-            
-            // Checks the path of the imported file and compares the import statements found
-            // in `fileName' against this file path format. An error is thrown if the import
-            // statements do not match the path of the package name in which `fileName' exists
+            // Check the path of the imported file and compare the *import*
+            // statements found in it with the imported file's path
+            // format. Throw an error if the *import* statements do not
+            // match the path of the package name in which `fileName' exists
             String packageName = packageNameToString(((Compilation) r.value).packageName());
-            String importPathDot = importPath.replaceAll(File.separator, "\\.");
-            System.out.println("|-" + packageName + " && " + importPathDot);
-            if (!importPathDot.equals(packageName)) {
-                Error.error(a, "Invalid package name found! Path string `" + packageName
-                        + "' may contain invalid characters or the path string does not "
-                        + "match the import statement `" + importPathDot
-                        + "'.");
+            String importPathWithDot = importPath.replaceAll(File.separator, "\\.");
+            if (!importPathWithDot.equals(packageName)) {
+                CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                            .addAST(a)
+                            .addError(VisitorMessageNumber.RESOLVE_IMPORTS_103)
+                            .addArguments(packageName)
+                            .build(), MessageType.PRINT_STOP);
             }
             
             TopLevelDecls.alreadyImportedFiles.put(fileName,
                     (Compilation) r.value);
             return (Compilation) r.value;
         } catch (java.io.FileNotFoundException e) {
-            Error.error(a, "File not found : " + fileName, true, 2104);
+            CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                        .addAST(a)
+                        .addError(VisitorMessageNumber.RESOLVE_IMPORTS_102)
+                        .addArguments(fileName)
+                        .build(), MessageType.PRINT_STOP);
         } catch (Exception e) {
-            Error.error(a, "Something went wrong while trying to parse "
-                    + fileName, true, 2105);
+            CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                        .addAST(a)
+                        .addError(VisitorMessageNumber.RESOLVE_IMPORTS_106)
+                        .addArguments(fileName)
+                        .build(), MessageType.PRINT_STOP);
         }
         return null;
     }
@@ -126,8 +138,8 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
      */
     public static void makeFileList(ArrayList<String> list, String directory) {
         Log.log("makeFileList(): Called with : " + directory);
-        // 'entries' will contain all the files in the directory 'directory' that has the right
-        // file extension (typically .pj)
+        // `entries' will contain all the files in the directory 'directory'
+        // that has the right file extension (typically .pj)
         String entries[] = new File(directory).list(new PJfiles());
         for (String s : entries) {
             File f = new File(directory + "/" + s);
@@ -135,7 +147,8 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
                 list.add(directory + "/" + s);
             }
         }
-        // 'list' now contains all the appropriate files in 'directory' - now handle the subdirectories in order.
+        // `list' now contains all the appropriate files in `directory' - now
+        // handle the subdirectories in order.
         entries = new File(directory).list();
         for (String s : entries) {
             File f = new File(directory + "/" + s);
@@ -159,7 +172,7 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
     }
 
     /**
-     * visitImport will read and parse an import statement. The chain of symbol tables
+     * VisitImport will read and parse an import statement. The chain of symbol tables
      * will be left in the `symtab' field. The parentage of multiple files imported in
      * the same import is also through the parent link.
      */
@@ -196,13 +209,18 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
                     // Oh no, the directory wasn't found at all!
                     String packageName = path.replaceAll("/", ".");
                     packageName = packageName.substring(0, packageName.length() - 1);
-                    Error.error(im, " Package '" + packageName + "' does not exist.", false, 2106);
+                    CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                .addAST(im)
+                                .addError(VisitorMessageNumber.RESOLVE_IMPORTS_103)
+                                .addArguments(packageName)
+                                .build(), MessageType.PRINT_CONTINUE);
                 }
             }
             Log.log("visitImport(): About to import `" + im.file().getname() + ".pj'");
         } else { // Not a .* import
             fileName = fileName + "/" + im.file().getname() + ".pj";
-            Error.setPackageName(path + "." + im.file().getname());
+            // Set package name
+            CompilerMessageManager.INSTANCE.setPackageName(path + "." + im.file().getname());
 
             // Is it a local file
             if (new File(fileName).isFile()) {
@@ -220,22 +238,31 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
                 } else {
                     // Nope, nothing found!
                     if (path.equals("")) {
-                        Error.error(im, "File '" + im.file().getname() + "' not found.", false, 2107);
+                        CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                    .addAST(im)
+                                    .addError(VisitorMessageNumber.RESOLVE_IMPORTS_102)
+                                    .addArguments(im.file().getname())
+                                    .build(), MessageType.PRINT_CONTINUE);
                     } else {
                         String packageName = path.replaceAll("/", ".");
                         packageName = packageName.substring(0, packageName.length() - 1);
-                        Error.error(im, "File '" + im.file().getname() + "' not found in package '" + path + "'.", false, 2108);
+                        CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                    .addAST(im)
+                                    .addError(VisitorMessageNumber.RESOLVE_IMPORTS_105)
+                                    .addArguments(im.file().getname(), path)
+                                    .build(), MessageType.PRINT_CONTINUE);
                     }
                 }
             }
         }
 
-        // 'fileList' now contains the list of all the files that this import caused to be imported
+        // `fileList' now contains the list of all the files that this import caused to be imported
         for (String fn : fileList) {
             // Scan, parse and build tree.
             String oldCurrentFileName = currentFileName;
             currentFileName = fn;
-            Error.setFileName(fn);
+            // Set current filename
+            CompilerMessageManager.INSTANCE.setFileName(fn);
             Compilation c = ResolveImports.importFile(im, fn, path /* packageName */);
 
             // Add it to the list of compilations for this import
@@ -245,7 +272,8 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
             // Declare types and constants for handling it's imports
             c.visit(new TopLevelDecls<AST>(importSymtab));
             currentFileName = oldCurrentFileName;
-            Error.setFileName(oldCurrentFileName);
+            // Reset filename
+            CompilerMessageManager.INSTANCE.setFileName(oldCurrentFileName);
 
             // Insert into the symtab chain along the parent link
             if (symtab == null)

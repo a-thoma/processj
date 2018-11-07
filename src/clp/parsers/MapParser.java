@@ -5,7 +5,7 @@ import clp.IOptionParser;
 /**
  * Default parser for keys and values.
  * 
- * @author Ben Cisneros
+ * @author Ben
  * @version 08/20/2018
  * @since 1.2
  */

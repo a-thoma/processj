@@ -1,77 +1,90 @@
 package clp;
 
 import java.lang.reflect.Field;
+import java.util.Iterator;
+import java.util.List;
 
 /**
- * The class {@link OptionWithValues} is a wrapper class that serves
- * as the base class for all shared attributes that belong to
- * {@link OptionValue} and {@link PositionalValue}.
+ * The class {@link OptionWithValue} is a wrapper class that
+ * serves as the base class for all shared attributes that
+ * belong to {@link OptionValue} and {@link PositionalValue}.
  * 
- * @author Ben Cisneros
+ * @author Ben
  * @version 08/20/2018
  * @since 1.2
  */
-public abstract class OptionWithValues {
+public abstract class OptionWithValue implements Comparable<OptionWithValue> {
+    
+    /**
+     * Default name.
+     */
+    protected final String simpleName;
     
     /**
      * The descriptive text messaged used in the help information.
      */
-    protected String help;
+    protected final String help;
 
     /**
      * How many values an option or argument has to consume.
      */
-    protected ArityRange arity;
+    protected final ArityRange arity;
 
     /**
      * The string used to describe what the value of an option or
      * argument is.
      */
-    protected String metavar;
+    protected final String metavar;
+    
+    /**
+     * The default value for this option as a string.
+     */
+    protected final String defaultValue;
 
     /**
      * Indicates whether an option or argument is required or not.
      */
-    protected boolean required;
+    protected final boolean required;
 
     /**
      * Indicates whether an option or argument should be included in
      * the help information or not.
      */
-    protected boolean hidden;
+    protected final boolean hidden;
 
     /**
      * The separator between an option or argument and its actual value.
      */
-    protected String split;
+    protected final String split;
 
     /**
      * The handlers used to parse the values for this option or argument.
      */
     @SuppressWarnings("rawtypes")
-    protected Class<? extends OptionParser>[] handlers;
+    protected final Class<? extends OptionParser>[] handlers;
     
     /**
      * The instances used to parser the values of a field.
      */
-    protected OptionParser<?>[] parsers;
+    protected final OptionParser<?>[] parsers;
     
     /**
      * Indicates the type of an option.
      */
-    protected OptionType type;
+    protected final OptionType type;
     
     /**
      * The annotated-field.
      */
-    protected Field field;
+    protected final Field field;
     
     /**
      * The default value for this option or argument.
      */
     protected Object value;
     
-    public OptionWithValues(Builder<?> builder) {
+    public OptionWithValue(Builder<?> builder) {
+        simpleName = builder.simpleName;
         help = builder.help;
         metavar = builder.metavar;
         required = builder.required;
@@ -82,17 +95,24 @@ public abstract class OptionWithValues {
         field = builder.field;
         parsers = builder.parsers;
         arity = builder.arity;
+        defaultValue = builder.defaultValue;
     }
-
-    // -----------------------------------------------------------------------------
-    // SETTERS
+    
+    // ================
+    // S E T T E R S
+    // ================
     
     public void addValue(Object newValue) {
         value = newValue;
     }
-
-    // -----------------------------------------------------------------------------
-    // GETTERS
+    
+    // ================
+    // G E T T E R S
+    // ================
+    
+    public final String getSimpleName() {
+        return simpleName;
+    }
     
     public final String getHelp() {
         return help;
@@ -100,6 +120,10 @@ public abstract class OptionWithValues {
 
     public final String getMetavar() {
         return metavar;
+    }
+    
+    public final String getDefaultValue() {
+        return defaultValue;
     }
 
     public final boolean isRequired() {
@@ -110,7 +134,7 @@ public abstract class OptionWithValues {
         return hidden;
     }
 
-    public final String getValueSeparator() {
+    public final String getSplit() {
         return split;
     }
 
@@ -147,13 +171,47 @@ public abstract class OptionWithValues {
         return arity;
     }
     
-    public abstract String getOptionHelp(int indent, int width);
+    public abstract String getOptionOrArgumentHelp(int indent, int width);
+    
+    public String getFilledParagraph(StringBuilder stringBuilder, List<String> words, int indent, int width) {
+        int charLeft = width - stringBuilder.length();
+        int charCount = 0;
+        // Move the definition to the next line if we exceed the
+        // minimum limit of characters
+        boolean nextLine = false;
+        if (stringBuilder.length() >= Formatter.MAX_CHAR_COUNT) {
+            charLeft = width - Formatter.MAX_CHAR_COUNT;
+            nextLine = true;
+        }
+        
+        for (Iterator<String> it = words.iterator(); it.hasNext();) {
+            String word = it.next();
+            if (nextLine) {
+                stringBuilder.append("\n").append(StringUtil.addSpaces(indent - 1));
+                nextLine = false;
+            }
+            charCount += word.length() + 1;
+            if (charCount > charLeft) {
+                stringBuilder.append("\n").append(StringUtil.addSpaces(indent - 1));
+                charCount = word.length() + 1;
+            }
+            stringBuilder.append(word);
+            if (it.hasNext())
+                stringBuilder.append(" ");
+        }
+        
+        return stringBuilder.toString();
+    }
+    
+    // =====================
+    // B U I L D E R
+    // =====================
     
     /**
-     * The class {@link Builder} uses descriptive methods to create options
-     * with default or initial values.
+     * The class {@link Builder} uses descriptive methods to
+     * create options with default or initial values.
      * 
-     * @author Ben Cisneros
+     * @author Ben
      * @version 08/20/2018
      * @since 1.2
      *
@@ -162,8 +220,10 @@ public abstract class OptionWithValues {
      */
     public static abstract class Builder<B> {
         
+        protected String simpleName;
         protected String help;
         protected String metavar;
+        protected String defaultValue;
         protected boolean required;
         protected boolean hidden;
         protected String split;
@@ -175,8 +235,10 @@ public abstract class OptionWithValues {
         protected ArityRange arity;
         
         public Builder() {
+            simpleName = null;
             help = null;
             metavar = null;
+            defaultValue = null;
             required = false;
             hidden = false;
             split = null;
@@ -189,54 +251,69 @@ public abstract class OptionWithValues {
         
         protected abstract B builder();
 
-        protected abstract <O extends OptionWithValues> O build();
+        protected abstract <O extends OptionWithValue> O build();
         
-        public B setHelp(String help) {
+        public B addSimpleName(String simpleName) {
+            this.simpleName = simpleName;
+            return builder();
+        }
+        
+        public B addHelp(String help) {
             this.help = help;
             return builder();
         }
         
-        public B setMetavar(String metavar) {
+        public B addMetavar(String metavar) {
             this.metavar = metavar;
             return builder();
         }
         
-        public B setRequired(boolean required) {
+        public B addDefaultValue(String defaultValue) {
+            this.defaultValue = defaultValue;
+            return builder();
+        }
+        
+        public B addRequired(boolean required) {
             this.required = required;
             return builder();
         }
         
-        public B setHidden(boolean hidden) {
+        public B addHidden(boolean hidden) {
             this.hidden = hidden;
             return builder();
         }
         
-        public B setValueSeparator(String split) {
+        public B addValueSeparator(String split) {
             this.split = split;
             return builder();
         }
         
-        public B setHandlers(@SuppressWarnings("rawtypes") Class<? extends OptionParser>[] handlers) {
+        public B addHandlers(@SuppressWarnings("rawtypes") Class<? extends OptionParser>[] handlers) {
             this.handlers = handlers;
             return builder();
         }
         
-        public B setParsers(OptionParser<?>[] parsers) {
+        public B addParsers(OptionParser<?>[] parsers) {
             this.parsers = parsers;
             return builder();
         }
         
-        public B setOptionType(OptionType type) {
+        public B addOptionType(OptionType type) {
             this.type = type;
             return builder();
         }
         
-        public B setField(Field field) {
+        public B addField(Field field) {
             this.field = field;
             return builder();
         }
         
-        public B setArity(String arity) {
+        public B addArity(ArityRange arity) {
+            this.arity = arity;
+            return builder();
+        }
+        
+        public B addArity(String arity) {
             this.arity = ArityRange.createArity(arity);
             return builder();
         }

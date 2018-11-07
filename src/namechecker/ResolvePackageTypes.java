@@ -8,11 +8,14 @@ import ast.Name;
 import ast.NamedType;
 import ast.Sequence;
 import ast.DefineTopLevelDecl;
-import utilities.Error;
+import utilities.PJMessage;
+import utilities.CompilerMessageManager;
 import utilities.Log;
+import utilities.MessageType;
 import utilities.Settings;
 import utilities.SymbolTable;
 import utilities.Visitor;
+import utilities.VisitorMessageNumber;
 
 public class ResolvePackageTypes extends Visitor<AST> {
 
@@ -20,7 +23,7 @@ public class ResolvePackageTypes extends Visitor<AST> {
         Log.logHeader("==============================================================");
         Log.logHeader("*       P A C K A G E D   T Y P E   R E S O L U T I O N      *");
         Log.logHeader("*       -----------------------------------------------      *");
-        Log.logHeader("*       File: " + Error.fileName);
+        Log.logHeader("*       File: " + CompilerMessageManager.INSTANCE.fileName);
         Log.logHeader("==============================================================");
     }
 
@@ -40,14 +43,15 @@ public class ResolvePackageTypes extends Visitor<AST> {
     public void resolveTypeOrConstant(Name na) {
         Log.log("ResolvePackagedTypes: Resolving `" + na + "'");
         Sequence<Name> pa = na.packageAccess();
-        String fileName = "", oldCurrentFileName = "";
+        String fileName = "";
+        String oldCurrentFileName = "";
         Compilation comp = null;
         // pa is the sequence of names before the :: (if any)
         // if there is no package access then the name must be a
         // name declared locally or in an imported file - both will
         // be correctly resolved at name checking time.
         if (pa.size() > 0) {
-            oldCurrentFileName = Error.fileName;
+            oldCurrentFileName = CompilerMessageManager.INSTANCE.fileName;
             // Turn X.Y.Z::f into X/Y/Z.pj
             fileName = Settings.absolutePath + makeImportFileName(pa);
             // Does X/Y/Z.pj exist?
@@ -64,12 +68,14 @@ public class ResolvePackageTypes extends Visitor<AST> {
                     // don't do anything just continue after the if.
                 } else {
                     // It was neither a local nor a library file - throw an error...
-                    Error.error(pa, "Cannot resolve file `"
-                            + makeImportFileName(pa)
-                            + "' as a local or library file.", true, 2150);
+                    CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                .addAST(pa)
+                                .addError(VisitorMessageNumber.RESOLVE_IMPORTS_101)
+                                .addArguments(makeImportFileName(pa))
+                                .build(), MessageType.PRINT_STOP);
                 }
             }
-            Error.setFileName(fileName);
+            CompilerMessageManager.INSTANCE.setFileName(fileName);
             // Now import it
             comp = ResolveImports.importFile(pa.child(0), fileName, makeImportFileName(pa));
 
@@ -81,7 +87,7 @@ public class ResolvePackageTypes extends Visitor<AST> {
                 comp.visit(new NameChecker<AST>(st));
                 // TODO: should we type check here?
             }
-            Error.setFileName(oldCurrentFileName);
+            CompilerMessageManager.INSTANCE.setFileName(oldCurrentFileName);
             st = SymbolTable.hook;
             // TODO: this should do a proper find if its a symb ol table that comes back
             // but we probably need Type checking for that !
@@ -112,7 +118,6 @@ public class ResolvePackageTypes extends Visitor<AST> {
         if (packages.size() > 0) {
             resolveTypeOrConstant(nt.name());
         }
-
         return null;
     }
 }

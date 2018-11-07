@@ -12,8 +12,8 @@ import clp.parsers.*;
 
 /**
  * The enum {@link ParserFactory} contains a factory of converters
- * and handlers that are used for parsing values that belong to
- * various command line options.
+ * and handlers types that are used for parsing values that belong
+ * to various command line options.
  * <p>
  * This factory provides the following methods:
  * </p>
@@ -23,13 +23,14 @@ import clp.parsers.*;
  * <li>{@link #addParserTypeForClassType(Class, Class)}</li>
  * </ul>
  *
- * @author Ben Cisneros
+ * @author Ben
  * @version 06/21/2018
  * @since 1.2
  */
 public enum ParserFactory {
 
-    INSTANCE;
+    INSTANCE
+    ;
 
     /**
      * Maps all types of {@link OptionParser}.

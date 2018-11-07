@@ -24,7 +24,7 @@ import java.lang.annotation.*;
  * <li>{@link Parameters#order()}</li>
  * </ul>
  *
- * @author Ben Cisneros
+ * @author Ben
  * @version 06/14/2018
  * @since 1.2
  */
@@ -47,7 +47,7 @@ public @interface Parameters {
     /**
      * The descriptive text messaged used in help information.
      */
-    String[] help() default {};
+    String help() default "";
 
     /**
      * Optional summary description of this command.

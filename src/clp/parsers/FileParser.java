@@ -5,7 +5,7 @@ import java.io.File;
 import clp.OptionParser;
 
 /**
- * @author Ben Cisneros
+ * @author Ben
  * @version 07/14/2018
  * @since 1.2
  */

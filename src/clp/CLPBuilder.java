@@ -7,39 +7,44 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Comparator;
 import java.util.HashMap;
 import java.util.HashSet;
 import java.util.LinkedHashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
+import java.util.SortedMap;
+import java.util.SortedSet;
 import java.util.TreeMap;
-import java.util.stream.Collectors;
+import java.util.TreeSet;
 
+import utilities.Assert;
 import utilities.MultiValueMap;
 
 /**
- * @author Ben Cisneros
+ * Responsible for building {@link OptionValue} and
+ * {@link PositionalValue}.
+ * 
+ * @author Ben
  * @version 07/21/2018
  * @since 1.2
  */
-public class OptionBuilder {
+public class CLPBuilder {
     
     /**
      * The first ever registered command is the parent command.
      */
-    Class<? extends OptionParameters> mainCommand;
+    Class<? extends Command> mainCommand;
     
     /**
      * Map of names to command types.
      */
-    private Map<String, Class<? extends OptionParameters>> namedAndCommandMap = new HashMap<>();
+    private Map<Class<? extends Command>, String> commandAndNameMap = new HashMap<>();
     
     /**
      * Map of command types to option group.
      */
-    private Map<Class<? extends OptionParameters>, OptionGroup> commandAndOptionMap = new HashMap<>();
+    private Map<Class<? extends Command>, OptionGroup> commandAndOptionMap = new HashMap<>();
     
     /**
      * Map of names to option values.
@@ -49,26 +54,23 @@ public class OptionBuilder {
     /**
      * Map of invoked command types.
      */
-    List<Class<? extends OptionParameters>> invokedCommandList = new ArrayList<>();
+    List<Class<? extends Command>> invokedCommandList = new ArrayList<>();
     
     /**
      * Collections of shared-options.
      */
     private Options options = new Options();
     
-    public OptionBuilder() {
+    public CLPBuilder() {
         // Nothing to do
     }
     
-    public OptionBuilder handlerArgs(String[] args) {
+    public CLPBuilder handlerArgs(String[] args) {
         handleArgs(expandArgs(args), mainCommand, 0, new ArrayList<>());
         return this;
     }
     
-    private void handleArgs(String[] args,
-                            Class<? extends OptionParameters> type,
-                            int currentIndex,
-                            List<String> positionArgs) {
+    private void handleArgs(String[] args, Class<? extends Command> type, int currentIndex, List<String> positionArgs) {
         int index = currentIndex;
         // Collect invoked commands - this is to validate required (individual)
         // options
@@ -94,11 +96,10 @@ public class OptionBuilder {
                 }
             } else if (isOption(argument)) {
                 OptionValue optionValue = optGroup.getOption(argument);
-                if (optionValue == null) {
-                    // Throw an error if the option does not belong to the invoked command type
+                // Throw an error if the option does not belong to the invoked command type
+                if (optionValue == null)
                     throw new RuntimeException(String.format("Unknown @Option '%s' for @Parameters '%s'.",
-                                argument, findCommandName(namedAndCommandMap, type)));
-                }
+                                  argument, commandAndNameMap.get(type)));
                 index = parseOption(optGroup, optionValue, index, args);
             } else if (isCommand(argument)) {
                 subParameters = true;
@@ -106,36 +107,32 @@ public class OptionBuilder {
             } else if (argument.startsWith("-")) {
                 List<String> maybeList = startWithOptionName(argument);
                 throw new RuntimeException(String.format("Unknown @Option '%s' for @Parameters '%s'. "
-                            + "Did you mean to say?\n%s", argument, findCommandName(namedAndCommandMap, type),
+                            + "Did you mean to say?\n%s", argument, commandAndNameMap.get(type),
                             String.join("\n", maybeList)));
             } else {
                 // Throw an error if the running command takes no arguments
-                if (optGroup.getPositionalArgs().size() == 0) {
+                if (optGroup.getArguments().size() == 0)
                     throw new RuntimeException(String.format("@Parameters '%s' takes zero arguments.",
-                                findCommandName(namedAndCommandMap, type)));
-                }
+                                  commandAndNameMap.get(type)));
                 // Unparsed values are treated as positional arguments
                 positionArgs.add(argument);
                 ++index;
             }
         }
         
+        // Parse positional arguments if any
         if (!positionArgs.isEmpty())
-            // Parse positional arguments if any
             parseArgument(optGroup, positionArgs);
         
+        // Sub-commands are ALWAYS invoked last
         if (subParameters)
-            // Sub-commands are ALWAYS invoked last
-            handleArgs(args, namedAndCommandMap.get(args[index]), index + 1, new ArrayList<>());
+            handleArgs(args, getCommandByName(args[index]), index + 1, new ArrayList<>());
         
-        // Validate required options
-        validateRequired();
+        // Validate required command line options
+        validateRequiredOptions();
     }
     
-    private int parseOption(OptionGroup optGroup,
-                            OptionValue option,
-                            int index,
-                            String[] args) {
+    private int parseOption(OptionGroup optGroup, OptionValue option, int index, String[] args) {
         if (option.isFlagOption()) {
             optGroup.addValue(option, null);
             ++index;
@@ -154,7 +151,7 @@ public class OptionBuilder {
                 // Throw error if there are missing arguments
                 if (index >= args.length)
                     throw new RuntimeException(String.format("@Option '%s' requires at least %d value.",
-                            option.getName(), arity.getFrom()));
+                            option.getSimpleName(), arity.getFrom()));
                 // Consume single value
                 optGroup.addValue(option, args[index++]);
             } else {
@@ -173,7 +170,7 @@ public class OptionBuilder {
                 // Have we consumed all required values?
                 if (j < endIndex)
                     throw new RuntimeException(String.format("@Option '%s' requires at least %d value(s), "
-                                + "only %d value(s) consumed.", option.getName(), arity.getFrom(), consumedArgs));
+                                + "only %d value(s) consumed.", option.getSimpleName(), arity.getFrom(), consumedArgs));
                 
                 // Consume remaining values if any is available and can be parsed
                 while (j < arity.getTo() && index < args.length && !consumedValue) {
@@ -190,16 +187,15 @@ public class OptionBuilder {
             }
         }
         // Remove required option after successfully parsing its value
-        requiredOptionMap.remove(option.getName());
+        requiredOptionMap.remove(option.getSimpleName());
         
         return index;
     }
     
-    private void parseArgument(OptionGroup optGroup,
-                               List<String> argList) {
+    private void parseArgument(OptionGroup optGroup, List<String> argList) {
         // Current position of an argument
         int index = 0;
-        for (PositionalValue argument : optGroup.getPositionalArgs()) {
+        for (PositionalValue argument : optGroup.getArguments()) {
             ArityRange order = argument.getArity();
             // The minimum number of values to consume
             int getFrom = order.getFrom();
@@ -226,7 +222,7 @@ public class OptionBuilder {
                 // Have we consumed all required values?
                 if (getFrom < index && getTo != Integer.MAX_VALUE)
                     throw new RuntimeException(String.format("@Argument '%s' requires %s value(s), "
-                                + "only %d value(s) consumed.", argument.getName(), order, consumedArgs));
+                                + "only %d value(s) consumed.", argument.getSimpleName(), order, consumedArgs));
             }
         }
         
@@ -235,7 +231,7 @@ public class OptionBuilder {
                         + "arguments.", index, argList.size() - index));
     }
     
-    public OptionBuilder addCommand(Class<? extends OptionParameters> type) {
+    public CLPBuilder addCommand(Class<? extends Command> type) {
         type = Assert.nonNull(type, "The specified class cannot be null.");
         Parameters parameters = type.getAnnotation(Parameters.class);
         
@@ -243,13 +239,13 @@ public class OptionBuilder {
             throw new RuntimeException(String.format("@Parameters annotation is either not attached to '%s' "
                         + "or its 'name' attribute is not defined.", Util.getTypeName(type)));
         
-        // Set parent command
+        // Set main (parent) command
         if (mainCommand == null)
             mainCommand = type;
 
         // Register command type by name
         String paramsName = parameters.name();
-        if (namedAndCommandMap.put(paramsName, type) != null)
+        if (commandAndNameMap.put(type, paramsName) != null)
             throw new RuntimeException(String.format("Name '%s' with possible duplicate @Parameters "
                         + "have been found.", paramsName));
         
@@ -264,9 +260,9 @@ public class OptionBuilder {
             try {
                 OptionValue optionValue = optGroup.getOption(optName);
                 options.add(optName, optionValue);
+                // Keep track of every required `Option'
                 if (optionValue.isRequired())
-                    // Keep track of every required @Option
-                    requiredOptionMap.put(optionValue.getName(), optionValue);
+                    requiredOptionMap.put(optionValue.getSimpleName(), optionValue);
             } catch (Exception e) {
                 throw new RuntimeException(e.getMessage());
             }
@@ -275,11 +271,11 @@ public class OptionBuilder {
         return this;
     }
     
-    public Map<String, Class<? extends OptionParameters>> getNamedAndCommandMap() {
-        return namedAndCommandMap;
+    public Map<Class<? extends Command>, String> getCommandAndNameMap() {
+        return commandAndNameMap;
     }
     
-    public Map<Class<? extends OptionParameters>, OptionGroup> getCommandAndOptionMap() {
+    public Map<Class<? extends Command>, OptionGroup> getCommandAndOptionMap() {
         return commandAndOptionMap;
     }
     
@@ -287,14 +283,14 @@ public class OptionBuilder {
         return options;
     }
     
-    public Class<? extends OptionParameters> getMainCommand() {
+    public Class<? extends Command> getMainCommand() {
         return mainCommand;
     }
     
-    private void validateRequired() {
+    private void validateRequiredOptions() {
         List<String> optNames = new ArrayList<>();
         
-        for (Class<? extends OptionParameters> type : invokedCommandList) {
+        for (Class<? extends Command> type : invokedCommandList) {
             OptionGroup optGroup = commandAndOptionMap.get(type);
             if (optGroup != null) {
                 Set<OptionValue> optSet = new HashSet<>();
@@ -305,12 +301,12 @@ public class OptionBuilder {
                 
                 List<String> names = new ArrayList<>();
                 for (OptionValue optValue : optSet) {
-                    if (requiredOptionMap.get(optValue.getName()) != null)
+                    if (requiredOptionMap.get(optValue.getSimpleName()) != null)
                         names.add("[" + String.join("|", optValue.getNames()) + "]");
                 }
                 
                 if (!names.isEmpty())
-                    optNames.add(findCommandName(namedAndCommandMap, type) + String.format(":\n%3s", " ")
+                    optNames.add(commandAndNameMap.get(type) + String.format(":\n%3s", " ")
                                 + String.join(",", names));
             }
         }
@@ -355,7 +351,7 @@ public class OptionBuilder {
         OptionValue optionValue = options.get(argName);
         
         if (optionValue != null)
-            return optionValue.getValueSeparator();
+            return optionValue.getSplit();
 
         return null;
     }
@@ -386,43 +382,37 @@ public class OptionBuilder {
         if (StringUtil.isStringEmpty(paramsName))
             return false;
         
-        return namedAndCommandMap.get(paramsName) != null;
+        return getCommandByName(paramsName) != null;
     }
     
     private List<String> startWithOptionName(String argName) {
-        final int MAX_CANDIDATES = 4;
-        MultiValueMap<Integer, String> result = new MultiValueMap<>();
+        final int MAX_CANDIDATES = 5;
+        MultiValueMap<Integer, String> sortedOptions = new MultiValueMap<>();
         List<String> candidateList = new ArrayList<>();
-        for (String optName : options.getNames()) {
-            if (optName.contains(argName)) {
-                candidateList.add(optName);
-                continue;
-            }
-        }
         // Check for possible matches
+        for (String optName : options.getNames()) {
+            if (optName.contains(argName))
+                candidateList.add(optName);
+        }
         if (!candidateList.isEmpty()) {
             for (String candidate : candidateList)
-                result.put(Util.distance(candidate, argName), candidate);
-            result = sortCandidateOptions(result);
-            return new ArrayList<>(result.values());
+                sortedOptions.put(Util.distance(candidate, argName), candidate);
+            sortedOptions = sortCandidateOptions(sortedOptions);
+            return new ArrayList<>(sortedOptions.values());
         }
-        // Unknown option! Use Levenshtein to compute possible candidates
+        // None found! Use Levenshtein to compute possible candidates
         for (String optName : options.getNames()) {
-            String[] optSplit = optName.split("-");
-            result.put(Util.distance("-" + optSplit[1], argName), optName);
+            String[] optList = optName.split("-");
+            sortedOptions.put(Util.distance("-" + optList[1], argName), optName);
         }
-        result = sortCandidateOptions(result);
-        Collection<Integer> keys = result.keys();
-        for (Integer k : keys) {
-            for (String name : result.get(k))
-                candidateList.add(name);
-        }
-        if (candidateList.size() >= MAX_CANDIDATES)
-            return candidateList.subList(0, MAX_CANDIDATES);
-        return candidateList;
+        sortedOptions = sortCandidateOptions(sortedOptions);
+        Collection<Integer> keys = sortedOptions.keys();
+        for (Integer k : keys)
+            candidateList.addAll(sortedOptions.get(k));
+        return candidateList.subList(0, Math.min(MAX_CANDIDATES, candidateList.size()));
     }
     
-    public static MultiValueMap<Integer, String> sortCandidateOptions(MultiValueMap<Integer, String> options) {
+    protected static MultiValueMap<Integer, String> sortCandidateOptions(MultiValueMap<Integer, String> options) {
         MultiValueMap<Integer, String> sortedOptions = new MultiValueMap<>();
         List<Integer> keys = new ArrayList<>(options.keys());
         Collections.sort(keys);
@@ -431,17 +421,17 @@ public class OptionBuilder {
         return sortedOptions;
     }
     
-    public <T extends OptionParameters> T getCommand(Class<T> type) {
+    public <T extends Command> T getCommand(Class<T> type) {
         OptionGroup optGroup = commandAndOptionMap.get(type);
         Constructor<T> constructor = optGroup.getConstructor(type);
         T instanceObj = null;
         try {
             instanceObj = constructor.newInstance(new Object[0]);
-            Set<Class<? extends OptionParameters>> classes = findAllExtendedClasses(type);
-            for (Class<? extends OptionParameters> clazz : classes) {
+            Set<Class<? extends Command>> classes = findAllExtendedClasses(type);
+            for (Class<? extends Command> clazz : classes) {
                 for (Field field : optGroup.getFieldList(clazz)) {
                     field.setAccessible(true);
-                    OptionWithValues optWithValues = optGroup.getOption(field);
+                    OptionWithValue optWithValues = optGroup.getOptionOrArgument(field);
                     if (optWithValues.getValue() != null)
                         field.set(instanceObj, optWithValues.getValue());
                 }
@@ -454,12 +444,13 @@ public class OptionBuilder {
         return instanceObj;
     }
     
-    protected static String findCommandName(Map<String, Class<? extends OptionParameters>> namedHashMap,
-                                            Class<? extends OptionParameters> command) {
-        return namedHashMap.entrySet().stream()
-                           .filter(entry -> entry.getValue().equals(command))
-                           .map(Map.Entry::getKey).findFirst()
-                           .orElse("<UNKNOWN>");
+    protected Class<? extends Command> getCommandByName(String name) {
+        for (Map.Entry<Class<? extends Command>, String> entry : commandAndNameMap.entrySet()) {
+            if (entry.getValue().equals(name))
+                return entry.getKey();
+        }
+        
+        return null;
     }
     
     protected static <T> T createNewInstance(Class<T> objClass) {
@@ -484,26 +475,30 @@ public class OptionBuilder {
     }
     
     @SuppressWarnings("unchecked")
-    protected static Set<Class<? extends OptionParameters>> findAllExtendedClasses(Class<? extends OptionParameters> type) {
-        Set<Class<? extends OptionParameters>> setClass = new LinkedHashSet<>();
+    protected static Set<Class<? extends Command>> findAllExtendedClasses(Class<? extends Command> type) {
+        Set<Class<? extends Command>> setClass = new LinkedHashSet<>();
         setClass.add(type);
         
         Class<?> superClass = type.getSuperclass();
         if (superClass == null || Object.class.equals(superClass))
             return setClass;
         
-        if (!OptionParameters.class.equals(superClass)) {
-            Class<? extends OptionParameters> classCast = (Class<? extends OptionParameters>) superClass;
+        if (!Command.class.equals(superClass)) {
+            Class<? extends Command> classCast = (Class<? extends Command>) superClass;
             setClass.addAll(findAllExtendedClasses(classCast));
         }
         
         return setClass;
     }
     
+    // =====================
+    // O P T I O N S
+    // =====================
+    
     /**
      * Collections of shared-options between command types.
      * 
-     * @author Ben Cisneros
+     * @author Ben
      * @version 08/15/2018
      * @since 1.2
      */
@@ -512,7 +507,7 @@ public class OptionBuilder {
         /**
          * Map of all shared-options.
          */
-        private Map<String, OptionValue> sharedOptions = new HashMap<>();
+        private SortedMap<String, OptionValue> sharedOptions = new TreeMap<>();
         
         public void add(String optName, OptionValue value) throws Exception {
             if (sharedOptions.put(optName, value) != null)
@@ -528,10 +523,9 @@ public class OptionBuilder {
         }
         
         public Set<OptionValue> getOptions() {
-            Set<OptionValue> optSet = new HashSet<>();
+            SortedSet<OptionValue> optSet = new TreeSet<>();
             for (OptionValue optionValue : sharedOptions.values())
                 optSet.add(optionValue);
-            
             return optSet;
         }
     }

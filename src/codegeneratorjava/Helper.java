@@ -20,13 +20,14 @@ import java.util.HashSet;
 import java.util.Set;
 
 import ast.ProcTypeDecl;
-import clp.Assert;
+import utilities.Assert;
 import utilities.Settings;
 
 /**
- * The class {@link Helper} contains helper methods for the {@link CodeGeneratorJava}.
+ * The class {@link Helper} contains helper methods for
+ * the {@link CodeGeneratorJava}.
  *
- * @author Ben Cisneros
+ * @author Ben
  * @version 06/21/2018
  * @since 1.2
  */
@@ -100,7 +101,7 @@ public class Helper {
 
         switch (type) {
         case MAIN_NAME:
-            // TODO: Nothing to do
+            // Ignore
             break;
         case PROCEDURE_NAME:
             varName = PROCEDURE_NAME.getTag() + name;
@@ -195,8 +196,9 @@ public class Helper {
         return getWrapperClass(type).toString();
     }
     
-    // -----------------------------------------------------------------------------
-    // INVALID IDENTIFIERS
+    // ==========================================
+    // I N V A L I D   I D E N T I F I E R S
+    // ==========================================
     
     // This is to prevent collision of names with special keywords in Java
     // when generating Java class files
@@ -249,6 +251,7 @@ public class Helper {
     }
     
     public static void writeToFile(String output, String sourceFile) {
+        // TODO: Write to home folder
         String javafile = "/Users/Ben/Documents/" + sourceFile + ".java";
         Writer writer = null;
 
@@ -261,8 +264,9 @@ public class Helper {
         }
     }
     
-    // -----------------------------------------------------------------------------
-    // TYPE SYSTEM
+    // =========================
+    // T Y P E   S Y S T E M
+    // =========================
     
     public static boolean isRangeInt(Class<?> type) {
         return type == Integer.class || type == Integer.TYPE ||

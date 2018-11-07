@@ -1,12 +1,14 @@
-package clp;
+package utilities;
 
 import java.util.Collection;
 
+import clp.StringUtil;
+
 /**
- * The class {@link Assert} provides a convenient way for checking
- * {@code null} objects.
+ * The class {@link Assert} provides a convenient way for
+ * checking {@code null} objects.
  * 
- * @author Ben Cisneros
+ * @author Ben
  * @version 08/06/2018
  * @since 1.2
  */

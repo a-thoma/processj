@@ -488,8 +488,7 @@ public class Library {
                 file.newLine();
                 file.newLine();
             } catch (Exception e) {
-                System.err
-                        .println("Error encountered while writing library stub files.");
+                System.err.println("Error encountered while writing library stub files.");
                 e.printStackTrace();
             }
             return null;

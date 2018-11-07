@@ -1,6 +1,7 @@
 package clp;
 
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -11,45 +12,38 @@ import java.util.stream.Collectors;
  * about an the annotation and each of its elements can be accessed
  * dynamically through this wrapper class.
  * 
- * @author Ben Cisneros
+ * @author Ben
  * @version 08/05/2018
  * @since 1.2
  */
-public final class OptionValue extends OptionWithValues {
+public final class OptionValue extends OptionWithValue {
     
-    /**
-     * Default (long) name of this option.
-     */
-    private String name;
-
     /**
      * The name (or names) of this option.
      */
-    private String[] names;
-
+    private final List<String> names;
+    
     private OptionValue(Builder builder) {
         super(builder);
-        name = builder.name;
         names = builder.names;
     }
     
-    public String getName() {
-        return name;
-    }
-    
-    public String[] getNames() {
+    public List<String> getNames() {
         return names;
     }
     
-    public String getOptionHelp(int indent, int width) {
-        StringBuilder stringBuilder = new StringBuilder(FormatterHelp.DEFAULT_LENGTH + help.length());
-        stringBuilder.append(" ");
+    public String getOptionOrArgumentHelp(int indent, int width) {
+        StringBuilder stringBuilder = new StringBuilder(Formatter.DEFAULT_LENGTH + help.length());
+        if (required)
+            stringBuilder.append("*");
+        else
+            stringBuilder.append("  ");
         
-        Iterator<String> itNames = Arrays.asList(names).iterator();
+        Iterator<String> itNames = names.iterator();
         while (itNames.hasNext()) {
             stringBuilder.append(itNames.next());
             if (itNames.hasNext())
-                stringBuilder.append(",");
+                stringBuilder.append(", ");
         }
         
         if (metavar.isEmpty())
@@ -62,65 +56,61 @@ public final class OptionValue extends OptionWithValues {
         while (indent > stringBuilder.length() + 2)
             stringBuilder.append(" ");
         stringBuilder.append(" ");
+
+        String newHelp = defaultValue.isEmpty() ? help : help + " (default=" + defaultValue + ")";
+        List<String> words = Arrays.asList(newHelp.split(" "));
         
-        int charLeft = width - stringBuilder.length();
-        if (help.length() <= charLeft)
-            return stringBuilder.append(help).toString();
-        
-        List<String> words = Arrays.asList(help.split(" "));
-        int charCount = 0;
-        for (Iterator<String> it = words.iterator(); it.hasNext(); ) {
-            String word = it.next();
-            charCount += word.length() + 1;
-            if (charCount > charLeft) {
-                stringBuilder.append("\n").append(StringUtil.countSpaces(indent - 1));
-                charCount = word.length() + 1;
-            }
-            stringBuilder.append(word);
-            if (it.hasNext())
-                stringBuilder.append(" ");
-        }
-        
-        return stringBuilder.toString();
+        return getFilledParagraph(stringBuilder, words, indent, width);
+    }
+
+    @Override
+    public int compareTo(OptionWithValue o) {
+        OptionValue o1 = (OptionValue) this;
+        OptionValue o2 = (OptionValue) o;
+        String o1Name = o1.simpleName;
+        String o2Name = o2.simpleName;
+        return o1Name.compareToIgnoreCase(o2Name);
     }
     
     @Override
     public String toString() {
         return getClass().getSimpleName() +
-                "(name=" + name +
-                ", names=" + StringUtil.join(Arrays.asList(names), ", ") +
-                ", help=" + help +
-                ", field= " + field.getName() +
-                ", nargs= " + arity +
-                ", metavar=" + metavar +
-                ", required=" + required +
-                ", hidden=" + hidden +
-                ", split=" + "\"" + split + "\"" +
-                ", handlers=" + Arrays.stream(handlers)
-                                      .map(handler -> handler + "")
-                                      .collect(Collectors.joining()) +
-                ", type=" + type +
-                ", handlers=" + Arrays.stream(parsers)
-                                      .map(parser -> parser + "")
-                                      .collect(Collectors.joining()) +
+                "(name="        + simpleName +
+                ", names="      + StringUtil.join(names, ",") +
+                ", help="       + help +
+                ", field= "     + field.getName() +
+                ", nargs= "     + arity +
+                ", metavar="    + metavar +
+                ", required="   + required +
+                ", hidden="     + hidden +
+                ", split="      + "\"" + split + "\"" +
+                ", handlers={"  + Arrays.stream(handlers)
+                                        .map(handler -> handler + "")
+                                        .collect(Collectors.joining(",")) + "}" +
+                ", type="       + type +
+                ", handlers={"  + Arrays.stream(parsers)
+                                        .map(parser -> parser + "")
+                                        .collect(Collectors.joining(",")) + "}" +
                 ")";
     }
+    
+    // =====================
+    // B U I L D E R
+    // =====================
 
     /**
      * Builder for this {@link OptionValue}.
      * 
-     * @author Ben Cisneros
+     * @author Ben
      * @version 08/05/2018
      * @since 1.2
      */
-    public static final class Builder extends OptionWithValues.Builder<Builder> {
-
-        private String name;
-        private String[] names;
+    public static final class Builder extends OptionWithValue.Builder<Builder> {
+        
+        private List<String> names;
 
         public Builder() {
             super();
-            name = null;
             names = null;
         }
 
@@ -130,24 +120,17 @@ public final class OptionValue extends OptionWithValues {
         }
 
         @Override
-        protected <O extends OptionWithValues> O build() {
+        protected <O extends OptionWithValue> O build() {
             @SuppressWarnings("unchecked")
             O option = (O) new OptionValue(this);
             return option;
         }
-        
-        public Builder setName(String name) {
-            this.name = name;
-            return this;
-        }
 
-        public Builder setNames(String[] names) {
-            this.names = names;
-            return this;
-        }
-        
-        public Builder setArity(ArityRange arity) {
-            this.arity = arity;
+        public Builder addNames(String[] names) {
+            List<String> sortedNames = Arrays.asList(names);
+            if (names.length > 1)
+                Collections.sort(sortedNames, StringUtil.SORT_BY_LENGTH);
+            this.names = sortedNames;
             return this;
         }
     }
