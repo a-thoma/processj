@@ -39,8 +39,7 @@ public class PJMessage extends CompilerMessage {
             stStackInfo.add("stack", throwable.getStackTrace());
         }
         
-        // Apply colour code if allowed on terminal. The attribute
-        // must be set to either `yes' or `no'
+        // Apply colour code mode if allowed on terminal
         String tag = stTag.render();
         if (Settings.isAnsiColour)
             tag = ColorCodes.colorTag(stTag.render(), error.getErrorSeverity());

@@ -22,9 +22,12 @@ import ast.SwitchStat;
 import ast.SyncStat;
 import ast.TimeoutStat;
 import ast.WhileStat;
+import utilities.CompilerMessageManager;
 import utilities.Log;
-import utilities.Error;
+import utilities.MessageType;
+import utilities.PJMessage;
 import utilities.Visitor;
+import utilities.VisitorMessageNumber;
 
 /**
  * If a visit returns 'true', then is it because the code
@@ -50,10 +53,16 @@ public class Reachability extends Visitor<Boolean> {
         // if (true) S1 else S2 - S2 is unreachable
         if (is.expr().isConstant() && ((Boolean) is.expr().constantValue())
                 && is.elsepart() != null)
-            Error.error(is, "Else-part of if-statement unreachable.", false, 5000);
+            CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                  .addAST(is)
+                                  .addError(VisitorMessageNumber.REACHABILITY_800)
+                                  .build(), MessageType.PRINT_CONTINUE);
         // if (false) S1 ... - S1 is unreachable
         if (is.expr().isConstant() && (!(Boolean) is.expr().constantValue()))
-            Error.error(is, "Then-part of if-statement unreachable.", false, 5001);
+            CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                  .addAST(is)
+                                  .addError(VisitorMessageNumber.REACHABILITY_801)
+                                  .build(), MessageType.PRINT_CONTINUE);
         boolean thenBranch = true;
         boolean elseBranch = true;
         thenBranch = is.thenpart().visit(this);
@@ -73,7 +82,10 @@ public class Reachability extends Visitor<Boolean> {
                 && ((b && // the statement can run to completion
                 !ws.hasBreak && !ws.hasReturn) // but has no breaks, so it will loop forever
                 || !b)) {
-            Error.warning(ws, "While-statement is an infinite loop", 5002);
+            CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                  .addAST(ws)
+                                  .addError(VisitorMessageNumber.REACHABILITY_802)
+                                  .build(), MessageType.PRINT_CONTINUE);
             ws.foreverLoop = true;
             loopConstruct = oldLoopConstruct;
             return new Boolean(false);
@@ -81,7 +93,10 @@ public class Reachability extends Visitor<Boolean> {
 
         if (ws.expr() != null && ws.expr().isConstant()
                 && (!(Boolean) ws.expr().constantValue())) {
-            Error.error(ws, "Body of while-statement unreachable.", false, 5012);
+            CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                  .addAST(ws)
+                                  .addError(VisitorMessageNumber.REACHABILITY_810)
+                                  .build(), MessageType.PRINT_CONTINUE);
             loopConstruct = oldLoopConstruct;
             return new Boolean(true);
         }
@@ -105,7 +120,10 @@ public class Reachability extends Visitor<Boolean> {
                 !ds.hasBreak && !ds.hasReturn) { // but has no breaks, so it will loop forever
             loopConstruct = oldLoopConstruct;
             ds.foreverLoop = true;
-            Error.warning(ds, "Do-statement is an infinite loop.", 5011);
+            CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                  .addAST(ds)
+                                  .addError(VisitorMessageNumber.REACHABILITY_809)
+                                  .build(), MessageType.PRINT_CONTINUE);
             return new Boolean(false);
         }
         loopConstruct = oldLoopConstruct;
@@ -129,9 +147,11 @@ public class Reachability extends Visitor<Boolean> {
                 b = bl.stats().child(i).visit(this);
                 Log.log("visiting child: " + i + " done");
                 if (!b && bl.stats().size() - 1 > i) {
-                    Error.error(bl.stats().child(i),
-                            "Unreachable code following statement beginning on line "
-                                    + bl.stats().child(i).line + ".", false, 5003);
+                    CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                          .addAST(bl.stats().child(i))
+                                          .addError(VisitorMessageNumber.REACHABILITY_803)
+                                          .addArguments(bl.stats().child(i).line)
+                                          .build(), MessageType.PRINT_CONTINUE);
                     canFinish = false;
                 }
             }
@@ -150,7 +170,10 @@ public class Reachability extends Visitor<Boolean> {
         // for (....; false ; ....) S1
         if (fs.expr() != null && fs.expr().isConstant()
                 && (!(Boolean) fs.expr().constantValue())) {
-            Error.error(fs, "Body of for-statement unreachable.", false, 5004);
+            CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                  .addAST(fs)
+                                  .addError(VisitorMessageNumber.REACHABILITY_804)
+                                  .build(), MessageType.PRINT_CONTINUE);
             loopConstruct = oldLoopConstruct;
             return new Boolean(true);
         }
@@ -164,7 +187,10 @@ public class Reachability extends Visitor<Boolean> {
                 .expr().constantValue()))) && b && // the statement can run to completion
                 !fs.hasBreak && !fs.hasReturn) // but has no breaks, so it will loop forever
         {
-            Error.warning(fs, "For-statement is an infinite loop.", 5005);
+            CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                  .addAST(fs)
+                                  .addError(VisitorMessageNumber.REACHABILITY_805)
+                                  .build(), MessageType.PRINT_CONTINUE);
             fs.foreverLoop = true;
             loopConstruct = oldLoopConstruct;
             return new Boolean(false);
@@ -180,10 +206,16 @@ public class Reachability extends Visitor<Boolean> {
     public Boolean visitBreakStat(BreakStat bs) {
         Log.log(bs, "Visiting a break-statement.");
         if (inParBlock)
-            Error.error(bs, "Break-statement inside par-block is not legal.", false, 5009);
+            CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                  .addAST(bs)
+                                  .addError(VisitorMessageNumber.REACHABILITY_808)
+                                  .build(), MessageType.PRINT_CONTINUE);
 
         if (loopConstruct == null && switchConstruct == null) {
-            Error.error(bs, "Break statement outside loop or switch construct.", false, 5006);
+            CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                  .addAST(bs)
+                                  .addError(VisitorMessageNumber.REACHABILITY_806)
+                                  .build(), MessageType.PRINT_CONTINUE);
             return new Boolean(true); // this break doesn't matter cause it can't be here anyways!
         }
         if (loopConstruct != null && !insideSwitch)
@@ -207,9 +239,15 @@ public class Reachability extends Visitor<Boolean> {
     public Boolean visitContinueStat(ContinueStat cs) {
         Log.log(cs, "Visiting a continue-statement.");
         if (inParBlock)
-            Error.error(cs, "Continue-statement inside par-block is not legal.", false, 5013);
+            CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                  .addAST(cs)
+                                  .addError(VisitorMessageNumber.REACHABILITY_811)
+                                  .build(), MessageType.PRINT_CONTINUE);
         if (loopConstruct == null) {
-            Error.error(cs, "Continue statement outside loop construct.", false, 5014);
+            CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                  .addAST(cs)
+                                  .addError(VisitorMessageNumber.REACHABILITY_812)
+                                  .build(), MessageType.PRINT_CONTINUE);
             return new Boolean(true); // this continue doesn't matter cause it can't be here anyways!
         }
         if (loopConstruct != null)
@@ -236,7 +274,10 @@ public class Reachability extends Visitor<Boolean> {
     public Boolean visitReturnStat(ReturnStat rs) {
         Log.log(rs, "Visiting a return-statement.");
         if (inParBlock)
-            Error.error(rs, "Return-statement inside par-block is not legal.", false, 5008);
+            CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                  .addAST(rs)
+                                  .addError(VisitorMessageNumber.REACHABILITY_807)
+                                  .build(), MessageType.PRINT_CONTINUE);
         if (loopConstruct != null)
             loopConstruct.hasReturn = true;
         return new Boolean(false);

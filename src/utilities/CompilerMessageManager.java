@@ -4,8 +4,6 @@ import java.io.File;
 import java.util.Iterator;
 import java.util.Stack;
 
-import org.stringtemplate.v4.ST;
-
 /**
  * The class {@link CompilerMessageManager} is used to
  * track down various types of error/warning messages
@@ -100,7 +98,7 @@ public enum CompilerMessageManager {
         while (it.hasNext()) {
             System.out.println(it.next().renderMessage());
             if (it.hasNext())
-                System.out.println("+------------------------------------------------------");
+                System.out.println("-------------------------------------------------------");
         }
     }
     

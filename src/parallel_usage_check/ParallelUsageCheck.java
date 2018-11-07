@@ -56,7 +56,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
             if (writeSet.containsKey(name)) {
                 CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                             .addAST(ra)
-                            .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECK_700)
+                            .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_700)
                             .addArguments(name)
                             .build(), MessageType.PRINT_CONTINUE);
             } else {
@@ -74,7 +74,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
             if (writeSet.containsKey(name)) {
                 CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                             .addAST(aae)
-                            .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECK_701)
+                            .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_701)
                             .addArguments(name)
                             .build(), MessageType.PRINT_CONTINUE);
             } else {
@@ -82,7 +82,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                 readSet.put(name, aae);
                 CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                             .addAST(aae)
-                            .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECK_702)
+                            .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_702)
                             .addArguments(name)
                             .build(), MessageType.PRINT_CONTINUE);
                 aae.index().visit(this);
@@ -92,9 +92,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
     }
 
     public Object visitAltStat(AltStat as) {
-        /* TODO:
-
-           alt {
+        /* alt {
              x = c.read() : { x = 1; }
                }
            causes issues!
@@ -113,7 +111,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                 if (writeSet.containsKey(name))
                     CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                                 .addAST(as)
-                                .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECK_703)
+                                .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_703)
                                 .addArguments(name)
                                 .build(), MessageType.PRINT_CONTINUE);
                 else {
@@ -126,7 +124,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                 if (writeSet.containsKey(name))
                     CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                                 .addAST(as)
-                                .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECK_704)
+                                .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_704)
                                 .addArguments(name)
                                 .build(), MessageType.PRINT_CONTINUE);
                 else {
@@ -139,7 +137,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                 if (writeSet.containsKey(name))
                     CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                                 .addAST(as)
-                                .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECK_705)
+                                .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_705)
                                 .addArguments(name)
                                 .build(), MessageType.PRINT_CONTINUE);
                 else {
@@ -147,7 +145,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                     writeSet.put(name, as.left());
                     CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                                 .addAST(as.left())
-                                .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECK_706)
+                                .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_706)
                                 .addArguments(name)
                                 .build(), MessageType.PRINT_CONTINUE);
                 }
@@ -164,7 +162,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
             if (writeSet.containsKey(name))
                 CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                             .addAST(ne)
-                            .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECK_707)
+                            .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_707)
                             .addArguments(name)
                             .build(), MessageType.PRINT_CONTINUE);
             else {
@@ -183,7 +181,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                 if (writeSet.containsKey(name))
                     CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                                 .addAST(up)
-                                .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECK_708)
+                                .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_708)
                                 .addArguments(name)
                                 .build(), MessageType.PRINT_CONTINUE);
                 else {
@@ -196,7 +194,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                 if (writeSet.containsKey(name))
                     CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                                 .addAST(up)
-                                .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECK_709)
+                                .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_709)
                                 .addArguments(name)
                                 .build(), MessageType.PRINT_CONTINUE);
                 else {
@@ -209,7 +207,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                 if (writeSet.containsKey(name))
                     CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                                 .addAST(up)
-                                .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECK_710)
+                                .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_710)
                                 .addArguments(name)
                                 .build(), MessageType.PRINT_CONTINUE);
                 else {
@@ -217,7 +215,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                     writeSet.put(name, up.expr());
                     CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                                 .addAST(up.expr())
-                                .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECK_711)
+                                .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_711)
                                 .addArguments(name)
                                 .build(), MessageType.PRINT_CONTINUE);
                 }
@@ -236,7 +234,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                     if (writeSet.containsKey(name))
                         CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                                     .addAST(up)
-                                    .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECK_712)
+                                    .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_712)
                                     .addArguments(name)
                                     .build(), MessageType.PRINT_CONTINUE);
                     else {
@@ -249,7 +247,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                     if (writeSet.containsKey(name))
                         CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                                     .addAST(up)
-                                    .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECK_713)
+                                    .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_713)
                                     .addArguments(name)
                                     .build(), MessageType.PRINT_CONTINUE);
                     else {
@@ -262,7 +260,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                     if (writeSet.containsKey(name))
                         CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                                     .addAST(up)
-                                    .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECK_714)
+                                    .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_714)
                                     .addArguments(name)
                                     .build(), MessageType.PRINT_CONTINUE);
                     else {
@@ -270,7 +268,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                         writeSet.put(name, up.expr());
                         CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                                     .addAST(up.expr())
-                                    .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECK_715)
+                                    .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_715)
                                     .addArguments(name)
                                     .build(), MessageType.PRINT_CONTINUE);
                     }

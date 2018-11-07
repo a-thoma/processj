@@ -39,10 +39,16 @@ public enum VisitorMessageNumber implements IMessageNumber {
     TOP_LEVEL_DECLS_206(206, ErrorSeverity.ERROR),
     TOP_LEVEL_DECLS_207(207, ErrorSeverity.ERROR),
     TOP_LEVEL_DECLS_208(208, ErrorSeverity.ERROR),
+    
+    // =========================================================
+    // N A M E   T Y P E   R E S O L U T I O N (300-399)
+    // =========================================================
+    
+    NAME_TYPE_RESOLUTION_300(300, ErrorSeverity.ERROR),
 
-    // ====================================================
-    // R E S O L V E   N A M E   C H E C K E R (400-499)
-    // ====================================================
+    // ======================================
+    // N A M E   C H E C K E R (400-499)
+    // ======================================
     
     NAME_CHECKER_400(400, ErrorSeverity.ERROR),
     NAME_CHECKER_401(401, ErrorSeverity.ERROR),
@@ -67,96 +73,109 @@ public enum VisitorMessageNumber implements IMessageNumber {
     NAME_CHECKER_420(420, ErrorSeverity.ERROR),
     NAME_CHECKER_421(421, ErrorSeverity.ERROR),
 
-    // ========================================================
-    // A R R A Y   T Y P E   C O N S T R U C T O R (500-599)
-    // ========================================================
+    // ====================================
+    // T Y P E   C H E C K E R (600-699)
+    // ====================================
     
-    ARRAY_TYPE_CONSTRUCTOR_500(500, ErrorSeverity.ERROR),
-    ARRAY_TYPE_CONSTRUCTOR_501(501, ErrorSeverity.ERROR),
-    ARRAY_TYPE_CONSTRUCTOR_502(502, ErrorSeverity.ERROR),
-    ARRAY_TYPE_CONSTRUCTOR_503(503, ErrorSeverity.ERROR),
-    ARRAY_TYPE_CONSTRUCTOR_504(504, ErrorSeverity.ERROR),
-
-    // ===========================================
-    // T Y P E   R E S O L U T I O N (600-699)
-    // ===========================================
-    
-    TYPE_RESOLUTION_600(600, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_601(601, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_602(602, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_603(603, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_604(604, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_605(605, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_606(606, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_607(607, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_608(608, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_609(609, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_610(610, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_611(611, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_612(612, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_613(613, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_614(614, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_615(615, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_616(616, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_617(617, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_618(618, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_619(619, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_620(620, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_621(621, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_622(622, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_623(623, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_624(624, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_625(625, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_626(626, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_627(627, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_628(628, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_629(629, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_630(630, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_631(631, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_632(632, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_633(633, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_634(634, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_635(635, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_636(636, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_637(637, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_638(638, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_639(639, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_640(640, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_641(641, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_642(642, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_643(643, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_644(644, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_645(645, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_646(646, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_647(647, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_648(648, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_649(649, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_650(650, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_651(651, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_652(652, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_653(653, ErrorSeverity.ERROR),
-    TYPE_RESOLUTION_654(654, ErrorSeverity.ERROR),
+    TYPE_CHECKER_600(600, ErrorSeverity.ERROR),
+    TYPE_CHECKER_601(601, ErrorSeverity.ERROR),
+    TYPE_CHECKER_602(602, ErrorSeverity.ERROR),
+    TYPE_CHECKER_603(603, ErrorSeverity.ERROR),
+    TYPE_CHECKER_604(604, ErrorSeverity.ERROR),
+    TYPE_CHECKER_605(605, ErrorSeverity.ERROR),
+    TYPE_CHECKER_606(606, ErrorSeverity.ERROR),
+    TYPE_CHECKER_607(607, ErrorSeverity.ERROR),
+    TYPE_CHECKER_608(608, ErrorSeverity.ERROR),
+    TYPE_CHECKER_609(609, ErrorSeverity.ERROR),
+    TYPE_CHECKER_610(610, ErrorSeverity.ERROR),
+    TYPE_CHECKER_611(611, ErrorSeverity.ERROR),
+    TYPE_CHECKER_612(612, ErrorSeverity.ERROR),
+    TYPE_CHECKER_613(613, ErrorSeverity.ERROR),
+    TYPE_CHECKER_614(614, ErrorSeverity.ERROR),
+    TYPE_CHECKER_615(615, ErrorSeverity.ERROR),
+    TYPE_CHECKER_616(616, ErrorSeverity.ERROR),
+    TYPE_CHECKER_617(617, ErrorSeverity.ERROR),
+    TYPE_CHECKER_618(618, ErrorSeverity.ERROR),
+    TYPE_CHECKER_619(619, ErrorSeverity.ERROR),
+    TYPE_CHECKER_620(620, ErrorSeverity.ERROR),
+    TYPE_CHECKER_621(621, ErrorSeverity.ERROR),
+    TYPE_CHECKER_622(622, ErrorSeverity.ERROR),
+    TYPE_CHECKER_623(623, ErrorSeverity.ERROR),
+    TYPE_CHECKER_624(624, ErrorSeverity.ERROR),
+    TYPE_CHECKER_625(625, ErrorSeverity.ERROR),
+    TYPE_CHECKER_626(626, ErrorSeverity.ERROR),
+    TYPE_CHECKER_627(627, ErrorSeverity.ERROR),
+    TYPE_CHECKER_628(628, ErrorSeverity.ERROR),
+    TYPE_CHECKER_629(629, ErrorSeverity.ERROR),
+    TYPE_CHECKER_630(630, ErrorSeverity.ERROR),
+    TYPE_CHECKER_631(631, ErrorSeverity.ERROR),
+    TYPE_CHECKER_632(632, ErrorSeverity.ERROR),
+    TYPE_CHECKER_633(633, ErrorSeverity.ERROR),
+    TYPE_CHECKER_634(634, ErrorSeverity.ERROR),
+    TYPE_CHECKER_635(635, ErrorSeverity.ERROR),
+    TYPE_CHECKER_636(636, ErrorSeverity.ERROR),
+    TYPE_CHECKER_637(637, ErrorSeverity.ERROR),
+    TYPE_CHECKER_638(638, ErrorSeverity.ERROR),
+    TYPE_CHECKER_639(639, ErrorSeverity.ERROR),
+    TYPE_CHECKER_640(640, ErrorSeverity.ERROR),
+    TYPE_CHECKER_641(641, ErrorSeverity.ERROR),
+    TYPE_CHECKER_642(642, ErrorSeverity.ERROR),
+    TYPE_CHECKER_643(643, ErrorSeverity.ERROR),
+    TYPE_CHECKER_644(644, ErrorSeverity.ERROR),
+    TYPE_CHECKER_645(645, ErrorSeverity.ERROR),
+    TYPE_CHECKER_646(646, ErrorSeverity.ERROR),
+    TYPE_CHECKER_647(647, ErrorSeverity.ERROR),
+    TYPE_CHECKER_648(648, ErrorSeverity.ERROR),
+    TYPE_CHECKER_649(649, ErrorSeverity.ERROR),
+    TYPE_CHECKER_650(650, ErrorSeverity.ERROR),
+    TYPE_CHECKER_651(651, ErrorSeverity.ERROR),
+    TYPE_CHECKER_652(652, ErrorSeverity.ERROR),
+    TYPE_CHECKER_653(653, ErrorSeverity.ERROR),
+    TYPE_CHECKER_654(654, ErrorSeverity.ERROR),
+    TYPE_CHECKER_655(655, ErrorSeverity.ERROR),
+    TYPE_CHECKER_656(656, ErrorSeverity.ERROR),
+    TYPE_CHECKER_657(657, ErrorSeverity.ERROR),
+    TYPE_CHECKER_658(658, ErrorSeverity.ERROR),
+    TYPE_CHECKER_659(659, ErrorSeverity.ERROR),
 
     // ===========================================================
-    // P A R A L L E L   U S A G E   C H E C K I N G (700-799)
+    // P A R A L L E L   U S A G E   C H E C K E R (700-799)
     // ===========================================================
     
-    PARALLEL_USAGE_CHECK_700(700, ErrorSeverity.ERROR),
-    PARALLEL_USAGE_CHECK_701(701, ErrorSeverity.ERROR),
-    PARALLEL_USAGE_CHECK_702(702, ErrorSeverity.ERROR),
-    PARALLEL_USAGE_CHECK_703(703, ErrorSeverity.ERROR),
-    PARALLEL_USAGE_CHECK_704(704, ErrorSeverity.ERROR),
-    PARALLEL_USAGE_CHECK_705(705, ErrorSeverity.ERROR),
-    PARALLEL_USAGE_CHECK_706(706, ErrorSeverity.ERROR),
-    PARALLEL_USAGE_CHECK_707(707, ErrorSeverity.ERROR),
-    PARALLEL_USAGE_CHECK_708(708, ErrorSeverity.ERROR),
-    PARALLEL_USAGE_CHECK_709(709, ErrorSeverity.ERROR),
-    PARALLEL_USAGE_CHECK_710(710, ErrorSeverity.ERROR),
-    PARALLEL_USAGE_CHECK_711(711, ErrorSeverity.WARNING),
-    PARALLEL_USAGE_CHECK_712(712, ErrorSeverity.ERROR),
-    PARALLEL_USAGE_CHECK_713(713, ErrorSeverity.ERROR),
-    PARALLEL_USAGE_CHECK_714(714, ErrorSeverity.ERROR),
-    PARALLEL_USAGE_CHECK_715(715, ErrorSeverity.WARNING)
+    PARALLEL_USAGE_CHECKER_700(700, ErrorSeverity.ERROR),
+    PARALLEL_USAGE_CHECKER_701(701, ErrorSeverity.ERROR),
+    PARALLEL_USAGE_CHECKER_702(702, ErrorSeverity.ERROR),
+    PARALLEL_USAGE_CHECKER_703(703, ErrorSeverity.ERROR),
+    PARALLEL_USAGE_CHECKER_704(704, ErrorSeverity.ERROR),
+    PARALLEL_USAGE_CHECKER_705(705, ErrorSeverity.ERROR),
+    PARALLEL_USAGE_CHECKER_706(706, ErrorSeverity.ERROR),
+    PARALLEL_USAGE_CHECKER_707(707, ErrorSeverity.ERROR),
+    PARALLEL_USAGE_CHECKER_708(708, ErrorSeverity.ERROR),
+    PARALLEL_USAGE_CHECKER_709(709, ErrorSeverity.ERROR),
+    PARALLEL_USAGE_CHECKER_710(710, ErrorSeverity.ERROR),
+    PARALLEL_USAGE_CHECKER_711(711, ErrorSeverity.WARNING),
+    PARALLEL_USAGE_CHECKER_712(712, ErrorSeverity.ERROR),
+    PARALLEL_USAGE_CHECKER_713(713, ErrorSeverity.ERROR),
+    PARALLEL_USAGE_CHECKER_714(714, ErrorSeverity.ERROR),
+    PARALLEL_USAGE_CHECKER_715(715, ErrorSeverity.WARNING),
+    
+    // =====================================
+    // R E A C H A B I L I T Y (800-899)
+    // =====================================
+    
+    REACHABILITY_800(800, ErrorSeverity.ERROR),
+    REACHABILITY_801(801, ErrorSeverity.ERROR),
+    REACHABILITY_802(802, ErrorSeverity.WARNING),
+    REACHABILITY_803(803, ErrorSeverity.ERROR),
+    REACHABILITY_804(804, ErrorSeverity.ERROR),
+    REACHABILITY_805(805, ErrorSeverity.WARNING),
+    REACHABILITY_806(806, ErrorSeverity.ERROR),
+    REACHABILITY_807(807, ErrorSeverity.ERROR),
+    REACHABILITY_808(808, ErrorSeverity.ERROR),
+    REACHABILITY_809(809, ErrorSeverity.WARNING),
+    REACHABILITY_810(810, ErrorSeverity.ERROR),
+    REACHABILITY_811(811, ErrorSeverity.ERROR),
+    REACHABILITY_812(812, ErrorSeverity.ERROR),
     ;
     
     /**
