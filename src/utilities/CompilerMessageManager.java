@@ -1,6 +1,10 @@
 package utilities;
 
+import java.io.BufferedWriter;
 import java.io.File;
+import java.io.FileOutputStream;
+import java.io.OutputStreamWriter;
+import java.io.Writer;
 import java.util.Iterator;
 import java.util.Stack;
 
@@ -91,6 +95,10 @@ public enum CompilerMessageManager {
         return stackTrace;
     }
     
+    public CompilerMessage getPostPonedMessage() {
+        return myPostPonedMessage;
+    }
+    
     public void printTrace(String source) {
         System.out.println("=============== E R R O R   R E P O R T ===============");
         System.out.println(String.format("%d error(s) in '%s'", errorCount, source));
@@ -120,5 +128,21 @@ public enum CompilerMessageManager {
         String absPath = new File("").getAbsolutePath() + "/";
         str = str.replaceAll(absPath,"");
         fileName = str;
+    }
+    
+    public void writeToFile(String outputFile) {
+        // TODO: Write to home folder
+        String javafile = "/Users/Ben/Documents/" + outputFile + ".txt";
+        StringBuilder stringBuilder = new StringBuilder();
+        for (CompilerMessage cm : stackTrace)
+            stringBuilder.append(cm.getMessageNumber().getNumber()).append("\n");
+        Writer writer = null;
+        try {
+            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(javafile), "utf-8"));
+            writer.write(stringBuilder.toString());
+            writer.close();
+        } catch (Exception e) {
+            System.out.println(e);
+        }
     }
 }

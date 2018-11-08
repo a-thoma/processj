@@ -236,8 +236,9 @@ public class Helper {
     }
     
     public static String getPackage(String packageName, String sourceFile) {
-        // An invocation comes from a different file (an import) if the source file
-        // from which an invocation is made is different to the package
+        // An invocation comes from a external file (an import) if the
+        // source file from which an invocation is made is different to
+        // the package
         if (!packageName.contains(sourceFile)) {
             String includePath = Settings.includeDir + File.separator + Settings.targetLanguage + File.separator;
             // The following replaces all `/' with `.'
@@ -246,7 +247,8 @@ public class Helper {
             return packageName;
         }
         
-        // Otherwise, the invocation must come from the same source file (and package)
+        // Otherwise, the invocation must come from the same source
+        // file (and package)
         return sourceFile;
     }
     

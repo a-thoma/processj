@@ -174,6 +174,7 @@ public class ProcessJc {
             
             if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
                 CompilerMessageManager.INSTANCE.printTrace("import declarations");
+                CompilerMessageManager.INSTANCE.writeToFile("PJErrors");
                 System.exit(1);
             }
             
