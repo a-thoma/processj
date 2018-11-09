@@ -3,9 +3,9 @@ import java.util.*;
 
 import ast.AST;
 import ast.Compilation;
-import clp.Formatter;
-import clp.CLPBuilder;
-import clp.StringUtil;
+import cli.CLIBuilder;
+import cli.Formatter;
+import cli.StringUtil;
 import codegeneratorjava.CodeGeneratorJava;
 import library.Library;
 import parser.parser;
@@ -29,7 +29,7 @@ import utilities.SymbolTable;
  */
 public class ProcessJc {
     
-    public static CLPBuilder optionBuilder = new CLPBuilder().addCommand(PJMain.class);
+    public static CLIBuilder optionBuilder = new CLIBuilder().addCommand(PJMain.class);
     
     public static void help() {
         Formatter formatHelp = new Formatter(optionBuilder);

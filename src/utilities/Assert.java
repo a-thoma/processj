@@ -2,7 +2,7 @@ package utilities;
 
 import java.util.Collection;
 
-import clp.StringUtil;
+import cli.StringUtil;
 
 /**
  * The class {@link Assert} provides a convenient way for

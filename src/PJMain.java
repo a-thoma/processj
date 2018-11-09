@@ -4,11 +4,11 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.List;
 
-import clp.Argument;
-import clp.IVersionPrinter;
-import clp.Option;
-import clp.Command;
-import clp.Parameters;
+import cli.Argument;
+import cli.Command;
+import cli.IVersionPrinter;
+import cli.Option;
+import cli.Parameters;
 import utilities.Language;
 
 /**
