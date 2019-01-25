@@ -195,6 +195,8 @@ public class Formatter {
         StringBuilder stringBuilder = new StringBuilder();
         int indent = findMaxLength(parameter.header());
         indent = (DEFAULT_WIDTH - indent) / 2;
+        if (parameter.header().length == 0)
+            return "";
         for (String header : parameter.header())
             stringBuilder.append(StringUtil.addSpaces(indent - 1)).append(header).append("\n");
         stringBuilder.append("\n");
@@ -206,6 +208,8 @@ public class Formatter {
     
     public String buildFooter() {
         Parameters parameter = optionBuilder.getMainCommand().getAnnotation(Parameters.class);
+        if (parameter.footer().length == 0)
+            return "";
         StringBuilder stringBuilder = new StringBuilder();
         for (String footer : parameter.footer())
             stringBuilder.append(footer).append("\n");

@@ -65,7 +65,7 @@ public class CLIBuilder {
         // Nothing to do
     }
     
-    public CLIBuilder handlerArgs(String[] args) {
+    public CLIBuilder handleArgs(String[] args) {
         handleArgs(expandArgs(args), mainCommand, 0, new ArrayList<>());
         return this;
     }

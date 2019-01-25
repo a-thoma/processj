@@ -91,11 +91,39 @@ public enum ParserFactory {
      *            The name of the option.
      * @return An {@link OptionParser} instance or {@code null} if none is found.
      */
-    public OptionParser<?> getParserTypeForClassType(Class<?> classType, String optionName) {
+//    public OptionParser<?> getParserTypeForClassType(Class<?> classType, String optionName) {
+    @SuppressWarnings("rawtypes")
+    public OptionParser<?> getParserTypeForClassType(Class<?> classType, String optionName, Class<? extends OptionParser> handler) {
         if (parserMap.get(classType) == null)
             return null;
-        
+        // First check if we are dealing with a user-defined class
+        else {
+            Class<?> clazz = findUserDefinedClass(handler);
+            if (clazz == null) {
+                // Add it to the factory
+                addParserTypeForClassType(handler, handler);
+                classType = handler;
+            }
+        }
+        // Otherwise, return whatever type the factory has.
         return parserMap.get(classType).getOptionParser(optionName);
+    }
+    
+    /**
+     * Gets the handler corresponding to the actual type specified by the user.
+     * Return {@code null} if the actual type is not found.
+     * 
+     * @param handler
+     *          Some user-defined type.
+     * @return The corresponding actual type, or {@code null} if not found.
+     */
+    @SuppressWarnings("rawtypes")
+    public Class<?> findUserDefinedClass(Class<? extends OptionParser> handler) {
+        for (Class<?> clazz : parserMap.keySet()) {
+            if (parserMap.get(clazz).getType().equals(handler))
+                return clazz;
+        }
+        return null;
     }
 
     /**
@@ -151,7 +179,7 @@ public enum ParserFactory {
          * @throws IllegalArgumentException
          *             When a constructor with a parameter {@code String} is not
          *             defined.
-         * @param converter
+         * @param handlerType
          *            The class type that the constructor belongs to.
          * @return A constructor that belong to class {@code converter}.
          */

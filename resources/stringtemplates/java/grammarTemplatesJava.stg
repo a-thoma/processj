@@ -118,7 +118,7 @@ Invocation(name, vars) ::= <<
 // 5) vars: the names of the formal parameters.
 // 6) body: the method body enclosed between braces.
 Method(modifier, type, name, types, vars, body) ::= <<
-<modifier> static <type> <name>(<types,vars:{t,v | <t> <v>}; separator=", ">) {
+<if(modifier)><modifier> <endif>static <type> <name>(<types,vars:{t,v | <t> <v>}; separator=", ">) {
     <! The body may be an invocation or a sequence of statements !>
     <body>
 }

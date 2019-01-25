@@ -174,10 +174,9 @@ public final class OptionGroup {
         builder.addHidden(annotation.hidden()).addRequired(annotation.required());
         
         // This is to retrieve information about the type of data each field
-        // holds at compile-time or run-time. Basic types such as byte, short,
-        // int, long, float, double, String and parameterized fields (of basic
-        // types) can be inferred. Complex data types such as user-defined
-        // types must be explicitly specified
+        // holds at run-time. Basic types such as byte, short, int, long, float,
+        // double, String and parameterized fields (of basic types) can be inferred.
+        // Complex data types such as user-defined types must be explicitly specified
         Class<?>[] fieldFinalTypes = findFieldFinalTypes(field);
         if (fieldFinalTypes.length == 2) {
             // Must be a field of type Map
@@ -468,11 +467,12 @@ public final class OptionGroup {
             return new EnumParser(optName, fieldType);
         // No, then attempt to create a parse from the given handler or return
         // `null' (for exception handling) if we fail to create a parser
-        OptionParser<?> parser = ParserFactory.INSTANCE.getParserTypeForClassType(fieldType, optName);
+        // TODO: Pass handler class to avoid using default handlers
+        OptionParser<?> parser = ParserFactory.INSTANCE.getParserTypeForClassType(fieldType, optName, handler);
         if (parser == null) {
             try {
                 ParserFactory.INSTANCE.addParserTypeForClassType(fieldType, handler);
-                parser = ParserFactory.INSTANCE.getParserTypeForClassType(fieldType, optName);
+                parser = ParserFactory.INSTANCE.getParserTypeForClassType(fieldType, optName, handler);
             } catch (Exception e) {
                 return null;
             }
@@ -557,8 +557,8 @@ public final class OptionGroup {
     
     protected static Constructor<? extends Command> findConstructor(Class<? extends Command> type) {
         try {
-            // This will fail if the extended class has no default constructor.
-            // One must ALWAYS be provided!
+            // This will fail if the extended class has no default no-argument constructor.
+            // One must NEVER be provided!
             return type.getConstructor(new Class[0]);
         } catch (NoSuchMethodException | SecurityException e) {
             throw new IllegalArgumentException(String.format("Missing default constructor in class '%s'.",

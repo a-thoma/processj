@@ -254,7 +254,7 @@ public class Helper {
     
     public static void writeToFile(String output, String sourceFile) {
         // TODO: Write to home folder
-        String javafile = "/Users/Ben/Documents/" + sourceFile + ".java";
+        String javafile = "/Users/Ben/Desktop/processj/tests/" + sourceFile + ".java";
         Writer writer = null;
 
         try {
