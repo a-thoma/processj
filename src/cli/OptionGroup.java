@@ -283,7 +283,7 @@ public final class OptionGroup {
         
         builder.addArity(order);
         
-        // Same as `Options' except that arguments cannot be of type Map.
+        // Same as 'Options' except that arguments cannot be of type Map.
         // Only one type should be returned and one parser instance should
         // be created. Complex data types such as user-defined types must
         // be explicitly specified
@@ -323,7 +323,7 @@ public final class OptionGroup {
                .addMetavar(annotation.metavar())
                .addDefaultValue(annotation.defaultValue());
         
-        // Build argument and parse the value assigned to `defaultValue'
+        // Build argument and parse the value assigned to 'defaultValue'
         PositionalValue argument = builder.build();
         if (!StringUtil.isStringEmpty(annotation.defaultValue()))
             addValue(argument, annotation.defaultValue());
@@ -350,17 +350,17 @@ public final class OptionGroup {
 
     private void addBooleanValue(OptionWithValue option, String value) {
         try {
-            // If `null' then this could be a stand alone option, e.g. a flag
+            // If 'null' then this could be a stand alone option, e.g. a flag
             // option that doesn't consume values
             if (value == null) {
                 // Check the value of this field and flip its value if the field
-                // was initialize. E.g. if `true' change it to `false', if `false'
-                // change it to `true'
+                // was initialize. E.g. if 'true' change it to 'false', if 'false'
+                // change it to 'true'
                 Boolean oldValue = (Boolean) option.getValue();
                 if (oldValue != null)
                     option.addValue(oldValue ? Boolean.FALSE : Boolean.TRUE);
                 else
-                    // No, then it must be null so set it to `true'
+                    // No, then it must be null so set it to 'true'
                     option.addValue(Boolean.TRUE);
             } else {
                 // Parse the given boolean value
@@ -409,7 +409,7 @@ public final class OptionGroup {
                 objArray = Array.newInstance(option.getField().getType().getComponentType(), 1);
                 Array.set(objArray, 0, parsedValue);
             } else {
-                // Because arrays cannot be resized, an array of `length + 1' size
+                // Because arrays cannot be resized, an array of 'length + 1' size
                 // is created before the values are copied into this new array
                 int length = Array.getLength(objArray);
                 Object newObjArray = Array.newInstance(objArray.getClass().getComponentType(), length + 1);
@@ -466,7 +466,7 @@ public final class OptionGroup {
         if (handler == null && Enum.class.isAssignableFrom(fieldType))
             return new EnumParser(optName, fieldType);
         // No, then attempt to create a parse from the given handler or return
-        // `null' (for exception handling) if we fail to create a parser
+        // 'null' (for exception handling) if we fail to create a parser
         // TODO: Pass handler class to avoid using default handlers
         OptionParser<?> parser = ParserFactory.INSTANCE.getParserTypeForClassType(fieldType, optName, handler);
         if (parser == null) {

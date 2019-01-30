@@ -86,7 +86,7 @@ public class Library {
     }
 
     public static void generateLibraries(Compilation c) {
-        // There are two types of libaries:
+        // There are two types of libraries:
         // - Libraries written in ProcessJ
         //   ProcessJ libraries must set the #LIBRARY flag
         // - Libraries written in some native language

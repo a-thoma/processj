@@ -18,12 +18,14 @@ import ast.Block;
 import ast.Compilation;
 import ast.ExprStat;
 import ast.Expression;
+import ast.Import;
 import ast.Invocation;
 import ast.LocalDecl;
 import ast.Modifier;
 import ast.Name;
 import ast.NamedType;
 import ast.ParamDecl;
+import ast.Pragma;
 import ast.PrimitiveLiteral;
 import ast.PrimitiveType;
 import ast.ProcTypeDecl;
@@ -89,6 +91,11 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * Current procedure call.
      */
     private String currProcName_ = null;
+    
+    /**
+     * Map of imports.
+     */
+    private List<String> importList_ = null;
 
     /**
      * Map of formal parameters transformed to fields.
@@ -141,6 +148,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         topLevelDeclsTable_ = topLevelDeclsTable;
         procMap_ = new LinkedHashMap<>();
         fieldMap_ = new LinkedHashMap<>();
+        importList_ = new ArrayList<>();
     }
 
     /**
@@ -198,8 +206,14 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         // Instance of Compilation template to fill in
         ST stCompilation = stGroup_.getInstanceOf("Compilation");
 
-        // Reference to all the top level types
-        // TODO: ...
+        // TODO: Reference to all the top level types
+        // Here..
+        Sequence<Import> imports = compilation.imports();
+        for (Import impts : imports) {
+            String importDecl = (String) impts.visit(this);
+            if (importDecl != null)
+                System.out.println("######### " + importDecl);
+        }
 
         // Reference to all remaining types
         List<String> body = new ArrayList<>();
@@ -207,12 +221,12 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         Sequence<Type> typeDecls = compilation.typeDecls();
         // TODO: Collect procedures, records, protocols, constants, and
         // external types (if any) before iterating over remaining items
+        // Here..
 
         // Iterate over remaining declarations which is anything that
         // comes after
         for (Type decls : typeDecls) {
             String declStr = (String) decls.visit(this);
-            System.out.println("WTF!!!!!!!");
             if (declStr != null) {
                 body.add(declStr);
             }
@@ -223,6 +237,9 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         stCompilation.add("name", sourceFile_);
         stCompilation.add("body", body);
         stCompilation.add("version", currentJVM);
+        
+        if (importList_.size() > 0)
+            stCompilation.add("imports", importList_);
 
         // Rendered code..
         templateResult = stCompilation.render();
@@ -247,7 +264,6 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      */
     public T visitProcTypeDecl(ProcTypeDecl pd) {
         Log.log(pd.line + ": Visiting a ProcTypeDecl (" + pd.name().getname() + ")");
-        
         // Generated template after evaluating this visitor
         ST stProcTypeDecl = null;
         // Save previous procedure
@@ -598,19 +614,21 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         String packageName = Helper.getPackage(invokedProc.myPackage, sourceFile_);
         // Check local procedures, if none is found then the procedure must come
         // from a different file (and package) 
-        if (packageName.contains(sourceFile_)) {
+        if (invokedProc.myPackage.contains(sourceFile_)) {
             // The procedure is looked up by its signature.
-            // NOTE: this should never return `null'!!!!
+            // NOTE: this should never return 'null'!!!!
             invokedProcName = procMap_.get(invokedProcName + invokedProc.signature());
-        } else {
+        } else if (invokedProc.isNative) {
             // Make the package visible on import by using the qualified name of the
-            // class the procedure belongs to and the name of folder the procedure's
+            // class the procedure belongs to and the name of the folder the procedure's
             // class belongs to, e.g., std.io.println(), where
-            //      `std' is the name of the package,
-            //      `io' is the name of the class,
-            //      `println' is the method declared in the class
-            invokedProcName = packageName + "." + invokedProcName;
-        }
+            //      'std' is the name of the package,
+            //      'io' is the name of the class/file,
+            //      'println' is the method declared in the class
+            invokedProcName = invokedProc.filename + "." + invokedProcName;
+            importList_.add("import " + invokedProc.library + ";");
+        } else
+            ; // TODO: non-native procedures...
         
         // These are the formal parameters of a procedure/method which are specified
         // by a list of comma-separated arguments
@@ -626,5 +644,11 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         stInvocation.add("vars", paramsList);
         
         return (T) stInvocation.render();
+    }
+    
+    public T visitImport(Import im) {
+        Log.log(im.line + ": Visiting BLAH BLAH BLAH!!!!!!!! (" + im.toString() + ")");
+        System.out.println(">>><<<< " + im.toString());
+        return (T) "//BLAH!!!!!";
     }
 }

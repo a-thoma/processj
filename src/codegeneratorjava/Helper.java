@@ -36,8 +36,7 @@ public class Helper {
     /**
      * Changes the name of a procedure, method, protocol, record, channel or local
      * variable so that the JVM can separate common names which belong to the same
-     * compiled class. For now, the process of encoding types and variables into
-     * unique names is trivial.
+     * compiled class.
      * 
      * <p>
      * The ProcessJ naming convention is as follows:
@@ -45,18 +44,18 @@ public class Helper {
      * 
      * <ul>
      * <li>
-     * For a procedure, the procedure is encoded as `{@code _proc$nameX}' where
+     * For a procedure, the procedure is encoded as '{@code _proc$nameX}' where
      * {@code name} is the procedure's unique identifier.
      * </li>
      *
      * <li>
-     * For a Java method, the method is encoded as `{@code _method$nameX}' where
+     * For a Java method, the method is encoded as '{@code _method$nameX}' where
      * {@code name} is the method's unique identifier.
      * </li>
      *
      * <li>
-     * For parameters, the parameter is encoded as `{@code _pd$nameX}' where
-     * {@code name} is the name of the argument and `{@code X}' represents the
+     * For parameters, the parameter is encoded as '{@code _pd$nameX}' where
+     * {@code name} is the name of the argument and '{@code X}' represents the
      * position of the parameter in the argument list.
      * <ul>
      * <li>For example: foo(_pd$bar0, _pd$foo1, ..., _pd@nameX)</li>
@@ -64,24 +63,24 @@ public class Helper {
      * </li>
      *
      * <li>
-     * For locals, the local is encoded as `{@code _ld$nameX}' where {@code name}
-     * is the name of the local variable and `{@code X}' is the local's unique
+     * For locals, the local is encoded as '{@code _ld$nameX}' where {@code name}
+     * is the name of the local variable and '{@code X}' is the local's unique
      * identifier.
      * </li>
      *
      * <li>
-     * For protocols, the protocol is encoded as `{@code _prot$nameX}' where
-     * {@code name} is a protocol tag and `{@code X}' is the protocol's unique
+     * For protocols, the protocol is encoded as '{@code _prot$nameX}' where
+     * {@code name} is a protocol tag and '{@code X}' is the protocol's unique
      * identifier.
      * </li>
      *
      * <li>
-     * For records, the record is encoded as `{@code _rec$nameX}' where
-     * {@code name} is a record tag and `{@code X}' is the records' unique identifier.
+     * For records, the record is encoded as '{@code _rec$nameX}' where
+     * {@code name} is a record tag and '{@code X}' is the records' unique identifier.
      * </li>
      *
-     * <li>For channels, the channel is encoded as `{@code _chan$nameX}' where
-     * `{@code name}' is either `{@code READ}' or `{@code WRITE}' and `{@code X}' is
+     * <li>For channels, the channel is encoded as '{@code _chan$nameX}' where
+     * '{@code name}' is either '{@code READ}' or '{@code WRITE}' and '{@code X}' is
      * the channel's unique identifier.
      * </li>
      * </ul>
@@ -241,7 +240,7 @@ public class Helper {
         // the package
         if (!packageName.contains(sourceFile)) {
             String includePath = Settings.includeDir + File.separator + Settings.targetLanguage + File.separator;
-            // The following replaces all `/' with `.'
+            // The following replaces all '/' with '.'
             includePath = includePath.replaceAll(File.separator, "\\.");
             packageName = packageName.replaceAll(includePath, "");
             return packageName;

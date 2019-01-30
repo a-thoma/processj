@@ -96,7 +96,7 @@ public class ResolvePackageTypes extends Visitor<AST> {
             if (td != null) { // Yes, we found something
                 na.c = comp;
                 na.resolvedPackageAccess = td;
-                Log.log(na.line + " Resolved `" + na + "' to `" + td + "'");
+                Log.log(na.line + " Resolved '" + na + "' to '" + td + "'");
             } else {
                 ;// TODO: don't error out now - the NameChecker will do that!
                 //Error.error(na,"Constant or Type '" + na + "' not declared.", false, 0000);
@@ -105,7 +105,7 @@ public class ResolvePackageTypes extends Visitor<AST> {
     }
 
     public AST visitName(Name na) {
-        Log.log(na.line + " Resolving Name `" + na.getname() + "'");
+        Log.log(na.line + " Resolving Name '" + na.getname() + "'");
         if (na.packageAccess().size() > 0) {
             resolveTypeOrConstant(na);
         }
@@ -113,7 +113,7 @@ public class ResolvePackageTypes extends Visitor<AST> {
     }
 
     public AST visitNamedType(NamedType nt) {
-        Log.log(nt.line + " Resolving NamedType `" + nt.name() + "'");
+        Log.log(nt.line + " Resolving NamedType '" + nt.name() + "'");
         Sequence<Name> packages = nt.name().packageAccess();
         if (packages.size() > 0) {
             resolveTypeOrConstant(nt.name());

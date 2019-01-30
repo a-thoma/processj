@@ -1,4 +1,4 @@
-import java.io.*;
+import java.io.File;
 import java.util.*;
 
 import ast.AST;
@@ -58,18 +58,16 @@ public class ProcessJc {
         
         Properties config = ConfigFileReader.openConfiguration();
         
-        // These fields have default values that could be updated
-        // with user input (see PJMain.java for more info)
+        // These fields have default values that could be updated with
+        // user input (see PJMain.java for more info)
         Settings.includeDir = pjMain.include;
         Settings.targetLanguage = pjMain.target;
-        boolean symbolTable = pjMain.symbolTable;
+        boolean sts = pjMain.symbolTable;
         boolean visitorAll = pjMain.visitorAll;
         List<File> files = pjMain.files;
-        
         // Turn on/off colour mode
         if (pjMain.ansiColour == null) {
-            // Only set the colour mode if the default value in
-            // properties file is `yes'
+            // Only set the colour mode if the default value in properties file is 'yes'
             if (config.getProperty("colour").equalsIgnoreCase("yes"))
                 Settings.isAnsiColour = true;
         } else {
@@ -77,7 +75,7 @@ public class ProcessJc {
             String ansiColorvalue = "no";
             if (Settings.isAnsiColour)
                 ansiColorvalue = "yes";
-            // Update `colour' code value in properties file
+            // Update 'colour' code value in properties file
             config.setProperty("colour", ansiColorvalue);
             ConfigFileReader.closeConfiguration(config);
             System.exit(0);
@@ -86,8 +84,7 @@ public class ProcessJc {
         // Display usage page
         if (pjMain.help)
             help();
-        // Display version
-        else if (pjMain.version) {
+        else if (pjMain.version) { // Display version
             try {
                 String[] list = pjMain.getVersion().getVersionPrinter();
                 System.out.println(StringUtil.join(Arrays.asList(list), "\n"));
@@ -96,15 +93,13 @@ public class ProcessJc {
             }
             System.exit(0);
         }
-        // TODO: Display error code information
-        else if (pjMain.errorCode != null) {
+        else if (pjMain.errorCode != null) { // TODO: Display error code information
             System.out.println("Not available..");
             System.exit(0);
         }
-        // Check for input file(s)
-        else if (files == null || files.isEmpty()) {
-            // At least one file must be provided. Otherwise, throw an error
-            // if none is given, or (for now) if a file does not exists
+        else if (files == null || files.isEmpty()) { // Check for input file(s)
+            // At least one file must be provided. Otherwise, throw an error if
+            // no file is given, or if a file does not exists
             System.out.println(new PJMessage.Builder()
                                    .addError(VisitorMessageNumber.RESOLVE_IMPORTS_100)
                                    .build().getST().render());
@@ -126,8 +121,8 @@ public class ProcessJc {
                 CompilerMessageManager.INSTANCE.setFileName(fileAbsolutePath);
                 CompilerMessageManager.INSTANCE.setPackageName(fileAbsolutePath);
                 
-                Error.setFileName(fileAbsolutePath);
-                Error.setPackageName(fileAbsolutePath);
+//                Error.setFileName(fileAbsolutePath);
+//                Error.setPackageName(fileAbsolutePath);
                 s = new Scanner(new java.io.FileReader(fileAbsolutePath));
                 p = new parser(s);
             } catch (java.io.FileNotFoundException e) {
@@ -158,7 +153,7 @@ public class ProcessJc {
             Library.generateLibraries(c);
 
             // This table will hold all the top level types
-            SymbolTable globalTypeTable = new SymbolTable("Main file: " + Error.fileName);
+            SymbolTable globalTypeTable = new SymbolTable("Main file: " + CompilerMessageManager.INSTANCE.fileName);
 
             // Dump log messages
             if (visitorAll)
@@ -168,27 +163,32 @@ public class ProcessJc {
             // V I S I T   I M P O R T   D E C L A R A T I O N S
             // =====================================================
             
-            c.visit(new namechecker.ResolveImports<AST>(globalTypeTable));
-            globalTypeTable.printStructure(""); System.out.println("Hello!!");System.exit(0);
+            c.visit(new namechecker.ResolveImports<AST>());
+//            globalTypeTable.printStructure("");
             
 //            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
 //                CompilerMessageManager.INSTANCE.printTrace("import declarations");
 //                CompilerMessageManager.INSTANCE.writeToFile("PJErrors");
 //                System.exit(1);
 //            }
+            globalTypeTable.setImportParent(SymbolTable.hook);
             
             // ===========================================================
             // V I S I T   T O P   L E V E L   D E C L A R A T I O N S
             // ===========================================================
             
             c.visit(new namechecker.TopLevelDecls<AST>(globalTypeTable));
+            
+            ///////
+            c.visit(new namechecker.ResolveProcTypeDecl<AST>());
+            //
 
 //            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
 //                CompilerMessageManager.INSTANCE.printTrace("top level declarations");
 //                System.exit(1);
 //            }
             
-            globalTypeTable = SymbolTable.hook;
+//            globalTypeTable = SymbolTable.hook;
 
             // Dump the symbol table structure
 //            if (symbolTable)
