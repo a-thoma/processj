@@ -666,10 +666,10 @@ channel_type ::=
         | SHARED WRITE CHAN LT type:t GT     {: RESULT = new ChannelType(t, ChannelType.SHARED_WRITE); :}
         | SHARED CHAN LT type:t GT           {: RESULT = new ChannelType(t, ChannelType.SHARED_READ_WRITE); :}
         | CHAN LT type:t GT	    	     {: RESULT = new ChannelType(t, ChannelType.NOT_SHARED); :}
-        | CHAN LT type:t GT DOT READ         {: RESULT = new ChannelEndType(ChannelEndType.NOT_SHARED, t, ChannelEndType.READ_END); :}
-        | CHAN LT type:t GT DOT WRITE        {: RESULT = new ChannelEndType(ChannelEndType.NOT_SHARED, t, ChannelEndType.WRITE_END); :}
-        | SHARED CHAN LT type:t GT DOT READ  {: RESULT = new ChannelEndType(ChannelEndType.SHARED, t, ChannelEndType.READ_END); :}
-        | SHARED CHAN LT type:t GT DOT WRITE {: RESULT = new ChannelEndType(ChannelEndType.SHARED, t, ChannelEndType.WRITE_END); :}
+        | CHAN LT type:t GT DOT READ         {: RESULT = new ChannelEndType(ChannelEndType.NOT_SHARED, new ChannelType(t, ChannelType.NOT_SHARED), ChannelEndType.READ_END); :}
+        | CHAN LT type:t GT DOT WRITE        {: RESULT = new ChannelEndType(ChannelEndType.NOT_SHARED, new ChannelType(t, ChannelType.NOT_SHARED), ChannelEndType.WRITE_END); :}
+        | SHARED CHAN LT type:t GT DOT READ  {: RESULT = new ChannelEndType(ChannelEndType.SHARED, new ChannelType(t, ChannelType.SHARED_READ), ChannelEndType.READ_END); :}
+        | SHARED CHAN LT type:t GT DOT WRITE {: RESULT = new ChannelEndType(ChannelEndType.SHARED, new ChannelType(t, ChannelType.SHARED_WRITE), ChannelEndType.WRITE_END); :}
         ;
 
 // **************************************************
