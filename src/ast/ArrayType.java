@@ -73,32 +73,18 @@ public class ArrayType extends Type {
         return v.visitArrayType(this);
     }
 
-    // *******************
-    // Type related stuff
-    // *******************
-
     @Override
-    public boolean isArrayType() {
-	return true;
-    }
-
-    // if α=Array(t1,I1) ∧ β=Array(t2,I2)
-    // α =T β ⇔ Array?(α) ∧ Array?(β) ∧ (t1 =T t2) ∧ ((I1 =I2) ∨ (I1 =⊥) ∨ (I2 =⊥))
-    @Override
-    public boolean typeEqual(Type t) {
-        // TODO
+    public boolean equal(Type t) {
         return false;
     }
 
     @Override
-    public boolean typeEquivalent(Type t) {
-        // TODO
+    public boolean equivalent(Type t) {
         return false;
     }
 
     @Override
-    public boolean typeAssignmentCompatible(Type t) {
-	// TODO
+    public boolean assignmentCompatible(Type t) {
         return false;
     }
     

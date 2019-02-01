@@ -12,9 +12,6 @@ public class ProtocolTypeDecl extends Type implements DefineTopLevelDecl {
         children = new AST[] { modifiers, name, extend, annotations, body };
     }
 
-    // *************************************************************************
-    // ** Accessor Methods
-
     public Sequence<Modifier> modifiers() {
         return (Sequence<Modifier>) children[0];
     }
@@ -35,48 +32,34 @@ public class ProtocolTypeDecl extends Type implements DefineTopLevelDecl {
         return (Sequence<ProtocolCase>) children[4];
     }
 
-
-    // *************************************************************************
-    // ** Misc. Methods
- 
-    public String toString() {
-        return typeName();
-    }
-
-    // *************************************************************************
-    // ** Visitor Related Methods
-
-    public <S extends Object> S visit(Visitor<S> v) {
-        return v.visitProtocolTypeDecl(this);
-    }
-
-    // *************************************************************************
-    // ** Type Related Methods
-
     public String signature() {
         return "<P" + name().getname() + ";";
+    }
+
+    public String toString() {
+        return typeName();
     }
 
     public String typeName() {
         return "Protocol: " + name();
     }
 
-    @Override public boolean isProtocolType() {
-	return true;
+    public <S extends Object> S visit(Visitor<S> v) {
+        return v.visitProtocolTypeDecl(this);
     }
 
-    // TODO
-    @Override public boolean typeEqual(Type t) {
+    @Override
+    public boolean equal(Type t) {
         return false;
     }
 
-    // TODO
-    @Override public boolean typeEquivalent(Type t) {
+    @Override
+    public boolean equivalent(Type t) {
         return false;
     }
 
-    // TODO
-    @Override public boolean typeAssignmentCompatible(Type t) {
+    @Override
+    public boolean assignmentCompatible(Type t) {
         return false;
     }
 }

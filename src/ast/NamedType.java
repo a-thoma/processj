@@ -52,29 +52,18 @@ public class NamedType extends Type implements DefineTopLevelDecl {
         return v.visitNamedType(this);
     }
 
-    // ********************
-    // Type Related Stuff
-    // ********************
-    
-    @Override public boolean isNamedType() {
-	return true;
-    }
-
-    
-    // TODO
-    @Override public boolean typeEqual(Type t) {
+    @Override
+    public boolean equal(Type t) {
         return false;
     }
 
-    // TODO
     @Override
-    public boolean typeEquivalent(Type t) {
+    public boolean equivalent(Type t) {
         return false;
     }
 
-    // TODO
     @Override
-    public boolean typeAssignmentCompatible(Type t) {
+    public boolean assignmentCompatible(Type t) {
         return false;
     }
 }

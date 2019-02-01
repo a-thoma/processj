@@ -25,27 +25,18 @@ public class ErrorType extends Type {
         return v.visitErrorType(this);
     }
 
-
-    // ********************
-    // Type Related Stuff
-    // ********************
-
-    @Override public boolean isErrorType() {
-	return true;
-    }
-
-    // Error types should not be checked like this...
-    @Override public boolean typeEqual(Type t) {
+    @Override
+    public boolean equal(Type t) {
         return false;
     }
 
-    // Error types should not be checked like this...
-    @Override public boolean typeEquivalent(Type t) {
+    @Override
+    public boolean equivalent(Type t) {
         return false;
     }
 
-    // Error types should not be checked like this...
-    @Override public boolean typeAssignmentCompatible(Type t) {
+    @Override
+    public boolean assignmentCompatible(Type t) {
         return false;
     }
 }
