@@ -1,12 +1,13 @@
-import java.io.*;
+import java.io.File;
 import java.util.*;
 
 import ast.AST;
 import ast.Compilation;
-import clp.Formatter;
-import clp.CLPBuilder;
-import clp.StringUtil;
+import cli.CLIBuilder;
+import cli.Formatter;
+import cli.StringUtil;
 import codegeneratorjava.CodeGeneratorJava;
+import codegeneratorjava.Helper;
 import library.Library;
 import parser.parser;
 import scanner.Scanner;
@@ -29,7 +30,7 @@ import utilities.SymbolTable;
  */
 public class ProcessJc {
     
-    public static CLPBuilder optionBuilder = new CLPBuilder().addCommand(PJMain.class);
+    public static CLIBuilder optionBuilder = new CLIBuilder().addCommand(PJMain.class);
     
     public static void help() {
         Formatter formatHelp = new Formatter(optionBuilder);
@@ -48,7 +49,7 @@ public class ProcessJc {
         // Build options and arguments with user input
         PJMain pjMain = null;
         try {
-            optionBuilder.handlerArgs(args);
+            optionBuilder.handleArgs(args);
             pjMain = optionBuilder.getCommand(PJMain.class);
         } catch(Exception e) {
             System.out.println(e.getMessage());
@@ -57,18 +58,16 @@ public class ProcessJc {
         
         Properties config = ConfigFileReader.openConfiguration();
         
-        // These fields have default values that could be updated
-        // with user input (see PJMain.java for more info)
+        // These fields have default values that could be updated with
+        // user input (see PJMain.java for more info)
         Settings.includeDir = pjMain.include;
         Settings.targetLanguage = pjMain.target;
-        boolean symbolTable = pjMain.symbolTable;
+        boolean sts = pjMain.symbolTable;
         boolean visitorAll = pjMain.visitorAll;
         List<File> files = pjMain.files;
-        
         // Turn on/off colour mode
         if (pjMain.ansiColour == null) {
-            // Only set the colour mode if the default value in
-            // properties file is `yes'
+            // Only set the colour mode if the default value in properties file is 'yes'
             if (config.getProperty("colour").equalsIgnoreCase("yes"))
                 Settings.isAnsiColour = true;
         } else {
@@ -76,7 +75,7 @@ public class ProcessJc {
             String ansiColorvalue = "no";
             if (Settings.isAnsiColour)
                 ansiColorvalue = "yes";
-            // Update `colour' code value in properties file
+            // Update 'colour' code value in properties file
             config.setProperty("colour", ansiColorvalue);
             ConfigFileReader.closeConfiguration(config);
             System.exit(0);
@@ -85,8 +84,7 @@ public class ProcessJc {
         // Display usage page
         if (pjMain.help)
             help();
-        // Display version
-        else if (pjMain.version) {
+        else if (pjMain.version) { // Display version
             try {
                 String[] list = pjMain.getVersion().getVersionPrinter();
                 System.out.println(StringUtil.join(Arrays.asList(list), "\n"));
@@ -95,15 +93,13 @@ public class ProcessJc {
             }
             System.exit(0);
         }
-        // TODO: Display error code information
-        else if (pjMain.errorCode != null) {
+        else if (pjMain.errorCode != null) { // TODO: Display error code information
             System.out.println("Not available..");
             System.exit(0);
         }
-        // Check for input file(s)
-        else if (files == null || files.isEmpty()) {
-            // At least one file must be provided. Otherwise, throw an error
-            // if none is given, or (for now) if a file does not exists
+        else if (files == null || files.isEmpty()) { // Check for input file(s)
+            // At least one file must be provided. Otherwise, throw an error if
+            // no file is given, or if a file does not exists
             System.out.println(new PJMessage.Builder()
                                    .addError(VisitorMessageNumber.RESOLVE_IMPORTS_100)
                                    .build().getST().render());
@@ -125,8 +121,8 @@ public class ProcessJc {
                 CompilerMessageManager.INSTANCE.setFileName(fileAbsolutePath);
                 CompilerMessageManager.INSTANCE.setPackageName(fileAbsolutePath);
                 
-                Error.setFileName(fileAbsolutePath);
-                Error.setPackageName(fileAbsolutePath);
+//                Error.setFileName(fileAbsolutePath);
+//                Error.setPackageName(fileAbsolutePath);
                 s = new Scanner(new java.io.FileReader(fileAbsolutePath));
                 p = new parser(s);
             } catch (java.io.FileNotFoundException e) {
@@ -157,38 +153,46 @@ public class ProcessJc {
             Library.generateLibraries(c);
 
             // This table will hold all the top level types
-            SymbolTable globalTypeTable = new SymbolTable("Main file: " + Error.fileName);
+            SymbolTable globalTypeTable = new SymbolTable("Main file: " + CompilerMessageManager.INSTANCE.fileName);
 
             // Dump log messages
             if (visitorAll)
                 Log.startLogging();
-            // Dump the symbol table structure
-            if (symbolTable)
-                globalTypeTable.printStructure("");
             
             // =====================================================
             // V I S I T   I M P O R T   D E C L A R A T I O N S
             // =====================================================
             
-            c.visit(new namechecker.ResolveImports<AST>(globalTypeTable));
+            c.visit(new namechecker.ResolveImports<AST>());
+//            globalTypeTable.printStructure("");
             
-            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
-                CompilerMessageManager.INSTANCE.printTrace("import declarations");
-                System.exit(1);
-            }
+//            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
+//                CompilerMessageManager.INSTANCE.printTrace("import declarations");
+//                CompilerMessageManager.INSTANCE.writeToFile("PJErrors");
+//                System.exit(1);
+//            }
+            globalTypeTable.setImportParent(SymbolTable.hook);
             
             // ===========================================================
             // V I S I T   T O P   L E V E L   D E C L A R A T I O N S
             // ===========================================================
             
             c.visit(new namechecker.TopLevelDecls<AST>(globalTypeTable));
-
-            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
-                CompilerMessageManager.INSTANCE.printTrace("top level declarations");
-                System.exit(1);
-            }
             
-            globalTypeTable = SymbolTable.hook;
+            ///////
+            c.visit(new namechecker.ResolveProcTypeDecl<AST>());
+            //
+
+//            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
+//                CompilerMessageManager.INSTANCE.printTrace("top level declarations");
+//                System.exit(1);
+//            }
+            
+//            globalTypeTable = SymbolTable.hook;
+
+            // Dump the symbol table structure
+//            if (symbolTable)
+//                globalTypeTable.printStructure("");
             
             // ========================================================
             // V I S I T R E S O L V E   P A C K A G E   T Y P E S
@@ -197,10 +201,10 @@ public class ProcessJc {
             // Resolve types from imported packages.
             c.visit(new namechecker.ResolvePackageTypes());
             
-            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
-                CompilerMessageManager.INSTANCE.printTrace("package types");
-                System.exit(1);
-            }
+//            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
+//                CompilerMessageManager.INSTANCE.printTrace("package types");
+//                System.exit(1);
+//            }
             
             // =======================================
             // V I S I T   N A M E   C H E C K E R
@@ -208,10 +212,10 @@ public class ProcessJc {
             
             c.visit(new namechecker.NameChecker<AST>(globalTypeTable));
             
-            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
-                CompilerMessageManager.INSTANCE.printTrace("name checker");
-                System.exit(1);
-            }
+//            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
+//                CompilerMessageManager.INSTANCE.printTrace("name checker");
+//                System.exit(1);
+//            }
             
             // =======================================
             // V I S I T   A R R A Y   T Y P E S
@@ -220,10 +224,10 @@ public class ProcessJc {
             // Re-construct Array Types correctly
             root.visit(new namechecker.ArrayTypeConstructor());
             
-            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
-                CompilerMessageManager.INSTANCE.printTrace("array types constructor");
-                System.exit(1);
-            }
+//            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
+//                CompilerMessageManager.INSTANCE.printTrace("array types constructor");
+//                System.exit(1);
+//            }
             
             // ========================================
             // V I S I T   T Y P E   C H E C K E R
@@ -231,10 +235,10 @@ public class ProcessJc {
             
             c.visit(new typechecker.TypeChecker(globalTypeTable));
             
-            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
-                CompilerMessageManager.INSTANCE.printTrace("type checking");
-                System.exit(1);
-            }
+//            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
+//                CompilerMessageManager.INSTANCE.printTrace("type checking");
+//                System.exit(1);
+//            }
             
             // ========================================
             // V I S I T   R E A C H A B I L I T Y
@@ -242,10 +246,10 @@ public class ProcessJc {
             
             c.visit(new reachability.Reachability());
             
-            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
-                CompilerMessageManager.INSTANCE.printTrace("reachability");
-                System.exit(1);
-            }
+//            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
+//                CompilerMessageManager.INSTANCE.printTrace("reachability");
+//                System.exit(1);
+//            }
             
             // ===========================================
             // V I S I T   P A R A L L E L   U S A G E
@@ -253,10 +257,10 @@ public class ProcessJc {
             
             c.visit(new parallel_usage_check.ParallelUsageCheck());
             
-            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
-                CompilerMessageManager.INSTANCE.printTrace("parallel usage checking");
-                System.exit(1);
-            }
+//            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
+//                CompilerMessageManager.INSTANCE.printTrace("parallel usage checking");
+//                System.exit(1);
+//            }
             
             // ==========================
             // V I S I T   Y I E L D
@@ -264,10 +268,10 @@ public class ProcessJc {
             
             c.visit(new yield.Yield());
             
-            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
-                CompilerMessageManager.INSTANCE.printTrace("yield");
-                System.exit(1);
-            }
+//            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
+//                CompilerMessageManager.INSTANCE.printTrace("yield");
+//                System.exit(1);
+//            }
             
             // ===============================
             // C O D E   G E N E R A T O R
@@ -279,7 +283,7 @@ public class ProcessJc {
                 System.err.println(String.format("Unknown target language '%s' selected.", Settings.targetLanguage));
                 System.exit(1);
             }
-
+            
             System.out.println(String.format("*** File '%s' was compiled successfully ***", inFile.getName()));
         }
     }
@@ -318,6 +322,6 @@ public class ProcessJc {
         String templateResult = (String) compilation.visit(generator);
 
         // Write the output to a file
-//        Helper.writeToFile(templateResult, generator.getSourceFile());
+        Helper.writeToFile(templateResult, generator.getSourceFile());
     }
 }

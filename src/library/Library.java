@@ -15,8 +15,10 @@ import ast.ProcTypeDecl;
 import ast.ProtocolTypeDecl;
 import ast.RecordTypeDecl;
 import ast.Type;
-import utilities.Error;
+import utilities.CompilerMessageManager;
 import utilities.Log;
+import utilities.MessageType;
+import utilities.PJMessage;
 import utilities.Visitor;
 
 /**
@@ -51,16 +53,22 @@ public class Library {
             String name = p.pname().getname().toUpperCase(); // TODO: perhaps error if pragma names are lowercase....
             Log.log("Looking up pragma '" + name + "'.");
             if (!ht.containsKey(name))
-                Error.error(p, "Illegal pragma '" + name + "'.");
+                CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                      .addArguments("Illegal pragma '" + name + "'.")
+                                      .build(), MessageType.PRINT_STOP);
             int argCount = pragmaArgCount[ht.get(name)];
             if (argCount != 0 && p.value() == null)
-                Error.error(p, "Pragma '" + name
-                        + "' requires 1 parameter, none was given.");
+                CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                      .addArguments("Pragma '" + name + "' requires 1 parameter, none was given.")
+                                      .build(), MessageType.PRINT_STOP);
             if (argCount == 0 && p.value() != null)
-                Error.error(p, "Pragma '" + name
-                        + "' does not require any parameters.");
+                CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                      .addArguments("Pragma '" + name + "' does not require any parameters.")
+                                      .build(), MessageType.PRINT_STOP);
             if (pragmaTable.containsKey(name))
-                Error.error(p, "Pragma '" + name + "' repeated.");
+                CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                      .addArguments("Pragma '" + name + "' repeated.")
+                                      .build(), MessageType.PRINT_STOP);
             else {
                 Log.log("Entering <"
                         + name
@@ -78,7 +86,7 @@ public class Library {
     }
 
     public static void generateLibraries(Compilation c) {
-        // There are two types of libaries:
+        // There are two types of libraries:
         // - Libraries written in ProcessJ
         //   ProcessJ libraries must set the #LIBRARY flag
         // - Libraries written in some native language
@@ -108,43 +116,60 @@ public class Library {
         if (pragmaTable.containsKey("LIBRARY")) {
             // FILE and LANGUAGE pragmas must be set.
             if (!pragmaTable.containsKey("LANGUAGE"))
-                Error.error("Missing LANGUAGE pragma.");
+                CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                      .addArguments("Missing LANGUAGE pragma.")
+                                      .build(), MessageType.PRINT_STOP);
             if (!pragmaTable.containsKey("FILE"))
-                Error.error("Missing FILE pragma.");
+                CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                      .addArguments("Missing FILE pragma.")
+                                      .build(), MessageType.PRINT_STOP);
             if (c.packageName() == null)
-                Error.error("Library files must declare a package name.");
+                CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                      .addArguments("Library files must declare a package name.")
+                                      .build(), MessageType.PRINT_STOP);
 
-            System.out
-                    .println("Library.java: LIBRARY pragma detected; generating library code.");
+            System.out.println("Library.java: LIBRARY pragma detected; generating library code.");
             if (pragmaTable.containsKey("NATIVELIB")) {
                 Log.log("Library.java: NATIVELIB pragma detected; mapping library to existing native library.");
                 // NATIVE cannot be set
                 if (pragmaTable.containsKey("NATIVE"))
-                    Error.error("pragmas NATIVE and NATIVELIB cannot be used together.");
+                    CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                          .addArguments("pragmas NATIVE and NATIVELIB cannot be used together.")
+                                          .build(), MessageType.PRINT_STOP);
                 // pragma LANGUAGE cannot be PROCESSJ.
                 if (pragmaTable.get("LANGUAGE").equals("PROCESSJ"))
-                    Error.error("The implementation language for a NATIVE library cannot be ProcessJ.");
+                    CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                          .addArguments("The implementation language for a NATIVE library cannot be ProcessJ.")
+                                          .build(), MessageType.PRINT_STOP);
 
                 String language = pragmaTable.get("LANGUAGE");
                 if (language.equals("C")) {
                     c.visit(new CheckProcedures<AST>(true));
                     generateNativeCLibFiles(c);
                 } else
-                    Error.error("Unknown native language '" + language + "'.");
+                    CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                          .addArguments("Unknown native language '" + language + "'.")
+                                          .build(), MessageType.PRINT_STOP);
             } else if (pragmaTable.containsKey("NATIVE")) {
                 Log.log("Library.java: NATIVE pragma detected; generating native header and implementation files and ProcessJ header file.");
                 // NATIVELIB cannot be set
                 if (pragmaTable.containsKey("NATIVELIB"))
-                    Error.error("pragmas NATIVE and NATIVELIB cannot be used together.");
+                    CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                          .addArguments("pragmas NATIVE and NATIVELIB cannot be used together.")
+                                          .build(), MessageType.PRINT_STOP);
                 if (pragmaTable.get("LANGUAGE").equals("PROCESSJ"))
-                    Error.error("The implementation language for a NATIVE library cannot be ProcessJ.");
+                    CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                          .addArguments("The implementation language for a NATIVE library cannot be ProcessJ.")
+                                          .build(), MessageType.PRINT_STOP);
 
                 String language = pragmaTable.get("LANGUAGE");
                 if (language.equals("C")) {
                     c.visit(new Library.CheckProcedures<AST>(true));
                     generateNativeFiles(c);
                 } else
-                    Error.error("Unknown native language '" + language + "'.");
+                    CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                          .addArguments("Unknown native language '" + language + "'.")
+                                          .build(), MessageType.PRINT_STOP);
             } else {
                 Log.log("Library.java: Generating ProcessJ library");
                 c.visit(new CheckProcedures<AST>(false));
@@ -172,45 +197,54 @@ public class Library {
             if (nativeLib) {
                 // All NATIVELIB and NATIVE files cannot contain procedures with ProcessJ bodies.
                 if (pd.body() != null)
-                    Error.error(
-                            pd,
-                            "Procedure '"
-                                    + pd.name().getname()
-                                    + "' is cannot have a body in a non-ProcessJ library file.");
+                    CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                          .addAST(pd)
+                                          .addArguments("Procedure '" + pd.name().getname() + "' is cannot have a body in a non-ProcessJ library file.")
+                                          .build(), MessageType.PRINT_STOP);
                 boolean nativeModifierFound = false;
                 // TODO: just call the correct method in Modifier.java
                 for (Modifier m : pd.modifiers())
                     nativeModifierFound |= (m.getModifier() == Modifier.NATIVE);
                 if (!nativeModifierFound)
-                    Error.error(pd, "Procedure '" + pd.name().getname()
-                            + "' must be declared native.");
+                    CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                          .addAST(pd)
+                                          .addArguments("Procedure '" + pd.name().getname() + "' must be declared native.")
+                                          .build(), MessageType.PRINT_STOP);
             } else {
                 // Regular ProcessJ Library
                 if (pd.body() == null)
-                    Error.error(pd, "Procedure '" + pd.name().getname()
-                            + "' must have a body.");
+                    CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                          .addAST(pd)
+                                          .addArguments("Procedure '" + pd.name().getname() + "' must have a body.")
+                                          .build(), MessageType.PRINT_STOP);
 
                 boolean nativeModifierFound = false;
                 for (Modifier m : pd.modifiers())
                     nativeModifierFound |= (m.getModifier() == Modifier.NATIVE);
                 if (nativeModifierFound)
-                    Error.error(pd, "Procedure '" + pd.name().getname()
-                            + "' cannot be declared native.");
+                    CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                          .addAST(pd)
+                                          .addArguments("Procedure '" + pd.name().getname() + "' cannot be declared native.")
+                                          .build(), MessageType.PRINT_STOP);
             }
             return null;
         }
 
         public T visitRecordTypeDecl(RecordTypeDecl rd) {
             if (nativeLib)
-                Error.error("Native libraries cannot contain record type declarations ('"
-                        + rd.name().getname() + "'.");
+                CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                      .addArguments("Native libraries cannot contain record type declarations ('"
+                                              + rd.name().getname() + "'.")
+                                      .build(), MessageType.PRINT_STOP);
             return null;
         }
 
         public T visitProtocolTypeDecl(ProtocolTypeDecl pd) {
             if (nativeLib)
-                Error.error("Native libraries cannot contain protocol type declarations ('"
-                        + pd.name().getname() + "'.");
+                CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                      .addArguments("Native libraries cannot contain protocol type declarations ('"
+                                              + pd.name().getname() + "'.")
+                                      .build(), MessageType.PRINT_STOP);
             return null;
         }
 
@@ -221,23 +255,35 @@ public class Library {
 
             if (nativeLib) {
                 if (!nativeModifierFound)
-                    Error.error(cd, "Constant declaration '"
-                            + cd.var().name().getname()
-                            + "' must be declared native.");
+                    CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                          .addAST(cd)
+                                          .addArguments("Constant declaration '"
+                                          + cd.var().name().getname()
+                                          + "' must be declared native.")
+                                          .build(), MessageType.PRINT_STOP);
                 if (cd.var().init() != null)
-                    Error.error(cd, "Native constant declaration '"
-                            + cd.var().name().getname()
-                            + "' cannot have an initializer.");
+                    CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                          .addAST(cd)
+                                          .addArguments("Native constant declaration '"
+                                          + cd.var().name().getname()
+                                          + "' cannot have an initializer.")
+                                          .build(), MessageType.PRINT_STOP);
             } else {
                 if (nativeModifierFound)
-                    Error.error(cd, "Constant declaration '"
-                            + cd.var().name().getname()
-                            + "' cannot declared native.");
+                    CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                          .addAST(cd)
+                                          .addArguments("Constant declaration '"
+                                          + cd.var().name().getname()
+                                          + "' cannot declared native.")
+                                          .build(), MessageType.PRINT_STOP);
                 if (cd.var().init() == null)
                     ;
-                Error.error(cd, "Constant declaration '"
-                        + cd.var().name().getname()
-                        + "' must have an initializer.");
+                CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                      .addAST(cd)
+                                      .addArguments("Constant declaration '"
+                                      + cd.var().name().getname()
+                                      + "' must have an initializer.")
+                                      .build(), MessageType.PRINT_STOP);
             }
             return null;
         }
@@ -419,8 +465,10 @@ public class Library {
                 nativeModifierFound |= (m.getModifier() == Modifier.NATIVE);
 
             if (nativeModifierFound) {
-                Error.error(cd,
-                        "Native keyword not allowed in non NATIVELIB library constants.");
+                CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                      .addAST(cd)
+                                      .addArguments("Native keyword not allowed in non NATIVELIB library constants.")
+                                      .build(), MessageType.PRINT_STOP);
             }
             return null;
         }
@@ -431,13 +479,17 @@ public class Library {
                 // Only primitive types (not Timer or Barrier) can be used as parameter and return types
                 Type returnType = pd.returnType();
                 if (!(returnType instanceof PrimitiveType))
-                    Error.error(pd,
-                            "Native C library procedures must return a primitive type.");
+                    CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                          .addAST(pd)
+                                          .addArguments("Native C library procedures must return a primitive type.")
+                                          .build(), MessageType.PRINT_STOP);
                 PrimitiveType pt = (PrimitiveType) returnType;
                 if (pt.getKind() == PrimitiveType.BarrierKind
                         || pt.getKind() == PrimitiveType.TimerKind)
-                    Error.error(pd,
-                            "Native C library procedures cannot return barrier or timer types.");
+                    CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                          .addAST(pd)
+                                          .addArguments("Native C library procedures cannot return barrier or timer types.")
+                                          .build(), MessageType.PRINT_STOP);
                 if (pt.getKind() == PrimitiveType.StringKind)
                     procedure += "char* ";
                 else if (pt.getKind() == PrimitiveType.BooleanKind)
@@ -450,15 +502,20 @@ public class Library {
                 procedure += packageName + "_" + pd.name().getname() + "_";
                 for (ParamDecl param : pd.formalParams()) {
                     if (!(param.type() instanceof PrimitiveType))
-                        Error.error(pd,
-                                "Native C library procedures can only accept primitive types as parameters."
-                                        + param.type().typeName());
+                        CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                              .addAST(pd)
+                                              .addArguments("Native C library procedures can only "
+                                              +"accept primitive types as parameters."
+                                              + param.type().typeName())
+                                              .build(), MessageType.PRINT_STOP);
                     pt = (PrimitiveType) param.type();
                     if (pt.getKind() == PrimitiveType.BarrierKind
                             || pt.getKind() == PrimitiveType.TimerKind)
-                        Error.error(
-                                pd,
-                                "Native C library procedures cannot accept barrier or timer types as parameters.");
+                        CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                              .addAST(pd)
+                                              .addArguments("Native C library procedures cannot accept "
+                                              +"barrier or timer types as parameters.")
+                                              .build(), MessageType.PRINT_STOP);
                     procedure += pt.signature();
                 }
                 procedure += "(";

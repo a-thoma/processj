@@ -32,8 +32,6 @@ import utilities.SymbolTable;
 import utilities.Visitor;
 import utilities.VisitorMessageNumber;
 
-// Error message number range: [2200 - 2299]
-
 public class NameChecker<T extends Object> extends Visitor<T> {
     SymbolTable currentScope = null;
 

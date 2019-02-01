@@ -6,6 +6,7 @@ public class ProcTypeDecl extends Type implements DefineTopLevelDecl {
 
     public boolean isNative = false;
     public String library; // Name of the library, e.g. math.h
+    public String filename; // Name of the file, e.g math
     public String nativeFunction; // Name of the native function, e.g. fabs
 
     public ProcTypeDecl(Sequence<Modifier> modifiers, Type returnType,

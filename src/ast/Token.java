@@ -7,7 +7,7 @@ public class Token {
     public int line; // Tne line number on which this token appears.
     public int charBegin; // The column number in which the token begins.
     public int charEnd; // The column number in which the token ends.
-
+    // TODO: add strings
     public static final String names[] = { "EOF", "error", "" };
 
     public Token(int kind, String text, int line, int charBegin, int charEnd) {

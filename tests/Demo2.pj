@@ -1,0 +1,11 @@
+import std.io;
+
+proc void main(string args[]) {
+    par {
+        //
+    }
+    
+    par {
+        //
+    }
+}

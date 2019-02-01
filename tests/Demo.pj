@@ -1,0 +1,9 @@
+import std.io;
+
+proc void say() {
+    println("Hello from say");
+}
+
+proc void main(string args[]) {
+    say();
+}

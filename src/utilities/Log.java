@@ -19,12 +19,12 @@ public class Log {
 
     public static void log(String s) {
         if (doLog)
-            System.out.println(Error.fileName + ":" + s);
+            System.out.println(CompilerMessageManager.INSTANCE.fileName + ":" + s);
     }
 
     public static void log(AST a, String s) {
         if (doLog)
-            System.out.println(Error.fileName + ":" + a.line + " " + s);
+            System.out.println(CompilerMessageManager.INSTANCE.fileName + ":" + a.line + " " + s);
     }
     
     public static void logHeader(String s) {
@@ -34,11 +34,11 @@ public class Log {
 
     public static void logNoNewline(String s) {
         if (doLog)
-            System.out.print(Error.fileName + ":" + s);
+            System.out.print(CompilerMessageManager.INSTANCE.fileName + ":" + s);
     }
 
     public static void logNoNewline(AST a, String s) {
         if (doLog)
-            System.out.print(Error.fileName + ":" + a.line + " " + s);
+            System.out.print(CompilerMessageManager.INSTANCE.fileName + ":" + a.line + " " + s);
     }
 }

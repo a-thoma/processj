@@ -20,16 +20,15 @@ import utilities.SymbolTable;
 import utilities.Visitor;
 import utilities.VisitorMessageNumber;
 
-public class ResolveImports<T extends Object> extends Visitor<T> {
-    // Symbol table associated with this file. Set in the constructor.
-    private SymbolTable symtab;
-
+public class ResolveImports<T extends AST> extends Visitor<T> {
+    
     public static String currentFileName = CompilerMessageManager.INSTANCE.fileName;
     
-    public ResolveImports(SymbolTable symtab) {
-        this.symtab = symtab;
+    public ResolveImports() {
         Log.logHeader("==============================================================");
         Log.logHeader("*                  R E S O L V E   I M P O R T S             *");
+        Log.logHeader("*       -----------------------------------------------      *");
+        Log.logHeader("*       File: " + CompilerMessageManager.INSTANCE.fileName);
         Log.logHeader("==============================================================");
     }
     
@@ -72,15 +71,14 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
             // Set the package name
             CompilerMessageManager.INSTANCE.setPackageName(fileName);
             
-            Log.log(a.line + " Starting import of file: `" + fileName + "'");
+            Log.log(a.line + " Starting import of file: '" + fileName + "'");
             Scanner s1 = new Scanner(new java.io.FileReader(fileName));
             parser p1 = new parser(s1);
             java_cup.runtime.Symbol r = p1.parse();
             
-            // Check the path of the imported file and compare the *import*
-            // statements found in it with the imported file's path
-            // format. Throw an error if the *import* statements do not
-            // match the path of the package name in which `fileName' exists
+            // Check the path of the imported file and compare the *import* statements found
+            // in it with the imported file's path format. Throw an error if the *import* statements
+            // do not match the path of the package name in which 'fileName' exists
             String packageName = packageNameToString(((Compilation) r.value).packageName());
             String importPathWithDot = importPath.replaceAll(File.separator, "\\.");
             if (!importPathWithDot.equals(packageName)) {
@@ -138,7 +136,7 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
      */
     public static void makeFileList(ArrayList<String> list, String directory) {
         Log.log("makeFileList(): Called with : " + directory);
-        // `entries' will contain all the files in the directory 'directory'
+        // 'entries' will contain all the files in the directory 'directory'
         // that has the right file extension (typically .pj)
         String entries[] = new File(directory).list(new PJfiles());
         for (String s : entries) {
@@ -147,7 +145,7 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
                 list.add(directory + "/" + s);
             }
         }
-        // `list' now contains all the appropriate files in `directory' - now
+        // 'list' now contains all the appropriate files in 'directory' - now
         // handle the subdirectories in order.
         entries = new File(directory).list();
         for (String s : entries) {
@@ -157,7 +155,7 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
         }
     }
     
-    String makeImportPath(Import im) {
+    public static String makeImportPath(Import im) {
         String path = "";
         if (im.path() != null) {
             int i = 0;
@@ -173,7 +171,7 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
 
     /**
      * VisitImport will read and parse an import statement. The chain of symbol tables
-     * will be left in the `symtab' field. The parentage of multiple files imported in
+     * will be left in the 'symtab' field. The parentage of multiple files imported in
      * the same import is also through the parent link.
      */
     public T visitImport(Import im) {
@@ -181,7 +179,7 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
         // An import is first tried in the local director
         // then in the include directory - unless it is of the form 'f' then it must be local.
         // Make the path for this import
-        String path = makeImportPath(im);
+        String path = ResolveImports.makeImportPath(im);
 
         Log.log("visitImport(): Package path is : " + path);
         Log.log("visitImport(): Package file name is : " + im.file().getname());
@@ -216,7 +214,7 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
                                 .build(), MessageType.PRINT_CONTINUE);
                 }
             }
-            Log.log("visitImport(): About to import `" + im.file().getname() + ".pj'");
+            Log.log("visitImport(): About to import '" + im.file().getname() + ".pj'");
         } else { // Not a .* import
             fileName = fileName + "/" + im.file().getname() + ".pj";
             // Set package name
@@ -255,8 +253,10 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
                 }
             }
         }
+        // Symbol table associated with this file
+        SymbolTable symtab = null;
 
-        // `fileList' now contains the list of all the files that this import caused to be imported
+        // 'fileList' now contains the list of all the files that this import caused to be imported
         for (String fn : fileList) {
             // Scan, parse and build tree.
             String oldCurrentFileName = currentFileName;
@@ -264,11 +264,15 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
             // Set current filename
             CompilerMessageManager.INSTANCE.setFileName(fn);
             Compilation c = ResolveImports.importFile(im, fn, path /* packageName */);
+            SymbolTable.hook = null;
 
             // Add it to the list of compilations for this import
             im.addCompilation(c);
             // Create a symboltable for it
             SymbolTable importSymtab = new SymbolTable("Import: " + fn);
+            // Visit imports in the current process file
+            c.visit(new ResolveImports<AST>());
+            importSymtab.setImportParent(SymbolTable.hook);
             // Declare types and constants for handling it's imports
             c.visit(new TopLevelDecls<AST>(importSymtab));
             currentFileName = oldCurrentFileName;
@@ -282,8 +286,10 @@ public class ResolveImports<T extends Object> extends Visitor<T> {
                 importSymtab.setParent(symtab);
                 symtab = importSymtab;
             }
+//            System.out.println("HERE");
+//            symtab.printStructure("   ");
         }
-        
+        SymbolTable.hook = symtab;
         return null;
     }
 }

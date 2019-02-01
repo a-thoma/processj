@@ -94,9 +94,6 @@ public class PJOne2OneChannel<T> extends PJChannel<T> {
         writer = null;
         reader = null;
     }
-    
-    // TODO: delete everything that comes after this comment!!!!!
-    // We can't delete these methods because of the abstract class contract
 
     @Override
     synchronized public void addReader(PJProcess p) {
@@ -111,6 +108,7 @@ public class PJOne2OneChannel<T> extends PJChannel<T> {
      */
     @Override
     synchronized public void addWriter(PJProcess p) {
-        throw new UnsupportedOperationException(String.format("Invalid operation for a %s", type.getText()));
+        throw new UnsupportedOperationException(String.format("Invalid operation for a %s. " +
+                "Method 'addWriter' must be ovirred!", type.getText()));
     }
 }
