@@ -30,18 +30,26 @@ public class ExternType extends Type {
         return typeName();
     }
 
-    @Override
-    public boolean equal(Type t) {
+    // ********************
+    // Type Related Stuff
+    // ********************
+
+    @Override public boolean isExternType() {
+	return true;
+    }
+
+    // TODO
+    @Override public boolean typeEqual(Type t) {
         return false;
     }
 
-    @Override
-    public boolean equivalent(Type t) {
+    // TODO
+    @Override public boolean typeEquivalent(Type t) {
         return false;
     }
 
-    @Override
-    public boolean assignmentCompatible(Type t) {
+    // TODO
+    @Override public boolean typeAssignmentCompatible(Type t) {
         return false;
     }
 }

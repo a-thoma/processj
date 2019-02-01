@@ -12,6 +12,9 @@ public class RecordTypeDecl extends Type implements DefineTopLevelDecl {
         children = new AST[] { modifiers, name, extend, annotations, body };
     }
 
+    // *************************************************************************
+    // ** Accessor Methods
+
     public Sequence<Modifier> modifiers() {
         return (Sequence<Modifier>) children[0];
     }
@@ -32,6 +35,9 @@ public class RecordTypeDecl extends Type implements DefineTopLevelDecl {
         return (Sequence<RecordMember>) children[4];
     }
 
+    // *************************************************************************
+    // ** Misc. Methods
+    
     public RecordMember getMember(String name) {
         for (RecordMember rm : body())
             if (rm.name().getname().equals(name))
@@ -43,6 +49,16 @@ public class RecordTypeDecl extends Type implements DefineTopLevelDecl {
         return typeName();
     }
 
+    // *************************************************************************
+    // ** Visitor Related Methods
+
+    public <S extends Object> S visit(Visitor<S> v) {
+        return v.visitRecordTypeDecl(this);
+    }
+
+    // *************************************************************************
+    // ** Type Related Methods
+    
     public String signature() {
         return "<R" + name().getname() + ";";
     }
@@ -51,22 +67,19 @@ public class RecordTypeDecl extends Type implements DefineTopLevelDecl {
         return "Record: " + name();
     }
 
-    public <S extends Object> S visit(Visitor<S> v) {
-        return v.visitRecordTypeDecl(this);
+    @Override public boolean isRecordType() {
+	return true;
     }
 
-    @Override
-    public boolean equal(Type t) {
+    @Override public boolean typeEqual(Type t) {
         return false;
     }
 
-    @Override
-    public boolean equivalent(Type t) {
+    @Override public boolean typeEquivalent(Type t) {
         return false;
     }
 
-    @Override
-    public boolean assignmentCompatible(Type t) {
+    @Override public boolean typeAssignmentCompatible(Type t) {
         return false;
     }
 }
