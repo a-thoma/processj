@@ -1,135 +1,133 @@
-import java.io.*;
+import java.io.File;
 import java.util.*;
 
 import ast.AST;
 import ast.Compilation;
-import clp.FormatterHelp;
-import clp.OptionBuilder;
-import clp.StringUtil;
+import cli.CLIBuilder;
+import cli.Formatter;
+import cli.StringUtil;
 import codegeneratorjava.CodeGeneratorJava;
+import codegeneratorjava.Helper;
 import library.Library;
 import parser.parser;
 import scanner.Scanner;
+import utilities.ConfigFileReader;
 import utilities.Error;
-import utilities.ErrorMessage;
+import utilities.PJMessage;
+import utilities.VisitorMessageNumber;
 import utilities.Language;
 import utilities.Log;
+import utilities.CompilerMessageManager;
 import utilities.Settings;
 import utilities.SymbolTable;
 
 /**
- * @author Ben Cisneros
+ * ProcessJ JVM Compiler.
+ * 
+ * @author Ben
  * @version 07/01/2018
  * @since 1.2
  */
 public class ProcessJc {
     
-    private static final String HELP_ERROR_MSG = "What would you like me to do?";
+    public static CLIBuilder optionBuilder = new CLIBuilder().addCommand(PJMain.class);
     
-    /**
-     * Pretty prints AST-like structures.
-     * 
-     * @param c
-     *          A {@link Compilation} unit representation of an AST.
-     */
-    private static void writeTree(Compilation c) {
-        try {
-            FileOutputStream fileOut = new FileOutputStream("Tree.ser");
-            ObjectOutputStream out = new ObjectOutputStream(fileOut);
-            out.writeObject(c);
-            out.close();
-            fileOut.close();
-            System.out.printf("Serialized data is saved in Tree.ser");
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
-    }
-    
-    public static void whatMessage() {
-        System.err.println(HELP_ERROR_MSG);
+    public static void help() {
+        Formatter formatHelp = new Formatter(optionBuilder);
+        System.out.println(formatHelp.buildUsagePage());
         System.exit(0);
     }
     
-    // TODO: Only for testing purposes!
-    public static final String ANSI_RESET = "\u001B[0m";
-    public static final String ANSI_RED = "\u001B[31m";
-    public static final String ANSI_UNDERLINE = "\033[4m";
-    //
-    
     public static void main(String[] args) {
-        if (args.length == 0) {
-//            System.out.println("[" + ANSI_UNDERLINE + "INFO" + ANSI_RESET + "] pjc: " + ANSI_RED + "error: " + ANSI_RESET + "no input file(s)");
-//            System.out.println("-> " + ErrorMessage.RESOLVE_IMPORTS_100.format("Blah!!"));
-            whatMessage();
-        }
+        if (args.length == 0)
+            help();
         
-        AST root = null;
+        // ===============================================
+        // C O M M A N D   L I N E   P R O C E S S O R
+        // ===============================================
         
-        // -----------------------------------------------------------------------------
-        // COMMAND LINE PROCESSOR
-        OptionBuilder optionBuilder = null;
+        // Build options and arguments with user input
         PJMain pjMain = null;
         try {
-            optionBuilder = new OptionBuilder()
-                                .addCommand(PJMain.class)
-                                .handlerArgs(args);
+            optionBuilder.handleArgs(args);
             pjMain = optionBuilder.getCommand(PJMain.class);
         } catch(Exception e) {
             System.out.println(e.getMessage());
-            System.exit(1);
-        }
-        
-        // These fields have default values, see PJMain.java for more information
-        Settings.includeDir = pjMain.include;
-        Settings.targetLanguage = pjMain.target;
-        boolean sts = pjMain.sts;
-        boolean visitorAll = pjMain.visitorAll;
-        List<File> files = pjMain.files;
-        
-        if (pjMain.help) {
-            FormatterHelp formatHelp = new FormatterHelp();
-            formatHelp.setSorted(true);
-            System.out.println(formatHelp.usagePage(optionBuilder));
             System.exit(0);
         }
         
-        if (pjMain.version) {
+        Properties config = ConfigFileReader.openConfiguration();
+        
+        // These fields have default values that could be updated with
+        // user input (see PJMain.java for more info)
+        Settings.includeDir = pjMain.include;
+        Settings.targetLanguage = pjMain.target;
+        boolean sts = pjMain.symbolTable;
+        boolean visitorAll = pjMain.visitorAll;
+        List<File> files = pjMain.files;
+        // Turn on/off colour mode
+        if (pjMain.ansiColour == null) {
+            // Only set the colour mode if the default value in properties file is 'yes'
+            if (config.getProperty("colour").equalsIgnoreCase("yes"))
+                Settings.isAnsiColour = true;
+        } else {
+            Settings.isAnsiColour = pjMain.ansiColour;
+            String ansiColorvalue = "no";
+            if (Settings.isAnsiColour)
+                ansiColorvalue = "yes";
+            // Update 'colour' code value in properties file
+            config.setProperty("colour", ansiColorvalue);
+            ConfigFileReader.closeConfiguration(config);
+            System.exit(0);
+        }
+        
+        // Display usage page
+        if (pjMain.help)
+            help();
+        else if (pjMain.version) { // Display version
             try {
-                String[] list = pjMain.versionPrinter.getVersionPrinter();
-                for (String text : list)
-                    System.out.println(text);
-                System.exit(0);
+                String[] list = pjMain.getVersion().getVersionPrinter();
+                System.out.println(StringUtil.join(Arrays.asList(list), "\n"));
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
+            System.exit(0);
         }
-        
-        if (!StringUtil.isStringEmpty(pjMain.info)) {
-            System.out.println(String.format("Information about @Option '%s' is not available.", pjMain.info));
+        else if (pjMain.errorCode != null) { // TODO: Display error code information
+            System.out.println("Not available..");
+            System.exit(0);
+        }
+        else if (files == null || files.isEmpty()) { // Check for input file(s)
+            // At least one file must be provided. Otherwise, throw an error if
+            // no file is given, or if a file does not exists
+            System.out.println(new PJMessage.Builder()
+                                   .addError(VisitorMessageNumber.RESOLVE_IMPORTS_100)
+                                   .build().getST().render());
             System.exit(0);
         }
         
-        if (files == null || files.isEmpty()) {
-            // At least one file must be provided otherwise throw an error
-            // Throw error messages
-            System.exit(0);
-        }
+        // ===============================================
+        // P R O C C E S S I N G   F I L E S
+        // ===============================================
         
-        // -----------------------------------------------------------------------------
+        AST root = null;
         
         for (File inFile : files) {
             Scanner s = null;
             parser p = null;
             try {
                 String fileAbsolutePath = inFile.getAbsolutePath();
-                Error.setFileName(fileAbsolutePath);
-                Error.setPackageName(fileAbsolutePath);
+                // Set package and filename
+                CompilerMessageManager.INSTANCE.setFileName(fileAbsolutePath);
+                CompilerMessageManager.INSTANCE.setPackageName(fileAbsolutePath);
+                
+//                Error.setFileName(fileAbsolutePath);
+//                Error.setPackageName(fileAbsolutePath);
                 s = new Scanner(new java.io.FileReader(fileAbsolutePath));
                 p = new parser(s);
             } catch (java.io.FileNotFoundException e) {
-                // TODO: error message
-                System.err.println(String.format("File not found: \"%s\"", inFile));
-                System.exit(1);
+                // This won't execute! The error is handled above
+                // by the command
             } catch (Exception e) {
                 e.printStackTrace();
                 System.exit(1);
@@ -149,122 +147,166 @@ public class ProcessJc {
             // Cast the result from the parse to a Compilation - this is the root of the tree
             Compilation c = (Compilation) root;
 
-            // SYNTAX TREE PRINTER
-//            c.visit(new Printers.ParseTreePrinter());
-
             // Decode pragmas - these are used for generating stubs from libraries.
             // No regular program would have them.
             Library.decodePragmas(c);
             Library.generateLibraries(c);
 
             // This table will hold all the top level types
-            SymbolTable globalTypeTable = new SymbolTable("Main file: " + Error.fileName);
+            SymbolTable globalTypeTable = new SymbolTable("Main file: " + CompilerMessageManager.INSTANCE.fileName);
 
             // Dump log messages
-            if (visitorAll) {
+            if (visitorAll)
                 Log.startLogging();
-            }
-
-            // Dump the symbol table structure
-            if (sts) {
-                globalTypeTable.printStructure("");
-            }
-
-            // -----------------------------------------------------------------------------
-            // VISIT IMPORT DECLARATIONS
-            c.visit(new namechecker.ResolveImports<AST>(globalTypeTable));
-            if (Error.errorCount != 0) {
-                System.out.println("** COMPILATION FAILED #0 **");
-                System.exit(1);
-            }
-
-            // -----------------------------------------------------------------------------
-            // TOP LEVEL DECLARATIONS
+            
+            // =====================================================
+            // V I S I T   I M P O R T   D E C L A R A T I O N S
+            // =====================================================
+            
+            c.visit(new namechecker.ResolveImports<AST>());
+//            globalTypeTable.printStructure("");
+            
+//            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
+//                CompilerMessageManager.INSTANCE.printTrace("import declarations");
+//                CompilerMessageManager.INSTANCE.writeToFile("PJErrors");
+//                System.exit(1);
+//            }
+            globalTypeTable.setImportParent(SymbolTable.hook);
+            
+            // ===========================================================
+            // V I S I T   T O P   L E V E L   D E C L A R A T I O N S
+            // ===========================================================
             
             c.visit(new namechecker.TopLevelDecls<AST>(globalTypeTable));
-            globalTypeTable = SymbolTable.hook;
+            
+            ///////
+            c.visit(new namechecker.ResolveProcTypeDecl<AST>());
+            //
+
+//            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
+//                CompilerMessageManager.INSTANCE.printTrace("top level declarations");
+//                System.exit(1);
+//            }
+            
+//            globalTypeTable = SymbolTable.hook;
+
+            // Dump the symbol table structure
+//            if (symbolTable)
+//                globalTypeTable.printStructure("");
+            
+            // ========================================================
+            // V I S I T R E S O L V E   P A C K A G E   T Y P E S
+            // ========================================================
 
             // Resolve types from imported packages.
             c.visit(new namechecker.ResolvePackageTypes());
-
-            // -----------------------------------------------------------------------------
-            // NAME CHECKER
+            
+//            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
+//                CompilerMessageManager.INSTANCE.printTrace("package types");
+//                System.exit(1);
+//            }
+            
+            // =======================================
+            // V I S I T   N A M E   C H E C K E R
+            // =======================================
             
             c.visit(new namechecker.NameChecker<AST>(globalTypeTable));
-            if (Error.errorCount != 0) {
-//                System.out.println("---------- Error Report ----------");
-//                System.out.println(String.format("%d errors in symbol resolution - fix these before type checking.",
-//                        Error.errorCount));
-//                System.out.println(Error.errors);
-                System.out.println("** COMPILATION FAILED #1 **");
-                System.exit(1);
-            }
+            
+//            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
+//                CompilerMessageManager.INSTANCE.printTrace("name checker");
+//                System.exit(1);
+//            }
+            
+            // =======================================
+            // V I S I T   A R R A Y   T Y P E S
+            // =======================================
 
             // Re-construct Array Types correctly
             root.visit(new namechecker.ArrayTypeConstructor());
-
-            // -----------------------------------------------------------------------------
-            // TYPE CHECKER
+            
+//            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
+//                CompilerMessageManager.INSTANCE.printTrace("array types constructor");
+//                System.exit(1);
+//            }
+            
+            // ========================================
+            // V I S I T   T Y P E   C H E C K E R
+            // ========================================
             
             c.visit(new typechecker.TypeChecker(globalTypeTable));
-
-            if (Error.errorCount != 0) {
-//                System.out.println("---------- Error Report ----------");
-//                System.out.println(String.format("%d errors in type checking - fix these before code generation.",
-//                        Error.errorCount));
-//                System.out.println(Error.errors);
-                System.out.println("** COMPILATION FAILED #2 **");
-                System.exit(1);
-            }
-
-            // -----------------------------------------------------------------------------
-            // OTHER SEMANTIC CHECKS
+            
+//            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
+//                CompilerMessageManager.INSTANCE.printTrace("type checking");
+//                System.exit(1);
+//            }
+            
+            // ========================================
+            // V I S I T   R E A C H A B I L I T Y
+            // ========================================
             
             c.visit(new reachability.Reachability());
-            c.visit(new parallel_usage_check.ParallelUsageCheck());
-            c.visit(new yield.Yield());
-
-            if (Error.errorCount != 0) {
-//                System.out.println("---------- Error Report ----------");
-//                System.out.println(Error.errors);
-                System.out.println("** COMPILATION FAILED #3 **");
-                System.exit(1);
-            }
             
-            // -----------------------------------------------------------------------------
-            // CODE GENERATOR
+//            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
+//                CompilerMessageManager.INSTANCE.printTrace("reachability");
+//                System.exit(1);
+//            }
+            
+            // ===========================================
+            // V I S I T   P A R A L L E L   U S A G E
+            // ===========================================
+            
+            c.visit(new parallel_usage_check.ParallelUsageCheck());
+            
+//            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
+//                CompilerMessageManager.INSTANCE.printTrace("parallel usage checking");
+//                System.exit(1);
+//            }
+            
+            // ==========================
+            // V I S I T   Y I E L D
+            // ==========================
+            
+            c.visit(new yield.Yield());
+            
+//            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
+//                CompilerMessageManager.INSTANCE.printTrace("yield");
+//                System.exit(1);
+//            }
+            
+            // ===============================
+            // C O D E   G E N E R A T O R
+            // ===============================
             
             if (Settings.targetLanguage == Language.JVM) {
-//                generateCodeJava(c, inFile, globalTypeTable);
-                System.out.println("NO CODE GENERATOR");
-                System.exit(1);
+                generateCodeJava(c, inFile, globalTypeTable);
             } else {
                 System.err.println(String.format("Unknown target language '%s' selected.", Settings.targetLanguage));
                 System.exit(1);
             }
-
-            System.out.println("** COMPILATION SUCCEEDED **");
+            
+            System.out.println(String.format("*** File '%s' was compiled successfully ***", inFile.getName()));
         }
     }
     
     /**
-     * Given a ProcessJ {@link Compilation} unit, e.g,. an abstract syntax tree
-     * object, we will generate the code for the JVM. The source range for this
-     * type of tree is the entire source file, not including leading and trailing
-     * whitespace characters and comments.
+     * Given a ProcessJ {@link Compilation} unit, e.g. an abstract
+     * syntax tree object, we will generate the code for the JVM.
+     * The source range for this type of tree is the entire source
+     * file, not including leading and trailing whitespace characters
+     * and comments.
      *
      * @param compilation
-     *              A {@link Compilation} unit consisting of a single file.
+     *              A {@link Compilation} unit consisting of a single
+     *              file.
      * @param inFile
      *              The compiled file.
      * @param topLevelDecls
      *              A symbol table consisting of all the top level types.
      */
     private static void generateCodeJava(Compilation compilation, File inFile, SymbolTable topLevelDecls) {
-
         // Read in and get the pathname of the input file
         String name = inFile.getName().substring(0, inFile.getName().lastIndexOf("."));
-        Properties configFile = utilities.ConfigFileReader.getConfiguration();
+        Properties config = utilities.ConfigFileReader.openConfiguration();
 
         // Run the code generator to decode pragmas, generate libraries, resolve
         // types, and set the symbol table for top level declarations
@@ -280,28 +322,6 @@ public class ProcessJc {
         String templateResult = (String) compilation.visit(generator);
 
         // Write the output to a file
-//        Helper.writeToFile(templateResult, generator.getSourceFile());
-    }
-
-    /**
-     * Pretty prints a hash table with fancy formatting.
-     *
-     * @param table
-     *          HashTable of values to print.
-     */
-    private static void printTable(Hashtable<String, Integer> table) {
-        String dashLine = "---------------------------------------------------------";
-        Log.log(dashLine);
-        Log.log(String.format("|%-25s\t|\t%15s\t|", "functionName", "Size"));
-        Log.log(dashLine);
-        Set<String> myKeys = table.keySet();
-
-        for (String name : myKeys) {
-            int size = table.get(name);
-            String msg = String.format("|%-25s\t|\t%15d\t|", name, size);
-            Log.log(msg);
-        }
-
-        Log.log(dashLine);
+        Helper.writeToFile(templateResult, generator.getSourceFile());
     }
 }

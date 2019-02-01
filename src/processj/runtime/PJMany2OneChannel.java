@@ -5,9 +5,10 @@ import java.util.LinkedList;
 /**
  * The runtime representation of a many-to-one channel.
  *
+ * @autho Ben
  * @author Cabel Shrestha
- * @version 1.0
- * @since 2016-05-01
+ * @version 08/29/2018
+ * @since 1.2
  */
 
 public class PJMany2OneChannel<T> extends PJChannel<T> {
@@ -24,7 +25,6 @@ public class PJMany2OneChannel<T> extends PJChannel<T> {
      * Constructor
      */
     public PJMany2OneChannel() {
-//        this.type = TYPE_MANY2ONE;
         type = PJChannelType.MANY2ONE;
     }
 

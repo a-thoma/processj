@@ -5,11 +5,11 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * The enum {@link Tag} represents and identifies various types such
- * as procedures, methods, parameters, local variables, protocols,
- * records, channels, etc.
+ * The enum {@link Tag} represents and identifies
+ * various types such as procedures, methods, parameters,
+ * local variables, protocols, records, channels, etc.
  *
- * @author Ben Cisneros
+ * @author Ben
  * @version 06/15/2018
  * @since 1.2
  */
@@ -17,17 +17,19 @@ public enum Tag {
 
     /**
      * Signatures and types.
+     * NOTE: labels can be used for debugging.
      */
-    MAIN_NAME           ("([T;)V", "mainProcedureType"),
-    PROCEDURE_NAME      ("_proc$", "procedureType"),
-    METHOD_NAME         ("_method$", "methodType"),
-    PARAM_NAME          ("_pd$", "parameterType"),
-    LOCAL_NAME          ("_ld$", "localVariableType"),
-    PROTOCOL_NAME       ("_prot$", "protocolType"),
-    RECORD_NAME         ("_rec$", "recordType"),
-    CHANNEL_NAME        ("_chan$", "channelType"),
-    CHANNEL_READ_NAME   ("READ", "channelReadType"),
-    CHANNEL_WRITE_NAME  ("WRITE", "channelWriteType")
+    MAIN_NAME           ("([T;)V"   , "mainProcedureType"),
+    PROCEDURE_NAME      ("_proc$"   , "procedureType"),
+    METHOD_NAME         ("_method$" , "methodType"),
+    PARAM_NAME          ("_pd$"     , "parameterType"),
+    LOCAL_NAME          ("_ld$"     , "localVariableType"),
+    PAR_BLOCK_NAME      ("par"    , "parBlockType"),
+    PROTOCOL_NAME       ("_prot$"   , "protocolType"),
+    RECORD_NAME         ("_rec$"    , "recordType"),
+    CHANNEL_NAME        ("_chan$"   , "channelType"),
+    CHANNEL_READ_NAME   ("READ"     , "channelReadType"),
+    CHANNEL_WRITE_NAME  ("WRITE"    , "channelWriteType")
     ;
 
     private final String tag;

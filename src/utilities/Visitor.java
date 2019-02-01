@@ -73,11 +73,12 @@ import ast.WhileStat;
  * must be re-implemented for each traversal through the tree.
  *
  * @author Matt Pedersen
+ * @since 1.1
  *
  */
 public abstract class Visitor<T extends Object> {
 
-    // The `debug' field should be set in the constructor of the
+    // The 'debug' field should be set in the constructor of the
     // extending class.
     protected boolean debug;
 

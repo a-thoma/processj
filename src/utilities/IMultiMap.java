@@ -3,15 +3,16 @@ package utilities;
 import java.util.Collection;
 
 /**
- * The interface {@link IMultiMap} serves as a base for all types of
- * maps that hold a collection of values associated with different keys.
+ * The interface {@link IMultiMap} serves as the base for
+ * all types of maps that hold a collection of values
+ * associated with different keys.
  * 
  * @param <K>
  *          The key type.
  * @param <V>
  *          The value type.
  * 
- * @author Ben Cisneros
+ * @author Ben
  * @version 09/04/2018
  * @since 1.2
  */

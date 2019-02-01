@@ -4,8 +4,8 @@ package processj.runtime;
  * The runtime representation of a channel. All four different channel types
  * subclass this class.
  *
+ * @author Ben
  * @author Cabel Shrestha
- * @author Ben Cisneros
  * @version 08/29/2018
  * @since 1.2
  */
@@ -143,8 +143,7 @@ public abstract class PJChannel<T> {
      *         All calls to isReadyToRead and to read() must happen in the same
      *         synchronized block.
      *
-     *         <pre>
-     * {@code
+     *<pre>
      * L2:
      *     synchronized (c) {
      *       if (c.isReadyToRead(this)) {
@@ -156,7 +155,7 @@ public abstract class PJChannel<T> {
      *      }
      *    }
      * }
-     *         </pre>
+     * </pre>
      */
     synchronized public boolean isReadyToRead(PJProcess p) {
         // Data present and reserved for a specific reader.

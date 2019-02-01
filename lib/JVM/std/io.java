@@ -1,4 +1,4 @@
-package JVM.std;
+package std;
 
 public class io {
 
