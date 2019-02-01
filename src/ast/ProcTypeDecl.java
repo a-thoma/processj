@@ -57,22 +57,48 @@ public class ProcTypeDecl extends Type implements DefineTopLevelDecl {
         return s;
     }
 
+    // *************************************************************************
+    // ** Visitor Related Methods
+
     public <S extends Object> S visit(Visitor<S> v) {
         return v.visitProcTypeDecl(this);
     }
 
-    @Override
-    public boolean equal(Type t) {
-        return false;
+    // *************************************************************************
+    // ** Type Related Methods
+
+    @Override public boolean isProcType() {
+	return true;
+    }
+    
+    // α = procedure(name1, {t1,1, . . . , t1,m1 }, t1) ∧ β = procedure(name2, {t2,1, . . . , t2,m2 }, t2)
+    // α =T β ⇔ procedure?(α) ∧ procedure?(β) ∧ (m1 = m2) ∧ (t1 =T t2) ∧ (name1 = name2) ∧ ∧^m1_i=1 (t1,i =T t2,i)
+    @Override public boolean typeEqual(Type t) {
+	// procedure?(β)
+	if (!t.isProcType())
+	    return false;
+	ProcTypeDecl other = (ProcTypeDecl)t;
+	// (m1 = m2)
+	if (formalParams().size() != other.formalParams().size())
+	    return false;
+	// (t1 =T t2)
+	if (!returnType().typeEqual(other.returnType()))
+	    return false;
+	// (name1 = name2) ∧ ∧^m1_i=1 (t1,i =T t2,i)  
+	boolean eq = true;
+	for (int i = 0; i<formalParams().size(); i++) {
+	    eq = eq && formalParams().child(i).type().typeEqual(other.formalParams().child(i).type());
+	}
+	return eq;
     }
 
-    @Override
-    public boolean equivalent(Type t) {
-        return false;
+    // α ∼T β ⇔ α =T β
+    @Override public boolean typeEquivalent(Type t) {
+        return this.typeEqual(t);
     }
 
-    @Override
-    public boolean assignmentCompatible(Type t) {
+    // TODO
+    @Override public boolean typeAssignmentCompatible(Type t) {
         return false;
     }
 }
