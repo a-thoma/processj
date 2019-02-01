@@ -17,12 +17,14 @@ public enum Tag {
 
     /**
      * Signatures and types.
+     * NOTE: labels can be used for debugging.
      */
     MAIN_NAME           ("([T;)V"   , "mainProcedureType"),
     PROCEDURE_NAME      ("_proc$"   , "procedureType"),
     METHOD_NAME         ("_method$" , "methodType"),
     PARAM_NAME          ("_pd$"     , "parameterType"),
     LOCAL_NAME          ("_ld$"     , "localVariableType"),
+    PAR_BLOCK_NAME      ("par"    , "parBlockType"),
     PROTOCOL_NAME       ("_prot$"   , "protocolType"),
     RECORD_NAME         ("_rec$"    , "recordType"),
     CHANNEL_NAME        ("_chan$"   , "channelType"),

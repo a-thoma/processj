@@ -12,6 +12,24 @@ import utilities.CompilerMessageManager;
 import utilities.Log;
 import utilities.Visitor;
 
+/**
+ * Importing a file(s) enables the use of types and procedures (which
+ * are also types) from other compilation units. A compilation unit can
+ * be a single file or a collection of files containing several types
+ * which we visited in sequence, for every 'import' statement found in
+ * a file, to determined if these types are part of a ProcessJ native
+ * library. In addition, we visit the fields related to 'pragma' values
+ * when an 'import' statement is encountered to check if a type is a
+ * library function and is native.
+ *
+ * @param <T>
+ *          The visitor interface used to traverse and resolve each
+ *          type in an 'import' statement.
+ * 
+ * @author Ben
+ * @version 01/31/2019
+ * @since 1.2
+ */
 public class ResolveProcTypeDecl<T extends AST> extends Visitor<T> {
     
     public Import currentImport = null;
@@ -64,7 +82,11 @@ public class ResolveProcTypeDecl<T extends AST> extends Visitor<T> {
     public T visitProcTypeDecl(ProcTypeDecl pd) {
         Log.log(pd.line + ": Visiting a ProcTypeDecl (" + pd.name().getname() + ")");
         if (pragmaTable.size() > 0 && currentImport != null) {
+            String path = ResolveImports.makeImportPath(currentImport);
+            Log.log("visitImport(): Package path is : " + path);
             if (pragmaTable.contains("LIBRARY") && pragmaTable.contains("NATIVE")) {
+                Log.log("visitImport(): Package file name is : " + currentImport.file().getname());
+                
                 pd.isNative = true;
                 pd.library = currentImport.toString();
                 pd.filename = pragmaTable.get("FILE");

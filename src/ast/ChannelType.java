@@ -9,7 +9,7 @@ public class ChannelType extends Type {
     public static final int SHARED_READ_WRITE = 2;
     public static final int NOT_SHARED = 3;
 
-    public String modSyms[] = { "shared read", "shared write", "shared", "" };
+    public String modSyms[] = { "shared read", "shared write", "shared", "no shared" };
 
     private int shared;
 

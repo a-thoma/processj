@@ -1,15 +1,5 @@
 package codegeneratorjava;
 
-import static codegeneratorjava.Tag.CHANNEL_NAME;
-import static codegeneratorjava.Tag.CHANNEL_READ_NAME;
-import static codegeneratorjava.Tag.CHANNEL_WRITE_NAME;
-import static codegeneratorjava.Tag.LOCAL_NAME;
-import static codegeneratorjava.Tag.METHOD_NAME;
-import static codegeneratorjava.Tag.PARAM_NAME;
-import static codegeneratorjava.Tag.PROCEDURE_NAME;
-import static codegeneratorjava.Tag.PROTOCOL_NAME;
-import static codegeneratorjava.Tag.RECORD_NAME;
-
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
@@ -103,32 +93,23 @@ public class Helper {
             // Ignore
             break;
         case PROCEDURE_NAME:
-            varName = PROCEDURE_NAME.getTag() + name;
-            break;
+            varName = Tag.PROCEDURE_NAME.getTag() + name; break;
         case METHOD_NAME:
-            varName = METHOD_NAME.getTag() + name;
-            break;
+            varName = Tag.METHOD_NAME.getTag() + name; break;
         case PARAM_NAME:
-            varName = PARAM_NAME.getTag() + name + X;
-            break;
+            varName = Tag.PARAM_NAME.getTag() + name + X; break;
         case LOCAL_NAME:
-            varName = LOCAL_NAME.getTag() + name + X;
-            break;
+            varName = Tag.LOCAL_NAME.getTag() + name + X; break;
         case PROTOCOL_NAME:
-            varName = PROTOCOL_NAME.getTag() + name + X;
-            break;
+            varName = Tag.PROTOCOL_NAME.getTag() + name + X; break;
         case RECORD_NAME:
-            varName = RECORD_NAME.getTag() + name + X;
-            break;
+            varName = Tag.RECORD_NAME.getTag() + name + X; break;
         case CHANNEL_NAME:
-            varName = CHANNEL_NAME.getTag() + name + X;
-            break;
+            varName = Tag.CHANNEL_NAME.getTag() + name + X; break;
         case CHANNEL_READ_NAME:
-            varName = CHANNEL_NAME.getTag() + name + X + CHANNEL_READ_NAME.getTag();
-            break;
+            varName = Tag.CHANNEL_NAME.getTag() + name + X + Tag.CHANNEL_READ_NAME.getTag(); break;
         case CHANNEL_WRITE_NAME:
-            varName = CHANNEL_NAME.getTag() + name + X + CHANNEL_WRITE_NAME.getTag();
-            break;
+            varName = Tag.CHANNEL_NAME.getTag() + name + X + Tag.CHANNEL_WRITE_NAME.getTag(); break;
         default:
             break;
         }

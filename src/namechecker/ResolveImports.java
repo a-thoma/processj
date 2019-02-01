@@ -155,7 +155,7 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
         }
     }
     
-    String makeImportPath(Import im) {
+    public static String makeImportPath(Import im) {
         String path = "";
         if (im.path() != null) {
             int i = 0;
@@ -179,7 +179,7 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
         // An import is first tried in the local director
         // then in the include directory - unless it is of the form 'f' then it must be local.
         // Make the path for this import
-        String path = makeImportPath(im);
+        String path = ResolveImports.makeImportPath(im);
 
         Log.log("visitImport(): Package path is : " + path);
         Log.log("visitImport(): Package file name is : " + im.file().getname());
