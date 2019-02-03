@@ -27,7 +27,7 @@ public class Demo {
 
         @Override
         public synchronized void run() {
-            _method$say();
+            Demo._method$say();
             terminate();
         }
     }

@@ -1,11 +1,16 @@
 import std.io;
 
-proc void main(string args[]) {
+public proc void say() {
     par {
-        //
+        println("from say");
+        println("say from");
     }
-    
+}
+
+public proc void main(string args[]) {
     par {
-        //
+        println("Hello");
+        println("World");
+        say();
     }
 }

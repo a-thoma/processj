@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import ast.ProcTypeDecl;
+import ast.Type;
 import utilities.Assert;
 import utilities.Settings;
 
@@ -141,27 +142,28 @@ public class Helper {
      *          A primitive class type or the class itself.
      * @return The type instances represented by a class.
      */
-    public static Class<?> getWrapperClass(Class<?> type) {
+    public static Class<?> getWrapperClass(Type type) {
         type = Assert.nonNull(type, "The parameter type cannot be null.");
-        if (type == Integer.TYPE) {
-            type = Integer.TYPE;
-        } else if (type == Byte.TYPE) {
-            type = Byte.TYPE;
-        } else if (type == Long.TYPE) {
-            type = Long.TYPE;
-        } else if (type == Double.TYPE) {
-            type = Double.TYPE;
-        } else if (type == Float.TYPE) {
-            type = Float.TYPE;
-        } else if (type == Boolean.TYPE) {
-            type = Boolean.TYPE;
-        } else if (type == Character.TYPE) {
-            type = Character.TYPE;
-        } else if (type == Short.TYPE) {
-            type = Short.TYPE;
+        Class<?> typeName = null;
+        if (type.isIntegerType()) {
+            typeName = Integer.class;
+        } else if (type.isByteType()) {
+            typeName = Byte.class;
+        } else if (type.isLongType()) {
+            typeName = Long.class;
+        } else if (type.isDoubleType()) {
+            typeName = Double.class;
+        } else if (type.isFloatType()) {
+            typeName = Float.class;
+        } else if (type.isBooleanType()) {
+            typeName = Boolean.class;
+        } else if (type.isCharType()) {
+            typeName = Character.class;
+        } else if (type.isShortType()) {
+            typeName = Short.class;
         }
         
-        return type;
+        return typeName;
     }
     
     /**
@@ -172,8 +174,8 @@ public class Helper {
      *          A primitive class type or the class itself.
      * @return A {@code String} representation of class {@code type}.
      */
-    public static String getWrapperType(Class<?> type) {
-        return getWrapperClass(type).toString();
+    public static String getWrapperType(Type type) {
+        return getWrapperClass(type).getSimpleName();
     }
     
     // ==========================================

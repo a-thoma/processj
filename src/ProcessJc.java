@@ -284,7 +284,8 @@ public class ProcessJc {
                 System.exit(1);
             }
             
-            System.out.println(String.format("*** File '%s' was compiled successfully ***", inFile.getName()));
+            //System.out.println(String.format("*** File '%s' was compiled successfully ***", inFile.getName()));
+            System.out.println("============= S = U = C = C = E = S = S =================");
         }
     }
     
