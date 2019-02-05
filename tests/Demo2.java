@@ -63,6 +63,59 @@ public class Demo2 {
     }
 
 
+    public static void _method$ben() {
+        io.println("form ben");
+    }
+
+    public static class _proc$yeah extends PJProcess {
+        public _proc$yeah() {
+        }
+
+        @Override
+        public synchronized void run() {
+            switch (this.runLabel) {
+                case 0: break;
+                case 1: resume(1); break;
+                default: break;
+            }
+
+            final PJPar _ld$par1 = new PJPar(2, this);
+
+            new PJProcess() {
+                @Override
+                public synchronized void run() {
+                    io.println("from yeah!");
+                    terminate();
+                }
+
+                @Override
+                public void finalize() {
+                    _ld$par1.decrement();
+                }
+            }.schedule();
+
+            new PJProcess() {
+                @Override
+                public synchronized void run() {
+                    io.println("yeah from!");
+                    terminate();
+                }
+
+                @Override
+                public void finalize() {
+                    _ld$par1.decrement();
+                }
+            }.schedule();
+
+            setNotReady();
+            this.runLabel = 1;
+            yield();
+            label(1);
+            terminate();
+        }
+    }
+
+
     public static class _proc$main extends PJProcess {
         private String[] _pd$args1;
 
@@ -78,7 +131,7 @@ public class Demo2 {
                 default: break;
             }
 
-            final PJPar _ld$par1 = new PJPar(3, this);
+            final PJPar _ld$par1 = new PJPar(6, this);
 
             new PJProcess() {
                 @Override
@@ -112,6 +165,126 @@ public class Demo2 {
                     _ld$par1.decrement();
                 }
             }).schedule();
+
+            new PJProcess() {
+                @Override
+                public synchronized void run() {
+                    Demo2._method$ben();
+                    terminate();
+                }
+
+                @Override
+                public void finalize() {
+                    _ld$par1.decrement();
+                }
+            }.schedule();
+
+            (new Demo2._proc$yeah() {
+                @Override
+                public void finalize() {
+                    _ld$par1.decrement();
+                }
+            }).schedule();
+
+            new PJProcess() {
+                @Override
+                public synchronized void run() {
+                    switch (this.runLabel) {
+                        case 0: break;
+                        case 2: resume(2); break;
+                        default: break;
+                    }
+
+                    final PJPar _ld$par2 = new PJPar(3, this);
+
+                    new PJProcess() {
+                        @Override
+                        public synchronized void run() {
+                            io.println("inside second par");
+                            terminate();
+                        }
+
+                        @Override
+                        public void finalize() {
+                            _ld$par2.decrement();
+                        }
+                    }.schedule();
+
+                    new PJProcess() {
+                        @Override
+                        public synchronized void run() {
+                            io.println("par inside second");
+                            terminate();
+                        }
+
+                        @Override
+                        public void finalize() {
+                            _ld$par2.decrement();
+                        }
+                    }.schedule();
+
+                    new PJProcess() {
+                        @Override
+                        public synchronized void run() {
+                            switch (this.runLabel) {
+                                case 0: break;
+                                case 3: resume(3); break;
+                                default: break;
+                            }
+
+                            final PJPar _ld$par3 = new PJPar(2, this);
+
+                            new PJProcess() {
+                                @Override
+                                public synchronized void run() {
+                                    io.println("thrid par block");
+                                    terminate();
+                                }
+
+                                @Override
+                                public void finalize() {
+                                    _ld$par3.decrement();
+                                }
+                            }.schedule();
+
+                            new PJProcess() {
+                                @Override
+                                public synchronized void run() {
+                                    io.println("par block thrid");
+                                    terminate();
+                                }
+
+                                @Override
+                                public void finalize() {
+                                    _ld$par3.decrement();
+                                }
+                            }.schedule();
+
+                            setNotReady();
+                            this.runLabel = 3;
+                            yield();
+                            label(3);
+                            terminate();
+                        }
+
+                        @Override
+                        public void finalize() {
+                            _ld$par2.decrement();
+                        }
+                    }.schedule();
+
+                    setNotReady();
+                    this.runLabel = 2;
+                    yield();
+                    label(2);
+                    terminate();
+                }
+
+                @Override
+                public void finalize() {
+                    _ld$par1.decrement();
+                }
+            }.schedule();
 
             setNotReady();
             this.runLabel = 1;

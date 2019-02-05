@@ -171,7 +171,7 @@ SwitchBlock(jumps) ::= <<
 <if(jumps)>
 switch (this.runLabel) {
     case 0: break;
-    <jumps; separator=";\n">
+    <jumps; separator="\n">
     default: break;
 }
 <endif>

@@ -7,10 +7,31 @@ public proc void say() {
     }
 }
 
+public proc void ben() {
+    println("form ben");
+}
+
+public proc void yeah() {
+    par {
+        println("from yeah!");
+        println("yeah from!");
+    }
+}
+
 public proc void main(string args[]) {
     par {
         println("Hello");
         println("World");
         say();
+        ben();
+        yeah();
+        par {
+            println("inside second par");
+            println("par inside second");
+            par {
+                println("thrid par block");
+                println("par block thrid");
+            }
+        }
     }
 }

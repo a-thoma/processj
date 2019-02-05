@@ -19,8 +19,8 @@ import utilities.Visitor;
  * which we visited in sequence, for every 'import' statement found in
  * a file, to determined if these types are part of a ProcessJ native
  * library. In addition, we visit the fields related to 'pragma' values
- * when an 'import' statement is encountered to check if a type is a
- * library function and is native.
+ * to check if a type is part of a native library function when an 'import'
+ * statement is encountered
  *
  * @param <T>
  *          The visitor interface used to traverse and resolve each
@@ -48,7 +48,6 @@ public class ResolveProcTypeDecl<T extends AST> extends Visitor<T> {
                 + ".");
         Log.log(" Visiting type declarations for " + CompilerMessageManager.INSTANCE.fileName);
         co.imports().visit(this);
-
         return null;
     }
     
@@ -66,6 +65,7 @@ public class ResolveProcTypeDecl<T extends AST> extends Visitor<T> {
     
     public T visitImport(Import im) {
         Log.log(im.line + ": Visiting an import (of file: " + im + ")");
+        Import prevImpot = currentImport;
         currentImport = im;
         Sequence<Compilation> compilations = im.getCompilations();
         for (Compilation c : compilations) {
@@ -74,8 +74,7 @@ public class ResolveProcTypeDecl<T extends AST> extends Visitor<T> {
                 c.typeDecls().visit(this);
             }
         }
-        currentImport = null;
-        
+        currentImport = prevImpot;
         return null;
     }
     

@@ -15,6 +15,10 @@ import std.io;
  */
 public class Demo {
     static void _method$say() {
+        Demo.null();
+    }
+
+    static void _method$foo() {
         io.println("Hello from say");
     }
 

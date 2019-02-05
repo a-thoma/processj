@@ -298,6 +298,10 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         ST stProcTypeDecl = null;
         // Save previous procedure
         String prevProcName = m_currProcName;
+        // Save previous jump labels
+        List<String> prevLabels = m_switchLabelList;
+        if (!m_switchLabelList.isEmpty())
+            m_switchLabelList = new ArrayList<>();
         // Name of invoked procedure
         m_currProcName = (String) pd.name().visit(this);
         // Procedures are static classes which belong to the same package. To avoid
@@ -308,13 +312,17 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         if (m_currProcName.equals("Anonymous")) {
             // Grab the instance for an anonymous procedure
             stProcTypeDecl = m_stGroup.getInstanceOf("AnonymousProcess");
-            // Save previous labels
-            List<String> prevLabels = m_switchLabelList;
             // Statements that appear in the procedure
             String[] body = (String[]) pd.body().visit(this);
             
             stProcTypeDecl.add("parBlock", m_currParBlock);
             stProcTypeDecl.add("syncBody", body);
+            // Add the 'switch' block
+            if (!m_switchLabelList.isEmpty()) {
+                ST stSwitchBlock = m_stGroup.getInstanceOf("SwitchBlock");
+                stSwitchBlock.add("jumps", m_switchLabelList);
+                stProcTypeDecl.add("switchBlock", stSwitchBlock.render());
+            }
         } else {
             // Restore global variables for a new PJProcess class
             resetGlobals();
@@ -405,7 +413,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
                 stProcTypeDecl.add("lvars", m_localParamFieldMap.keySet());
             }
             // Add the 'switch' block
-            if (m_switchLabelList.size() > 0) {
+            if (!m_switchLabelList.isEmpty()) {
                 ST stSwitchBlock = m_stGroup.getInstanceOf("SwitchBlock");
                 stSwitchBlock.add("jumps", m_switchLabelList);
                 stProcTypeDecl.add("switchBlock", stSwitchBlock.render());
@@ -414,6 +422,8 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         
         // Restore and reset previous values
         m_currProcName = prevProcName;
+        // Restore previous jump labels
+        m_switchLabelList = prevLabels;
 
         return (T) stProcTypeDecl.render();
     }
@@ -707,7 +717,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         // from a different file (and package) 
         if (invokedProc.myPackage.contains(m_sourceFile)) {
             // The procedure is looked up by its signature.
-            // Note:this should never return 'null'!
+            // Note that this should never return 'null'!
             invokedProcName = packageName + "." + m_procMap.get(invokedProcName + invokedProc.signature());
         } else if (invokedProc.isNative) {
             // Make the package visible on import by using the qualified name of the
@@ -794,6 +804,8 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
                     // and return a 'string' representing the class the process belongs
                     // to; e.g.
                     //      (new <className>(...) {
+                    //          @Override public synchronized void run() { ... }
+                    //          @Override public finalize() { ... }
                     //      }.schedule();
                     if (Helper.doesProcedureYield(in.targetProc))
                         stmts.add((String) in.visit(this));
