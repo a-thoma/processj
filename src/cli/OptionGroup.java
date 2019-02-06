@@ -174,7 +174,7 @@ public final class OptionGroup {
         builder.addHidden(annotation.hidden()).addRequired(annotation.required());
         
         // This is to retrieve information about the type of data each field
-        // holds at run-time. Basic types such as byte, short, int, long, float,
+        // holds at runtime. Basic types such as byte, short, int, long, float,
         // double, String and parameterized fields (of basic types) can be inferred.
         // Complex data types such as user-defined types must be explicitly specified
         Class<?>[] fieldFinalTypes = findFieldFinalTypes(field);

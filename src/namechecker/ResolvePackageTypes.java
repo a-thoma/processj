@@ -41,7 +41,7 @@ public class ResolvePackageTypes extends Visitor<AST> {
     }
 
     public void resolveTypeOrConstant(Name na) {
-        Log.log("ResolvePackagedTypes: Resolving `" + na + "'");
+        Log.log("ResolvePackagedTypes: Resolving '" + na + "'");
         Sequence<Name> pa = na.packageAccess();
         String fileName = "";
         String oldCurrentFileName = "";
@@ -89,7 +89,7 @@ public class ResolvePackageTypes extends Visitor<AST> {
             }
             CompilerMessageManager.INSTANCE.setFileName(oldCurrentFileName);
             st = SymbolTable.hook;
-            // TODO: this should do a proper find if its a symb ol table that comes back
+            // TODO: this should do a proper find if its a symbol table that comes back
             // but we probably need Type checking for that !
             // so for now - SymbolTable implements TopLevelDecl as well!
             DefineTopLevelDecl td = (DefineTopLevelDecl) st.getShallow(na.simplename());

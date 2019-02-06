@@ -651,7 +651,7 @@ named_type ::=
           IDENTIFIER:id {: RESULT = new NamedType(new Name(id)); :}
     //| primary:p COLONCOLON IDENTIFIER:id {: RESULT = new NamedType(new Name(id, primary2PackageAccess(p))); :}
 	//| IDENTIFIER:p COLONCOLON IDENTIFIER:id {: RESULT = new NamedType(new Name(id, primary2PackageAccess(new NameExpr(new Name(p))))); :}
-	package_access COLONCOLON IDENTIFIER
+	//package_access COLONCOLON IDENTIFIER
 	;
 
 // ArrayType :> Type :> AST

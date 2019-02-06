@@ -78,7 +78,7 @@ public class ProcessJc {
             // Update 'colour' code value in properties file
             config.setProperty("colour", ansiColorvalue);
             ConfigFileReader.closeConfiguration(config);
-            System.exit(0);
+//            System.exit(0);
         }
         
         // Display usage page
@@ -162,16 +162,15 @@ public class ProcessJc {
             // =====================================================
             // V I S I T   I M P O R T   D E C L A R A T I O N S
             // =====================================================
-            
-            c.visit(new namechecker.ResolveImports<AST>());
-//            globalTypeTable.printStructure("");
+            SymbolTable.hook = null;
+            c.visit(new namechecker.ResolveImports<AST>(globalTypeTable));
+            globalTypeTable.printStructure("");
             
 //            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
 //                CompilerMessageManager.INSTANCE.printTrace("import declarations");
 //                CompilerMessageManager.INSTANCE.writeToFile("PJErrors");
 //                System.exit(1);
 //            }
-            globalTypeTable.setImportParent(SymbolTable.hook);
             
             // ===========================================================
             // V I S I T   T O P   L E V E L   D E C L A R A T I O N S
@@ -193,6 +192,7 @@ public class ProcessJc {
             // Dump the symbol table structure
 //            if (symbolTable)
 //                globalTypeTable.printStructure("");
+            
             
             // ========================================================
             // V I S I T R E S O L V E   P A C K A G E   T Y P E S

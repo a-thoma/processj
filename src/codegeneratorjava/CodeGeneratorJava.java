@@ -759,6 +759,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         // Report a warning message for having an empty 'par' block?
         if (pb.stats().size() == 0)
             return null;
+        int currJumpLabel = m_jumLabel;
         // Generated template after evaluating this visitor
         ST stParBlock = m_stGroup.getInstanceOf("ParBlock");
         // Save previous 'par' block
@@ -769,6 +770,8 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         if (m_parMap.get(m_currParBlock) == null) {
             // Yes! register this block.
             m_parMap.put(m_currProcName, pb.stats().size());
+            // Reset the jump label!
+            m_jumLabel = 0;
             // Since this is a new 'par' block, we need to create a
             // variable inside the process in which this 'par' block
             // was declared
@@ -801,8 +804,8 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
                     ExprStat es = (ExprStat) st;
                     Invocation in = (Invocation) es.expr();
                     // If this invocation is made on a process then visit the invocation
-                    // and return a 'string' representing the class the process belongs
-                    // to; e.g.
+                    // and return a 'string' representing the wrapper class for this procedure
+                    // e.g.
                     //      (new <className>(...) {
                     //          @Override public synchronized void run() { ... }
                     //          @Override public finalize() { ... }
@@ -820,6 +823,8 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         
         // Restore 'par' block
         m_currParBlock = prevParBlock;
+        // Restore 'jump' label
+        m_jumLabel = currJumpLabel;
         
         return (T) stParBlock.render();
     }

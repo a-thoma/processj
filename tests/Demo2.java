@@ -191,7 +191,7 @@ public class Demo2 {
                 public synchronized void run() {
                     switch (this.runLabel) {
                         case 0: break;
-                        case 2: resume(2); break;
+                        case 1: resume(1); break;
                         default: break;
                     }
 
@@ -228,7 +228,7 @@ public class Demo2 {
                         public synchronized void run() {
                             switch (this.runLabel) {
                                 case 0: break;
-                                case 3: resume(3); break;
+                                case 1: resume(1); break;
                                 default: break;
                             }
 
@@ -261,9 +261,9 @@ public class Demo2 {
                             }.schedule();
 
                             setNotReady();
-                            this.runLabel = 3;
+                            this.runLabel = 1;
                             yield();
-                            label(3);
+                            label(1);
                             terminate();
                         }
 
@@ -274,9 +274,9 @@ public class Demo2 {
                     }.schedule();
 
                     setNotReady();
-                    this.runLabel = 2;
+                    this.runLabel = 1;
                     yield();
-                    label(2);
+                    label(1);
                     terminate();
                 }
 
