@@ -5,5 +5,15 @@ proc void say() {
 }
 
 proc void main(string args[]) {
-    say();
+    //say();
+    
+    par {
+        println("from first par");
+        println("par from first");
+    }
+    
+    par {
+        println("from second par");
+        println("par from second");
+    }
 }

@@ -310,6 +310,9 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         // For non-invocations, that is, for anything other that procedure that
         // 'yields', we need to extends the PJProcess class 'anonymously'
         if (m_currProcName.equals("Anonymous")) {
+            // Preserve current 'jump' label
+            int prevJumLabel = m_jumLabel;
+            m_jumLabel = 0;
             // Grab the instance for an anonymous procedure
             stProcTypeDecl = m_stGroup.getInstanceOf("AnonymousProcess");
             // Statements that appear in the procedure
@@ -323,6 +326,8 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
                 stSwitchBlock.add("jumps", m_switchLabelList);
                 stProcTypeDecl.add("switchBlock", stSwitchBlock.render());
             }
+            // Restore 'jump' label
+            m_jumLabel = prevJumLabel;
         } else {
             // Restore global variables for a new PJProcess class
             resetGlobals();
@@ -759,7 +764,6 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         // Report a warning message for having an empty 'par' block?
         if (pb.stats().size() == 0)
             return null;
-        int currJumpLabel = m_jumLabel;
         // Generated template after evaluating this visitor
         ST stParBlock = m_stGroup.getInstanceOf("ParBlock");
         // Save previous 'par' block
@@ -770,8 +774,6 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         if (m_parMap.get(m_currParBlock) == null) {
             // Yes! register this block.
             m_parMap.put(m_currProcName, pb.stats().size());
-            // Reset the jump label!
-            m_jumLabel = 0;
             // Since this is a new 'par' block, we need to create a
             // variable inside the process in which this 'par' block
             // was declared
@@ -823,8 +825,6 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         
         // Restore 'par' block
         m_currParBlock = prevParBlock;
-        // Restore 'jump' label
-        m_jumLabel = currJumpLabel;
         
         return (T) stParBlock.render();
     }

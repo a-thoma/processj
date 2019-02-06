@@ -15,10 +15,6 @@ import std.io;
  */
 public class Demo {
     static void _method$say() {
-        Demo.null();
-    }
-
-    static void _method$foo() {
         io.println("Hello from say");
     }
 
@@ -31,7 +27,77 @@ public class Demo {
 
         @Override
         public synchronized void run() {
-            Demo._method$say();
+            switch (this.runLabel) {
+                case 0: break;
+                case 1: resume(1); break;
+                case 2: resume(2); break;
+                default: break;
+            }
+
+            final PJPar _ld$par1 = new PJPar(2, this);
+
+            new PJProcess() {
+                @Override
+                public synchronized void run() {
+                    io.println("from first par");
+                    terminate();
+                }
+
+                @Override
+                public void finalize() {
+                    _ld$par1.decrement();
+                }
+            }.schedule();
+
+            new PJProcess() {
+                @Override
+                public synchronized void run() {
+                    io.println("par from first");
+                    terminate();
+                }
+
+                @Override
+                public void finalize() {
+                    _ld$par1.decrement();
+                }
+            }.schedule();
+
+            setNotReady();
+            this.runLabel = 1;
+            yield();
+            label(1);
+            final PJPar _ld$par2 = new PJPar(2, this);
+
+            new PJProcess() {
+                @Override
+                public synchronized void run() {
+                    io.println("from second par");
+                    terminate();
+                }
+
+                @Override
+                public void finalize() {
+                    _ld$par2.decrement();
+                }
+            }.schedule();
+
+            new PJProcess() {
+                @Override
+                public synchronized void run() {
+                    io.println("par from second");
+                    terminate();
+                }
+
+                @Override
+                public void finalize() {
+                    _ld$par2.decrement();
+                }
+            }.schedule();
+
+            setNotReady();
+            this.runLabel = 2;
+            yield();
+            label(2);
             terminate();
         }
     }

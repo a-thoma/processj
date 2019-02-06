@@ -16,6 +16,11 @@ public proc void yeah() {
         println("from yeah!");
         println("yeah from!");
     }
+
+    par {
+        say();
+        ben();
+    }
 }
 
 public proc void main(string args[]) {

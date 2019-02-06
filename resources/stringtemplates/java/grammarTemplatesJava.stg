@@ -204,7 +204,7 @@ final PJPar <name> = new PJPar(<count>, <process>);
 setNotReady();
 this.runLabel = <jump>;
 yield();
-label(<jump>);
+label(<jump>);<\n>
 >>
 
 //========================================================================================
