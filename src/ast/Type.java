@@ -24,11 +24,11 @@ public abstract class Type extends AST {
             return true;
         return false;
     }
-
-    public boolean DELETE_assignable() {
+    */
+    public boolean assignable() {
         return (!typeName().equals("null") && !typeName().equals("void"));
     }
-
+    /*
     public static boolean DELETE_assignmentCompatible(Type var, Type val) {
 
         Log.log("Type: var: " + var);

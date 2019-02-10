@@ -22,34 +22,41 @@ public class ExternType extends Type {
         return "E" + name().getname() + ";";
     }
 
-    public <S extends Object> S visit(Visitor<S> v) {
-        return v.visitExternType(this);
-    }
-
     public String toString() {
         return typeName();
     }
 
-    // ********************
-    // Type Related Stuff
-    // ********************
+    // *************************************************************************
+    // ** Visitor Related Methods
 
-    @Override public boolean isExternType() {
+    public <S extends Object> S visit(Visitor<S> v) {
+        return v.visitExternType(this);
+    }
+
+    // *************************************************************************
+    // ** Type Related Methods
+
+    @Override 
+    public boolean isExternType() {
 	return true;
     }
 
-    // TODO
+    // α = ExternType(n1) and β = ExternType(n2) 
+    // α =T β ⇔ n1 == n2
     @Override public boolean typeEqual(Type t) {
-        return false;
+	if (!t.isExternType())
+	    return false;
+	ExternType other = (ExternType)t;
+        return name().getname().equals(other.name().getname());
     }
 
-    // TODO
+    // α ~T β ⇔ α =T β
     @Override public boolean typeEquivalent(Type t) {
-        return false;
+        return typeEqual(t);
     }
 
-    // TODO
+    // α :=T β ⇔ α =T β  
     @Override public boolean typeAssignmentCompatible(Type t) {
-        return false;
+        return typeEqual(t);
     }
 }

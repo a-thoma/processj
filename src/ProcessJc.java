@@ -163,15 +163,16 @@ public class ProcessJc {
             // V I S I T   I M P O R T   D E C L A R A T I O N S
             // =====================================================
             
-            c.visit(new namechecker.ResolveImports<AST>());
-//            globalTypeTable.printStructure("");
+	    SymbolTable.hook = null;
+            c.visit(new namechecker.ResolveImports<AST>(globalTypeTable));
+            globalTypeTable.printStructure("");
             
 //            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
 //                CompilerMessageManager.INSTANCE.printTrace("import declarations");
 //                CompilerMessageManager.INSTANCE.writeToFile("PJErrors");
 //                System.exit(1);
 //            }
-            globalTypeTable.setImportParent(SymbolTable.hook);
+//            globalTypeTable.setImportParent(SymbolTable.hook);
             
             // ===========================================================
             // V I S I T   T O P   L E V E L   D E C L A R A T I O N S

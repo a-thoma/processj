@@ -69,13 +69,16 @@ public class ArrayType extends Type {
         return s;
     }
 
+
+    // *************************************************************************
+    // ** Visitor Related Methods
+
     public <S extends Object> S visit(Visitor<S> v) {
         return v.visitArrayType(this);
     }
 
-    // *******************
-    // Type related stuff
-    // *******************
+    // *************************************************************************
+    // ** Type Related Methods
 
     @Override
     public boolean isArrayType() {

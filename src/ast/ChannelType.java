@@ -55,17 +55,22 @@ public class ChannelType extends Type {
         return 4;
     }
 
-    // ********************
-    // Type Related Stuff
-    // ********************
 
-    @Override public boolean isChannelType() {
+    // *************************************************************************
+    // ** Visitor Related Methods
+
+    @Override 
+    public boolean isChannelType() {
 	return true;
     }
 
+    // *************************************************************************
+    // ** Type Related Methods
+
     // if α = Channel(t1, a1) ∧ β = Channel(t2, a2)
     // α =T β ⇔ Channel?(α) ∧ Channel?(β) ∧ (t1 =T t2) ∧ (a1 = a2)
-    @Override public boolean typeEqual(Type t) {
+    @Override 
+    public boolean typeEqual(Type t) {
 	// Channel?(β) -- is t a channel?
 	if (!t.isChannelType())
 	    return false;
@@ -78,12 +83,14 @@ public class ChannelType extends Type {
     }
 
     // α ∼T β ⇔ α =T β
-    @Override public boolean typeEquivalent(Type t) {
+    @Override 
+    public boolean typeEquivalent(Type t) {
         return this.typeEqual(t);
     }
 
-    // Channels cannot be assigned
-    @Override public boolean typeAssignmentCompatible(Type t) {
+    // Channels cannot be assigned.
+    @Override 
+    public boolean typeAssignmentCompatible(Type t) {
         return false;
     }
 }

@@ -85,7 +85,10 @@ public class ProcTypeDecl extends Type implements DefineTopLevelDecl {
 	// (t1 =T t2)
 	if (!returnType().typeEqual(other.returnType()))
 	    return false;
-	// (name1 = name2) ∧ ∧^m1_i=1 (t1,i =T t2,i)  
+	// (name1 = name2) ∧ 
+	if (!name().getname().equals(other.name().getname()))
+	    return false;
+	// ∧^m1_i=1 (t1,i =T t2,i)  
 	boolean eq = true;
 	for (int i = 0; i<formalParams().size(); i++) {
 	    eq = eq && formalParams().child(i).type().typeEqual(other.formalParams().child(i).type());
@@ -98,8 +101,24 @@ public class ProcTypeDecl extends Type implements DefineTopLevelDecl {
         return this.typeEqual(t);
     }
 
-    // TODO
+    // α = procedure(name1, {t1,1, . . . , t1,m1 }, t1) ∧ β = procedure(name2, {t2,1, . . . , t2,m2 }, t2)
+    // α "=T β ⇔ procedure?(α) ∧ procedure?(β) ∧ (m1 = m2) ∧ (t2 :=T t1) ∧ ∧^m1_i=1 (t1,i :=T t2,i)
     @Override public boolean typeAssignmentCompatible(Type t) {
-        return false;
+	// procedure?(β)
+	if (!t.isProcType())
+	    return false;
+	ProcTypeDecl other = (ProcTypeDecl)t;
+	// (m1 = m2)
+	if (formalParams().size() != other.formalParams().size())
+	    return false;
+	// (t2 :=T t1)
+	if (!other.returnType().typeAssignmentCompatible(this))
+	    return false;
+	//  ∧^m1_i=1 (t1,i =T t2,i)  
+	boolean eq = true;
+	for (int i = 0; i<formalParams().size(); i++) {
+	    eq = eq && formalParams().child(i).type().typeAssignmentCompatible(other.formalParams().child(i).type());
+	}
+	return eq;
     }
 }
