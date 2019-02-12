@@ -74,9 +74,9 @@ public static void main(<types,vars:{t,v | <t> <v>}; separator=", ">) {
 ProcClass(name, types, vars, ltypes, lvars, methods, main, switchBlock, syncBody) ::= <<
 public static class <name> extends PJProcess {
     <! -------- Instance variables for formal parameters -------- !>
-    <if(vars)><types,vars:{t,v | private <t> <v>}; separator=";\n">;<\n><endif>
+    <if(vars)><types,vars:{t,v | protected <t> <v>}; separator=";\n">;<\n><endif>
     <! -------- Instance variables for local parameters -------- !>
-    <if(lvars)><ltypes,lvars:{t,v | private <t> <v>}; separator=";\n">;<\n><endif>
+    <if(lvars)><ltypes,lvars:{t,v | protected <t> <v>}; separator=";\n">;<\n><endif>
     <! -------- Instance methods -------- !>
     <if(methods)><methods; separator="\n"><\n><endif>
     <! -------- Default Constructor -------- !>
@@ -133,10 +133,14 @@ InvocationProcType(name, vars, parBlock) ::= <<
 // 2) type: the data type of the value returned by the method.
 // 3) name: the name that uniquely applies and identifies the method.
 // 4) types: the type of values associated to formal parameters.
-// 5) vars: the names of the formal parameters.
-// 6) body: the method body enclosed between braces.
-Method(modifier, type, name, types, vars, body) ::= <<
+// 5) vars: the names of the formal parameters preceded by '_ld'.
+// 6) ltypes: data types for local parameters.
+// 7) lvars: unique names for fields preceded by '_ld'.
+// 8) body: the method body enclosed between braces.
+Method(modifier, type, name, types, vars, ltypes, lvars, body) ::= <<
 <if(modifier)><modifier> <endif>static <type> <name>(<types,vars:{t,v | <t> <v>}; separator=", ">) {
+    <! -------- Variables for local parameters -------- !>
+    <if(lvars)><ltypes,lvars:{t,v | <t> <v>}; separator=";\n">;<\n><endif>
     <! The body may be an invocation or a sequence of statements !>
     <body>
 }
@@ -153,15 +157,16 @@ Field(modifier, type, name, val) ::= "<if(modifier)><modifier> <endif><Var(type,
 
 //========================================================================================
 // Initializes a declaration for a variable given a type and a value.
-// The declaration becomes a simple assignment statement if no type is
-// specified. If a type is given, it becomes a new declaration in which a
-// value may be assigned to the variable.
+// The declaration becomes a simple assignment statement if no type and
+// no operator is specified. If a type is given, it becomes a new declaration
+// in which a value may be assigned to the variable.
 // 1) type: a data type that determines the value a variable can contain.
 // 2) name: a qualified name for the variable.
 // 3) val: the value to be assigned to the variable.
-Var(type, name, val) ::= "<Type(type)><name><Init(val)>"
+// 4) op: a build-in operator used to manipulate data and variables.
+Var(type, name, val, op) ::= "<Type(type)><name><Init(val, op)>"
 Type(type) ::= "<if(type)><type> <endif>"
-Init(val) ::= "<if(val)> = <val><endif>"
+Init(val, op) ::= "<if(val)> <if(op)><op><else>=<endif> <val><endif>"
 
 //========================================================================================
 // Defines a 'switch' block containing labels that route the flow
@@ -226,3 +231,7 @@ new PJProcess() {
     }
 }.schedule();
 >>
+
+//========================================================================================
+//
+ChannelDecl(type) ::= "<if(type)>new <type>();<endif>"

@@ -1,19 +1,19 @@
 import std.io;
 
-proc void say() {
-    println("Hello from say");
+public proc void writer(chan<int>.write out) {
+  out.write(42);
 }
 
-proc void main(string args[]) {
-    //say();
-    
-    par {
-        println("from first par");
-        println("par from first");
-    }
-    
-    par {
-        println("from second par");
-        println("par from second");
-    }
+public proc void reader(chan<int>.read in) {
+  int value;
+  value = in.read();
+  println(value);
+}
+
+public proc void main(string args[]) {
+  chan<int> c;
+  par {
+    writer(c.write);
+    reader(c.read);
+  }
 }

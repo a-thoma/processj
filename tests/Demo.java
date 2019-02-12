@@ -14,12 +14,22 @@ import std.io;
  *
  */
 public class Demo {
-    static void _method$say() {
-        io.println("Hello from say");
+    public static void _method$hello() {
+        io.println("Hello");
+    }
+
+    public static void _method$hello(String _pd$a1) {
+        io.println(_pd$a1);
+    }
+
+    public static void _method$world(String _pd$aa1) {
+        io.println(_pd$aa1);
     }
 
     public static class _proc$main extends PJProcess {
-        private String[] _pd$args1;
+        protected String[] _pd$args1;
+
+        protected PJOne2OneChannel<Integer> _ld$ab1;
 
         public _proc$main(String[] _pd$args1) {
             this._pd$args1 = _pd$args1;
@@ -30,16 +40,16 @@ public class Demo {
             switch (this.runLabel) {
                 case 0: break;
                 case 1: resume(1); break;
-                case 2: resume(2); break;
                 default: break;
             }
 
-            final PJPar _ld$par1 = new PJPar(2, this);
+            _ld$ab1 = new PJOne2OneChannel<Integer>();
+            final PJPar _ld$par1 = new PJPar(3, this);
 
             new PJProcess() {
                 @Override
                 public synchronized void run() {
-                    io.println("from first par");
+                    Demo._method$hello();
                     terminate();
                 }
 
@@ -52,7 +62,20 @@ public class Demo {
             new PJProcess() {
                 @Override
                 public synchronized void run() {
-                    io.println("par from first");
+                    Demo._method$world("Wait!!");
+                    terminate();
+                }
+
+                @Override
+                public void finalize() {
+                    _ld$par1.decrement();
+                }
+            }.schedule();
+
+            new PJProcess() {
+                @Override
+                public synchronized void run() {
+                    Demo._method$hello("Yay!!!");
                     terminate();
                 }
 
@@ -66,38 +89,8 @@ public class Demo {
             this.runLabel = 1;
             yield();
             label(1);
-            final PJPar _ld$par2 = new PJPar(2, this);
 
-            new PJProcess() {
-                @Override
-                public synchronized void run() {
-                    io.println("from second par");
-                    terminate();
-                }
-
-                @Override
-                public void finalize() {
-                    _ld$par2.decrement();
-                }
-            }.schedule();
-
-            new PJProcess() {
-                @Override
-                public synchronized void run() {
-                    io.println("par from second");
-                    terminate();
-                }
-
-                @Override
-                public void finalize() {
-                    _ld$par2.decrement();
-                }
-            }.schedule();
-
-            setNotReady();
-            this.runLabel = 2;
-            yield();
-            label(2);
+            Demo._method$world("It finally works!!");
             terminate();
         }
     }

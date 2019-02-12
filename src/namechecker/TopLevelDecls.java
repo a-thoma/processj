@@ -52,7 +52,7 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
      * Establishes a symbol table with the top-level declarations declared
      * in the file associated with this compilation inserted. Also causes
      * the creation of a symbol table chain for imported files that is
-     * available through the `importParent' field of the symbol table. This
+     * available through the 'importParent' field of the symbol table. This
      * chain can be traversed through its parent links.
      *
      * @param co

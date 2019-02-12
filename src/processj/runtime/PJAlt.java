@@ -90,19 +90,19 @@ public class PJAlt {
                     }
                 } else if (guards[i] instanceof PJChannel) {
                     // If not shared call isReady() and if true
-                    PJChannel c = (PJChannel) guards[i];
-                    if (c.isSharedRead()) {
-                        // If shared, call isReadyAndReserve() and if true
-                        if (c.isReadyToReadAltAndReserve()) {
-                            chosen = i;
-                            break;
-                        }
-                    } else {
-                        if (c.isReadyToRead(process)) {
-                            chosen = i;
-                            break;
-                        }
-                    }
+//                    PJChannel c = (PJChannel) guards[i];
+//                    if (c.isSharedRead()) {
+//                        // If shared, call isReadyAndReserve() and if true
+//                        if (c.isReadyToReadAltAndReserve()) {
+//                            chosen = i;
+//                            break;
+//                        }
+//                    } else {
+//                        if (c.isReadyToRead(process)) {
+//                            chosen = i;
+//                            break;
+//                        }
+//                    }
                 }
             }
         }

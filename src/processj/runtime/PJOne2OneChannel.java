@@ -1,114 +1,53 @@
 package processj.runtime;
 
-/**
- * The runtime representation of a one-to-one channel.
- * 
- * @author Ben
- * @author Cabel Shrestha
- * @version 08/29/2018
- * @since 1.2
- */
-
 public class PJOne2OneChannel<T> extends PJChannel<T> {
     
     /**
-     * A reference to the writer of the channel
+     * TODO
      */
-    private PJProcess writer = null;
-
+    protected PJProcess writer;
+    
     /**
-     * A reference to the reader of the channel
+     * TODO
      */
-    private PJProcess reader = null;
-
-    /**
-     * Constructor.
-     */
+    protected PJProcess reader;
+    
     public PJOne2OneChannel() {
+        writer = null;
+        reader = null;
         type = PJChannelType.ONE2ONE;
     }
 
-    /**
-     * Writes a data item value of type T to the channel.
-     *
-     * @param p
-     *          The writing process.
-     * @param item
-     *          The data item to be exchanged.
-     */
     @Override
-    synchronized public void write(PJProcess p, T item) {
-        data = item;
-        writer = p;
-        writer.setNotReady();
-        hasData = true;
-        if (reader != null) {
-            reader.setReady();
-        }
+    synchronized public void write(PJProcess p, T data) {
+        this.data = data;       // set data on channel
+        writer = p;             // register the writer
+        writer.setNotReady();   // set writer not ready
+        if (reader != null)     // if a reader is there
+            reader.setReady();  // set it ready to run
     }
 
-    /**
-     * Reads a data item value item of type T from the channel.
-     *
-     * @param p
-     *          The reading process.
-     * @return T The read value.
-     */
     @Override
     synchronized public T read(PJProcess p) {
-        hasData = false;
-        // We need to set the writer ready as the synchronization has happened
-        // when the data was read.
-        writer.setReady();
-        // clear the writer and reader
-        writer = null;
-        reader = null;
-        return data;
-    }
-
-    /**
-     * First part of an extended rendezvous read. Returns the data item but does
-     * not set the writer ready.
-     *
-     * @param p
-     *          The reading process.
-     * @return T The read value.
-     */
-    @Override
-    synchronized public T readPreRendezvous(PJProcess p) {
-        T myData = data;
-        data = null;
-        return myData;
-    }
-
-    /**
-     * Second part of an extended rendezvous read. Sets the writer ready to run.
-     *
-     * @param p
-     *          The reading process.
-     */
-    @Override
-    synchronized public void readPostRendezvous(PJProcess p) {
-        hasData = false;
-        writer.setReady();
-        writer = null;
-        reader = null;
+        writer.setReady();      // set writer ready
+        writer = null;          // clear writer field
+        reader = null;          // clear reader field
+        return data;            // return data
     }
 
     @Override
-    synchronized public void addReader(PJProcess p) {
-        reader = p;
+    synchronized public boolean isReadyToRead(PJProcess p) {
+        if (writer != null)         // if a writer is present
+            return true;            // return true
+        else {                      // otherwise
+            reader = p;             // register 'p' as the reader
+            reader.setNotReady();   // set reader not ready
+        }
+        return false;
     }
 
-    /**
-     * Throws {@link UnsopportedOperationException} when invoked.
-     *
-     * @param p
-     *          A process.
-     */
     @Override
-    synchronized public void addWriter(PJProcess p) {
-        throw new UnsupportedOperationException(String.format("Invalid operation for a %s. " +
-                "Method 'addWriter' must be ovirred!", type.getText()));
+    public boolean isReadyToWrite() {
+        return true;
     }
 }

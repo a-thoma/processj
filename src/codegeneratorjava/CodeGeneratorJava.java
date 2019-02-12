@@ -17,6 +17,8 @@ import ast.ArrayType;
 import ast.Assignment;
 import ast.BinaryExpr;
 import ast.Block;
+import ast.ChannelEndExpr;
+import ast.ChannelEndType;
 import ast.ChannelType;
 import ast.Compilation;
 import ast.ExprStat;
@@ -25,6 +27,7 @@ import ast.Invocation;
 import ast.LocalDecl;
 import ast.Modifier;
 import ast.Name;
+import ast.NameExpr;
 import ast.NamedType;
 import ast.ParBlock;
 import ast.ParamDecl;
@@ -36,9 +39,10 @@ import ast.Statement;
 import ast.Type;
 import ast.Var;
 import processj.runtime.PJBarrier;
-import processj.runtime.PJMany2ManyChannel;
-import processj.runtime.PJMany2OneChannel;
-import processj.runtime.PJOne2ManyChannel;
+import processj.runtime.PJChannelType;
+//import processj.runtime.PJMany2ManyChannel;
+//import processj.runtime.PJMany2OneChannel;
+//import processj.runtime.PJOne2ManyChannel;
 import processj.runtime.PJOne2OneChannel;
 import processj.runtime.PJTimer;
 import utilities.ErrorSeverity;
@@ -114,6 +118,11 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
     private HashMap<String, String> m_formalParamFieldMap = null;
     
     /**
+     * Map of formal parameters names to name tags.
+     */
+    private HashMap<String, String> m_formalParamNameMap = null;
+    
+    /**
      * Map of local parameters transformed to fields.
      */
     private HashMap<String, String> m_localParamFieldMap = null;
@@ -165,6 +174,11 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * Jump label.
      */
     private int m_jumLabel = 0;
+    
+    /**
+     * Current 'chan' type.
+     */
+    private PJChannelType m_currChanType = null;
 
     /**
      * Internal constructor that loads a group file containing a collection of
@@ -189,6 +203,8 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         m_importList = new LinkedHashSet<>();
         m_switchLabelList = new ArrayList<>();
         m_parMap = new LinkedHashMap<>();
+        
+        m_formalParamNameMap = new LinkedHashMap<>();
     }
 
     /**
@@ -333,25 +349,20 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
             resetGlobals();
             // Formal parameters that must be passed to the procedure
             Sequence<ParamDecl> formals = pd.formalParams();
-            // The scope in which all declarations appear in a procedure
-            String[] body = (String[]) pd.body().visit(this);
 
             if (formals != null && formals.size() > 0) {
                 // Iterate through and visit every parameter declaration
                 for (int i = 0; i < formals.size(); ++i) {
                     ParamDecl actualParam = formals.child(i);
-                    // Retrieve the name and type of a parameter in the parameter list
-                    String name = (String) actualParam.paramName().visit(this);
-                    String type = (String) actualParam.type().visit(this);
-                    // Create a tag for this parameter and then add it to the collection
-                    // of parameters for reference
-                    name = Helper.makeVariableName(name, ++m_varDecId, Tag.PARAM_NAME);
-                    m_formalParamFieldMap.put(name, type);
+                    // Retrieve the name and type of a parameter in the parameter list;
+                    // note that we ignored the value returned by this visitor.
+                    actualParam.visit(this);
                 }
-            } else {
-                // Procedure does not take any parameters
-                m_formalParamFieldMap.clear();
-            }
+            } else
+                ; // Procedure does not take any parameters
+            
+            // The scope in which all declarations appear in a procedure
+            String[] body = (String[]) pd.body().visit(this);
 
             // Retrieve modifier(s) attached to invoked procedure such as private,
             // public, protected, etc.
@@ -470,13 +481,18 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         
         // Grab the type and name of a declared variable
         String type = (String) pd.type().visit(this);
-        String name = (String) pd.paramName().visit(this);
-        // Generated template after evaluating this visitor
-        ST stParamDecl = m_stGroup.getInstanceOf("Var");
-        stParamDecl.add("type", type);
-        stParamDecl.add("name", name);
-
-        return (T) stParamDecl.render();
+        String name = (String) pd.paramName().getname();
+        
+        // Create a tag for this parameter and then add it to the collection
+        // of parameters for reference
+        String newName = Helper.makeVariableName(name, ++m_varDecId, Tag.PARAM_NAME);
+        m_formalParamFieldMap.put(newName, type);
+        m_formalParamNameMap.put(name, newName);
+        
+        // Ignored the value returned by this visitor; the reason for this
+        // is that templates for methods and procedures take a list of
+        // types and variable names.
+        return null;
     }
     
     /**
@@ -495,25 +511,40 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
 
         // Returning values for a local declaration
         String name = (String) ld.var().name().visit(this);
+        // Create a tag for this local channel expr parameter
+        name = Helper.makeVariableName(name, ++m_localDecId, Tag.LOCAL_NAME);
         String type = (String) ld.type().visit(this);
         String val = null;
         // This variable could be initialized, e.g., through an assignment operator
         Expression expr = ld.var().init();
         // Visit the expressions associated with this variable
-        if (expr != null && expr.type instanceof PrimitiveType) {
-            val = (String) expr.visit(this);
+        if (expr != null) {
+            if (expr.type instanceof PrimitiveType) {
+                val = (String) expr.visit(this);
+            } else if (expr.type instanceof ChannelEndType) {
+                // TODO:
+            }
+        }
+        
+        if (val == null) {
+            // Must be a simple declaration that requires allocating memory for a new object.
+            if (m_currChanType == PJChannelType.ONE2ONE) {
+                ST stChannelDecl = m_stGroup.getInstanceOf("ChannelDecl");
+                stChannelDecl.add("type", type);
+                val = stChannelDecl.render();
+            }
         }
 
         // If we reach this section, then we have a simple variable declaration
         // inside the body of a procedure or a static Java method. This declaration
-        // becomes a member variable of a process
+        // becomes a member variable of a procedure
         ST stVar = m_stGroup.getInstanceOf("Var");
-        stVar.add("type", type);
+        //stVar.add("type", type);
         stVar.add("name", name);
         stVar.add("val", val);
         
         if (m_currProcName != null) {
-//            m_localParamFieldMap.put(key, value)
+            m_localParamFieldMap.put(name, type);
         }
 
         return (T) stVar.render();
@@ -540,7 +571,21 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
             Log.log(String.format("%s: Special keyword '%s' found.", ErrorSeverity.WARNING, na.getname()));
         }
         
-        return (T) na.getname();
+        String name = na.getname();
+        if (!m_formalParamNameMap.isEmpty() && m_formalParamNameMap.containsKey(name))
+            name = m_formalParamNameMap.get(name);
+        
+        return (T) name;
+    }
+    
+    /**
+     * -----------------------------------------------------------------------------
+     * VISIT NAME_EXPR
+     */
+    public T visitNameExpr(NameExpr ne) {
+        Log.log(ne.line + ": Visiting NameExpr (" + ne.name().getname() + ")");
+        // TODO: NameExpr always points to a 'Decl' aration so check in here!!
+        return (T) ne.name().visit(this);
     }
     
     /**
@@ -595,18 +640,31 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         
         switch (ct.shared()) {
         case ChannelType.NOT_SHARED:
-            chanType = PJOne2OneChannel.class.getSimpleName(); break;
+            chanType = PJOne2OneChannel.class.getSimpleName();
+            m_currChanType = PJChannelType.ONE2ONE;
+            break;
         case ChannelType.SHARED_READ:
-            chanType = PJOne2ManyChannel.class.getSimpleName(); break;
+//            chanType = PJOne2ManyChannel.class.getSimpleName(); break;
         case ChannelType.SHARED_WRITE:
-            chanType = PJMany2OneChannel.class.getSimpleName(); break;
+//            chanType = PJMany2OneChannel.class.getSimpleName(); break;
         case ChannelType.SHARED_READ_WRITE:
-            chanType = PJMany2ManyChannel.class.getSimpleName(); break;
+//            chanType = PJMany2ManyChannel.class.getSimpleName(); break;
         }
         // Resolve parameterized type for channel
+        //  e.g. chan<int> ...; where 'int' is the Type to be resolved
         String type = getChannelType(ct.baseType());
         
         return (T) (chanType + "<" + type + ">");
+    }
+    
+    /**
+     * -----------------------------------------------------------------------------
+     * VISIT CHANNEL_END_EXPR
+     */
+    public T visitChannelEndExpr(ChannelEndExpr ce) {
+        Log.log(ce.line + ": Visiting a Channel End Expr (" + (ce.isRead() ? "read" : "write") + ")");
+        
+        return null;
     }
     
     /**
@@ -860,6 +918,9 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
 
         m_localParamFieldMap.clear();
         m_switchLabelList.clear();
+        
+        m_formalParamFieldMap.clear();
+        m_formalParamNameMap.clear();
     }
     
     /**

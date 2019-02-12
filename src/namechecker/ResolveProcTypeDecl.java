@@ -75,6 +75,7 @@ public class ResolveProcTypeDecl<T extends AST> extends Visitor<T> {
             }
         }
         currentImport = prevImpot;
+        pragmaTable.clear();
         return null;
     }
     
@@ -91,7 +92,6 @@ public class ResolveProcTypeDecl<T extends AST> extends Visitor<T> {
                 pd.filename = pragmaTable.get("FILE");
                 pd.nativeFunction = pd.name().getname();
             }
-            pragmaTable.clear();
         }
         return null;
     }
