@@ -5,7 +5,9 @@ import utilities.Visitor;
 public class NamedType extends Type implements DefineTopLevelDecl {
 
     private DefineTopLevelDecl resolvedTopLevelDecl = null; // could be a SymbolTable
-    private Type type = null;
+    // This field is set to the actual type this named type resolved to. 
+    // This is done in the resolve method in typechecker/TypeChecker.java
+    private Type actualType = null;
 
     public NamedType(Name name) {
         super(name);
@@ -15,7 +17,7 @@ public class NamedType extends Type implements DefineTopLevelDecl {
 
     public NamedType(Name name, Type type) {
         this(name);
-        this.type = type;
+        this.actualType = type;
         nchildren = 1;
         children = new AST[] { name };
     }
@@ -25,11 +27,11 @@ public class NamedType extends Type implements DefineTopLevelDecl {
     }
 
     public Type type() {
-        return type;
+        return actualType;
     }
 
     public void setType(Type type) {
-        this.type = type;
+        this.actualType = type;
     }
 
     public String typeName() {

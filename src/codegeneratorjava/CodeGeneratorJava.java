@@ -661,6 +661,9 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      */
     public T visitInvocation(Invocation in) {
         ProcTypeDecl invokedProc = in.targetProc;
+	System.out.println(invokedProc);
+	System.out.println(invokedProc.name());
+
         String invokedProcName = invokedProc.name().getname();
         Log.log(in.line + ": Visiting Invocation (" + invokedProcName + ")");
         // Generated template after evaluating this invocation

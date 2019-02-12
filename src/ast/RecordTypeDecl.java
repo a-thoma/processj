@@ -59,6 +59,7 @@ public class RecordTypeDecl extends Type implements DefineTopLevelDecl {
     // *************************************************************************
     // ** Type Related Methods
     
+    @Override
     public String signature() {
         return "<R" + name().getname() + ";";
     }
@@ -67,19 +68,29 @@ public class RecordTypeDecl extends Type implements DefineTopLevelDecl {
         return "Record: " + name();
     }
 
-    @Override public boolean isRecordType() {
+    @Override 
+    public boolean isRecordType() {
 	return true;
     }
 
-    @Override public boolean typeEqual(Type t) {
-        return false;
+    // α =T β ⇔ Record?(α) ∧ Record?(β) ∧ (name1 = name2)
+    // We implement NAME EQUALITY not structural equality
+    @Override 
+    public boolean typeEqual(Type t) {
+	if (!t.isRecordType())
+	    return false;
+	RecordTypeDecl other = (RecordTypeDecl)t;
+        return name().getname().equals(other.name().getname());
     }
 
-    @Override public boolean typeEquivalent(Type t) {
-        return false;
+    // α∼T β ⇔ α =T β
+    @Override 
+    public boolean typeEquivalent(Type t) {
+        return typeEqual(t);
     }
 
+    // α :=T β ⇔ α ∼T β ⇔ α =T β    
     @Override public boolean typeAssignmentCompatible(Type t) {
-        return false;
+	return typeEqual(t);
     }
 }

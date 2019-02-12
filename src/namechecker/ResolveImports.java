@@ -24,7 +24,10 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
     
     public static String currentFileName = CompilerMessageManager.INSTANCE.fileName;
     
-    public ResolveImports() {
+    private SymbolTable importChild = null;
+
+    public ResolveImports(SymbolTable importChild) {
+	this.importChild = importChild;
         Log.logHeader("==============================================================");
         Log.logHeader("*                  R E S O L V E   I M P O R T S             *");
         Log.logHeader("*       -----------------------------------------------      *");
@@ -63,8 +66,7 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
         Log.log(a.line + " Attempting to import: " + fileName);
         Compilation c = TopLevelDecls.alreadyImportedFiles.get(fileName);
         if (c != null) {
-            Log.log(a.line + " Import of '" + fileName
-                    + "' already done before!");
+            Log.log(a.line + " Import of '" + fileName + "' already done before!");
             return c;
         }
         try {
@@ -253,8 +255,8 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
                 }
             }
         }
-        // Symbol table associated with this file
-        SymbolTable symtab = null;
+
+
 
         // 'fileList' now contains the list of all the files that this import caused to be imported
         for (String fn : fileList) {
@@ -264,32 +266,28 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
             // Set current filename
             CompilerMessageManager.INSTANCE.setFileName(fn);
             Compilation c = ResolveImports.importFile(im, fn, path /* packageName */);
-            SymbolTable.hook = null;
 
             // Add it to the list of compilations for this import
             im.addCompilation(c);
             // Create a symboltable for it
-            SymbolTable importSymtab = new SymbolTable("Import: " + fn);
+            SymbolTable symtab = new SymbolTable("Import: " + fn);
+
+	    importChild.setImportParent(symtab);
+	    symtab.setParent(SymbolTable.hook);
+	    SymbolTable.hook = symtab;
+
+	    SymbolTable oldHook = SymbolTable.hook;
+	    SymbolTable.hook = null;
             // Visit imports in the current process file
-            c.visit(new ResolveImports<AST>());
-            importSymtab.setImportParent(SymbolTable.hook);
-            // Declare types and constants for handling it's imports
-            c.visit(new TopLevelDecls<AST>(importSymtab));
-            currentFileName = oldCurrentFileName;
+            c.visit(new ResolveImports<AST>(symtab));
+	    // Declare types and constants for handling it's imports
+            c.visit(new TopLevelDecls<AST>(symtab));
+	    SymbolTable.hook = oldHook;
+
+	    currentFileName = oldCurrentFileName;
             // Reset filename
             CompilerMessageManager.INSTANCE.setFileName(oldCurrentFileName);
-
-            // Insert into the symtab chain along the parent link
-            if (symtab == null)
-                symtab = importSymtab;
-            else {
-                importSymtab.setParent(symtab);
-                symtab = importSymtab;
-            }
-//            System.out.println("HERE");
-//            symtab.printStructure("   ");
         }
-        SymbolTable.hook = symtab;
         return null;
     }
 }

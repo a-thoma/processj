@@ -115,15 +115,15 @@ public class PrimitiveType extends Type {
         }
     }
 
+    // *************************************************************************
+    // ** Visitor Related Methods
+
     public <S extends Object> S visit(Visitor<S> v) {
         return v.visitPrimitiveType(this);
     }
 
-    /* ******************************************
-     * * Type Checking methods.
-     * * Re-implements many of the abstract 
-     * * methods found in Type.java
-     */
+    // *************************************************************************
+    // ** Type Related Methods
 
     // α =T β ⇔ Primitive?(α) ∧ Primitive?(β) ∧ α = β
     @Override
@@ -146,26 +146,27 @@ public class PrimitiveType extends Type {
 	if (!t.isPrimitiveType())
 	    return false;
 	PrimitiveType other = (PrimitiveType)t;
-	return other.typeLessThan(this);
+	return other.typeLessThanEqual(this);
     }
 
-    // byte <T short <T char <T int <T long <T float <T double
+    // α <T β ⇔ Numeric?(α) ∧ Numeric?(β) 
+    // Definition:
+    // byte <T short <T char <T int <T long <T float <T double  
     public boolean typeLessThan(Type t) {
-	if (!t.isPrimitiveType())
-	    return false;
 	if (!this.isNumericType() || !t.isNumericType())
 	    return false;
 	PrimitiveType other = (PrimitiveType)t;
 	return this.kind < other.kind;
     }
-
+    
+    // α <=T β ⇔ Primitive?(α) ∧ Primitive?(β) ∧ 
+    //           (α =T β || (Numeric?(α) ∧ Numeric?(β) ∧ α <T β))
     public boolean typeLessThanEqual(Type t) {
 	if (!t.isPrimitiveType())
             return false;
-	if (!this.isNumericType() || !t.isNumericType())
-            return false;
-	PrimitiveType other =(PrimitiveType)t;
-	return this.kind <= other.kind;
+	if (t.typeEqual(this))
+	    return true;
+	return this.typeLessThan(t);
     }
 
     public Type typeCeiling(PrimitiveType t) {
@@ -181,55 +182,68 @@ public class PrimitiveType extends Type {
         return this;
     }
 
-    @Override public boolean isPrimitiveType() {
+    @Override 
+    public boolean isPrimitiveType() {
 	return true;
     }
     
-    @Override public boolean isIntegerType() {
+    @Override 
+    public boolean isIntegerType() {
 	return (kind == IntKind);
     }
 
-    @Override public boolean isBooleanType() {
+    @Override 
+    public boolean isBooleanType() {
         return (kind == BooleanKind);
     }
 
-    @Override public boolean isByteType() {
+    @Override 
+    public boolean isByteType() {
 	return (kind == ByteKind);
     }
 
-    @Override public boolean isShortType() {
+    @Override 
+    public boolean isShortType() {
 	return (kind == ShortKind);
     }
 
-    @Override public boolean isCharType() {
+    @Override 
+    public boolean isCharType() {
         return (kind == CharKind);
     }
 
-    @Override public boolean isLongType() {
+    @Override 
+    public boolean isLongType() {
         return (kind == LongKind);
     }
 
-    @Override public boolean isVoidType() {
+    @Override 
+    public boolean isVoidType() {
         return (kind == VoidKind);
     }
    
-    @Override public boolean isStringType() {
+    @Override 
+    public boolean isStringType() {
         return (kind == StringKind);
     }
 
-    @Override public boolean isFloatType() {
+    @Override 
+    public boolean isFloatType() {
         return (kind == FloatKind);
     }
 
-    @Override public boolean isDoubleType() {
+    @Override 
+    public boolean isDoubleType() {
         return (kind == DoubleKind);
     }
 
-    @Override public boolean isNumericType() {
+    @Override 
+    public boolean isNumericType() {
         return (isFloatType() || isDoubleType() || isIntegralType());
     }
     
-    @Override public boolean isIntegralType() {
+    @Override 
+    public boolean isIntegralType() {
         return (isIntegerType() || isShortType() || isByteType() || isCharType() || isLongType());
     }
 
