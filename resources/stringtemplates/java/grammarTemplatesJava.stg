@@ -142,7 +142,7 @@ Method(modifier, type, name, types, vars, ltypes, lvars, body) ::= <<
     <! -------- Variables for local parameters -------- !>
     <if(lvars)><ltypes,lvars:{t,v | <t> <v>}; separator=";\n">;<\n><endif>
     <! The body may be an invocation or a sequence of statements !>
-    <body>
+    <if(body)><body; separator="\n"><endif>
 }
 >>
 
@@ -166,7 +166,7 @@ Field(modifier, type, name, val) ::= "<if(modifier)><modifier> <endif><Var(type,
 // 4) op: a build-in operator used to manipulate data and variables.
 Var(type, name, val, op) ::= "<Type(type)><name><Init(val, op)>"
 Type(type) ::= "<if(type)><type> <endif>"
-Init(val, op) ::= "<if(val)> <if(op)><op><else>=<endif> <val><endif>"
+Init(val, op) ::= "<if(val)> <if(op)><op><else>=<endif> <val><else>;<endif>"
 
 //========================================================================================
 // Defines a 'switch' block containing labels that route the flow

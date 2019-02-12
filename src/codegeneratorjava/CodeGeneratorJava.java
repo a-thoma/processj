@@ -126,12 +126,6 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * Map of local parameters transformed to fields.
      */
     private HashMap<String, String> m_localParamFieldMap = null;
-
-    /**
-     * Map of yielding and non-yielding procedures transformed to classes
-     * or Java methods.
-     */
-    private HashMap<String, String> m_procMap = null;
     
     /**
      * Map of 'par' blocks declared in a process. This map associates the
@@ -144,16 +138,6 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * List of switch labels.
      */
     private List<String> m_switchLabelList = null;
-
-    /**
-     * Identifier for a procedure declaration.
-     */
-    private int m_procDecId = 0;
-
-    /**
-     * Identifier for a method declaration.
-     */
-    private int m_methodDecdId = 0;
 
     /**
      * Identifier for a parameter declaration.
@@ -197,7 +181,6 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         Log.log("==========================================");
         
         m_stGroup = new STGroupFile(m_stGammarFile);
-        m_procMap = new LinkedHashMap<>();
         m_formalParamFieldMap = new LinkedHashMap<>();
         m_localParamFieldMap = new LinkedHashMap<>();
         m_importList = new LinkedHashSet<>();
@@ -377,7 +360,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
             if (doYield) {
                 // This procedure yields! Grab the instance of a yielding procedure
                 // from the string template in order to define a new class
-                procName = Helper.makeVariableName(m_currProcName, ++m_procDecId, Tag.PROCEDURE_NAME);
+                procName = Helper.makeVariableName(m_currProcName + changeSignature(pd), 0, Tag.PROCEDURE_NAME);
                 stProcTypeDecl = m_stGroup.getInstanceOf("ProcClass");
                 stProcTypeDecl.add("name", procName);
                 // The statements that appear in the body of the procedure
@@ -385,7 +368,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
             } else {
                 // Otherwise, grab the instance of a non-yielding procedure instead
                 // to define a new static Java method
-                procName = Helper.makeVariableName(m_currProcName, ++m_methodDecdId, Tag.METHOD_NAME);
+                procName = Helper.makeVariableName(m_currProcName + changeSignature(pd), 0, Tag.METHOD_NAME);
                 stProcTypeDecl = m_stGroup.getInstanceOf("Method");
                 stProcTypeDecl.add("name", procName);
                 stProcTypeDecl.add("type", procType);
@@ -394,9 +377,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
                     stProcTypeDecl.add("modifier", modifiers);
                 stProcTypeDecl.add("body", body);
             }
-
-            // Add this procedure to the collection of procedures for reference
-            m_procMap.put(m_currProcName + pd.signature(), procName);
+            
             // Create an entry point for the ProcessJ program which is just a Java main
             // method that is called by the JVM
             if ("main".equals(m_currProcName) && pd.signature().equals(Tag.MAIN_NAME.getTag())) {
@@ -489,9 +470,12 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         m_formalParamFieldMap.put(newName, type);
         m_formalParamNameMap.put(name, newName);
         
-        // Ignored the value returned by this visitor; the reason for this
-        // is that templates for methods and procedures take a list of
-        // types and variable names.
+        // Ignored the value returned by this visitor. The reason for this
+        // is that templates for methods and procedures take a list of types
+        // and variable names. If you want to return the name and type of this
+        // formal parameter (e.g. some_type + " " + some_name), you must change
+        // the arguments of 'Method' and 'ProcClass' in the grammarTempalteJava
+        // file.
         return null;
     }
     
@@ -584,7 +568,9 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      */
     public T visitNameExpr(NameExpr ne) {
         Log.log(ne.line + ": Visiting NameExpr (" + ne.name().getname() + ")");
-        // TODO: NameExpr always points to a 'Decl' aration so check in here!!
+        // TODO: NameExpr always points to a 'Decl'aration so check in here!!
+        if (ne.myDecl instanceof ParamDecl)
+            System.out.println("ParamDecl!@##$");
         return (T) ne.name().visit(this);
     }
     
@@ -781,7 +767,14 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         if (invokedProc.myPackage.contains(m_sourceFile)) {
             // The procedure is looked up by its signature.
             // Note that this should never return 'null'!
-            invokedProcName = packageName + "." + m_procMap.get(invokedProcName + invokedProc.signature());
+            String signature = "";
+            if (Helper.doesProcedureYield(invokedProc))
+                signature = Helper.makeVariableName(
+                        invokedProcName + changeSignature(invokedProc), 0, Tag.PROCEDURE_NAME);
+            else
+                signature = Helper.makeVariableName(
+                        invokedProcName + changeSignature(invokedProc), 0, Tag.METHOD_NAME);
+            invokedProcName = packageName + "." + signature;
         } else if (invokedProc.isNative) {
             // Make the package visible on import by using the qualified name of the
             // class the procedure belongs to and the name of the folder the procedure's
@@ -949,5 +942,25 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
                 new Sequence(),               // implement
                 null,                         // annotations
                 new Block(new Sequence(st))); // body
+    }
+    
+    private String changeSignature(ProcTypeDecl pd) {
+        String s = "";
+        for (ParamDecl param : pd.formalParams()) {
+            s = s + "$" + param.type().signature();
+            // Array [t; where 't' is the baste type
+            if (param.type().isArrayType())
+                s = s.replace("[", "ar").replace(";", "");
+            // <Rn; 'n' is the name
+            else if (param.type().isRecordType())
+                s = s.replace("<", "r").replace(";", "");
+            // <Pn; 'n' is the name
+            else if (param.type().isProtocolType())
+                s = s.replace("<", "p").replace(";", "");
+            // {t
+            else if (param.type().isChannelType())
+                s = s.replace("{", "ct").replace(";", "");
+        }
+        return s;
     }
 }

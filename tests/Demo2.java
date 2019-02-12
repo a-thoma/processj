@@ -146,10 +146,10 @@ public class Demo2 {
     }
 
 
-    public static class _proc$main extends PJProcess {
+    public static class _proc$main$arT extends PJProcess {
         protected String[] _pd$args1;
 
-        public _proc$main(String[] _pd$args1) {
+        public _proc$main$arT(String[] _pd$args1) {
             this._pd$args1 = _pd$args1;
         }
 
@@ -161,7 +161,7 @@ public class Demo2 {
                 default: break;
             }
 
-            final PJPar _ld$par1 = new PJPar(7, this);
+            final PJPar _ld$par1 = new PJPar(6, this);
 
             new PJProcess() {
                 @Override
@@ -318,186 +318,6 @@ public class Demo2 {
                 }
             }.schedule();
 
-            new PJProcess() {
-                @Override
-                public synchronized void run() {
-                    switch (this.runLabel) {
-                        case 0: break;
-                        case 1: resume(1); break;
-                        default: break;
-                    }
-
-                    final PJPar _ld$par4 = new PJPar(6, this);
-
-                    new PJProcess() {
-                        @Override
-                        public synchronized void run() {
-                            io.println("Hello");
-                            terminate();
-                        }
-
-                        @Override
-                        public void finalize() {
-                            _ld$par4.decrement();
-                        }
-                    }.schedule();
-
-                    new PJProcess() {
-                        @Override
-                        public synchronized void run() {
-                            io.println("World");
-                            terminate();
-                        }
-
-                        @Override
-                        public void finalize() {
-                            _ld$par4.decrement();
-                        }
-                    }.schedule();
-
-                    (new Demo2._proc$say() {
-                        @Override
-                        public void finalize() {
-                            _ld$par4.decrement();
-                        }
-                    }).schedule();
-
-                    new PJProcess() {
-                        @Override
-                        public synchronized void run() {
-                            Demo2._method$ben();
-                            terminate();
-                        }
-
-                        @Override
-                        public void finalize() {
-                            _ld$par4.decrement();
-                        }
-                    }.schedule();
-
-                    (new Demo2._proc$yeah() {
-                        @Override
-                        public void finalize() {
-                            _ld$par4.decrement();
-                        }
-                    }).schedule();
-
-                    new PJProcess() {
-                        @Override
-                        public synchronized void run() {
-                            switch (this.runLabel) {
-                                case 0: break;
-                                case 1: resume(1); break;
-                                default: break;
-                            }
-
-                            final PJPar _ld$par5 = new PJPar(3, this);
-
-                            new PJProcess() {
-                                @Override
-                                public synchronized void run() {
-                                    io.println("inside second par");
-                                    terminate();
-                                }
-
-                                @Override
-                                public void finalize() {
-                                    _ld$par5.decrement();
-                                }
-                            }.schedule();
-
-                            new PJProcess() {
-                                @Override
-                                public synchronized void run() {
-                                    io.println("par inside second");
-                                    terminate();
-                                }
-
-                                @Override
-                                public void finalize() {
-                                    _ld$par5.decrement();
-                                }
-                            }.schedule();
-
-                            new PJProcess() {
-                                @Override
-                                public synchronized void run() {
-                                    switch (this.runLabel) {
-                                        case 0: break;
-                                        case 1: resume(1); break;
-                                        default: break;
-                                    }
-
-                                    final PJPar _ld$par6 = new PJPar(2, this);
-
-                                    new PJProcess() {
-                                        @Override
-                                        public synchronized void run() {
-                                            io.println("thrid par block");
-                                            terminate();
-                                        }
-
-                                        @Override
-                                        public void finalize() {
-                                            _ld$par6.decrement();
-                                        }
-                                    }.schedule();
-
-                                    new PJProcess() {
-                                        @Override
-                                        public synchronized void run() {
-                                            io.println("par block thrid");
-                                            terminate();
-                                        }
-
-                                        @Override
-                                        public void finalize() {
-                                            _ld$par6.decrement();
-                                        }
-                                    }.schedule();
-
-                                    setNotReady();
-                                    this.runLabel = 1;
-                                    yield();
-                                    label(1);
-
-                                    terminate();
-                                }
-
-                                @Override
-                                public void finalize() {
-                                    _ld$par5.decrement();
-                                }
-                            }.schedule();
-
-                            setNotReady();
-                            this.runLabel = 1;
-                            yield();
-                            label(1);
-
-                            terminate();
-                        }
-
-                        @Override
-                        public void finalize() {
-                            _ld$par4.decrement();
-                        }
-                    }.schedule();
-
-                    setNotReady();
-                    this.runLabel = 1;
-                    yield();
-                    label(1);
-
-                    terminate();
-                }
-
-                @Override
-                public void finalize() {
-                    _ld$par1.decrement();
-                }
-            }.schedule();
-
             setNotReady();
             this.runLabel = 1;
             yield();
@@ -510,7 +330,7 @@ public class Demo2 {
     public static void main(String[] _pd$args1) {
     	Scheduler scheduler = new Scheduler();
         PJProcess.scheduler = scheduler;
-        (new Demo2._proc$main(_pd$args1)).schedule();
+        (new Demo2._proc$main$arT(_pd$args1)).schedule();
         PJProcess.scheduler.start();
     }
 }

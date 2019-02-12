@@ -14,83 +14,28 @@ import std.io;
  *
  */
 public class Demo {
-    public static void _method$hello() {
-        io.println("Hello");
+    static void _method$say() {
+        Demo._method$say$I(1);
+        io.println("Hello from say");
     }
 
-    public static void _method$hello(String _pd$a1) {
+    static void _method$say$I(int _pd$a1) {
         io.println(_pd$a1);
     }
 
-    public static void _method$world(String _pd$aa1) {
-        io.println(_pd$aa1);
-    }
-
-    public static class _proc$main extends PJProcess {
+    public static class _proc$main$arT extends PJProcess {
         protected String[] _pd$args1;
 
-        protected PJOne2OneChannel<Integer> _ld$ab1;
+        protected int _ld$a1;
 
-        public _proc$main(String[] _pd$args1) {
+        public _proc$main$arT(String[] _pd$args1) {
             this._pd$args1 = _pd$args1;
         }
 
         @Override
         public synchronized void run() {
-            switch (this.runLabel) {
-                case 0: break;
-                case 1: resume(1); break;
-                default: break;
-            }
-
-            _ld$ab1 = new PJOne2OneChannel<Integer>();
-            final PJPar _ld$par1 = new PJPar(3, this);
-
-            new PJProcess() {
-                @Override
-                public synchronized void run() {
-                    Demo._method$hello();
-                    terminate();
-                }
-
-                @Override
-                public void finalize() {
-                    _ld$par1.decrement();
-                }
-            }.schedule();
-
-            new PJProcess() {
-                @Override
-                public synchronized void run() {
-                    Demo._method$world("Wait!!");
-                    terminate();
-                }
-
-                @Override
-                public void finalize() {
-                    _ld$par1.decrement();
-                }
-            }.schedule();
-
-            new PJProcess() {
-                @Override
-                public synchronized void run() {
-                    Demo._method$hello("Yay!!!");
-                    terminate();
-                }
-
-                @Override
-                public void finalize() {
-                    _ld$par1.decrement();
-                }
-            }.schedule();
-
-            setNotReady();
-            this.runLabel = 1;
-            yield();
-            label(1);
-
-            Demo._method$world("It finally works!!");
+            _ld$a1;
+            Demo._method$say();
             terminate();
         }
     }
@@ -98,7 +43,7 @@ public class Demo {
     public static void main(String[] _pd$args1) {
     	Scheduler scheduler = new Scheduler();
         PJProcess.scheduler = scheduler;
-        (new Demo._proc$main(_pd$args1)).schedule();
+        (new Demo._proc$main$arT(_pd$args1)).schedule();
         PJProcess.scheduler.start();
     }
 }
