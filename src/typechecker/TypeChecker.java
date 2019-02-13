@@ -704,7 +704,7 @@ public class TypeChecker extends Visitor<Type> {
 				(resolve(((ParamDecl) ptd.formalParams().child(i)).type())).typeAssignmentCompatible(resolve(in.params().child(i).type));
                         }
 			if (candidate) {
-			    System.out.println("Candidate kept");
+//			    System.out.println("Candidate kept");
                             candidateProcs.append(ptd);
                             Log.log("Possible proc: " + ptd.typeName() + " " + ptd.formalParams());
                         }
