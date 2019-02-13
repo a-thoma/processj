@@ -686,17 +686,17 @@ public class TypeChecker extends Visitor<Type> {
             if (procs != null)
                 for (Object pd : procs.entries.values().toArray()) {
                     ProcTypeDecl ptd = (ProcTypeDecl) pd;
-		    //System.out.println("Handling Procedure : " + ptd.typeName() + ptd.signature());
+		    //Log.log("Handling Procedure : " + ptd.typeName() + ptd.signature());
                     // set the qualified name in pd such that we can get at it later.
-		    System.out.println(ptd.formalParams().size() + "  " + in.params().size());
+		    Log.log(ptd.formalParams().size() + "  " + in.params().size());
                     if (ptd.formalParams().size() == in.params().size()) {
                         // TODO: this should store this somwhere
                         boolean candidate = true;
                         Log.log(" checking if Assignment Compatible proc: " + ptd.typeName() + " ( " + ptd.signature()
                                 + " ) ");
                         for (int i = 0; i < in.params().size(); i++) {
-			     System.out.println("Formal's type: " + ptd.formalParams().child(i).type());
-			     System.out.println("Actual's type: " + in.params().child(i).type);
+			     Log.log("Formal's type: " + ptd.formalParams().child(i).type());
+			     Log.log("Actual's type: " + in.params().child(i).type);
 			
 
 
@@ -704,12 +704,12 @@ public class TypeChecker extends Visitor<Type> {
 				(resolve(((ParamDecl) ptd.formalParams().child(i)).type())).typeAssignmentCompatible(resolve(in.params().child(i).type));
                         }
 			if (candidate) {
-//			    System.out.println("Candidate kept");
+			    Log.log("Candidate kept");
                             candidateProcs.append(ptd);
                             Log.log("Possible proc: " + ptd.typeName() + " " + ptd.formalParams());
                         }
 			else 
-			    System.out.println("Candidate thrown away");
+			    Log.log("Candidate thrown away");
                     }
                 }
 	    
