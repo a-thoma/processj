@@ -14,28 +14,44 @@ import std.io;
  *
  */
 public class Demo {
-    static void _method$say() {
-        Demo._method$say$I(1);
-        io.println("Hello from say");
+    public static class _proc$say$chanreadI extends PJProcess {
+        protected PJOne2OneChannel<Integer> _pd$r1;
+
+        public _proc$say$chanreadI(PJOne2OneChannel<Integer> _pd$r1) {
+            this._pd$r1 = _pd$r1;
+        }
+
+        @Override
+        public synchronized void run() {
+            Demo._method$say$I(1);
+            io.println("Hello from say");
+            terminate();
+        }
     }
+
 
     static void _method$say$I(int _pd$a1) {
         io.println(_pd$a1);
     }
 
-    public static class _proc$main$arT extends PJProcess {
+    public static class _proc$main$arrT extends PJProcess {
         protected String[] _pd$args1;
 
-        protected int _ld$a1;
+        protected PJOne2OneChannel<Integer> _ld$a1;
 
-        public _proc$main$arT(String[] _pd$args1) {
+        public _proc$main$arrT(String[] _pd$args1) {
             this._pd$args1 = _pd$args1;
         }
 
         @Override
         public synchronized void run() {
-            _ld$a1;
-            Demo._method$say();
+            _ld$a1 = new PJOne2OneChannel<Integer>();
+            (new Demo._proc$say$chanreadI(_ld$a1) {
+                @Override
+                public void finalize() {
+            .decrement();
+                }
+            }).schedule();
             terminate();
         }
     }
@@ -43,7 +59,7 @@ public class Demo {
     public static void main(String[] _pd$args1) {
     	Scheduler scheduler = new Scheduler();
         PJProcess.scheduler = scheduler;
-        (new Demo._proc$main$arT(_pd$args1)).schedule();
+        (new Demo._proc$main$arrT(_pd$args1)).schedule();
         PJProcess.scheduler.start();
     }
 }

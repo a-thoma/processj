@@ -26,7 +26,7 @@ public class Demo2 {
                 default: break;
             }
 
-            final PJPar _ld$par1 = new PJPar(2, this);
+            final PJPar _ld$par1 = new PJPar(3, this);
 
             new PJProcess() {
                 @Override
@@ -45,6 +45,57 @@ public class Demo2 {
                 @Override
                 public synchronized void run() {
                     io.println("say from");
+                    terminate();
+                }
+
+                @Override
+                public void finalize() {
+                    _ld$par1.decrement();
+                }
+            }.schedule();
+
+            new PJProcess() {
+                @Override
+                public synchronized void run() {
+                    switch (this.runLabel) {
+                        case 0: break;
+                        case 1: resume(1); break;
+                        default: break;
+                    }
+
+                    final PJPar _ld$par2 = new PJPar(2, this);
+
+                    new PJProcess() {
+                        @Override
+                        public synchronized void run() {
+                            io.println("a");
+                            terminate();
+                        }
+
+                        @Override
+                        public void finalize() {
+                            _ld$par2.decrement();
+                        }
+                    }.schedule();
+
+                    new PJProcess() {
+                        @Override
+                        public synchronized void run() {
+                            io.println("b");
+                            terminate();
+                        }
+
+                        @Override
+                        public void finalize() {
+                            _ld$par2.decrement();
+                        }
+                    }.schedule();
+
+                    setNotReady();
+                    this.runLabel = 1;
+                    yield();
+                    label(1);
+
                     terminate();
                 }
 
@@ -146,10 +197,10 @@ public class Demo2 {
     }
 
 
-    public static class _proc$main$arT extends PJProcess {
+    public static class _proc$main$arrT extends PJProcess {
         protected String[] _pd$args1;
 
-        public _proc$main$arT(String[] _pd$args1) {
+        public _proc$main$arrT(String[] _pd$args1) {
             this._pd$args1 = _pd$args1;
         }
 
@@ -330,7 +381,7 @@ public class Demo2 {
     public static void main(String[] _pd$args1) {
     	Scheduler scheduler = new Scheduler();
         PJProcess.scheduler = scheduler;
-        (new Demo2._proc$main$arT(_pd$args1)).schedule();
+        (new Demo2._proc$main$arrT(_pd$args1)).schedule();
         PJProcess.scheduler.start();
     }
 }

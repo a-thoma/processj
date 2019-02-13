@@ -1,6 +1,6 @@
 import std.io;
 
-proc void say() {
+proc void say(chan<int>.read r) [yield=true] {
     say(1);
     println("Hello from say");
 }
@@ -10,6 +10,6 @@ proc void say(int a) {
 }
 
 proc void main(string args[]) {
-    int a;
-    say();
+    chan<int> a;
+    say(a.read);
 }
