@@ -49,7 +49,7 @@ import utilities.Language;
                         },
             footer = {  "Run 'pjc -info <command>' or 'pjc -info <option>' for help with a specific\n" +
                         "subcommand or option.\n",
-                        "See https://processj.org for more details.",
+                        "See www.processj.org for more details.",
                         "Bug reports, feedback, complains, love, food, etc, to matt.pedersen@unlv.edu"
                         },
             name = "pjc",
