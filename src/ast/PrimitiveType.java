@@ -72,15 +72,6 @@ public class PrimitiveType extends Type {
         return p1.kind;
     }
 
-    public static PrimitiveType ceilingType(PrimitiveType p1, PrimitiveType p2) {
-        if (p1.kind < IntKind && p2.kind < IntKind)
-            return new PrimitiveType(IntKind);
-
-        if (p1.kind < p2.kind)
-            return p2;
-        return p1;
-    }
-
     public String toString() {
         return typeName();
     }
@@ -124,22 +115,136 @@ public class PrimitiveType extends Type {
         }
     }
 
+    // *************************************************************************
+    // ** Visitor Related Methods
+
     public <S extends Object> S visit(Visitor<S> v) {
         return v.visitPrimitiveType(this);
     }
 
+    // *************************************************************************
+    // ** Type Related Methods
+
+    // α =T β ⇔ Primitive?(α) ∧ Primitive?(β) ∧ α = β
     @Override
-    public boolean equal(Type t) {
-        return false;
+    public boolean typeEqual(Type t) {
+	if (!t.isPrimitiveType())
+	    return false;
+	PrimitiveType other = (PrimitiveType)t;
+	return (this.kind == other.kind);
     }
 
+    // α ∼T β ⇔ Primitive?(α) ∧ Primitive?(β) ∧ α =T β
     @Override
-    public boolean equivalent(Type t) {
-        return false;
+    public boolean typeEquivalent(Type t) {
+        return this.typeEqual(t);
     }
 
+    // α :=T β ⇔ Primitive?(α) ∧ Primitive?(β) ∧ β ≤ α
     @Override
-    public boolean assignmentCompatible(Type t) {
-        return false;
+    public boolean typeAssignmentCompatible(Type t) {
+	if (!t.isPrimitiveType())
+	    return false;
+	PrimitiveType other = (PrimitiveType)t;
+	return other.typeLessThanEqual(this);
     }
+
+    // α <T β ⇔ Numeric?(α) ∧ Numeric?(β) 
+    // Definition:
+    // byte <T short <T char <T int <T long <T float <T double  
+    public boolean typeLessThan(Type t) {
+	if (!this.isNumericType() || !t.isNumericType())
+	    return false;
+	PrimitiveType other = (PrimitiveType)t;
+	return this.kind < other.kind;
+    }
+    
+    // α <=T β ⇔ Primitive?(α) ∧ Primitive?(β) ∧ 
+    //           (α =T β || (Numeric?(α) ∧ Numeric?(β) ∧ α <T β))
+    public boolean typeLessThanEqual(Type t) {
+	if (!t.isPrimitiveType())
+            return false;
+	if (t.typeEqual(this))
+	    return true;
+	return this.typeLessThan(t);
+    }
+
+    public Type typeCeiling(PrimitiveType t) {
+	// TODO: This should probably be an assertion as 
+	// ceiling should only ever be called on numeric types anyways
+	if (!this.isNumericType() || !t.isNumericType())
+	    return new ErrorType();
+        if (this.kind < IntKind && t.kind < IntKind)
+            return new PrimitiveType(IntKind);
+
+	if (this.kind < t.kind)
+            return t;
+        return this;
+    }
+
+    @Override 
+    public boolean isPrimitiveType() {
+	return true;
+    }
+    
+    @Override 
+    public boolean isIntegerType() {
+	return (kind == IntKind);
+    }
+
+    @Override 
+    public boolean isBooleanType() {
+        return (kind == BooleanKind);
+    }
+
+    @Override 
+    public boolean isByteType() {
+	return (kind == ByteKind);
+    }
+
+    @Override 
+    public boolean isShortType() {
+	return (kind == ShortKind);
+    }
+
+    @Override 
+    public boolean isCharType() {
+        return (kind == CharKind);
+    }
+
+    @Override 
+    public boolean isLongType() {
+        return (kind == LongKind);
+    }
+
+    @Override 
+    public boolean isVoidType() {
+        return (kind == VoidKind);
+    }
+   
+    @Override 
+    public boolean isStringType() {
+        return (kind == StringKind);
+    }
+
+    @Override 
+    public boolean isFloatType() {
+        return (kind == FloatKind);
+    }
+
+    @Override 
+    public boolean isDoubleType() {
+        return (kind == DoubleKind);
+    }
+
+    @Override 
+    public boolean isNumericType() {
+        return (isFloatType() || isDoubleType() || isIntegralType());
+    }
+    
+    @Override 
+    public boolean isIntegralType() {
+        return (isIntegerType() || isShortType() || isByteType() || isCharType() || isLongType());
+    }
+
 }

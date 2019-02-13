@@ -21,22 +21,36 @@ public class ErrorType extends Type {
         return "<Error>";
     }
 
+    // *************************************************************************
+    // ** Visitor Related Methods
+
     public <S extends Object> S visit(Visitor<S> v) {
         return v.visitErrorType(this);
     }
 
-    @Override
-    public boolean equal(Type t) {
+    // *************************************************************************
+    // ** Type Related Methods
+
+    @Override 
+    public boolean isErrorType() {
+	return true;
+    }
+
+    // Error types should not be checked like this...
+    @Override 
+    public boolean typeEqual(Type t) {
         return false;
     }
 
-    @Override
-    public boolean equivalent(Type t) {
+    // Error types should not be checked like this...
+    @Override 
+    public boolean typeEquivalent(Type t) {
         return false;
     }
 
-    @Override
-    public boolean assignmentCompatible(Type t) {
+    // Error types should not be checked like this...
+    @Override 
+    public boolean typeAssignmentCompatible(Type t) {
         return false;
     }
 }

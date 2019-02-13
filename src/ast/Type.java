@@ -19,19 +19,17 @@ public abstract class Type extends AST {
 
     public abstract String typeName();
 
-    public boolean identical(Type other) {
+    /*    public boolean DELETE_identical(Type other) {
         if (signature().equals(other.signature()))
             return true;
         return false;
     }
-
+    */
     public boolean assignable() {
         return (!typeName().equals("null") && !typeName().equals("void"));
     }
-
-    public abstract String signature();
-
-    public static boolean assignmentCompatible(Type var, Type val) {
+    /*
+    public static boolean DELETE_assignmentCompatible(Type var, Type val) {
 
         Log.log("Type: var: " + var);
         Log.log("Type: val: " + val);
@@ -75,10 +73,20 @@ public abstract class Type extends AST {
         }
         return false;
     }
+    */
+    // Each type must re-implement these 
 
-    public static boolean protocolExtends(ProtocolTypeDecl sup,
-                                          ProtocolTypeDecl sub) {
-        if (sup.identical(sub))
+    public abstract String signature() ; 
+    public abstract boolean typeEqual(Type other) ;
+    public abstract boolean typeEquivalent(Type other) ;
+    public abstract boolean typeAssignmentCompatible(Type other) ;
+  
+
+    // Not sure why this one is here - shuld be in protocolType, shouldn't it?
+
+    public boolean protocolExtends(ProtocolTypeDecl sup,
+                                   ProtocolTypeDecl sub) {
+        if (sup.typeEqual(sub))
             return true;
         else {
             boolean b = false;
@@ -91,123 +99,159 @@ public abstract class Type extends AST {
         }
     }
 
-    public boolean isIntegerType() {
-        return (this instanceof PrimitiveType && ((PrimitiveType) this)
-            .getKind() == PrimitiveType.IntKind);
+    // The general implementation of all these should be to return 'false'.
+    // Each type should in turn implement which ever one applies to it
 
+    // Reimplemented in PrimitiveType
+    public boolean isIntegerType() {
+        //return (this instanceof PrimitiveType && ((PrimitiveType) this)
+        //    .getKind() == PrimitiveType.IntKind);
+        return false;   
     }
 
     public boolean isErrorType() {
-        return (this instanceof ErrorType);
+        //return (this instanceof ErrorType);
+	return false;
     }
+
+    public boolean isExternType() {
+	return false;
+    }
+
 
     public boolean isArrayType() {
-        return (this instanceof ArrayType);
+        //return (this instanceof ArrayType);
+	return false;
     }
 
+    // Reimplemented in PrimitiveType
     public boolean isBooleanType() {
-        return (this instanceof PrimitiveType && ((PrimitiveType) this)
-            .getKind() == PrimitiveType.BooleanKind);
+        //return (this instanceof PrimitiveType && ((PrimitiveType) this)
+	//.getKind() == PrimitiveType.BooleanKind);
+	return false;
     }
 
+    // Reimplemented in PrimitiveType 
     public boolean isByteType() {
-        return (this instanceof PrimitiveType && ((PrimitiveType) this)
-            .getKind() == PrimitiveType.ByteKind);
+        //return (this instanceof PrimitiveType && ((PrimitiveType) this)
+	//  .getKind() == PrimitiveType.ByteKind);
+	return false;
     }
 
+    // Reimplemented in PrimitiveType     
     public boolean isShortType() {
-        return (this instanceof PrimitiveType && ((PrimitiveType) this)
-            .getKind() == PrimitiveType.ShortKind);
+        // return (this instanceof PrimitiveType && ((PrimitiveType) this)
+	//.getKind() == PrimitiveType.ShortKind);
+	return false;
     }
 
+    // Reimplemented in PrimitiveType
     public boolean isCharType() {
-        return (this instanceof PrimitiveType && ((PrimitiveType) this)
-            .getKind() == PrimitiveType.CharKind);
+	//        return (this instanceof PrimitiveType && ((PrimitiveType) this)
+        //    .getKind() == PrimitiveType.CharKind);
+	return false;
     }
 
+    // Reimplemented in PrimitiveType 
     public boolean isLongType() {
-        return (this instanceof PrimitiveType && ((PrimitiveType) this)
-            .getKind() == PrimitiveType.LongKind);
+        //return (this instanceof PrimitiveType && ((PrimitiveType) this)
+        //    .getKind() == PrimitiveType.LongKind);
+	return false;
     }
 
     public boolean isTimerType() {
-        return (this instanceof PrimitiveType && ((PrimitiveType) this)
-            .getKind() == PrimitiveType.TimerKind);
+        //return (this instanceof PrimitiveType && ((PrimitiveType) this)
+        //    .getKind() == PrimitiveType.TimerKind);
+	return false;
     }
 
     public boolean isBarrierType() {
-        return (this instanceof PrimitiveType && ((PrimitiveType) this)
-            .getKind() == PrimitiveType.BarrierKind);
+	//        return (this instanceof PrimitiveType && ((PrimitiveType) this)
+        //    .getKind() == PrimitiveType.BarrierKind);
+	return false;
     }
 
     public boolean isChannelType() {
-        return (this instanceof ChannelType);
+        //return (this instanceof ChannelType);
+	return false;
     }
 
     public boolean isChannelEndType() {
-        return (this instanceof ChannelEndType);
+        //return (this instanceof ChannelEndType);
+	return false;
     }
 
     public boolean isRecordType() {
-        return (this instanceof RecordTypeDecl);
+        //return (this instanceof RecordTypeDecl);
+	return false;
     }
 
     public boolean isProtocolType() {
-        return (this instanceof ProtocolTypeDecl);
+        // return (this instanceof ProtocolTypeDecl);
+	return false;
     }
 
+    // Reimplemented in PrimitiveType
     public boolean isVoidType() {
-        return (this instanceof PrimitiveType && ((PrimitiveType) this)
-            .getKind() == PrimitiveType.VoidKind);
+        //return (this instanceof PrimitiveType && ((PrimitiveType) this)
+        //    .getKind() == PrimitiveType.VoidKind);
+	return false;
     }
 
-    // TODO: Do we need this??
+    // TODO: Do we need this?? Probably ....
     public boolean isNullType() {
         //return (this instanceof NullType);
-        return false; // TEMPOREARY RETURN VALUE
+        return false;
     }
 
+    // Reimplemented in PrimitiveType  
     public boolean isStringType() {
-        return (this instanceof PrimitiveType && ((PrimitiveType) this)
-            .getKind() == PrimitiveType.StringKind);
+        //return (this instanceof PrimitiveType && ((PrimitiveType) this)
+	//   .getKind() == PrimitiveType.StringKind);
+	return false;
     }
 
+    // Reimplemented in PrimitiveType       
     public boolean isFloatType() {
-        return (this instanceof PrimitiveType && ((PrimitiveType) this)
-            .getKind() == PrimitiveType.FloatKind);
+        //return (this instanceof PrimitiveType && ((PrimitiveType) this)
+        //    .getKind() == PrimitiveType.FloatKind);
+	return false;
     }
 
+    // Reimplemented in PrimitiveType       
     public boolean isDoubleType() {
-        return (this instanceof PrimitiveType && ((PrimitiveType) this)
-            .getKind() == PrimitiveType.DoubleKind);
+        //return (this instanceof PrimitiveType && ((PrimitiveType) this)
+        //    .getKind() == PrimitiveType.DoubleKind);
+	return false;
     }
 
+    // Reimplemented in PrimitiveType   
     public boolean isNumericType() {
-        return (isFloatType() || isDoubleType() || isIntegralType());
+        //return (isFloatType() || isDoubleType() || isIntegralType());
+	return false;
     }
 
+    // Reimplemented in PrimitiveType 
     public boolean isIntegralType() {
-        return (isIntegerType() || isShortType() || isByteType()
-            || isCharType() || isLongType());
+        //return (isIntegerType() || isShortType() || isByteType()
+        //    || isCharType() || isLongType());
+	return false;
     }
 
+    // reimplemented in PrimitiveType
     public boolean isPrimitiveType() {
-        return isNumericType() || isVoidType() || isNullType()
-            || isStringType() || isBooleanType();
+	//        return isNumericType() || isVoidType() || isNullType()
+        //    || isStringType() || isBooleanType();
+	return false;
     }
 
     public boolean isNamedType() {
-        return (this instanceof NamedType);
+        //return (this instanceof NamedType);
+	return false;
     }
-    
-    //////////////////
-    // ADDED: 25/09/2018
-    //////////////////
-    
-    public abstract boolean equal(Type t);
-    
-    public abstract boolean equivalent(Type t);
-    
-    public abstract boolean assignmentCompatible(Type t);
+
+    public boolean isProcType() {
+	return false;
+    }
 
 }

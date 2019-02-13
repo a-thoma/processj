@@ -56,22 +56,33 @@ public class ChannelEndType extends Type {
         return (Type) children[0];
     }
 
+    
+    public boolean isChannelEndType() {
+	return true;
+    }
+
+
     public <S extends Object> S visit(Visitor<S> v) {
         return v.visitChannelEndType(this);
     }
 
     @Override
-    public boolean equal(Type t) {
+    public boolean typeEqual(Type t) {
         return false;
     }
 
     @Override
-    public boolean equivalent(Type t) {
+    public boolean typeEquivalent(Type t) {
         return false;
     }
 
     @Override
-    public boolean assignmentCompatible(Type t) {
-        return false;
+    public boolean typeAssignmentCompatible(Type t) {
+        if (!t.isChannelEndType())
+	    return false;
+	else {	    
+	    ChannelEndType cet = (ChannelEndType)t;
+	    return baseType().typeAssignmentCompatible(cet.baseType());
+	}
     }
 }
