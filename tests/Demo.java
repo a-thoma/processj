@@ -14,30 +14,72 @@ import std.io;
  *
  */
 public class Demo {
-    public static class _proc$say$chanreadI extends PJProcess {
-        protected PJOne2OneChannel<Integer> _pd$r1;
+    public static class _proc$writer$chanwriteI extends PJProcess {
+        protected PJOne2OneChannel<Integer> _pd$out1;
 
-        public _proc$say$chanreadI(PJOne2OneChannel<Integer> _pd$r1) {
-            this._pd$r1 = _pd$r1;
+        public _proc$writer$chanwriteI(PJOne2OneChannel<Integer> _pd$out1) {
+            this._pd$out1 = _pd$out1;
         }
 
         @Override
         public synchronized void run() {
-            Demo._method$say$I(1);
-            io.println("Hello from say");
+            switch (this.runLabel) {
+                case 0: break;
+                case 1: resume(1); break;
+                default: break;
+            }
+
+            _pd$out1.write(this, 42);
+            this.runLabel = 1;
+            yield();
+            label(1);
+
             terminate();
         }
     }
 
 
-    static void _method$say$I(int _pd$a1) {
-        io.println(_pd$a1);
+    public static class _proc$reader$chanreadI extends PJProcess {
+        protected PJOne2OneChannel<Integer> _pd$in1;
+
+        protected int _ld$value1;
+
+        public _proc$reader$chanreadI(PJOne2OneChannel<Integer> _pd$in1) {
+            this._pd$in1 = _pd$in1;
+        }
+
+        @Override
+        public synchronized void run() {
+            switch (this.runLabel) {
+                case 0: break;
+                case 1: resume(1); break;
+                case 2: resume(2); break;
+                default: break;
+            }
+
+            if (!_pd$in1.isReadyToRead(this)) {
+                this.runLabel = 1;
+                yield();
+            }
+
+            label(1);
+            _ld$value1 = _pd$in1.read(this);
+            this.runLabel = 2;
+            yield();
+
+            label(2);
+
+            io.println("The value is " + _ld$value1);
+            terminate();
+        }
     }
+
 
     public static class _proc$main$arrT extends PJProcess {
         protected String[] _pd$args1;
 
-        protected PJOne2OneChannel<Integer> _ld$a1;
+        protected PJOne2OneChannel<Integer> _ld$c1;
+        protected int _ld$a2;
 
         public _proc$main$arrT(String[] _pd$args1) {
             this._pd$args1 = _pd$args1;
@@ -45,13 +87,35 @@ public class Demo {
 
         @Override
         public synchronized void run() {
-            _ld$a1 = new PJOne2OneChannel<Integer>();
-            (new Demo._proc$say$chanreadI(_ld$a1) {
+            switch (this.runLabel) {
+                case 0: break;
+                case 1: resume(1); break;
+                default: break;
+            }
+
+            _ld$c1 = new PJOne2OneChannel<Integer>();
+            _ld$a2 = 2;
+            final PJPar _ld$par1 = new PJPar(2, this);
+
+            (new Demo._proc$writer$chanwriteI(_ld$c1) {
                 @Override
                 public void finalize() {
-            .decrement();
+                    _ld$par1.decrement();
                 }
             }).schedule();
+
+            (new Demo._proc$reader$chanreadI(_ld$c1) {
+                @Override
+                public void finalize() {
+                    _ld$par1.decrement();
+                }
+            }).schedule();
+
+            setNotReady();
+            this.runLabel = 1;
+            yield();
+            label(1);
+
             terminate();
         }
     }

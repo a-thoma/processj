@@ -13,14 +13,14 @@ import utilities.Log;
 import utilities.Visitor;
 
 /**
- * Importing a file(s) enables the use of types and procedures (which
+ * Importing a file enables the use of types and procedures (which
  * are also types) from other compilation units. A compilation unit can
  * be a single file or a collection of files containing several types
- * which we visited in sequence, for every 'import' statement found in
- * a file, to determined if these types are part of a ProcessJ native
+ * which we must visit in sequence, for every 'import' statement found
+ * in a file, to determined if these types are part of a ProcessJ native
  * library. In addition, we visit the fields related to 'pragma' values
  * to check if a type is part of a native library function when an 'import'
- * statement is encountered
+ * statement is encountered.
  *
  * @param <T>
  *          The visitor interface used to traverse and resolve each

@@ -63,8 +63,8 @@ public class Scheduler extends Thread {
                 System.err.println("No processes ready to run. System is deadlocked");
                 tq.kill();
 
-//                System.err.println("[Scheduler] Total Context Switches: " + contextSwitches);
-//                System.err.println("[Scheduler] Max RunQueue Size: " + maxrqsize);
+                System.err.println("[Scheduler] Total Context Switches: " + contextSwitches);
+                System.err.println("[Scheduler] Max RunQueue Size: " + maxrqsize);
 
                 logExecutionTime();
                 System.exit(1);

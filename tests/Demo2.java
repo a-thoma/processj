@@ -26,7 +26,7 @@ public class Demo2 {
                 default: break;
             }
 
-            final PJPar _ld$par1 = new PJPar(3, this);
+            final PJPar _ld$par1 = new PJPar(2, this);
 
             new PJProcess() {
                 @Override
@@ -45,57 +45,6 @@ public class Demo2 {
                 @Override
                 public synchronized void run() {
                     io.println("say from");
-                    terminate();
-                }
-
-                @Override
-                public void finalize() {
-                    _ld$par1.decrement();
-                }
-            }.schedule();
-
-            new PJProcess() {
-                @Override
-                public synchronized void run() {
-                    switch (this.runLabel) {
-                        case 0: break;
-                        case 1: resume(1); break;
-                        default: break;
-                    }
-
-                    final PJPar _ld$par2 = new PJPar(2, this);
-
-                    new PJProcess() {
-                        @Override
-                        public synchronized void run() {
-                            io.println("a");
-                            terminate();
-                        }
-
-                        @Override
-                        public void finalize() {
-                            _ld$par2.decrement();
-                        }
-                    }.schedule();
-
-                    new PJProcess() {
-                        @Override
-                        public synchronized void run() {
-                            io.println("b");
-                            terminate();
-                        }
-
-                        @Override
-                        public void finalize() {
-                            _ld$par2.decrement();
-                        }
-                    }.schedule();
-
-                    setNotReady();
-                    this.runLabel = 1;
-                    yield();
-                    label(1);
-
                     terminate();
                 }
 
