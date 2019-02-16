@@ -3,6 +3,15 @@ package ast;
 public abstract class Statement extends AST {
 
     private String label = "";
+    private boolean yields = false;
+
+    public Statement(Token t) {
+        super(t);
+    }
+
+    public Statement(AST a) {
+        super(a);
+    }
 
     public void setLabel(String label) {
         this.label = label;
@@ -11,12 +20,12 @@ public abstract class Statement extends AST {
     public String getLabel() {
         return label;
     }
-
-    public Statement(Token t) {
-        super(t);
+    
+    public boolean doesYield() { 
+	    return yields;
     }
 
-    public Statement(AST a) {
-        super(a);
+    public void setYield() {
+	    yields = true;
     }
 }
