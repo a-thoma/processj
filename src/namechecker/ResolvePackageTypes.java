@@ -72,7 +72,7 @@ public class ResolvePackageTypes extends Visitor<AST> {
                                 .addAST(pa)
                                 .addError(VisitorMessageNumber.RESOLVE_IMPORTS_101)
                                 .addArguments(makeImportFileName(pa))
-                                .build(), MessageType.PRINT_STOP);
+                                .build());
                 }
             }
             CompilerMessageManager.INSTANCE.setFileName(fileName);

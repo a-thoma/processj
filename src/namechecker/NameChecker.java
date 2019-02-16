@@ -165,13 +165,13 @@ public class NameChecker<T extends Object> extends Visitor<T> {
                             .addAST(in)
                             .addError(VisitorMessageNumber.NAME_CHECKER_403)
                             .addArguments(in.procedureName().getname())
-                            .build(), MessageType.PRINT_CONTINUE);
+                            .build());
             if (!(o instanceof SymbolTable))
                 CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                             .addAST(in)
                             .addError(VisitorMessageNumber.NAME_CHECKER_404)
                             .addArguments(in.procedureName().getname())
-                            .build(), MessageType.PRINT_CONTINUE);
+                            .build());
                 
             else
                 in.candidateMethods = (SymbolTable) o;
@@ -194,7 +194,7 @@ public class NameChecker<T extends Object> extends Visitor<T> {
                         .addAST(ld)
                         .addError(VisitorMessageNumber.NAME_CHECKER_400)
                         .addArguments(ld.name())
-                        .build(), MessageType.PRINT_CONTINUE);
+                        .build());
         ld.var().myDecl = ld;
         super.visitLocalDecl(ld);
         return null;
@@ -213,13 +213,13 @@ public class NameChecker<T extends Object> extends Visitor<T> {
                         .addAST(nt)
                         .addError(VisitorMessageNumber.NAME_CHECKER_401)
                         .addArguments(nt.name().getname())
-                        .build(), MessageType.PRINT_CONTINUE);
+                        .build());
         if (o instanceof ConstantDecl) {
             CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                         .addAST(nt)
                         .addError(VisitorMessageNumber.NAME_CHECKER_407)
                         .addArguments(nt.name().getname())
-                        .build(), MessageType.PRINT_CONTINUE);
+                        .build());
         }
         Log.log("NamedType: o = " + o);
         // TODO: consider the import hierarchy back for similiarly named procs
@@ -249,7 +249,7 @@ public class NameChecker<T extends Object> extends Visitor<T> {
                         .addAST(ne)
                         .addError(VisitorMessageNumber.NAME_CHECKER_405)
                         .addArguments(ne.name().getname())
-                        .build(), MessageType.PRINT_CONTINUE);
+                        .build());
         else
             ne.myDecl = (AST) o;
         return null;
@@ -266,7 +266,7 @@ public class NameChecker<T extends Object> extends Visitor<T> {
                     .addAST(nm)
                     .addError(VisitorMessageNumber.NAME_CHECKER_406)
                     .addArguments(nm.name().getname())
-                    .build(), MessageType.PRINT_CONTINUE);
+                    .build());
         else
             nm.myDecl = (DefineTopLevelDecl) o;
         return null;
@@ -281,7 +281,7 @@ public class NameChecker<T extends Object> extends Visitor<T> {
                         .addAST(pd)
                         .addError(VisitorMessageNumber.NAME_CHECKER_402)
                         .addArguments(pd.name())
-                        .build(), MessageType.PRINT_CONTINUE);
+                        .build());
         super.visitParamDecl(pd);
         return null;
     }
@@ -314,7 +314,7 @@ public class NameChecker<T extends Object> extends Visitor<T> {
                             .addAST(pd)
                             .addError(VisitorMessageNumber.NAME_CHECKER_408)
                             .addArguments(name.getname())
-                            .build(), MessageType.PRINT_CONTINUE);
+                            .build());
                 // We do not test for ProcTypeDecl because the top level scope contains a
                 // SymbolTable for each procedure as we might have multiple declarations of
                 // procedures with the same name.
@@ -323,7 +323,7 @@ public class NameChecker<T extends Object> extends Visitor<T> {
                         .addAST(pd)
                         .addError(VisitorMessageNumber.NAME_CHECKER_410)
                         .addArguments(name.getname())
-                        .build(), MessageType.PRINT_CONTINUE);
+                        .build());
         }
         if (pd.body() != null)
             pd.body().visit(this);
@@ -342,13 +342,13 @@ public class NameChecker<T extends Object> extends Visitor<T> {
                         .addAST(pl)
                         .addError(VisitorMessageNumber.NAME_CHECKER_409)
                         .addArguments(pl.name().getname())
-                        .build(), MessageType.PRINT_CONTINUE);
+                        .build());
         else if (!(o instanceof ProtocolTypeDecl))
             CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                     .addAST(pl)
                     .addError(VisitorMessageNumber.NAME_CHECKER_412)
                     .addArguments(pl.name().getname())
-                    .build(), MessageType.PRINT_CONTINUE);
+                    .build());
 
         // Check if the tag is OK now.
         pl.myTypeDecl = (ProtocolTypeDecl) o;
@@ -364,7 +364,7 @@ public class NameChecker<T extends Object> extends Visitor<T> {
                 .addAST(pl)
                 .addError(VisitorMessageNumber.NAME_CHECKER_413)
                 .addArguments(pl.tag().getname(), pl.name().getname())
-                .build(), MessageType.PRINT_CONTINUE);
+                .build());
 
         return null;
     }
@@ -382,13 +382,13 @@ public class NameChecker<T extends Object> extends Visitor<T> {
                         .addAST(n)
                         .addError(VisitorMessageNumber.NAME_CHECKER_414)
                         .addArguments(n.getname())
-                        .build(), MessageType.PRINT_CONTINUE);
+                        .build());
             else if (!(o instanceof ProtocolTypeDecl))
                 CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                         .addAST(n)
                         .addError(VisitorMessageNumber.NAME_CHECKER_415)
                         .addArguments(n.getname())
-                        .build(), MessageType.PRINT_CONTINUE);
+                        .build());
             n.myDecl = (AST) o;
         }
         // TODO: make sure we don't repreat names in the 'extend' part.
@@ -407,13 +407,13 @@ public class NameChecker<T extends Object> extends Visitor<T> {
                     .addAST(rl)
                     .addError(VisitorMessageNumber.NAME_CHECKER_416)
                     .addArguments(rl.name().getname())
-                    .build(), MessageType.PRINT_CONTINUE);
+                    .build());
         else if (!(o instanceof RecordTypeDecl))
             CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                     .addAST(rl)
                     .addError(VisitorMessageNumber.NAME_CHECKER_417)
                     .addArguments(rl.name().getname())
-                    .build(), MessageType.PRINT_CONTINUE);
+                    .build());
         else
             rl.myTypeDecl = (RecordTypeDecl) o;
         return null;
@@ -431,13 +431,13 @@ public class NameChecker<T extends Object> extends Visitor<T> {
                         .addAST(n)
                         .addError(VisitorMessageNumber.NAME_CHECKER_418)
                         .addArguments(n.getname())
-                        .build(), MessageType.PRINT_CONTINUE);
+                        .build());
             else if (!(o instanceof RecordTypeDecl))
                 CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                         .addAST(n)
                         .addError(VisitorMessageNumber.NAME_CHECKER_419)
                         .addArguments(n.getname())
-                        .build(), MessageType.PRINT_CONTINUE);
+                        .build());
         }
         // Make sure we don't repeat names in the 'extends' part.
         // TODO: Remove 'extends' from records.
@@ -448,7 +448,7 @@ public class NameChecker<T extends Object> extends Visitor<T> {
                         .addAST(rt)
                         .addError(VisitorMessageNumber.NAME_CHECKER_420)
                         .addArguments(name.getname(), rt.name().getname())
-                        .build(), MessageType.PRINT_CONTINUE);
+                        .build());
             hs.add(name.getname());
         }
         rt.body().visit(this);
@@ -474,7 +474,7 @@ public class NameChecker<T extends Object> extends Visitor<T> {
                 CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                         .addAST(sl)
                         .addError(VisitorMessageNumber.NAME_CHECKER_421)
-                        .build(), MessageType.PRINT_CONTINUE);
+                        .build());
         return null;
     }
 

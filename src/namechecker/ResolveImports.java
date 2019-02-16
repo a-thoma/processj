@@ -88,7 +88,7 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
                             .addAST(a)
                             .addError(VisitorMessageNumber.RESOLVE_IMPORTS_103)
                             .addArguments(packageName)
-                            .build(), MessageType.PRINT_STOP);
+                            .build());
             }
             
             TopLevelDecls.alreadyImportedFiles.put(fileName,
@@ -99,13 +99,13 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
                         .addAST(a)
                         .addError(VisitorMessageNumber.RESOLVE_IMPORTS_102)
                         .addArguments(fileName)
-                        .build(), MessageType.PRINT_STOP);
+                        .build());
         } catch (Exception e) {
             CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                         .addAST(a)
                         .addError(VisitorMessageNumber.RESOLVE_IMPORTS_106)
                         .addArguments(fileName)
-                        .build(), MessageType.PRINT_STOP);
+                        .build());
         }
         return null;
     }
@@ -213,7 +213,7 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
                                 .addAST(im)
                                 .addError(VisitorMessageNumber.RESOLVE_IMPORTS_103)
                                 .addArguments(packageName)
-                                .build(), MessageType.PRINT_CONTINUE);
+                                .build());
                 }
             }
             Log.log("visitImport(): About to import '" + im.file().getname() + ".pj'");
@@ -242,7 +242,7 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
                                     .addAST(im)
                                     .addError(VisitorMessageNumber.RESOLVE_IMPORTS_102)
                                     .addArguments(im.file().getname())
-                                    .build(), MessageType.PRINT_CONTINUE);
+                                    .build());
                     } else {
                         String packageName = path.replaceAll("/", ".");
                         packageName = packageName.substring(0, packageName.length() - 1);
@@ -250,7 +250,7 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
                                     .addAST(im)
                                     .addError(VisitorMessageNumber.RESOLVE_IMPORTS_105)
                                     .addArguments(im.file().getname(), path)
-                                    .build(), MessageType.PRINT_CONTINUE);
+                                    .build());
                     }
                 }
             }

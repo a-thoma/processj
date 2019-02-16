@@ -14,14 +14,10 @@ import std.io;
  *
  */
 public class Demo {
-    // TODO: This a temporary fix for unreachable code due to
-    // infinite loop
-    public static boolean isTrue() { return true; }
-
-    public static class _proc$writer$chanwriteI extends PJProcess {
+    public static class _proc$writer$cwI extends PJProcess {
         protected PJOne2OneChannel<Integer> _pd$out1;
 
-        public _proc$writer$chanwriteI(PJOne2OneChannel<Integer> _pd$out1) {
+        public _proc$writer$cwI(PJOne2OneChannel<Integer> _pd$out1) {
             this._pd$out1 = _pd$out1;
         }
 
@@ -43,12 +39,12 @@ public class Demo {
     }
 
 
-    public static class _proc$reader$chanreadI extends PJProcess {
+    public static class _proc$reader$crI extends PJProcess {
         protected PJOne2OneChannel<Integer> _pd$in1;
 
         protected int _ld$value1;
 
-        public _proc$reader$chanreadI(PJOne2OneChannel<Integer> _pd$in1) {
+        public _proc$reader$crI(PJOne2OneChannel<Integer> _pd$in1) {
             this._pd$in1 = _pd$in1;
         }
 
@@ -79,13 +75,13 @@ public class Demo {
     }
 
 
-    public static class _proc$main$arrT extends PJProcess {
+    public static class _proc$main$arT extends PJProcess {
         protected String[] _pd$args1;
 
         protected PJOne2OneChannel<Integer> _ld$c1;
         protected int _ld$a2;
 
-        public _proc$main$arrT(String[] _pd$args1) {
+        public _proc$main$arT(String[] _pd$args1) {
             this._pd$args1 = _pd$args1;
         }
 
@@ -101,14 +97,14 @@ public class Demo {
             _ld$a2 = 2;
             final PJPar _ld$par1 = new PJPar(2, this);
 
-            (new Demo._proc$writer$chanwriteI(_ld$c1) {
+            (new Demo._proc$writer$cwI(_ld$c1) {
                 @Override
                 public void finalize() {
                     _ld$par1.decrement();
                 }
             }).schedule();
 
-            (new Demo._proc$reader$chanreadI(_ld$c1) {
+            (new Demo._proc$reader$crI(_ld$c1) {
                 @Override
                 public void finalize() {
                     _ld$par1.decrement();
@@ -127,7 +123,7 @@ public class Demo {
     public static void main(String[] _pd$args1) {
     	Scheduler scheduler = new Scheduler();
         PJProcess.scheduler = scheduler;
-        (new Demo._proc$main$arrT(_pd$args1)).schedule();
+        (new Demo._proc$main$arT(_pd$args1)).schedule();
         PJProcess.scheduler.start();
     }
 }

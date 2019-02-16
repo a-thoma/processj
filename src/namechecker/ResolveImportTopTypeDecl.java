@@ -47,6 +47,7 @@ public class ResolveImportTopTypeDecl<T extends AST> extends Visitor<T> {
         Log.logHeader("");
         Log.logHeader("*                 R E S O L V E   N A T I V E                *");
         Log.logHeader("*                T O P   L E V E L   D E C L S               *");
+        Log.logHeader("*                            D O N E                         *");
         Log.logHeader("*       File: " + CompilerMessageManager.INSTANCE.fileName);
         Log.logHeader("==============================================================");
         
@@ -68,7 +69,7 @@ public class ResolveImportTopTypeDecl<T extends AST> extends Visitor<T> {
         Import prevImpot = currentImport;
         currentImport = im;
         Sequence<Compilation> compilations = im.getCompilations();
-        // For every to-level decl in a file, determine if this type
+        // For every top-level decl in a file, determine if this type
         // is part of a ProcessJ native library
         for (Compilation c : compilations) {
             if (c == null)
@@ -91,9 +92,9 @@ public class ResolveImportTopTypeDecl<T extends AST> extends Visitor<T> {
         Log.log(pd.line + ": Visiting a ProcTypeDecl (" + pd.name().getname() + ")");
         if (pragmaTable.size() > 0 && currentImport != null) {
             String path = ResolveImports.makeImportPath(currentImport);
-            Log.log("visitImport(): Package path is : " + path);
+            Log.log(pd.line + ": Package path is : " + path);
             if (pragmaTable.contains("LIBRARY") && pragmaTable.contains("NATIVE")) {
-                Log.log("visitImport(): Package file name is : " + currentImport.file().getname());
+                Log.log(pd.line + ": Package file name is : " + currentImport.file().getname());
                 pd.isNative = true;
                 pd.library = currentImport.toString();
                 pd.filename = pragmaTable.get("FILE");

@@ -14,18 +14,14 @@ import std.io;
  *
  */
 public class commstime {
-    // TODO: This a temporary fix for unreachable code due to
-    // infinite loop
-    public static boolean isTrue() { return true; }
-
-    public static class _proc$prefix$J$chanreadJ$chanwriteJ extends PJProcess {
+    public static class _proc$prefix$J$crJ$cwJ extends PJProcess {
         protected long _pd$n1;
         protected PJOne2OneChannel<Long> _pd$in2;
         protected PJOne2OneChannel<Long> _pd$out3;
 
         protected long _ld$l1;
 
-        public _proc$prefix$J$chanreadJ$chanwriteJ(long _pd$n1, PJOne2OneChannel<Long> _pd$in2, PJOne2OneChannel<Long> _pd$out3) {
+        public _proc$prefix$J$crJ$cwJ(long _pd$n1, PJOne2OneChannel<Long> _pd$in2, PJOne2OneChannel<Long> _pd$out3) {
             this._pd$n1 = _pd$n1;
             this._pd$in2 = _pd$in2;
             this._pd$out3 = _pd$out3;
@@ -74,13 +70,13 @@ public class commstime {
     }
 
 
-    public static class _proc$succ$chanreadJ$chanwriteJ extends PJProcess {
+    public static class _proc$succ$crJ$cwJ extends PJProcess {
         protected PJOne2OneChannel<Long> _pd$in1;
         protected PJOne2OneChannel<Long> _pd$out2;
 
         protected long _ld$l1;
 
-        public _proc$succ$chanreadJ$chanwriteJ(PJOne2OneChannel<Long> _pd$in1, PJOne2OneChannel<Long> _pd$out2) {
+        public _proc$succ$crJ$cwJ(PJOne2OneChannel<Long> _pd$in1, PJOne2OneChannel<Long> _pd$out2) {
             this._pd$in1 = _pd$in1;
             this._pd$out2 = _pd$out2;
         }
@@ -122,14 +118,14 @@ public class commstime {
     }
 
 
-    public static class _proc$delta$chanreadJ$chanwriteJ$chanwriteJ extends PJProcess {
+    public static class _proc$delta$crJ$cwJ$cwJ extends PJProcess {
         protected PJOne2OneChannel<Long> _pd$in1;
         protected PJOne2OneChannel<Long> _pd$out12;
         protected PJOne2OneChannel<Long> _pd$out23;
 
         protected long _ld$l1;
 
-        public _proc$delta$chanreadJ$chanwriteJ$chanwriteJ(PJOne2OneChannel<Long> _pd$in1, PJOne2OneChannel<Long> _pd$out12, PJOne2OneChannel<Long> _pd$out23) {
+        public _proc$delta$crJ$cwJ$cwJ(PJOne2OneChannel<Long> _pd$in1, PJOne2OneChannel<Long> _pd$out12, PJOne2OneChannel<Long> _pd$out23) {
             this._pd$in1 = _pd$in1;
             this._pd$out12 = _pd$out12;
             this._pd$out23 = _pd$out23;
@@ -222,12 +218,12 @@ public class commstime {
     }
 
 
-    public static class _proc$consume$chanreadJ extends PJProcess {
+    public static class _proc$consume$crJ extends PJProcess {
         protected PJOne2OneChannel<Long> _pd$in1;
 
         protected long _ld$l1;
 
-        public _proc$consume$chanreadJ(PJOne2OneChannel<Long> _pd$in1) {
+        public _proc$consume$crJ(PJOne2OneChannel<Long> _pd$in1) {
             this._pd$in1 = _pd$in1;
         }
 
@@ -263,7 +259,7 @@ public class commstime {
     }
 
 
-    public static class _proc$main$arrT extends PJProcess {
+    public static class _proc$main$arT extends PJProcess {
         protected String[] _pd$args1;
 
         protected PJOne2OneChannel<Long> _ld$a1;
@@ -272,7 +268,7 @@ public class commstime {
         protected PJOne2OneChannel<Long> _ld$d4;
         protected long _ld$x5;
 
-        public _proc$main$arrT(String[] _pd$args1) {
+        public _proc$main$arT(String[] _pd$args1) {
             this._pd$args1 = _pd$args1;
         }
 
@@ -353,28 +349,28 @@ public class commstime {
 
             final PJPar _ld$par2 = new PJPar(4, this);
 
-            (new commstime._proc$delta$chanreadJ$chanwriteJ$chanwriteJ(_ld$d4, _ld$a1, _ld$b2) {
+            (new commstime._proc$delta$crJ$cwJ$cwJ(_ld$d4, _ld$a1, _ld$b2) {
                 @Override
                 public void finalize() {
                     _ld$par2.decrement();
                 }
             }).schedule();
 
-            (new commstime._proc$succ$chanreadJ$chanwriteJ(_ld$b2, _ld$c3) {
+            (new commstime._proc$succ$crJ$cwJ(_ld$b2, _ld$c3) {
                 @Override
                 public void finalize() {
                     _ld$par2.decrement();
                 }
             }).schedule();
 
-            (new commstime._proc$prefix$J$chanreadJ$chanwriteJ(0, _ld$c3, _ld$d4) {
+            (new commstime._proc$prefix$J$crJ$cwJ(0, _ld$c3, _ld$d4) {
                 @Override
                 public void finalize() {
                     _ld$par2.decrement();
                 }
             }).schedule();
 
-            (new commstime._proc$consume$chanreadJ(_ld$a1) {
+            (new commstime._proc$consume$crJ(_ld$a1) {
                 @Override
                 public void finalize() {
                     _ld$par2.decrement();
@@ -393,7 +389,7 @@ public class commstime {
     public static void main(String[] _pd$args1) {
     	Scheduler scheduler = new Scheduler();
         PJProcess.scheduler = scheduler;
-        (new commstime._proc$main$arrT(_pd$args1)).schedule();
+        (new commstime._proc$main$arT(_pd$args1)).schedule();
         PJProcess.scheduler.start();
     }
 }

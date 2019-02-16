@@ -165,7 +165,7 @@ public class ProcessJc {
             // =====================================================
             SymbolTable.hook = null;
             c.visit(new namechecker.ResolveImports<AST>(globalTypeTable));
-            globalTypeTable.printStructure("");
+//            globalTypeTable.printStructure("");
             
 //            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
 //                CompilerMessageManager.INSTANCE.printTrace("import declarations");

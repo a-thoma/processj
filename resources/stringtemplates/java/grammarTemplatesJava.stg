@@ -35,10 +35,6 @@ import processj.runtime.*;
  *
  */
 public class <name> {
-    // TODO: This a temporary fix for unreachable code due to
-    // infinite loop
-    public static boolean isTrue() { return true; }
-    
     <if(body)><body; separator="\n\n"><endif>
 }
 >>

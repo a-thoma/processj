@@ -111,7 +111,7 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
                         .addAST(cd)
                         .addError(VisitorMessageNumber.TOP_LEVEL_DECLS_200)
                         .addArguments(cd.var().name().getname())
-                        .build(), MessageType.PRINT_CONTINUE);
+                        .build());
         return null;
     }
 
@@ -126,7 +126,7 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
                             .addAST(pd)
                             .addError(VisitorMessageNumber.TOP_LEVEL_DECLS_205)
                             .addArguments(pd.name().getname())
-                            .build(), MessageType.PRINT_CONTINUE);
+                            .build());
 
         // Mobile procedure may NOT be overloaded.
         // If a symbol table contains a mobile the field isMobileProcedure is true.
@@ -147,13 +147,13 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
                                     .addAST(pd)
                                     .addError(VisitorMessageNumber.TOP_LEVEL_DECLS_206)
                                     .addArguments(pd.name().getname())
-                                    .build(), MessageType.PRINT_CONTINUE);
+                                    .build());
                     else
                         CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                                 .addAST(pd)
                                 .addError(VisitorMessageNumber.TOP_LEVEL_DECLS_208)
                                 .addArguments(pd.name().getname())
-                                .build(), MessageType.PRINT_CONTINUE);
+                                .build());
                 } else
                     st.put(pd.signature(), pd);
             } else
@@ -161,7 +161,7 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
                             .addAST(pd)
                             .addError(VisitorMessageNumber.TOP_LEVEL_DECLS_201)
                             .addArguments(pd.getname())
-                            .build(), MessageType.PRINT_CONTINUE);
+                            .build());
         }
         return null;
     }
@@ -174,7 +174,7 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
                         .addAST(rd)
                         .addError(VisitorMessageNumber.TOP_LEVEL_DECLS_202)
                         .addArguments(rd.name().getname())
-                        .build(), MessageType.PRINT_CONTINUE);
+                        .build());
         return null;
     }
 
@@ -187,7 +187,7 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
                         .addAST(pd)
                         .addError(VisitorMessageNumber.TOP_LEVEL_DECLS_203)
                         .addArguments(pd.name().getname())
-                        .build(), MessageType.PRINT_CONTINUE);
+                        .build());
         return null;
     }
 
@@ -199,7 +199,7 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
                         .addAST(nt)
                         .addError(VisitorMessageNumber.TOP_LEVEL_DECLS_207)
                         .addArguments(nt.name().getname())
-                        .build(), MessageType.PRINT_CONTINUE);
+                        .build());
         return null;
     }
 }

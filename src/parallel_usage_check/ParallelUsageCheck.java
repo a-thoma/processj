@@ -58,7 +58,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                             .addAST(ra)
                             .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_700)
                             .addArguments(name)
-                            .build(), MessageType.PRINT_CONTINUE);
+                            .build());
             } else {
                 Log.log(ra, "RecordAccess: '" + name + "' is added to the read set.");
                 readSet.put(name, ra);
@@ -76,7 +76,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                             .addAST(aae)
                             .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_701)
                             .addArguments(name)
-                            .build(), MessageType.PRINT_CONTINUE);
+                            .build());
             } else {
                 Log.log(aae, "ArrayAccessExpr: '" + name + "' is added to the read set.");
                 readSet.put(name, aae);
@@ -84,7 +84,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                             .addAST(aae)
                             .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_702)
                             .addArguments(name)
-                            .build(), MessageType.PRINT_CONTINUE);
+                            .build());
                 aae.index().visit(this);
             }
         }
@@ -113,7 +113,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                                 .addAST(as)
                                 .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_703)
                                 .addArguments(name)
-                                .build(), MessageType.PRINT_CONTINUE);
+                                .build());
                 else {
                     Log.log(as, "NameExpr: '" + name + "' is added to the write set.");
                     writeSet.put(name, as.left());
@@ -126,7 +126,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                                 .addAST(as)
                                 .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_704)
                                 .addArguments(name)
-                                .build(), MessageType.PRINT_CONTINUE);
+                                .build());
                 else {
                     Log.log(as, "RecordAccess: '" + name + "' is added to the write set.");
                     writeSet.put(name, as.left());
@@ -139,7 +139,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                                 .addAST(as)
                                 .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_705)
                                 .addArguments(name)
-                                .build(), MessageType.PRINT_CONTINUE);
+                                .build());
                 else {
                     Log.log(as, "ArrayAccessExpr: '" + name + "' is added to the write set.");
                     writeSet.put(name, as.left());
@@ -147,7 +147,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                                 .addAST(as.left())
                                 .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_706)
                                 .addArguments(name)
-                                .build(), MessageType.PRINT_CONTINUE);
+                                .build());
                 }
             }
         }
@@ -164,7 +164,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                             .addAST(ne)
                             .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_707)
                             .addArguments(name)
-                            .build(), MessageType.PRINT_CONTINUE);
+                            .build());
             else {
                 Log.log(ne, "NameExpr: '" + name + "' is added to the read set.");
                 readSet.put(name, ne);
@@ -183,7 +183,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                                 .addAST(up)
                                 .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_708)
                                 .addArguments(name)
-                                .build(), MessageType.PRINT_CONTINUE);
+                                .build());
                 else {
                     Log.log(up, "NameExpr: '" + name + "' is added to the write set.");
                     writeSet.put(name, up.expr());
@@ -196,7 +196,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                                 .addAST(up)
                                 .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_709)
                                 .addArguments(name)
-                                .build(), MessageType.PRINT_CONTINUE);
+                                .build());
                 else {
                     Log.log(up, "RecordAccess: '" + name + "' is added to the write set.");
                     writeSet.put(name, up.expr());
@@ -209,7 +209,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                                 .addAST(up)
                                 .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_710)
                                 .addArguments(name)
-                                .build(), MessageType.PRINT_CONTINUE);
+                                .build());
                 else {
                     Log.log(up, "ArrayAccessExpr: '" + name + "' is added to the write set.");
                     writeSet.put(name, up.expr());
@@ -217,7 +217,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                                 .addAST(up.expr())
                                 .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_711)
                                 .addArguments(name)
-                                .build(), MessageType.PRINT_CONTINUE);
+                                .build());
                 }
             }
         }
@@ -236,7 +236,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                                     .addAST(up)
                                     .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_712)
                                     .addArguments(name)
-                                    .build(), MessageType.PRINT_CONTINUE);
+                                    .build());
                     else {
                         Log.log(up, "NameExpr: '" + name + "' is added to the write set.");
                         writeSet.put(name, up.expr());
@@ -249,7 +249,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                                     .addAST(up)
                                     .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_713)
                                     .addArguments(name)
-                                    .build(), MessageType.PRINT_CONTINUE);
+                                    .build());
                     else {
                         Log.log(up, "RecordAccess: '" + name + "' is added to the write set.");
                         writeSet.put(name, up.expr());
@@ -262,7 +262,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                                     .addAST(up)
                                     .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_714)
                                     .addArguments(name)
-                                    .build(), MessageType.PRINT_CONTINUE);
+                                    .build());
                     else {
                         Log.log(up, "ArrayAccessExpr: '" + name + "' is added to the write set.");
                         writeSet.put(name, up.expr());
@@ -270,7 +270,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                                     .addAST(up.expr())
                                     .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_715)
                                     .addArguments(name)
-                                    .build(), MessageType.PRINT_CONTINUE);
+                                    .build());
                     }
                 }
             } else
