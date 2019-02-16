@@ -182,12 +182,16 @@ public class Helper {
     // I N V A L I D   I D E N T I F I E R S
     // ==========================================
     
-    // This is to prevent collision of names with special keywords in Java
+    // This is to prevent collision of names with special keywords
     // when generating Java class files
     private static final Set<String> INVALID_NAMES = new HashSet<>(Arrays.asList(
-            new String[] { "abstract", "assert", "class", "catch", "enum", "extends", "final",
+            new String[] {
+                    /* Java keywords */
+                    "abstract", "assert", "class", "catch", "enum", "extends", "final",
                     "goto", "instanceof", "interface", "static", "super", "synchronized",
-                    "this", "throw", "throws", "try", "null"
+                    "this", "throw", "throws", "try", "null",
+                    /* ProcessJ keywords */
+                    "label", "jump", "terminate", "yield"
             }));
     
     /**
@@ -246,24 +250,5 @@ public class Helper {
         } catch (Exception e) {
             System.out.println(e);
         }
-    }
-    
-    // =========================
-    // T Y P E   S Y S T E M
-    // =========================
-    
-    public static boolean isRangeInt(Class<?> type) {
-        return type == Integer.class || type == Integer.TYPE ||
-               type == Byte.class || type == Byte.TYPE ||
-               type == Short.class || type == Short.TYPE;
-    }
-    
-    public static boolean isRangeLong(Class<?> type) {
-        return type == Long.class || type == Long.TYPE || isRangeInt(type);
-    }
-    
-    public static boolean isRangeDouble(Class<?> type) {
-        return type == Float.class || type == Float.TYPE ||
-               type == Double.class || type == Double.TYPE;
     }
 }

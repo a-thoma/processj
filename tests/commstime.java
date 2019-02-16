@@ -267,6 +267,7 @@ public class commstime {
         protected PJOne2OneChannel<Long> _ld$c3;
         protected PJOne2OneChannel<Long> _ld$d4;
         protected long _ld$x5;
+        protected int _ld$label6;
 
         public _proc$main$arT(String[] _pd$args1) {
             this._pd$args1 = _pd$args1;
@@ -285,6 +286,7 @@ public class commstime {
             _ld$b2 = new PJOne2OneChannel<Long>();
             _ld$c3 = new PJOne2OneChannel<Long>();
             _ld$d4 = new PJOne2OneChannel<Long>();
+
 
             final PJPar _ld$par1 = new PJPar(2, this);
 

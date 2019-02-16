@@ -478,7 +478,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         if (ws.stat() != null)
             stats = (String[]) ws.stat().visit(this);
         else
-            // The body of a while could be empty
+            // The body of a 'while' could be empty
             stats = new String[] { ";" };
         
         stWhileStat.add("expr", condExpr);
@@ -650,13 +650,10 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
     public T visitName(Name na) {
         Log.log(na.line + ": Visiting a Name (" + na.getname() + ")");
         
-        if (Helper.isInvalidJavaIdentifier(na.getname())) {
-            Log.log(String.format("%s: Special keyword '%s' found.", ErrorSeverity.WARNING, na.getname()));
-        }
-        
         String name = na.getname();
-        if (!_paramDeclNameMap.isEmpty() && _paramDeclNameMap.containsKey(name))
-            name = _paramDeclNameMap.get(name);
+        if (!_paramDeclNameMap.isEmpty())
+            if (_paramDeclNameMap.containsKey(name))
+                name = _paramDeclNameMap.get(name);
         
         return (T) name;
     }
@@ -667,7 +664,8 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      */
     public T visitNameExpr(NameExpr ne) {
         Log.log(ne.line + ": Visiting NameExpr (" + ne.name().getname() + ")");
-        // TODO: NameExpr always points to a 'Decl'aration so check in here!!
+        
+        // NameExpr always points to 'myDecl'
         return (T) ne.name().visit(this);
     }
     
@@ -745,7 +743,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT CHANNEL_END_EXPR
      */
     public T visitChannelEndExpr(ChannelEndExpr ce) {
-        Log.log(ce.line + ": Visiting a Channel End Expr (" + (ce.isRead() ? "read" : "write") + ")");
+        Log.log(ce.line + ": Visiting a Channel End Expression (" + (ce.isRead() ? "read" : "write") + ")");
         
         String channel = (String) ce.channel().visit(this);
         _isChanRead = ce.isRead() ? true : false;
@@ -1188,7 +1186,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
     }
     
     private T createChannelReadExpr(String lhs, String op, ChannelReadExpr cr) {
-        Log.log(cr.line + ": Creating ChannelReadExpr for " + lhs);
+        Log.log(cr.line + ": Creating Channel Read Expression");
         
         // Generated template after evaluating this visitor
         ST stChannelReadExpr = _stGroup.getInstanceOf("ChannelReadExpr");

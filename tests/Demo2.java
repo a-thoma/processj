@@ -14,10 +14,6 @@ import std.io;
  *
  */
 public class Demo2 {
-    // TODO: This a temporary fix for unreachable code due to
-    // infinite loop
-    public static boolean isTrue() { return true; }
-
     public static class _proc$say extends PJProcess {
         public _proc$say() {
         }
@@ -150,10 +146,10 @@ public class Demo2 {
     }
 
 
-    public static class _proc$main$arrT extends PJProcess {
+    public static class _proc$main$arT extends PJProcess {
         protected String[] _pd$args1;
 
-        public _proc$main$arrT(String[] _pd$args1) {
+        public _proc$main$arT(String[] _pd$args1) {
             this._pd$args1 = _pd$args1;
         }
 
@@ -334,7 +330,7 @@ public class Demo2 {
     public static void main(String[] _pd$args1) {
     	Scheduler scheduler = new Scheduler();
         PJProcess.scheduler = scheduler;
-        (new Demo2._proc$main$arrT(_pd$args1)).schedule();
+        (new Demo2._proc$main$arT(_pd$args1)).schedule();
         PJProcess.scheduler.start();
     }
 }
