@@ -14,7 +14,7 @@ import utilities.Log;
 import utilities.Visitor;
 
 /**
- * Visitors used for marking procedures as 'native' ProcessJ procedures.
+ * Visitors used for marking top-level decls as 'native'.
  *
  * @param <T>
  *          The visitor interface used to traverse and resolve each
