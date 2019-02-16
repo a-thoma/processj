@@ -14,6 +14,10 @@ import std.io;
  *
  */
 public class Demo {
+    // TODO: This a temporary fix for unreachable code due to
+    // infinite loop
+    public static boolean isTrue() { return true; }
+
     public static class _proc$writer$chanwriteI extends PJProcess {
         protected PJOne2OneChannel<Integer> _pd$out1;
 

@@ -3,7 +3,7 @@ import std.io;
 proc void prefix(long n, chan<long>.read in, chan<long>.write out) {
   out.write(n);
   long l = 0;
-  while (l < 5) {
+  while (l < 1000000) { // l < 5
     l = in.read();
     out.write(l);
   }
@@ -11,7 +11,7 @@ proc void prefix(long n, chan<long>.read in, chan<long>.write out) {
 
 proc void succ(chan<long>.read in, chan<long>.write out) {
   long l = 0;
-  while (l < 5) {
+  while (l < 999999) { // l < 4
     l = in.read();
     out.write(l+1);
   }
@@ -19,18 +19,19 @@ proc void succ(chan<long>.read in, chan<long>.write out) {
 
 proc void delta(chan<long>.read in, chan<long>.write out1, chan<long>.write out2) {
   long l = 0;
-  while (l < 5) {
+  while (l < 1000000) {  // l < 5
     l = in.read();
     par {
-      out1.write(l);
-      out2.write(l);
+      out1.write(l);  // consume
+      if (l != 1000000)     // l != 5
+        out2.write(l);  // succ
     }
   }
 }
 
 proc void consume(chan<long>.read in) {
   long l = 0;
-  while (l < 5) {
+  while (l < 1000000) { // l < 5
     l = in.read();
     println(l);
   }
@@ -38,6 +39,12 @@ proc void consume(chan<long>.read in) {
 
 proc void main(string args[]) {
   chan<long> a,b,c,d;
+  long x;
+  par {
+    x = c.read();
+    c.write(54); //c.write.write();
+  }
+
   par {
     delta(d.read, a.write, b.write);
     succ(b.read, c.write);

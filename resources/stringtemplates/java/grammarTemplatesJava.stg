@@ -198,8 +198,10 @@ SwitchCase(jump) ::= "case <jump>: resume(<jump>); break;"
 // 1) expr:
 // 2) body:
 WhileStat(expr, body) ::= <<
-while (<expr>) {
+boolean cntrLoop = (<expr>);
+while (cntrLoop) {
     <if(body)><body; separator="\n"><endif>
+    cntrLoop = (<expr>);
 }
 >>
 
@@ -271,7 +273,7 @@ label(<resume0>);<"\n">
 // 1) chaName: name of the write channel-end.
 // 2) resume0:
 // 3) resume1:
-ChannelReadExpr(chanName, lhs, resume0, resume1) ::= <<
+ChannelReadExpr(chanName, lhs, op, resume0, resume1) ::= <<
 
 if (!<chanName>.isReadyToRead(this)) {
     this.runLabel = <resume0>;
@@ -279,7 +281,7 @@ if (!<chanName>.isReadyToRead(this)) {
 }
 
 label(<resume0>);
-<if(lhs)><lhs> = <chanName>.read(this);
+<if(lhs)><lhs> <op> <chanName>.read(this);
 <else><chanName>.read(this);
 <endif>
 this.runLabel = <resume1>;
@@ -290,9 +292,9 @@ label(<resume1>);<"\n">
 
 //========================================================================================
 //
-// 1)
-// 2)
-// 3)
+// 1) expr:
+// 2) thenPart:
+// 3) elsePart:
 IfStat(expr, thenPart, elsePart) ::= <<
 if (<expr>) {
     <thenPart; separator="\n">
@@ -300,3 +302,15 @@ if (<expr>) {
     <elsePart; separator="\n">
 }<endif>
 >>
+
+//========================================================================================
+//
+// 1) operand:
+// 2) op:
+UnaryPostExpr(operand, op) ::= "<if(operand)><operand><op>;<endif>"
+
+//========================================================================================
+//
+// 1) operand:
+// 2) op:
+UnaryPreExpr(operand, op) ::= "<if(operand)><op><operand>;<endif>"

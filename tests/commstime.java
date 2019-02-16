@@ -48,7 +48,8 @@ public class commstime {
             label(1);
 
             _ld$l1 = 0;
-            while (_ld$l1 < 5) {
+            boolean cntrLoop = (_ld$l1 < 1000000);
+            while (cntrLoop) {
                 if (!_pd$in2.isReadyToRead(this)) {
                     this.runLabel = 2;
                     yield();
@@ -66,6 +67,7 @@ public class commstime {
                 yield();
                 label(4);
 
+                cntrLoop = (_ld$l1 < 1000000);
             }
             terminate();
         }
@@ -94,7 +96,8 @@ public class commstime {
             }
 
             _ld$l1 = 0;
-            while (_ld$l1 < 5) {
+            boolean cntrLoop = (_ld$l1 < 999999);
+            while (cntrLoop) {
                 if (!_pd$in1.isReadyToRead(this)) {
                     this.runLabel = 1;
                     yield();
@@ -112,6 +115,7 @@ public class commstime {
                 yield();
                 label(3);
 
+                cntrLoop = (_ld$l1 < 999999);
             }
             terminate();
         }
@@ -142,7 +146,8 @@ public class commstime {
             }
 
             _ld$l1 = 0;
-            while (_ld$l1 < 5) {
+            boolean cntrLoop = (_ld$l1 < 1000000);
+            while (cntrLoop) {
                 if (!_pd$in1.isReadyToRead(this)) {
                     this.runLabel = 1;
                     yield();
@@ -189,11 +194,13 @@ public class commstime {
                             default: break;
                         }
 
-                        _pd$out23.write(this, _ld$l1);
-                        this.runLabel = 1;
-                        yield();
-                        label(1);
+                        if (_ld$l1 != 1000000) {
+                            _pd$out23.write(this, _ld$l1);
+                            this.runLabel = 1;
+                            yield();
+                            label(1);
 
+                        }
                         terminate();
                     }
 
@@ -208,6 +215,7 @@ public class commstime {
                 yield();
                 label(3);
 
+                cntrLoop = (_ld$l1 < 1000000);
             }
             terminate();
         }
@@ -233,7 +241,8 @@ public class commstime {
             }
 
             _ld$l1 = 0;
-            while (_ld$l1 < 5) {
+            boolean cntrLoop = (_ld$l1 < 1000000);
+            while (cntrLoop) {
                 if (!_pd$in1.isReadyToRead(this)) {
                     this.runLabel = 1;
                     yield();
@@ -247,6 +256,7 @@ public class commstime {
                 label(2);
 
                 io.println(_ld$l1);
+                cntrLoop = (_ld$l1 < 1000000);
             }
             terminate();
         }
@@ -260,6 +270,7 @@ public class commstime {
         protected PJOne2OneChannel<Long> _ld$b2;
         protected PJOne2OneChannel<Long> _ld$c3;
         protected PJOne2OneChannel<Long> _ld$d4;
+        protected long _ld$x5;
 
         public _proc$main$arrT(String[] _pd$args1) {
             this._pd$args1 = _pd$args1;
@@ -270,6 +281,7 @@ public class commstime {
             switch (this.runLabel) {
                 case 0: break;
                 case 1: resume(1); break;
+                case 2: resume(2); break;
                 default: break;
             }
 
@@ -277,40 +289,102 @@ public class commstime {
             _ld$b2 = new PJOne2OneChannel<Long>();
             _ld$c3 = new PJOne2OneChannel<Long>();
             _ld$d4 = new PJOne2OneChannel<Long>();
-            final PJPar _ld$par1 = new PJPar(4, this);
+
+            final PJPar _ld$par1 = new PJPar(2, this);
+
+            new PJProcess() {
+                @Override
+                public synchronized void run() {
+                    switch (this.runLabel) {
+                        case 0: break;
+                        case 1: resume(1); break;
+                        case 2: resume(2); break;
+                        default: break;
+                    }
+
+                    if (!_ld$c3.isReadyToRead(this)) {
+                        this.runLabel = 1;
+                        yield();
+                    }
+
+                    label(1);
+                    _ld$x5 = _ld$c3.read(this);
+                    this.runLabel = 2;
+                    yield();
+
+                    label(2);
+
+                    terminate();
+                }
+
+                @Override
+                public void finalize() {
+                    _ld$par1.decrement();
+                }
+            }.schedule();
+
+            new PJProcess() {
+                @Override
+                public synchronized void run() {
+                    switch (this.runLabel) {
+                        case 0: break;
+                        case 1: resume(1); break;
+                        default: break;
+                    }
+
+                    _ld$c3.write(this, (long) 54);
+                    this.runLabel = 1;
+                    yield();
+                    label(1);
+
+                    terminate();
+                }
+
+                @Override
+                public void finalize() {
+                    _ld$par1.decrement();
+                }
+            }.schedule();
+
+            setNotReady();
+            this.runLabel = 1;
+            yield();
+            label(1);
+
+            final PJPar _ld$par2 = new PJPar(4, this);
 
             (new commstime._proc$delta$chanreadJ$chanwriteJ$chanwriteJ(_ld$d4, _ld$a1, _ld$b2) {
                 @Override
                 public void finalize() {
-                    _ld$par1.decrement();
+                    _ld$par2.decrement();
                 }
             }).schedule();
 
             (new commstime._proc$succ$chanreadJ$chanwriteJ(_ld$b2, _ld$c3) {
                 @Override
                 public void finalize() {
-                    _ld$par1.decrement();
+                    _ld$par2.decrement();
                 }
             }).schedule();
 
             (new commstime._proc$prefix$J$chanreadJ$chanwriteJ(0, _ld$c3, _ld$d4) {
                 @Override
                 public void finalize() {
-                    _ld$par1.decrement();
+                    _ld$par2.decrement();
                 }
             }).schedule();
 
             (new commstime._proc$consume$chanreadJ(_ld$a1) {
                 @Override
                 public void finalize() {
-                    _ld$par1.decrement();
+                    _ld$par2.decrement();
                 }
             }).schedule();
 
             setNotReady();
-            this.runLabel = 1;
+            this.runLabel = 2;
             yield();
-            label(1);
+            label(2);
 
             terminate();
         }

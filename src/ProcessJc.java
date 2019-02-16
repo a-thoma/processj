@@ -10,6 +10,7 @@ import codegeneratorjava.CodeGeneratorJava;
 import codegeneratorjava.Helper;
 import library.Library;
 import parser.parser;
+import rewriters.CastRewrite;
 import scanner.Scanner;
 import utilities.ConfigFileReader;
 import utilities.Error;
@@ -179,7 +180,7 @@ public class ProcessJc {
             c.visit(new namechecker.TopLevelDecls<AST>(globalTypeTable));
             
             ///////
-            c.visit(new namechecker.ResolveProcTypeDecl<AST>());
+            c.visit(new namechecker.ResolveImportTopTypeDecl<AST>());
             //
 
 //            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
@@ -239,6 +240,12 @@ public class ProcessJc {
 //                CompilerMessageManager.INSTANCE.printTrace("type checking");
 //                System.exit(1);
 //            }
+            
+            // ========================================
+            // V I S I T   R E W R I T E S
+            // ========================================
+            
+            c.visit(new CastRewrite());
             
             // ========================================
             // V I S I T   R E A C H A B I L I T Y

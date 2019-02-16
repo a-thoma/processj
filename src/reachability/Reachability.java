@@ -77,7 +77,7 @@ public class Reachability extends Visitor<Boolean> {
         LoopStatement oldLoopConstruct = loopConstruct;
         loopConstruct = ws;
 
-        boolean b = ws.stat().visit(this);
+        boolean b = ws.stat() != null ? ws.stat().visit(this) : true; // Only the compiler will know
         if (ws.expr().isConstant() && ((Boolean) ws.expr().constantValue())
                 && ((b && // the statement can run to completion
                 !ws.hasBreak && !ws.hasReturn) // but has no breaks, so it will loop forever

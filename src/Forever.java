@@ -2,10 +2,11 @@
 public class Forever {
 
     public static boolean istrue() { return true; }
+    public static Long foo() { return 5l; }
     
     public static void main(String...args) {
-        while (istrue())
-            ;
-        System.out.println("blha!");
+        boolean a = true;
+//        while (a)
+//            ;
     }
 }

@@ -17,6 +17,7 @@ import ast.ArrayType;
 import ast.Assignment;
 import ast.BinaryExpr;
 import ast.Block;
+import ast.CastExpr;
 import ast.ChannelEndExpr;
 import ast.ChannelEndType;
 import ast.ChannelReadExpr;
@@ -25,6 +26,7 @@ import ast.ChannelWriteStat;
 import ast.Compilation;
 import ast.ExprStat;
 import ast.Expression;
+import ast.ForStat;
 import ast.IfStat;
 import ast.Invocation;
 import ast.LocalDecl;
@@ -40,6 +42,8 @@ import ast.ProcTypeDecl;
 import ast.Sequence;
 import ast.Statement;
 import ast.Type;
+import ast.UnaryPostExpr;
+import ast.UnaryPreExpr;
 import ast.Var;
 import ast.WhileStat;
 import processj.runtime.PJChannel;
@@ -170,7 +174,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      */
     private boolean _isChanRead = false;
     
-    private static final String EMPTY = "";
+    private static final String EMPTY_STRING = "";
 
     /**
      * Internal constructor that loads a group file containing a collection of
@@ -301,6 +305,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      */
     public T visitProcTypeDecl(ProcTypeDecl pd) {
         Log.log(pd.line + ": Visiting a ProcTypeDecl (" + pd.name().getname() + ")");
+        
         // Generated template after evaluating this visitor
         ST stProcTypeDecl = null;
         // Save previous procedure
@@ -464,21 +469,28 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         if (ws.expr() != null)
             condExpr = (String) ws.expr().visit(this);
         
-        // TODO: Temporary dirty trick fix for unreachable code due to
-        // infinite loop. This calls the a static method defined in the
-        // 'Compilation' template
-        if (ws.foreverLoop)
-            condExpr = "isTrue()";
+        // TODO: Temporary dirty fix for unreachable code due to
+        // infinite loop. This invokes a static method defined in
+        // the 'Compilation' template called 'isTrue()'
+//        if (ws.foreverLoop)
+//            condExpr = "isTrue()";
         
         if (ws.stat() != null)
             stats = (String[]) ws.stat().visit(this);
         else
+            // The body of a while could be empty
             stats = new String[] { ";" };
         
         stWhileStat.add("expr", condExpr);
         stWhileStat.add("body", stats);
         
         return (T) stWhileStat.render();
+    }
+    
+    public T visitForStat(ForStat fs) {
+        Log.log(fs.line + ": Visiting a ForStat");
+        
+        return null;
     }
     
     /**
@@ -527,7 +539,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         String rhs = null;
         
         if (as.right() instanceof ChannelReadExpr) {
-            return (T) createChannelReadExpr(lhs, ((ChannelReadExpr) as.right()));
+            return (T) createChannelReadExpr(lhs, op, ((ChannelReadExpr) as.right()));
         } else
             rhs = (String) as.right().visit(this);
         
@@ -557,10 +569,10 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         
         // Ignored the value returned by this visitor. The reason for this
         // is that templates for methods and classes take a list of types
-        // and variable names. If you want to return the name and type of this
-        // formal parameter (e.g. some_type + " " + some_name), you must change
-        // the arguments of 'Method' and 'ProcClass' in the grammarTempalteJava
-        // file.
+        // and variable names. If you want to return the name and type of a
+        // formal parameter declaration (e.g. some_type + " " + some_name),
+        // you must change the _attribute_ values of 'Method' and 'ProcClass'
+        // in the grammarTempalteJava file.
         return null;
     }
     
@@ -609,7 +621,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         // in which it was declared, we return the 'empty' string iff this
         // local variable is not initialized
         if (ld.type().isPrimitiveType() && expr == null)
-            return (T) EMPTY;
+            return (T) EMPTY_STRING;
 
         // If we reach this section, then we have a simple variable declaration
         // inside the body of a procedure or a static Java method. This declaration
@@ -721,8 +733,8 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         case ChannelType.SHARED_READ_WRITE:
 //            chanType = PJMany2ManyChannel.class.getSimpleName(); break;
         }
-        // Resolve parameterized type for channel; e.g., chan<int> ..
-        // where 'int' is the Type to be resolved
+        // Resolve parameterized type for channel; e.g., chan<T>
+        // where 'T' is the type to be resolved
         String type = getChannelType(ct.baseType());
         
         return (T) (chanType + "<" + type + ">");
@@ -750,8 +762,8 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         
         // Channel class type
         String chanType = PJOne2OneChannel.class.getSimpleName();
-        // Resolve parameterized type for channel; e.g., chan<int> ..
-        // where 'int' is the Type to be resolved
+        // Resolve parameterized type for channel; e.g., chan<T>
+        // where 'T' is the type to be resolved
         String type = getChannelType(ct.baseType());
         
         return (T) (chanType + "<" + type + ">");
@@ -770,7 +782,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         // is the writing end of a channel.
         Expression chanExpr = cw.channel();
         // 'c' is the name of the channel
-        String chanWriteName = "";
+        String chanWriteName = null;
         if (chanExpr instanceof NameExpr)
             chanWriteName = (String) chanExpr.visit(this);
         stChanWriteStat.add("chanName", chanWriteName);
@@ -799,7 +811,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         // is the reading end of a channel.
         Expression chanExpr = cr.channel();
         // 'c' is the name of the channel
-        String chanEndName = "";
+        String chanEndName = null;
         if (chanExpr instanceof NameExpr)
             chanEndName = (String) chanExpr.visit(this);
         stChannelReadExpr.add("chanName", chanEndName);
@@ -823,9 +835,9 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
 
         // Generated template after evaluating this visitor
         ST stVar = _stGroup.getInstanceOf("Var");
-        // Returned values for name and expression
+        // Returned values for name and expression (if any)
         String name = (String) va.name().visit(this);
-        String exprStr = "";
+        String exprStr = null;
         // This variable could be initialized, e.g., through an assignment operator
         Expression expr = va.init();
         // Visits the expressions associated with this variable
@@ -860,7 +872,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
     public T visitModifier(Modifier mo) {
         Log.log(mo.line + ": Visiting a Modifier (" + mo + ")");
         
-        // Type of modifiers: public, protected, private, etc..
+        // Type of modifiers: public, protected, private, etc.
         return (T) mo.toString();
     }
     
@@ -898,8 +910,8 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
                 // These are either
                 //      1) a sequence of statements, or
                 //      2) a single statement
-                // found in a Block statement, e.g. local declarations, variable
-                // declarations, invocations, etc..
+                // found in a 'block' statement, e.g. local declarations,
+                // variable declarations, invocations, etc.
                 if (stats instanceof String[]) {
                     String[] statsStr = (String[]) stats;
                     sequenceStr.addAll(Arrays.asList(statsStr));
@@ -913,16 +925,31 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
     }
     
     /**
+     * 
+     */
+    public T visitCastExpr(CastExpr ce) {
+        Log.log(ce.line + ": Visiting a CastExpr");
+        
+        String castType = (String) ce.type().visit(this);
+        String tmp = "(" + castType + ") " + ce.expr().visit(this);
+        
+        return (T) tmp;
+    }
+    
+    /**
      * -----------------------------------------------------------------------------
      * VISIT INVOCATION
      */
     @SuppressWarnings("rawtypes")
     public T visitInvocation(Invocation in) {
-        ProcTypeDecl invokedProc = in.targetProc;
-        String invokedProcName = invokedProc.name().getname();
-        Log.log(in.line + ": Visiting Invocation (" + invokedProcName + ")");
+        Log.log(in.line + ": Visiting Invocation (" + in.targetProc.name().getname() + ")");
+        
         // Generated template after evaluating this invocation
         ST stInvocation = null;
+        // Target procedure
+        ProcTypeDecl invokedProc = in.targetProc;
+        // Name of invoked procedure
+        String invokedProcName = invokedProc.name().getname();
         // An import is done when an invocation comes from a different package
         String packageName = Helper.getPackage(invokedProc.myPackage, _sourceFile);
         // Check local procedures, if none is found then the procedure must come
@@ -985,6 +1012,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      */
     public T visitParBlock(ParBlock pb) {
         Log.log(pb.line + ": Visiting a ParBlock with " + pb.stats().size() + " statements.");
+        
         // Report a warning message for having an empty 'par' block?
         if (pb.stats().size() == 0)
             return null;
@@ -1054,6 +1082,47 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
     }
     
     /**
+     * -----------------------------------------------------------------------------
+     * VISIT UNARY_POST_EXPR
+     */
+    public T visitUnaryPostExpr(UnaryPostExpr ue) {
+        Log.log(ue.line + ": Visiting a UnaryPostExpr (" + ue.opString() + ")");
+        
+        // Generated template after evaluating this visitor
+        ST stUnaryPostExpr = _stGroup.getInstanceOf("UnaryPostExpr");
+        String operand = (String) ue.expr().visit(this);
+        String op = ue.opString();
+        
+        stUnaryPostExpr.add("operand", operand);
+        stUnaryPostExpr.add("op", op);
+        
+        return (T) stUnaryPostExpr.render();
+    }
+    
+    /**
+     * -----------------------------------------------------------------------------
+     * VISIT UNARY_PRE_EXPR
+     */
+    public T visitUnaryPreExpr(UnaryPreExpr ue) {
+        Log.log(ue.line + ": Visiting a UnaryPreExpr (" + ue.opString() + ")");
+        
+        // Generated template after evaluating this visitor
+        ST stUnaryPreExpr = _stGroup.getInstanceOf("UnaryPreExpr");
+        String operand = (String) ue.expr().visit(this);
+        String op = ue.opString();
+        
+        stUnaryPreExpr.add("operand", operand);
+        stUnaryPreExpr.add("op", op);
+        
+        return (T) stUnaryPreExpr.render();
+    }
+    
+    // **********************************************************************
+    // * Helper-methods are declared below
+    // *
+    // **********************************************************************
+    
+    /**
      * Returns the parameterized type of a Channel object.
      * 
      * @param t
@@ -1118,7 +1187,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
                 new Block(new Sequence(st))); // body
     }
     
-    private T createChannelReadExpr(String lhs, ChannelReadExpr cr) {
+    private T createChannelReadExpr(String lhs, String op, ChannelReadExpr cr) {
         Log.log(cr.line + ": Creating ChannelReadExpr for " + lhs);
         
         // Generated template after evaluating this visitor
@@ -1140,6 +1209,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         }
         
         stChannelReadExpr.add("lhs", lhs);
+        stChannelReadExpr.add("op", op);
         
         return (T) stChannelReadExpr.render();
     }

@@ -14,6 +14,10 @@ import std.io;
  *
  */
 public class Demo2 {
+    // TODO: This a temporary fix for unreachable code due to
+    // infinite loop
+    public static boolean isTrue() { return true; }
+
     public static class _proc$say extends PJProcess {
         public _proc$say() {
         }
