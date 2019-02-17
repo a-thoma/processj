@@ -129,10 +129,12 @@ public class Helper {
      * @return {@code true} if the procedure can yield or {@code false} otherwise.
      */
     public static boolean doesProcedureYield(final ProcTypeDecl pd) {
-        if (pd == null) {
+        if (pd == null)
             return false;
-        }
-        return pd.annotations().isDefined("yield") && Boolean.valueOf(pd.annotations().get("yield"));
+        
+        return pd.yields ||
+               (pd.annotations().isDefined("yield") &&
+               Boolean.valueOf(pd.annotations().get("yield")));
     }
     
     /**

@@ -14,30 +14,8 @@ import std.io;
  *
  */
 public class Demo {
-    public static class _proc$writer$cwI extends PJProcess {
-        protected PJOne2OneChannel<Integer> _pd$out1;
-
-        public _proc$writer$cwI(PJOne2OneChannel<Integer> _pd$out1) {
-            this._pd$out1 = _pd$out1;
-        }
-
-        @Override
-        public synchronized void run() {
-            switch (this.runLabel) {
-                case 0: break;
-                case 1: resume(1); break;
-                default: break;
-            }
-
-            _pd$out1.write(this, 42);
-            this.runLabel = 1;
-            yield();
-            label(1);
-
-            terminate();
-        }
+    public static void _method$writer$cwI(PJOne2OneChannel<Integer> _pd$out1) {
     }
-
 
     public static class _proc$reader$crI extends PJProcess {
         protected PJOne2OneChannel<Integer> _pd$in1;
@@ -78,44 +56,12 @@ public class Demo {
     public static class _proc$main$arT extends PJProcess {
         protected String[] _pd$args1;
 
-        protected PJOne2OneChannel<Integer> _ld$c1;
-        protected int _ld$a2;
-
         public _proc$main$arT(String[] _pd$args1) {
             this._pd$args1 = _pd$args1;
         }
 
         @Override
         public synchronized void run() {
-            switch (this.runLabel) {
-                case 0: break;
-                case 1: resume(1); break;
-                default: break;
-            }
-
-            _ld$c1 = new PJOne2OneChannel<Integer>();
-            _ld$a2 = 2;
-            final PJPar _ld$par1 = new PJPar(2, this);
-
-            (new Demo._proc$writer$cwI(_ld$c1) {
-                @Override
-                public void finalize() {
-                    _ld$par1.decrement();
-                }
-            }).schedule();
-
-            (new Demo._proc$reader$crI(_ld$c1) {
-                @Override
-                public void finalize() {
-                    _ld$par1.decrement();
-                }
-            }).schedule();
-
-            setNotReady();
-            this.runLabel = 1;
-            yield();
-            label(1);
-
             terminate();
         }
     }

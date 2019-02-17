@@ -1406,7 +1406,7 @@ pre_increment_expression ::=
 
 // UnaryPreExpr :> Expression :> AST
 pre_decrement_expression ::=
-          MINUSMINUS unary_expression:e {: RESULT = new UnaryPreExpr(e, UnaryPreExpr.PLUSPLUS); :}
+          MINUSMINUS unary_expression:e {: RESULT = new UnaryPreExpr(e, UnaryPreExpr.MINUSMINUS); :}
         ;
 
 // Expression :> AST

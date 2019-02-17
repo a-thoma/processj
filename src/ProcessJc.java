@@ -275,6 +275,8 @@ public class ProcessJc {
             
             c.visit(new yield.Yield());
             
+            c.visit(new rewriters.Yield());
+            
 //            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
 //                CompilerMessageManager.INSTANCE.printTrace("yield");
 //                System.exit(1);

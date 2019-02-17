@@ -928,10 +928,16 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
     public T visitCastExpr(CastExpr ce) {
         Log.log(ce.line + ": Visiting a CastExpr");
         
-        String castType = (String) ce.type().visit(this);
-        String tmp = "(" + castType + ") " + ce.expr().visit(this);
+        // Generated template after evaluating this invocation
+        ST stCastExpr = _stGroup.getInstanceOf("CastExpr");
+                
+        String type = (String) ce.type().visit(this);
+        String expr = (String) ce.expr().visit(this);
         
-        return (T) tmp;
+        stCastExpr.add("type", type);
+        stCastExpr.add("expr", expr);
+        
+        return (T) stCastExpr.render();
     }
     
     /**

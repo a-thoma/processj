@@ -114,6 +114,9 @@ Invocation(name, vars) ::= <<
 
 //========================================================================================
 //
+// 1) name:
+// 2) vars:
+// 3) parBlock:
 InvocationProcType(name, vars, parBlock) ::= <<
 (new <name>(<if(vars)><vars; separator=", "><endif>) {
     @Override
@@ -251,9 +254,11 @@ new PJProcess() {
 
 //========================================================================================
 //
+// 1) type:
 ChannelDecl(type) ::= "<if(type)>new <type>()<endif>"
 
 //========================================================================================
+//
 // 1) chaName: name of the write channel-end.
 // 2) resume0:
 // 3) resume1:
@@ -266,6 +271,7 @@ label(<resume0>);<"\n">
 >>
 
 //========================================================================================
+//
 // 1) chaName: name of the write channel-end.
 // 2) resume0:
 // 3) resume1:
@@ -310,3 +316,9 @@ UnaryPostExpr(operand, op) ::= "<if(operand)><operand><op>;<endif>"
 // 1) operand:
 // 2) op:
 UnaryPreExpr(operand, op) ::= "<if(operand)><op><operand>;<endif>"
+
+//========================================================================================
+//
+// 1) type:
+// 2) expr:
+CastExpr(type, expr) ::= "<if(type)>((<type>) (<expr>))<endif>"

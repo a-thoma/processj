@@ -3,6 +3,7 @@ package ast;
 public abstract class Expression extends AST {
 
     public Type type = null;
+    private boolean yields;
 
     public Expression(Token t) {
         super(t);
@@ -18,5 +19,13 @@ public abstract class Expression extends AST {
 
     public Object constantValue() {
         return null;
+    }
+    
+    public boolean doesYield() { 
+        return yields;
+    }
+
+    public void setYield() {
+        yields = true;
     }
 }

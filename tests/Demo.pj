@@ -1,7 +1,7 @@
 import std.io;
 
 public proc void writer(chan<int>.write out) {
-  out.write(42);
+  //out.write(42);
 }
 
 public proc void reader(chan<int>.read in) {
@@ -11,10 +11,10 @@ public proc void reader(chan<int>.read in) {
 }
 
 public proc void main(string args[]) {
-  chan<int> c;
-  int a = 2;
-  par {
-    writer(c.write);
-    reader(c.read);
-  }
+  //chan<int> c;
+  //int a = 2;
+  //par {
+  //  writer(c.write);
+  //  reader(c.read);
+  //}
 }
