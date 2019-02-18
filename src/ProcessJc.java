@@ -1,9 +1,8 @@
 import java.io.File;
 import java.util.*;
 
-import ast.AST;
-import ast.Compilation;
-import cli.CLIBuilder;
+import ast.*;
+import cli.*;
 import cli.Formatter;
 import cli.StringUtil;
 import codegeneratorjava.CodeGeneratorJava;
@@ -267,11 +266,18 @@ public class ProcessJc {
             // V I S I T   Y I E L D
             // ==========================
             
-            c.visit(new yield.Yield());
+	    //            c.visit(new yield.Yield());
 
             c.visit(new rewriters.Yield());
+	    //c.visit(new rewriters.Expr());
+	    
+	    c.visit(new semanticcheck.LiteralInits());
 
-            
+
+            new rewriters.Test().go(c, null);
+	    System.out.println("Lets reprint it all");
+	    c.visit(new printers.ParseTreePrinter());
+	    c.visit(new printers.PrettyPrinter());
 //            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
 //                CompilerMessageManager.INSTANCE.printTrace("yield");
 //                System.exit(1);
