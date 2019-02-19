@@ -27,6 +27,7 @@ public enum Tag {
     PAR_BLOCK_NAME      ("par"    , "parBlockType"),
     PROTOCOL_NAME       ("_prot$"   , "protocolType"),
     RECORD_NAME         ("_rec$"    , "recordType"),
+    RECORD_FIELD_NAME   ("_recVar$" , "recordMember"),
     CHANNEL_NAME        ("_chan$"   , "channelType"),
     CHANNEL_READ_NAME   ("READ"     , "channelReadType"),
     CHANNEL_WRITE_NAME  ("WRITE"    , "channelWriteType")

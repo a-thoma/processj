@@ -39,6 +39,8 @@ import ast.ParamDecl;
 import ast.PrimitiveLiteral;
 import ast.PrimitiveType;
 import ast.ProcTypeDecl;
+import ast.RecordMember;
+import ast.RecordTypeDecl;
 import ast.Sequence;
 import ast.Statement;
 import ast.Type;
@@ -116,6 +118,11 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * List of imports.
      */
     private Set<String> _importList = null;
+    
+    /**
+     * Top level declarations.
+     */
+    private SymbolTable _topLevelDecls = null;
 
     /**
      * Map of formal parameters transformed to fields.
@@ -138,6 +145,21 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * its block.
      */
     private HashMap<String, Integer> _parMap = null;
+    
+    /**
+     * 
+     */
+    private HashMap<String, String> _recordMap = null;
+    
+    /**
+     * 
+     */
+    private HashMap<String, String> _recordFieldMap = null;
+    
+    /**
+     * 
+     */
+    private HashMap<String, String> _recordMemberMap = null;
     
     /**
      * List of switch labels.
@@ -174,6 +196,11 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      */
     private boolean _isChanRead = false;
     
+    /**
+     * This is used to avoid name collisions.
+     */
+    private boolean _fieldName = true;
+    
     private static final String EMPTY_STRING = "";
 
     /**
@@ -182,16 +209,17 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * definitions. Additionally, the constructor initializes a symbol table
      * with top level types declarations.
      * 
-     * @param topLevelDeclsTable
+     * @param topLevelDecls
      * 			The top level types which can be procedures, records, protocols,
      * 			constants, and/or external types.
      */
-    public CodeGeneratorJava(SymbolTable topLevelDeclsTable) {
+    public CodeGeneratorJava(SymbolTable topLevelDecls) {
         Log.log("==========================================");
         Log.log("*      C O D E   G E N E R A T O R       *");
         Log.log("*                J A V A                 *");
         Log.log("==========================================");
         
+        _topLevelDecls = topLevelDecls;
         _stGroup = new STGroupFile(_stGammarFile);
         _formalParamFieldMap = new LinkedHashMap<>();
         _localParamFieldMap = new LinkedHashMap<>();
@@ -200,6 +228,10 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         _parMap = new LinkedHashMap<>();
         
         _paramDeclNameMap = new LinkedHashMap<>();
+        
+        _recordMap = new LinkedHashMap<>();
+        _recordFieldMap = new LinkedHashMap<>();
+        _recordMemberMap = new LinkedHashMap<>();
     }
 
     /**
@@ -256,10 +288,6 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         String templateResult = null;
         // Instance of Compilation template to fill in
         ST stCompilation = _stGroup.getInstanceOf("Compilation");
-
-        
-        // TODO: Reference to all the top level types
-        // Here..
 
         // Reference to all remaining types
         List<String> body = new ArrayList<>();
@@ -319,7 +347,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         // Procedures are static classes which belong to the same package. To avoid
         // having classes with the same name, we generate a new name for this procedure
         String procName = null;
-        // For non-invocations, that is, for anything other that procedure that
+        // For non-invocations, that is, for anything other than a procedure that
         // 'yields', we need to extends the PJProcess class 'anonymously'
         if (_currProcName.equals("Anonymous")) {
             // Preserve current 'jump' label
@@ -650,10 +678,20 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
     public T visitName(Name na) {
         Log.log(na.line + ": Visiting a Name (" + na.getname() + ")");
         
-        String name = na.getname();
-        if (!_paramDeclNameMap.isEmpty())
-            if (_paramDeclNameMap.containsKey(name))
-                name = _paramDeclNameMap.get(name);
+        String name = null;
+        if (_fieldName && !_paramDeclNameMap.isEmpty()) {
+            if (_paramDeclNameMap.containsKey(na.getname()))
+                name = _paramDeclNameMap.get(na.getname());
+        }
+        
+        if (name == null && _recordMemberMap.containsKey(name))
+            name = _recordFieldMap.get(name);
+        
+        if (name == null && _recordMap.containsKey(name))
+            name = _recordMap.get(name);
+        
+        if (name == null)
+            name = na.getname();
         
         return (T) name;
     }
@@ -716,7 +754,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT CHANNEL_TYPE
      */
     public T visitChannelType(ChannelType ct) {
-        Log.log(ct.line + ": Visiting a Channel Type (" + ct + ")");
+        Log.log(ct.line + ": Visiting a ChannelType (" + ct + ")");
         
         // Channel class type
         String chanType = "";
@@ -743,7 +781,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT CHANNEL_END_EXPR
      */
     public T visitChannelEndExpr(ChannelEndExpr ce) {
-        Log.log(ce.line + ": Visiting a Channel End Expression (" + (ce.isRead() ? "read" : "write") + ")");
+        Log.log(ce.line + ": Visiting a ChannelEndExpr (" + (ce.isRead() ? "read" : "write") + ")");
         
         String channel = (String) ce.channel().visit(this);
         _isChanRead = ce.isRead() ? true : false;
@@ -756,7 +794,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT CHANNEL_END_TYPE
      */
     public T visitChannelEndType(ChannelEndType ct) {
-        Log.log(ct.line + ": Visiting a Channel End Type (" + ct.typeName() + ")");
+        Log.log(ct.line + ": Visiting a ChannelEndType (" + ct.typeName() + ")");
         
         // Channel class type
         String chanType = PJOne2OneChannel.class.getSimpleName();
@@ -772,7 +810,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT CHANNEL_WRITE_STAT
      */
     public T visitChannelWriteStat(ChannelWriteStat cw) {
-        Log.log(cw.line + ": Visiting a Channel Write Statement");
+        Log.log(cw.line + ": Visiting a ChannelWriteStat");
         
         // Generated template after evaluating this visitor
         ST stChanWriteStat = _stGroup.getInstanceOf("ChanWriteStat");
@@ -801,7 +839,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT CHANNEL_READ_EXPR
      */
     public T visitChannelReadExpr(ChannelReadExpr cr) {
-        Log.log(cr.line + ": Visiting a Channel Write Statement");
+        Log.log(cr.line + ": Visiting a ChannelReadExpr");
         
         // Generated template after evaluating this visitor
         ST stChannelReadExpr = _stGroup.getInstanceOf("ChannelReadExpr");
@@ -898,7 +936,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         Log.log(se.line + ": Visiting a Sequence");
         
         // Sequence of statements enclosed in a 'block' statement
-        List<String> sequenceStr = new ArrayList<>();
+        List<String> seqstr = new ArrayList<>();
         // Iterate through every statement
         for (int i = 0; i < se.size(); ++i) {
             if (se.child(i) != null) {
@@ -912,18 +950,19 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
                 // variable declarations, invocations, etc.
                 if (stats instanceof String[]) {
                     String[] statsStr = (String[]) stats;
-                    sequenceStr.addAll(Arrays.asList(statsStr));
+                    seqstr.addAll(Arrays.asList(statsStr));
                 } else {
-                    sequenceStr.add((String) stats);
+                    seqstr.add((String) stats);
                 }
             }
         }
         
-        return (T) sequenceStr.toArray(new String[0]);
+        return (T) seqstr.toArray(new String[0]);
     }
     
     /**
-     * 
+     * -----------------------------------------------------------------------------
+     * VISIT CAST_EXPR
      */
     public T visitCastExpr(CastExpr ce) {
         Log.log(ce.line + ": Visiting a CastExpr");
@@ -986,9 +1025,8 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         Sequence<Expression> parameters = in.params();
         String[] paramsList = (String[]) parameters.visit(this);
         
-        // For an invocation of a procedure that does not 'yield' and one
-        // which is not inside par block, we wrap the procedure in a 'par'
-        // block
+        // For an invocation of a procedure that 'yields' and one which
+        // is not inside par block, we wrap the procedure in a 'par' block
         if (Helper.doesProcedureYield(invokedProc) && _currParBlock == null) {
             return (new ParBlock(
                     new Sequence(new ExprStat(in)), // statements
@@ -1008,6 +1046,58 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         stInvocation.add("vars", paramsList);
         
         return (T) stInvocation.render();
+    }
+    
+    /**
+     * -----------------------------------------------------------------------------
+     * VISIT RECORD_TYPE_DECL
+     */
+    public T visitRecordTypeDecl(RecordTypeDecl rt) {
+        Log.log(rt.line + ": Visiting a RecordTypeDecl (" + rt.name().getname() + ")");
+        
+        // Generated template after evaluating this visitor
+        ST stRecordClass = _stGroup.getInstanceOf("RecordClass");
+        String recName = Helper.makeVariableName(rt.name().getname(), 0, Tag.RECORD_NAME);
+        // Create a tag for this record and then add it to the collection
+        // of records for reference
+        _recordMap.put(rt.name().getname(), recName);
+        _recordFieldMap.clear();
+        
+        // The scope in which all members appear in a record
+        for (RecordMember rm : rt.body())
+            rm.visit(this);
+        
+        // The list of fields that should be passed to the constructor
+        // of the static class that the record belongs to
+        if (!_recordFieldMap.isEmpty()) {
+            stRecordClass.add("types", _recordFieldMap.values());
+            stRecordClass.add("vars", _recordFieldMap.keySet());
+        }
+        
+        stRecordClass.add("name", recName);
+        
+        return (T) stRecordClass.render();
+    }
+    
+    /**
+     * -----------------------------------------------------------------------------
+     * VISIT RECORD_MEMBER
+     */
+    public T visitRecordMember(RecordMember rm) {
+        Log.log(rm.line + ": Visiting a RecordMember (" + rm.type() + " " + rm.name().getname() + ")");
+        
+        // Grab the type and name of a declared variable
+        String name = (String) rm.name().visit(this);
+        String type = (String) rm.type().visit(this);
+        
+        // Add this field to the collection of record members for reference
+        _recordFieldMap.put(name, type);
+        _recordMemberMap.put(name, name);
+        
+        // Ignored the value returned by this visitor. The reason for this
+        // is that the template for records take a list of types and variable
+        // names.
+        return null;
     }
     
     /**

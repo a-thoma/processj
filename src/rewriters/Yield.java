@@ -68,7 +68,7 @@ public class Yield extends Visitor<Boolean> {
         boolean b = visitChildren(bl.children);
         if (b)
             bl.setYield();
-        System.out.println("[Yield]: Block yields: " + b);
+        Log.log("[Yield]: Block yields: " + b);
         return b;
     }
     

@@ -46,8 +46,7 @@ public class ResolveImportTopTypeDecl<T extends AST> extends Visitor<T> {
 
         Log.logHeader("");
         Log.logHeader("*                 R E S O L V E   N A T I V E                *");
-        Log.logHeader("*                T O P   L E V E L   D E C L S               *");
-        Log.logHeader("*                            D O N E                         *");
+        Log.logHeader("*            T O P   L E V E L   D E C L S   D O N E         *");
         Log.logHeader("*       File: " + CompilerMessageManager.INSTANCE.fileName);
         Log.logHeader("==============================================================");
         

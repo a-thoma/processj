@@ -78,9 +78,10 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
             parser p1 = new parser(s1);
             java_cup.runtime.Symbol r = p1.parse();
             
-            // Check the path of the imported file and compare the *import* statements found
-            // in it with the imported file's path format. Throw an error if the *import* statements
-            // do not match the path of the package name in which 'fileName' exists
+            // Check the path of the imported file and compare the *import* statements
+            // found in the given file with the imported file's path format. Throw an
+            // error if the *import* statements do not match the path of the package
+            // name in which 'fileName' exists
             String packageName = packageNameToString(((Compilation) r.value).packageName());
             String importPathWithDot = importPath.replaceAll(File.separator, "\\.");
             if (!importPathWithDot.equals(packageName)) {

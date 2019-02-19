@@ -322,3 +322,27 @@ UnaryPreExpr(operand, op) ::= "<if(operand)><op><operand>;<endif>"
 // 1) type:
 // 2) expr:
 CastExpr(type, expr) ::= "<if(type)>((<type>) (<expr>))<endif>"
+
+//========================================================================================
+//
+ReturnWrapper(value) ::= "{ return <value>; }"
+
+//========================================================================================
+//
+// 1) modifier:
+// 2) name:
+// 3) types:
+// 4) vars:
+RecordClass(modifier, name, types, vars) ::= <<
+<if(modifier)><modifier> <endif>static class <name> implements PJRecord {
+    <! -------- Member variables -------- !>
+    <if(vars)><types,vars:{t,v | public <t> <v>}; separator=";\n">;<\n><endif>
+    <! -------- Default Constructor -------- !>
+    public <name>(<types,vars:{t,v | <t> <v>}; separator=", ">) {
+        <! Initialize member fields !>
+        <if(vars)><vars:{v | this.<v> = <v>}; separator=";\n">;<endif>
+    }
+    
+    public String getName() { return getPJRecordName(); }
+}
+>>

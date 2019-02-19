@@ -104,7 +104,7 @@ public class Helper {
         case PROTOCOL_NAME:
             varName = Tag.PROTOCOL_NAME.getTag() + name + X; break;
         case RECORD_NAME:
-            varName = Tag.RECORD_NAME.getTag() + name + X; break;
+            varName = Tag.RECORD_NAME.getTag() + name; break;
         case CHANNEL_NAME:
             varName = Tag.CHANNEL_NAME.getTag() + name + X; break;
         case CHANNEL_READ_NAME:

@@ -180,6 +180,10 @@ public class ProcessJc {
             c.visit(new namechecker.TopLevelDecls<AST>(globalTypeTable));
             
             ///////
+            c.visit(new rewriters.RecordRewrite<>(globalTypeTable));
+            //
+            
+            ///////
             c.visit(new namechecker.ResolveImportTopTypeDecl<AST>());
             //
 
