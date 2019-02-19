@@ -2,7 +2,7 @@ package ast;
 
 import utilities.Visitor;
 
-public class ArrayLiteral extends Expression {
+public class ArrayLiteral extends Literal {
 
     public ArrayLiteral(Sequence<Expression> seq) {
         super(seq);

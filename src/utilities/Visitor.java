@@ -1,72 +1,6 @@
 package utilities;
 
-import ast.AltCase;
-import ast.AltStat;
-import ast.Annotation;
-import ast.Annotations;
-import ast.ArrayAccessExpr;
-import ast.ArrayLiteral;
-import ast.ArrayType;
-import ast.Assignment;
-import ast.BinaryExpr;
-import ast.Block;
-import ast.BreakStat;
-import ast.CastExpr;
-import ast.ChannelEndExpr;
-import ast.ChannelEndType;
-import ast.ChannelReadExpr;
-import ast.ChannelType;
-import ast.ChannelWriteStat;
-import ast.ClaimStat;
-import ast.Compilation;
-import ast.ConstantDecl;
-import ast.ContinueStat;
-import ast.DoStat;
-import ast.ErrorType;
-import ast.ExprStat;
-import ast.ExternType;
-import ast.ForStat;
-import ast.Guard;
-import ast.IfStat;
-import ast.ImplicitImport;
-import ast.Import;
-import ast.Invocation;
-import ast.LocalDecl;
-import ast.Modifier;
-import ast.Name;
-import ast.NameExpr;
-import ast.NamedType;
-import ast.NewArray;
-import ast.NewMobile;
-import ast.ParBlock;
-import ast.ParamDecl;
-import ast.Pragma;
-import ast.PrimitiveLiteral;
-import ast.PrimitiveType;
-import ast.ProcTypeDecl;
-import ast.ProtocolCase;
-import ast.ProtocolLiteral;
-import ast.ProtocolTypeDecl;
-import ast.QualifiedName;
-import ast.RecordAccess;
-import ast.RecordLiteral;
-import ast.RecordMember;
-import ast.RecordTypeDecl;
-import ast.ReturnStat;
-import ast.Sequence;
-import ast.SkipStat;
-import ast.StopStat;
-import ast.SuspendStat;
-import ast.SwitchGroup;
-import ast.SwitchLabel;
-import ast.SwitchStat;
-import ast.SyncStat;
-import ast.Ternary;
-import ast.TimeoutStat;
-import ast.UnaryPostExpr;
-import ast.UnaryPreExpr;
-import ast.Var;
-import ast.WhileStat;
+import ast.*;
 
 /**
  * Abstract class for the visitor pattern. This abstract class
@@ -276,6 +210,10 @@ public abstract class Visitor<T extends Object> {
 
     public T visitRecordAccess(RecordAccess ra) {
         return ra.visitChildren(this);
+    }
+
+    public T visitRecordMemberLiteral(RecordMemberLiteral rm) {
+        return rm.visitChildren(this);
     }
 
     public T visitRecordLiteral(RecordLiteral rl) {
