@@ -294,6 +294,7 @@ public class Yield extends Visitor<Boolean> {
         boolean b = false;
         for (int i = 0; i < se.size(); i++)
             if (se.child(i) != null) {
+		System.out.println(i + " " + (se==null) + " " + (se.child(i) == null) + " " + se.child(i));	       
                 boolean bb = se.child(i).visit(this);
                 b = b || bb;
             }
@@ -328,6 +329,11 @@ public class Yield extends Visitor<Boolean> {
             st.setYield();
         return b;
     }
+
+    public Boolean visitRecordMemberLiteral(RecordMemberLiteral rm) {
+	return rm.expr().visit(this);
+    }
+
 
     public Boolean visitSyncStat(SyncStat st) {
         st.setYield();
