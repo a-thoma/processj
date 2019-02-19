@@ -11,8 +11,8 @@ import utilities.Visitor;
 /**
  * Visitor used for rewriting the body of records that inherit fields
  * from one or more than one record. Since multiple inheritance is
- * is not supported in Java, the visitor adds _shallow_ copies of
- * fields that a record inherits from other records.
+ * not supported in Java, the visitor adds _shallow_ copies of fields
+ * that a record inherits from other records.
  * 
  * @author Ben
  */
@@ -64,7 +64,7 @@ public class RecordRewrite<T extends Object> extends Visitor<T> {
                 }
             }
         }
-        // Add the one this 'record' members to the set
+        // Add this 'record' members to the set
         for (RecordMember rm : rt.body())
             se.add(rm);
         // Combine all into one
