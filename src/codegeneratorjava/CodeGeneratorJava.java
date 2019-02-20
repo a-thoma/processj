@@ -12,47 +12,8 @@ import org.stringtemplate.v4.ST;
 import org.stringtemplate.v4.STGroup;
 import org.stringtemplate.v4.STGroupFile;
 
-import ast.AST;
-import ast.ArrayType;
-import ast.Assignment;
-import ast.BinaryExpr;
-import ast.Block;
-import ast.CastExpr;
-import ast.ChannelEndExpr;
-import ast.ChannelEndType;
-import ast.ChannelReadExpr;
-import ast.ChannelType;
-import ast.ChannelWriteStat;
-import ast.Compilation;
-import ast.ExprStat;
-import ast.Expression;
-import ast.ForStat;
-import ast.IfStat;
-import ast.Invocation;
-import ast.LocalDecl;
-import ast.Modifier;
-import ast.Name;
-import ast.NameExpr;
-import ast.NamedType;
-import ast.ParBlock;
-import ast.ParamDecl;
-import ast.PrimitiveLiteral;
-import ast.PrimitiveType;
-import ast.ProcTypeDecl;
-import ast.RecordMember;
-import ast.RecordTypeDecl;
-import ast.Sequence;
-import ast.Statement;
-import ast.Type;
-import ast.UnaryPostExpr;
-import ast.UnaryPreExpr;
-import ast.Var;
-import ast.WhileStat;
-import processj.runtime.PJChannel;
-import processj.runtime.PJChannelType;
-import processj.runtime.PJOne2OneChannel;
-import processj.runtime.PJTimer;
-import utilities.ErrorSeverity;
+import ast.*;
+import processj.runtime.*;
 import utilities.Log;
 import utilities.SymbolTable;
 import utilities.Visitor;
@@ -633,6 +594,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         Expression expr = ld.var().init();
         // Visit the expressions associated with this variable
         if (expr != null) {
+            System.out.println("!!@@##");
             if (ld.type() instanceof PrimitiveType) {
                 val = (String) expr.visit(this);
             }
@@ -1102,6 +1064,16 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
     
     /**
      * -----------------------------------------------------------------------------
+     * VISIT RECORD_LITERAL
+     */
+    public T visitRecordLiteral(RecordLiteral rl) {
+        Log.log(rl.line + ": Visiting a RecordLiteral (" + rl.name().getname() + ")");
+        
+        return null;
+    }
+    
+    /**
+     * -----------------------------------------------------------------------------
      * VISIT PAR_BLOCK
      */
     public T visitParBlock(ParBlock pb) {
@@ -1147,7 +1119,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
                 // An 'expression' is any valid unit of code that resolves to a value,
                 // that is, it can be a combination of variables, operations and values
                 // that yield a result. An 'statement' is a line of code that performs
-                // some action, e.g., print statements, an assignment statement,etc.
+                // some action, e.g., print statements, an assignment statement, etc.
                 if (st instanceof ExprStat && ((ExprStat) st).expr() instanceof Invocation) {
                     ExprStat es = (ExprStat) st;
                     Invocation in = (Invocation) es.expr();

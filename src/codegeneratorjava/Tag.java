@@ -25,10 +25,7 @@ public enum Tag {
     PARAM_NAME          ("_pd$"     , "parameterType"),
     LOCAL_NAME          ("_ld$"     , "localVariableType"),
     PAR_BLOCK_NAME      ("par"    , "parBlockType"),
-    PROTOCOL_NAME       ("_prot$"   , "protocolType"),
-    CHANNEL_NAME        ("_chan$"   , "channelType"),
-    CHANNEL_READ_NAME   ("READ"     , "channelReadType"),
-    CHANNEL_WRITE_NAME  ("WRITE"    , "channelWriteType")
+    PROTOCOL_NAME       ("_prot$"   , "protocolType")
     ;
 
     private final String tag;

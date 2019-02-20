@@ -59,6 +59,8 @@ public class Demo {
     public static class _proc$writer$cwI extends PJProcess {
         protected PJOne2OneChannel<Integer> _pd$out1;
 
+        protected K _ld$k1;
+
         public _proc$writer$cwI(PJOne2OneChannel<Integer> _pd$out1) {
             this._pd$out1 = _pd$out1;
         }
@@ -71,6 +73,7 @@ public class Demo {
                 default: break;
             }
 
+            _ld$k1;
             _pd$out1.write(this, 42);
             this.runLabel = 1;
             yield();

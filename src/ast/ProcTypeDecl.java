@@ -122,4 +122,9 @@ public class ProcTypeDecl extends Type implements DefineTopLevelDecl {
 	}
 	return eq;
     }
+
+    @Override
+    public String defaultType() {
+        return null;
+    }
 }

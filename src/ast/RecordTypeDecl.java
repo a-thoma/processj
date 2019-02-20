@@ -93,4 +93,9 @@ public class RecordTypeDecl extends Type implements DefineTopLevelDecl {
     @Override public boolean typeAssignmentCompatible(Type t) {
 	return typeEqual(t);
     }
+
+    @Override
+    public String defaultType() {
+        return null;
+    }
 }

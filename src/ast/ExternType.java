@@ -59,4 +59,9 @@ public class ExternType extends Type {
     @Override public boolean typeAssignmentCompatible(Type t) {
         return typeEqual(t);
     }
+
+    @Override
+    public String defaultType() {
+        return null;
+    }
 }

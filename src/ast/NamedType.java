@@ -79,4 +79,9 @@ public class NamedType extends Type implements DefineTopLevelDecl {
     public boolean typeAssignmentCompatible(Type t) {
         return false;
     }
+
+    @Override
+    public String defaultType() {
+        return null;
+    }
 }

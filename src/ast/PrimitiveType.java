@@ -247,4 +247,9 @@ public class PrimitiveType extends Type {
         return (isIntegerType() || isShortType() || isByteType() || isCharType() || isLongType());
     }
 
+    @Override
+    public String defaultType() {
+        return null;
+    }
+
 }

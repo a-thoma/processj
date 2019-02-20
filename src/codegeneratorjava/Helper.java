@@ -64,16 +64,6 @@ public class Helper {
      * {@code name} is a protocol tag and '{@code X}' is the protocol's unique
      * identifier.
      * </li>
-     *
-     * <li>
-     * For records, the record is encoded as '{@code _rec$nameX}' where
-     * {@code name} is a record tag and '{@code X}' is the records' unique identifier.
-     * </li>
-     *
-     * <li>For channels, the channel is encoded as '{@code _chan$nameX}' where
-     * '{@code name}' is either '{@code READ}' or '{@code WRITE}' and '{@code X}' is
-     * the channel's unique identifier.
-     * </li>
      * </ul>
      *
      * @param name
@@ -103,12 +93,6 @@ public class Helper {
             varName = Tag.LOCAL_NAME.getTag() + name + X; break;
         case PROTOCOL_NAME:
             varName = Tag.PROTOCOL_NAME.getTag() + name + X; break;
-        case CHANNEL_NAME:
-            varName = Tag.CHANNEL_NAME.getTag() + name + X; break;
-        case CHANNEL_READ_NAME:
-            varName = Tag.CHANNEL_NAME.getTag() + name + X + Tag.CHANNEL_READ_NAME.getTag(); break;
-        case CHANNEL_WRITE_NAME:
-            varName = Tag.CHANNEL_NAME.getTag() + name + X + Tag.CHANNEL_WRITE_NAME.getTag(); break;
         default:
             break;
         }

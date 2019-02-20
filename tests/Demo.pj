@@ -18,6 +18,7 @@ record P extends K, X, T {
 }
 
 public proc void writer(chan<int>.write out) {
+  K k = new K { z = 2 };
   out.write(42);
 }
 

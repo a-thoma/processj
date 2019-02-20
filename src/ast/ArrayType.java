@@ -104,6 +104,9 @@ public class ArrayType extends Type {
 	// TODO
         return false;
     }
-    
-    
+
+    @Override
+    public String defaultType() {
+        return null;
+    }
 }
