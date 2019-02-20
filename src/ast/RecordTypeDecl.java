@@ -3,7 +3,7 @@ package ast;
 import utilities.Visitor;
 
 public class RecordTypeDecl extends Type implements DefineTopLevelDecl {
-
+    
     public RecordTypeDecl(Sequence<Modifier> modifiers, Name name,
                           Sequence<AST> extend, Annotations annotations,
                           Sequence<RecordMember> body) {

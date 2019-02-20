@@ -329,7 +329,11 @@ public class Yield extends Visitor<Boolean> {
             st.setYield();
         return b;
     }
-
+    
+    public Boolean visitRecordMemberLiteral(RecordMemberLiteral rm) {
+        return rm.expr().visit(this);
+    }
+    
     public Boolean visitSyncStat(SyncStat st) {
         st.setYield();
         return true;

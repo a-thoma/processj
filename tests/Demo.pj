@@ -1,11 +1,11 @@
 import std.io;
 
-record K extends T {
-    int z;
-}
-
 record T {
     int a;
+}
+
+record K {
+    int z;
 }
 
 record X extends T {

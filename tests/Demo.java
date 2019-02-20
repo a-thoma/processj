@@ -14,74 +14,46 @@ import std.io;
  *
  */
 public class Demo {
-    static class _rec$K implements PJRecord {
+    static class T implements PJRecord {
         public int a;
-        public A aa;
+
+        public T(int a) {
+            this.a = a;
+        }
+    }
+
+    static class K implements PJRecord {
         public int z;
 
-        public _rec$K(int a, A aa, int z) {
-            this.a = a;
-            this.aa = aa;
+        public K(int z) {
             this.z = z;
         }
-
-        public String getName() { return getPJRecordName(); }
     }
 
-    static class _rec$T implements PJRecord {
+    static class X implements PJRecord {
         public int a;
-        public A aa;
-
-        public _rec$T(int a, A aa) {
-            this.a = a;
-            this.aa = aa;
-        }
-
-        public String getName() { return getPJRecordName(); }
-    }
-
-    static class _rec$X implements PJRecord {
-        public int a;
-        public A aa;
         public int p;
 
-        public _rec$X(int a, A aa, int p) {
+        public X(int a, int p) {
             this.a = a;
-            this.aa = aa;
             this.p = p;
         }
-
-        public String getName() { return getPJRecordName(); }
     }
 
-    static class _rec$P implements PJRecord {
-        public int a;
-        public A aa;
+    static class P implements PJRecord {
         public int z;
+        public int a;
         public int p;
         public int x;
         public int y;
 
-        public _rec$P(int a, A aa, int z, int p, int x, int y) {
-            this.a = a;
-            this.aa = aa;
+        public P(int z, int a, int p, int x, int y) {
             this.z = z;
+            this.a = a;
             this.p = p;
             this.x = x;
             this.y = y;
         }
-
-        public String getName() { return getPJRecordName(); }
-    }
-
-    static class _rec$A implements PJRecord {
-        public String c;
-
-        public _rec$A(String c) {
-            this.c = c;
-        }
-
-        public String getName() { return getPJRecordName(); }
     }
 
     public static class _proc$writer$cwI extends PJProcess {

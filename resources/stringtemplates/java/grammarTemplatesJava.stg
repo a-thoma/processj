@@ -325,10 +325,6 @@ CastExpr(type, expr) ::= "<if(type)>((<type>) (<expr>))<endif>"
 
 //========================================================================================
 //
-ReturnWrapper(value) ::= "{ return <value>; }"
-
-//========================================================================================
-//
 // 1) modifier:
 // 2) name:
 // 3) types:
@@ -342,7 +338,5 @@ RecordClass(modifier, name, types, vars) ::= <<
         <! Initialize member fields !>
         <if(vars)><vars:{v | this.<v> = <v>}; separator=";\n">;<endif>
     }
-    
-    public String getName() { return getPJRecordName(); }
 }
 >>

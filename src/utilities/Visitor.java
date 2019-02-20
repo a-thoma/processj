@@ -51,6 +51,7 @@ import ast.QualifiedName;
 import ast.RecordAccess;
 import ast.RecordLiteral;
 import ast.RecordMember;
+import ast.RecordMemberLiteral;
 import ast.RecordTypeDecl;
 import ast.ReturnStat;
 import ast.Sequence;
@@ -276,6 +277,10 @@ public abstract class Visitor<T extends Object> {
 
     public T visitRecordAccess(RecordAccess ra) {
         return ra.visitChildren(this);
+    }
+    
+    public T visitRecordMemberLiteral(RecordMemberLiteral rm) {
+        return rm.visitChildren(this);
     }
 
     public T visitRecordLiteral(RecordLiteral rl) {

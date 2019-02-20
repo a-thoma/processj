@@ -1057,7 +1057,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         
         // Generated template after evaluating this visitor
         ST stRecordClass = _stGroup.getInstanceOf("RecordClass");
-        String recName = Helper.makeVariableName(rt.name().getname(), 0, Tag.RECORD_NAME);
+        String recName = (String) rt.name().visit(this);
         // Create a tag for this record and then add it to the collection
         // of records for reference
         _recordMap.put(rt.name().getname(), recName);

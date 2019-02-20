@@ -26,8 +26,6 @@ public enum Tag {
     LOCAL_NAME          ("_ld$"     , "localVariableType"),
     PAR_BLOCK_NAME      ("par"    , "parBlockType"),
     PROTOCOL_NAME       ("_prot$"   , "protocolType"),
-    RECORD_NAME         ("_rec$"    , "recordType"),
-    RECORD_FIELD_NAME   ("_recVar$" , "recordMember"),
     CHANNEL_NAME        ("_chan$"   , "channelType"),
     CHANNEL_READ_NAME   ("READ"     , "channelReadType"),
     CHANNEL_WRITE_NAME  ("WRITE"    , "channelWriteType")
@@ -61,19 +59,18 @@ public enum Tag {
             Tag result = null;
             for (Tag tagType : values()) {
                 if (tagType.tag.startsWith(name)) {
-                    if (result == null) {
+                    if (result == null)
                         result = tagType;
-                    } else {
-                        throw new IllegalArgumentException(String.format("Unable to find ambiguous tag \"%s\" "
-                                    + "in %s.", name, getTags()));
-                    }
+                    else
+                        throw new IllegalArgumentException(
+                                String.format("Unable to find ambiguous tag \"%s\" "
+                                        + "in %s.", name, getTags()));
                 }
             }
 
-            if (result == null) {
+            if (result == null)
                 throw new IllegalArgumentException(String.format("Unable to find tag \"%s\" in %s.",
                             name, getTags()));
-            }
 
             return result;
         }
