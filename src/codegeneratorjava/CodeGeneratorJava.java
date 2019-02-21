@@ -78,7 +78,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
     /**
      * List of imports.
      */
-    private Set<String> _importList = null;
+    private Set<String> _importList = new LinkedHashSet<>();
     
     /**
      * Top level declarations.
@@ -88,44 +88,44 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
     /**
      * Map of formal parameters transformed to fields.
      */
-    private HashMap<String, String> _formalParamFieldMap = null;
+    private HashMap<String, String> _formalParamFieldMap = new LinkedHashMap<>();
     
     /**
      * Map of formal parameters names to name tags.
      */
-    private HashMap<String, String> _paramDeclNameMap = null;
+    private HashMap<String, String> _paramDeclNameMap = new LinkedHashMap<>();
     
     /**
      * Map of local parameters transformed to fields.
      */
-    private HashMap<String, String> _localParamFieldMap = null;
+    private HashMap<String, String> _localParamFieldMap = new LinkedHashMap<>();
     
     /**
      * Map of 'par' blocks declared in a process. This map associates the
      * name of a 'par' block with the number of processes invoked within
      * its block.
      */
-    private HashMap<String, Integer> _parMap = null;
+    private HashMap<String, Integer> _parMap = new LinkedHashMap<>();
     
     /**
      * 
      */
-    private HashMap<String, String> _recordMap = null;
+    private HashMap<String, String> _recordMap = new LinkedHashMap<>();
     
     /**
      * 
      */
-    private HashMap<String, String> _recordFieldMap = null;
+    private HashMap<String, String> _recordFieldMap = new LinkedHashMap<>();
     
     /**
      * 
      */
-    private HashMap<String, String> _recordMemberMap = null;
+    private HashMap<String, String> _recordMemberMap = new LinkedHashMap<>();
     
     /**
      * List of switch labels.
      */
-    private List<String> _switchLabelList = null;
+    private List<String> _switchLabelList = new ArrayList<>();
 
     /**
      * Identifier for a parameter declaration.
@@ -146,11 +146,6 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * Jump label.
      */
     private int _jumLabel = 0;
-    
-    /**
-     * Channel type.
-     */
-    private PJChannelType _chanType = null;
     
     /**
      * Channel-end type (e.g. 'read' or 'write')
@@ -182,17 +177,6 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         
         _topLevelDecls = topLevelDecls;
         _stGroup = new STGroupFile(_stGammarFile);
-        _formalParamFieldMap = new LinkedHashMap<>();
-        _localParamFieldMap = new LinkedHashMap<>();
-        _importList = new LinkedHashSet<>();
-        _switchLabelList = new ArrayList<>();
-        _parMap = new LinkedHashMap<>();
-        
-        _paramDeclNameMap = new LinkedHashMap<>();
-        
-        _recordMap = new LinkedHashMap<>();
-        _recordFieldMap = new LinkedHashMap<>();
-        _recordMemberMap = new LinkedHashMap<>();
     }
 
     /**
@@ -522,14 +506,14 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         
         // Generated template after evaluating this visitor
         ST stVar = _stGroup.getInstanceOf("Var");
-        // TODO: Do a simple assignment statement
+        
         String op = (String) as.opString();
         String lhs = (String) as.left().visit(this);
         String rhs = null;
         
-        if (as.right() instanceof ChannelReadExpr) {
+        if (as.right() instanceof ChannelReadExpr)
             return (T) createChannelReadExpr(lhs, op, ((ChannelReadExpr) as.right()));
-        } else
+        else
             rhs = (String) as.right().visit(this);
         
         stVar.add("name", lhs);
@@ -573,11 +557,11 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         Log.log(ld.line + ": Visting a LocalDecl (" + ld.type().typeName() + " " + ld.var().name().getname() + ")");
 
         // We could have the following targets:
-        // x = in.read();                  , a single channel read
-        // x = b.read() + c.read() + ...;  , multiple channel reads
-        // x = read();                     , a Java method that returns a value
-        // x = a + b;                      , a binary expression
-        // x = a = b ...;                  , a complex assignment
+        //      x = in.read();                  , a single channel read
+        //      x = b.read() + c.read() + ...;  , multiple channel reads
+        //      x = read();                     , a Java method that returns a value
+        //      x = a + b;                      , a binary expression
+        //      x = a = b ...;                  , a complex assignment
 
         // Returning values for a local declaration
         String name = (String) ld.var().name().getname();
@@ -594,10 +578,10 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         Expression expr = ld.var().init();
         // Visit the expressions associated with this variable
         if (expr != null) {
-            System.out.println("!!@@##");
-            if (ld.type() instanceof PrimitiveType) {
+            if (ld.type() instanceof PrimitiveType)
                 val = (String) expr.visit(this);
-            }
+            else if (ld.type() instanceof NamedType) // Must be a record
+                val = (String) expr.visit(this);
         }
         
         // Must be a simple declaration for a channel type
@@ -607,11 +591,16 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
             val = stChannelDecl.render();
         }
         
-        // TODO: After making a local declaration a field of the procedure
-        // in which it was declared, we return the 'empty' string iff this
+        // After making a local declaration a field of the procedure in
+        // which it was declared, we return the 'empty' string iff this
         // local variable is not initialized
-        if (ld.type().isPrimitiveType() && expr == null)
-            return (T) EMPTY_STRING;
+//        if (ld.type().isPrimitiveType() && expr == null)
+//            return (T) EMPTY_STRING;
+        if (expr == null) {
+            if (ld.type().isPrimitiveType() ||
+                ld.type().isNamedType())
+                return (T) EMPTY_STRING;
+        }
 
         // If we reach this section, then we have a simple variable declaration
         // inside the body of a procedure or a static Java method. This declaration
@@ -1069,6 +1058,55 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
     public T visitRecordLiteral(RecordLiteral rl) {
         Log.log(rl.line + ": Visiting a RecordLiteral (" + rl.name().getname() + ")");
         
+        // Generated template after evaluating this visitor
+        ST stRecordListeral = _stGroup.getInstanceOf("RecordLiteral");
+        String type = (String) rl.name().visit(this);
+        
+        // This map is used to determine the order in which values are
+        // used with the constructor of the class associated with this
+        // record 'type'
+        HashMap<String, String> members = new LinkedHashMap<>();
+        RecordTypeDecl rt = (RecordTypeDecl) _topLevelDecls.get(type);
+        if (rt != null) { // This should never be 'null'
+            for (RecordMember rm : rt.body())
+                members.put(rm.name().getname(), rm.name().getname());
+        }
+        
+        // This can get hairy! A visit to an 'assignment' would return
+        // a string "z = 3", where 'z' is the member of a record and '3'
+        // is the literal value used to initialized this member with.
+        // This is something we don't want to do. Instead, we need to
+        // return the literal value assigned to 'z'
+        for (Expression ex : rl.members()) {
+            if (ex instanceof Assignment) {
+                Assignment as = (Assignment) ex;
+                String lhs = (String) as.left().visit(this);
+                String rhs = (String) as.right().visit(this);
+                if (members.put(lhs, rhs) == null)
+                    Log.log(rl.line + ": initializing '" + lhs + "' with '" + rhs + "'");
+            }
+        }
+        
+        stRecordListeral.add("type", type);
+        stRecordListeral.add("vals", members.values());
+        
+        return (T) stRecordListeral.render();
+    }
+    
+    /**
+     * -----------------------------------------------------------------------------
+     * VISIT RECORD_ACCESS
+     */
+    public T visitRecordAccess(RecordAccess ra) {
+        Log.log(ra.line + ": Visiting a RecordAccess (" + ra + ")");
+
+        // Generated template after evaluating this visitor
+        ST stRecordAccess = null;
+        
+        if (ra.record().type.isRecordType()) {
+            stRecordAccess = _stGroup.getInstanceOf("RecordAccess");
+        }
+        
         return null;
     }
     
@@ -1095,7 +1133,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
             // Since this is a new 'par' block, we need to create a
             // variable inside the process in which this 'par' block
             // was declared
-            if (_currProcName != null) { // This can never be 'null'!!
+            if (_currProcName != null) { // This should never be 'null'
                 stParBlock.add("name", _currParBlock);
                 stParBlock.add("count", pb.stats().size());
                 stParBlock.add("process", "this");
@@ -1322,11 +1360,12 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
             else if (param.type().isChannelEndType()) {
                 if (((ChannelEndType) param.type()).isRead())
                     // {t;? channel read
-                    s = s.replace("{", "cr").replace(";?", "");
+                    s = s.replace("{", "cr").replace(";", "").replace("?", "");
                 else
                     // {t;! channel write
-                    s = s.replace("{", "cw").replace(";!", "");
-            }
+                    s = s.replace("{", "cw").replace(";", "").replace("!", "");
+            } else
+                s = s.replace(";", "");
         }
         return s;
     }

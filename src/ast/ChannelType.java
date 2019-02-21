@@ -93,9 +93,4 @@ public class ChannelType extends Type {
     public boolean typeAssignmentCompatible(Type t) {
         return false;
     }
-
-    @Override
-    public String defaultType() {
-        return null;
-    }
 }

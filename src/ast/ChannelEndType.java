@@ -83,9 +83,4 @@ public class ChannelEndType extends Type {
             return baseType().typeAssignmentCompatible(cet.baseType());
         }
     }
-
-    @Override
-    public String defaultType() {
-        return null;
-    }
 }

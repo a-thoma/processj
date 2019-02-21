@@ -53,9 +53,4 @@ public class ErrorType extends Type {
     public boolean typeAssignmentCompatible(Type t) {
         return false;
     }
-
-    @Override
-    public String defaultType() {
-        return null;
-    }
 }

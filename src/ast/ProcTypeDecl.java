@@ -11,12 +11,12 @@ public class ProcTypeDecl extends Type implements DefineTopLevelDecl {
     public boolean yields = false;
 
     public ProcTypeDecl(Sequence<Modifier> modifiers, Type returnType,
-                        Name name, Sequence<ParamDecl> formals, Sequence<Name> implement,
-                        Annotations annotations, Block body) {
+                        Name name, Sequence<ParamDecl> formals,
+                        Sequence<Name> implement, Annotations annotations,
+                        Block body) {
         super(name);
         nchildren = 7;
-        children = new AST[] { modifiers, returnType, name, formals, implement,
-            annotations, body };
+        children = new AST[] { modifiers, returnType, name, formals, implement, annotations, body };
     }
 
     public Sequence<Modifier> modifiers() {
@@ -69,62 +69,65 @@ public class ProcTypeDecl extends Type implements DefineTopLevelDecl {
     // *************************************************************************
     // ** Type Related Methods
 
-    @Override public boolean isProcType() {
-	return true;
+    @Override
+    public boolean isProcType() {
+        return true;
     }
-    
-    // α = procedure(name1, {t1,1, . . . , t1,m1 }, t1) ∧ β = procedure(name2, {t2,1, . . . , t2,m2 }, t2)
-    // α =T β ⇔ procedure?(α) ∧ procedure?(β) ∧ (m1 = m2) ∧ (t1 =T t2) ∧ (name1 = name2) ∧ ∧^m1_i=1 (t1,i =T t2,i)
-    @Override public boolean typeEqual(Type t) {
-	// procedure?(β)
-	if (!t.isProcType())
-	    return false;
-	ProcTypeDecl other = (ProcTypeDecl)t;
-	// (m1 = m2)
-	if (formalParams().size() != other.formalParams().size())
-	    return false;
-	// (t1 =T t2)
-	if (!returnType().typeEqual(other.returnType()))
-	    return false;
-	// (name1 = name2) ∧ 
-	if (!name().getname().equals(other.name().getname()))
-	    return false;
-	// ∧^m1_i=1 (t1,i =T t2,i)  
-	boolean eq = true;
-	for (int i = 0; i<formalParams().size(); i++) {
-	    eq = eq && formalParams().child(i).type().typeEqual(other.formalParams().child(i).type());
-	}
-	return eq;
+
+    // α = procedure(name1, {t1,1, . . . , t1,m1 }, t1) ∧ β = procedure(name2,
+    // {t2,1, . . . , t2,m2 }, t2)
+    // α =T β ⇔ procedure?(α) ∧ procedure?(β) ∧ (m1 = m2) ∧ (t1 =T t2) ∧ (name1 =
+    // name2) ∧ ∧^m1_i=1 (t1,i =T t2,i)
+    @Override
+    public boolean typeEqual(Type t) {
+        // procedure?(β)
+        if (!t.isProcType())
+            return false;
+        ProcTypeDecl other = (ProcTypeDecl) t;
+        // (m1 = m2)
+        if (formalParams().size() != other.formalParams().size())
+            return false;
+        // (t1 =T t2)
+        if (!returnType().typeEqual(other.returnType()))
+            return false;
+        // (name1 = name2) ∧
+        if (!name().getname().equals(other.name().getname()))
+            return false;
+        // ∧^m1_i=1 (t1,i =T t2,i)
+        boolean eq = true;
+        for (int i = 0; i < formalParams().size(); i++) {
+            eq = eq && formalParams().child(i).type().typeEqual(other.formalParams().child(i).type());
+        }
+        return eq;
     }
 
     // α ∼T β ⇔ α =T β
-    @Override public boolean typeEquivalent(Type t) {
+    @Override
+    public boolean typeEquivalent(Type t) {
         return this.typeEqual(t);
     }
 
-    // α = procedure(name1, {t1,1, . . . , t1,m1 }, t1) ∧ β = procedure(name2, {t2,1, . . . , t2,m2 }, t2)
-    // α "=T β ⇔ procedure?(α) ∧ procedure?(β) ∧ (m1 = m2) ∧ (t2 :=T t1) ∧ ∧^m1_i=1 (t1,i :=T t2,i)
-    @Override public boolean typeAssignmentCompatible(Type t) {
-	// procedure?(β)
-	if (!t.isProcType())
-	    return false;
-	ProcTypeDecl other = (ProcTypeDecl)t;
-	// (m1 = m2)
-	if (formalParams().size() != other.formalParams().size())
-	    return false;
-	// (t2 :=T t1)
-	if (!other.returnType().typeAssignmentCompatible(this))
-	    return false;
-	//  ∧^m1_i=1 (t1,i =T t2,i)  
-	boolean eq = true;
-	for (int i = 0; i<formalParams().size(); i++) {
-	    eq = eq && formalParams().child(i).type().typeAssignmentCompatible(other.formalParams().child(i).type());
-	}
-	return eq;
-    }
-
+    // α = procedure(name1, {t1,1, . . . , t1,m1 }, t1) ∧ β = procedure(name2,
+    // {t2,1, . . . , t2,m2 }, t2)
+    // α "=T β ⇔ procedure?(α) ∧ procedure?(β) ∧ (m1 = m2) ∧ (t2 :=T t1) ∧ ∧^m1_i=1
+    // (t1,i :=T t2,i)
     @Override
-    public String defaultType() {
-        return null;
+    public boolean typeAssignmentCompatible(Type t) {
+        // procedure?(β)
+        if (!t.isProcType())
+            return false;
+        ProcTypeDecl other = (ProcTypeDecl) t;
+        // (m1 = m2)
+        if (formalParams().size() != other.formalParams().size())
+            return false;
+        // (t2 :=T t1)
+        if (!other.returnType().typeAssignmentCompatible(this))
+            return false;
+        // ∧^m1_i=1 (t1,i =T t2,i)
+        boolean eq = true;
+        for (int i = 0; i < formalParams().size(); i++) {
+            eq = eq && formalParams().child(i).type().typeAssignmentCompatible(other.formalParams().child(i).type());
+        }
+        return eq;
     }
 }

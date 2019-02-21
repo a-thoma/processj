@@ -340,3 +340,17 @@ RecordClass(modifier, name, types, vars) ::= <<
     }
 }
 >>
+
+//========================================================================================
+//
+// 1) type:
+// 2) vals:
+RecordLiteral(type, vals) ::= <<
+new <type>(<vals:{v | <v>}; separator=", ">)
+>>
+
+//========================================================================================
+//
+// 1) name:
+// 2) member:
+RecordAccess(name, member) ::= "<if(name)><name>.<member>"

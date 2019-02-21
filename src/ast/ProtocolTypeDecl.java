@@ -79,9 +79,4 @@ public class ProtocolTypeDecl extends Type implements DefineTopLevelDecl {
     @Override public boolean typeAssignmentCompatible(Type t) {
         return false;
     }
-
-    @Override
-    public String defaultType() {
-        return null;
-    }
 }

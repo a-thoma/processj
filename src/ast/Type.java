@@ -235,6 +235,4 @@ public abstract class Type extends AST {
     public boolean isProcType() {
         return false;
     }
-
-    public abstract String defaultType();
 }

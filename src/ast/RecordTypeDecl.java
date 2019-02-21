@@ -3,10 +3,9 @@ package ast;
 import utilities.Visitor;
 
 public class RecordTypeDecl extends Type implements DefineTopLevelDecl {
-    
-    public RecordTypeDecl(Sequence<Modifier> modifiers, Name name,
-                          Sequence<AST> extend, Annotations annotations,
-                          Sequence<RecordMember> body) {
+
+    public RecordTypeDecl(Sequence<Modifier> modifiers, Name name, Sequence<AST> extend,
+                        Annotations annotations, Sequence<RecordMember> body) {
         super(name);
         nchildren = 5;
         children = new AST[] { modifiers, name, extend, annotations, body };
@@ -37,7 +36,7 @@ public class RecordTypeDecl extends Type implements DefineTopLevelDecl {
 
     // *************************************************************************
     // ** Misc. Methods
-    
+
     public RecordMember getMember(String name) {
         for (RecordMember rm : body())
             if (rm.name().getname().equals(name))
@@ -58,7 +57,7 @@ public class RecordTypeDecl extends Type implements DefineTopLevelDecl {
 
     // *************************************************************************
     // ** Type Related Methods
-    
+
     @Override
     public String signature() {
         return "<R" + name().getname() + ";";
@@ -68,34 +67,30 @@ public class RecordTypeDecl extends Type implements DefineTopLevelDecl {
         return "Record: " + name();
     }
 
-    @Override 
+    @Override
     public boolean isRecordType() {
-	return true;
+        return true;
     }
 
     // α =T β ⇔ Record?(α) ∧ Record?(β) ∧ (name1 = name2)
     // We implement NAME EQUALITY not structural equality
-    @Override 
+    @Override
     public boolean typeEqual(Type t) {
-	if (!t.isRecordType())
-	    return false;
-	RecordTypeDecl other = (RecordTypeDecl)t;
+        if (!t.isRecordType())
+            return false;
+        RecordTypeDecl other = (RecordTypeDecl) t;
         return name().getname().equals(other.name().getname());
     }
 
     // α∼T β ⇔ α =T β
-    @Override 
+    @Override
     public boolean typeEquivalent(Type t) {
         return typeEqual(t);
     }
 
-    // α :=T β ⇔ α ∼T β ⇔ α =T β    
-    @Override public boolean typeAssignmentCompatible(Type t) {
-	return typeEqual(t);
-    }
-
+    // α :=T β ⇔ α ∼T β ⇔ α =T β
     @Override
-    public String defaultType() {
-        return null;
+    public boolean typeAssignmentCompatible(Type t) {
+        return typeEqual(t);
     }
 }

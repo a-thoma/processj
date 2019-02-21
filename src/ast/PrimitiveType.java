@@ -246,10 +246,4 @@ public class PrimitiveType extends Type {
     public boolean isIntegralType() {
         return (isIntegerType() || isShortType() || isByteType() || isCharType() || isLongType());
     }
-
-    @Override
-    public String defaultType() {
-        return null;
-    }
-
 }
