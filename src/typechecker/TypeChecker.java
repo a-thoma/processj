@@ -1014,7 +1014,8 @@ public class TypeChecker extends Visitor<Type> {
                             + "' has no member '" + ra.field().getname() + "'.", 3062);
                     return ra.type;
                 }
-                Type rmt = resolve(rm.type().visit(this));
+//                Type rmt = resolve(rm.type().visit(this));
+                Type rmt = resolve(rm.type());  // Quick fixed made for record member access
                 ra.type = rmt;
 	    } else {
 		// Must be a protocol type.

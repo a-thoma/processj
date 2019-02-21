@@ -353,4 +353,4 @@ new <type>(<vals:{v | <v>}; separator=", ">)
 //
 // 1) name:
 // 2) member:
-RecordAccess(name, member) ::= "<if(name)><name>.<member>"
+RecordAccess(name, member) ::= "<if(name)><name>.<member><endif>"

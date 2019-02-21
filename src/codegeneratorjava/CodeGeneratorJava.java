@@ -542,10 +542,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         
         // Ignored the value returned by this visitor. The reason for this
         // is that templates for methods and classes take a list of types
-        // and variable names. If you want to return the name and type of a
-        // formal parameter declaration (e.g. some_type + " " + some_name),
-        // you must change the _attribute_ values of 'Method' and 'ProcClass'
-        // in the grammarTempalteJava file.
+        // and variable names.
         return null;
     }
     
@@ -1105,9 +1102,15 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         
         if (ra.record().type.isRecordType()) {
             stRecordAccess = _stGroup.getInstanceOf("RecordAccess");
-        }
+            String name = (String) ra.record().visit(this);
+            String field = (String) ra.field().visit(this);
+            
+            stRecordAccess.add("name", name);
+            stRecordAccess.add("member", field);
+        } else
+            ; // TODO: Don't forget to resolve protocol access
         
-        return null;
+        return (T) stRecordAccess.render();
     }
     
     /**

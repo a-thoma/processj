@@ -261,7 +261,7 @@ public final class OptionGroup {
                .addMetavar(annotation.metavar())
                .addDefaultValue(annotation.defaultValue());
         
-        // Build option and parse the value assigned to `defaultValue'
+        // Build option and parse the value assigned to 'defaultValue'
         OptionValue option = builder.build();
         if (!StringUtil.isStringEmpty(annotation.defaultValue()))
             addValue(option, annotation.defaultValue());
