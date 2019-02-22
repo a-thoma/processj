@@ -68,7 +68,8 @@ public class ProcessJc {
         List<File> files = pjMain.files;
         // Turn on/off colour mode
         if (pjMain.ansiColour == null) {
-            // Only set the colour mode if the default value in properties file is 'yes'
+            // Only set the colour mode if the default value in 
+            // properties file is 'yes'
             if (config.getProperty("colour").equalsIgnoreCase("yes"))
                 Settings.isAnsiColour = true;
         } else {

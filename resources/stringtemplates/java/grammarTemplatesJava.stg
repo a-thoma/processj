@@ -356,12 +356,12 @@ CastExpr(type, expr) ::= "<if(type)>((<type>) (<expr>))<endif>"
 
 //========================================================================================
 //
-// 1) modifier:
-// 2) name:
+// 1) modifier: access level such as public, private, or protected.
+// 2) name: the name that uniquely applies and identifies the record.
 // 3) types:
 // 4) vars:
-RecordClass(modifier, name, types, vars) ::= <<
-<if(modifier)><modifier> <endif>static class <name> implements PJRecord {
+RecordClass(modifiers, name, types, vars) ::= <<
+<if(modifiers)><modifiers; separator=" "> <else>protected <endif>static class <name> implements PJRecord {
     <! -------- Member variables -------- !>
     <if(vars)><types,vars:{t,v | public <t> <v>}; separator=";\n">;<\n><endif>
     <! -------- Default Constructor -------- !>
@@ -385,3 +385,28 @@ new <type>(<vals; separator=", ">)
 // 1) name:
 // 2) member:
 RecordAccess(name, member) ::= "<if(name)><name>.<member><endif>"
+
+//========================================================================================
+//
+// 1) modifier: access level such as public, private, or protected.
+// 2) name: the name that uniquely applies and identifies the protocol.
+// 3) body:
+ProtocolClass(modifiers, name, body) ::= <<
+<if(modifiers)><modifiers; separator=" "> <else>protected <endif>static class <name> {
+    <body; separator="\n\n">
+}
+>>
+
+//========================================================================================
+//
+ProtocolTypeDecl(modifier, name, types, vars) ::= <<
+<if(modifier)><modifier> <else>protected <endif>static class <name> extends PJProtocolCase {
+    <! -------- Member variables -------- !>
+    <if(vars)><types,vars:{t,v | public <t> <v>}; separator=";\n">;<\n><endif>
+    <! -------- Default Constructor -------- !>
+    public <name>(<types,vars:{t,v | <t> <v>}; separator=", ">) {
+        <! Initialize member fields !>
+        <if(vars)><vars:{v | this.<v> = <v>}; separator=";\n">;<endif>
+    }
+}
+>>

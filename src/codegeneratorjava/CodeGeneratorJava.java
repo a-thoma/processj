@@ -108,17 +108,18 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
     private HashMap<String, Integer> _parMap = new LinkedHashMap<>();
     
     /**
-     * 
+     * Map of record names to name tags.
      */
     private HashMap<String, String> _recordMap = new LinkedHashMap<>();
     
     /**
-     * 
+     * Map of records member transformed to fields.
      */
     private HashMap<String, String> _recordFieldMap = new LinkedHashMap<>();
     
     /**
-     * 
+     * Map of records members transformed to fields for records that
+     * inherit members from other records.
      */
     private HashMap<String, String> _recordMemberMap = new LinkedHashMap<>();
     
@@ -1082,6 +1083,16 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
     
     /**
      * -----------------------------------------------------------------------------
+     * VISIT PROTOCOL_TYPE_DECL
+     */
+    public T visitProtocolTypeDecl(ProtocolTypeDecl pd) {
+        Log.log(pd.line + ": Visiting a ProtocolTypeDecl (" + pd.name().getname() + ")");
+        
+        return null;
+    }
+    
+    /**
+     * -----------------------------------------------------------------------------
      * VISIT RECORD_TYPE_DECL
      */
     public T visitRecordTypeDecl(RecordTypeDecl rt) {
@@ -1090,6 +1101,11 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         // Generated template after evaluating this visitor
         ST stRecordClass = _stGroup.getInstanceOf("RecordClass");
         String recName = (String) rt.name().visit(this);
+        List<String> modifiers = new ArrayList<>();
+        
+        for (Modifier m : rt.modifiers())
+            modifiers.add((String) m.visit(this));
+        
         // Create a tag for this record and then add it to the collection
         // of records for reference
         _recordMap.put(rt.name().getname(), recName);
@@ -1107,6 +1123,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         }
         
         stRecordClass.add("name", recName);
+        stRecordClass.add("modifiers", modifiers);
         
         return (T) stRecordClass.render();
     }

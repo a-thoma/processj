@@ -92,7 +92,7 @@ public class Helper {
         case LOCAL_NAME:
             varName = Tag.LOCAL_NAME.getTag() + name + X; break;
         case PROTOCOL_NAME:
-            varName = Tag.PROTOCOL_NAME.getTag() + name + X; break;
+            varName = Tag.PROTOCOL_NAME.getTag() + name; break;
         default:
             break;
         }

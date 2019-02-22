@@ -14,7 +14,7 @@ import std.io;
  *
  */
 public class Demo {
-    static class T implements PJRecord {
+    public static class T implements PJRecord {
         public int a;
 
         public T(int a) {
@@ -22,15 +22,17 @@ public class Demo {
         }
     }
 
-    static class K implements PJRecord {
+    public static class K implements PJRecord {
         public int z;
+        public T t;
 
-        public K(int z) {
+        public K(int z, T t) {
             this.z = z;
+            this.t = t;
         }
     }
 
-    static class X implements PJRecord {
+    protected static class X implements PJRecord {
         public int a;
         public int p;
         public String b;
@@ -42,16 +44,18 @@ public class Demo {
         }
     }
 
-    static class P implements PJRecord {
+    protected static class P implements PJRecord {
         public int z;
+        public T t;
         public int a;
         public int p;
         public String b;
         public int x;
         public int y;
 
-        public P(int z, int a, int p, String b, int x, int y) {
+        public P(int z, T t, int a, int p, String b, int x, int y) {
             this.z = z;
+            this.t = t;
             this.a = a;
             this.p = p;
             this.b = b;
@@ -60,7 +64,7 @@ public class Demo {
         }
     }
 
-    static class L implements PJRecord {
+    private static class L implements PJRecord {
         public K k;
         public String str;
 
@@ -89,9 +93,9 @@ public class Demo {
                 default: break;
             }
 
-            _ld$k1 = new K(3);
+            _ld$k1 = new K(3, new T(45));
             _ld$x2 = new X(20, 300, "Ben");
-            _ld$l3 = new L(new K(56), "Benjamin");
+            _ld$l3 = new L(_ld$k1, "Benjamin");
             _pd$out1.write(this, ((L) (_ld$l3)));
             this.runLabel = 1;
             yield();
@@ -132,7 +136,7 @@ public class Demo {
 
             label(2);
 
-            io.println("The value is " + _ld$value1.k.z);
+            io.println("The value is " + _ld$value1.k.t.a);
             terminate();
         }
     }
