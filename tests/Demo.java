@@ -60,12 +60,24 @@ public class Demo {
         }
     }
 
-    public static class _proc$writer$cwLK extends PJProcess {
-        protected PJOne2OneChannel<K> _pd$out1;
+    static class L implements PJRecord {
+        public K k;
+        public String str;
+
+        public L(K k, String str) {
+            this.k = k;
+            this.str = str;
+        }
+    }
+
+    public static class _proc$writer$cwLL extends PJProcess {
+        protected PJOne2OneChannel<L> _pd$out1;
 
         protected K _ld$k1;
+        protected X _ld$x2;
+        protected L _ld$l3;
 
-        public _proc$writer$cwLK(PJOne2OneChannel<K> _pd$out1) {
+        public _proc$writer$cwLL(PJOne2OneChannel<L> _pd$out1) {
             this._pd$out1 = _pd$out1;
         }
 
@@ -78,7 +90,9 @@ public class Demo {
             }
 
             _ld$k1 = new K(3);
-            _pd$out1.write(this, ((K) (_ld$k1)));
+            _ld$x2 = new X(20, 300, "Ben");
+            _ld$l3 = new L(new K(56), "Benjamin");
+            _pd$out1.write(this, ((L) (_ld$l3)));
             this.runLabel = 1;
             yield();
             label(1);
@@ -88,12 +102,12 @@ public class Demo {
     }
 
 
-    public static class _proc$reader$crLK extends PJProcess {
-        protected PJOne2OneChannel<K> _pd$in1;
+    public static class _proc$reader$crLL extends PJProcess {
+        protected PJOne2OneChannel<L> _pd$in1;
 
-        protected K _ld$value1;
+        protected L _ld$value1;
 
-        public _proc$reader$crLK(PJOne2OneChannel<K> _pd$in1) {
+        public _proc$reader$crLL(PJOne2OneChannel<L> _pd$in1) {
             this._pd$in1 = _pd$in1;
         }
 
@@ -118,7 +132,7 @@ public class Demo {
 
             label(2);
 
-            io.println("The value is " + _ld$value1.z);
+            io.println("The value is " + _ld$value1.k.z);
             terminate();
         }
     }
@@ -127,7 +141,7 @@ public class Demo {
     public static class _proc$main$arT extends PJProcess {
         protected String[] _pd$args1;
 
-        protected PJOne2OneChannel<K> _ld$c1;
+        protected PJOne2OneChannel<L> _ld$c1;
         protected int _ld$a2;
 
         public _proc$main$arT(String[] _pd$args1) {
@@ -142,18 +156,18 @@ public class Demo {
                 default: break;
             }
 
-            _ld$c1 = new PJOne2OneChannel<K>();
+            _ld$c1 = new PJOne2OneChannel<L>();
             _ld$a2 = 2;
             final PJPar _ld$par1 = new PJPar(2, this);
 
-            (new Demo._proc$writer$cwLK(_ld$c1) {
+            (new Demo._proc$writer$cwLL(_ld$c1) {
                 @Override
                 public void finalize() {
                     _ld$par1.decrement();
                 }
             }).schedule();
 
-            (new Demo._proc$reader$crLK(_ld$c1) {
+            (new Demo._proc$reader$crLL(_ld$c1) {
                 @Override
                 public void finalize() {
                     _ld$par1.decrement();

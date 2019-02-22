@@ -307,6 +307,37 @@ if (<expr>) {
 
 //========================================================================================
 //
+// 1) name:
+BreakStat(name) ::= <<
+<if(name)><name><else>break;<endif>
+>>
+
+//========================================================================================
+//
+// 1) label:
+SwitchLabel(label) ::= <<
+<if(label)>case <label><else>default<endif>
+>>
+
+//========================================================================================
+//
+// 1) labels:
+// 2) stats:
+SwitchGroup(labels, stats) ::= <<
+<labels:{l | <l>:}; separator="\n">
+    <stats; separator="\n">
+>>
+
+//========================================================================================
+//
+SwitchStat(expr, block) ::= <<
+switch(<expr>) {
+<block; separator="\n">
+}
+>>
+
+//========================================================================================
+//
 // 1) operand:
 // 2) op:
 UnaryPostExpr(operand, op) ::= "<if(operand)><operand><op>;<endif>"
@@ -346,7 +377,7 @@ RecordClass(modifier, name, types, vars) ::= <<
 // 1) type:
 // 2) vals:
 RecordLiteral(type, vals) ::= <<
-new <type>(<vals:{v | <v>}; separator=", ">)
+new <type>(<vals; separator=", ">)
 >>
 
 //========================================================================================

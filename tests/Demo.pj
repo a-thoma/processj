@@ -6,6 +6,7 @@ record T {
 
 record K {
     int z;
+    //T t;
 }
 
 record X extends T {
@@ -18,21 +19,27 @@ record P extends K, X, T {
     int y;
 }
 
-public proc void writer(chan<K>.write out) {
-  K k = new K { z = 3 };
-  //X x = new X { b = "Ben", p = 300, a = 20 };
-
-  out.write(k);
+record L {
+    K k;
+    string str;
 }
 
-public proc void reader(chan<K>.read in) {
-  K value;
+public proc void writer(chan<L>.write out) {
+  K k = new K { z = 3 };
+  X x = new X { b = "Ben", p = 300, a = 20 };
+  L l = new L { str = "Benjamin", k = new K { z = 56 } };
+
+  out.write(l);
+}
+
+public proc void reader(chan<L>.read in) {
+  L value;
   value = in.read();
-  println("The value is " + value.z);
+  println("The value is " + value.k.z);
 }
 
 public proc void main(string args[]) {
-  chan<K> c;
+  chan<L> c;
   int a = 2;
   par {
     writer(c.write);
