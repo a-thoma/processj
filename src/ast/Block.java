@@ -3,6 +3,11 @@ package ast;
 import utilities.Visitor;
 
 public class Block extends Statement {
+
+    // This is set to true in the rewriting of channel read expressions inside other expressions when blocks are created
+    public boolean canBeMerged = false;
+
+
     public Block(Sequence<Statement> stats) {
         super(stats);
         nchildren = 1;

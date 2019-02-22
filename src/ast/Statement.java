@@ -2,6 +2,14 @@ package ast;
 
 public abstract class Statement extends AST {
 
+    // This sequenec is used in the rewriting phase.                                                                                                                                                               
+    // It holds Declarations and Assignments of the form:                                                                                                                                                          
+    //                                                                                                                                                                                                             
+    // T temp_1;                                                                                                                                                                                                   
+    // temp_1 = c.read();                                                                                                                                                                                          
+    public Sequence<Statement> assignments = null;
+
+
     private String label = "";
     private boolean yields = false;
 

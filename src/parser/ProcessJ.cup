@@ -1071,8 +1071,9 @@ empty_statement ::=
 // SyncStat :> Statement :> AST
 barrier_sync_statement ::= 
 //          SYNC primary_no_new_array_or_mobile:e SEMICOLON {: RESULT = new SyncStat(e); :}
-     primary:e DOT SYNC LPAREN RPAREN SEMICOLON {: RESULT = new SyncStat(e); :}
-        ;
+        primary:e DOT SYNC LPAREN RPAREN SEMICOLON {: RESULT = new SyncStat(e); :}
+     | IDENTIFIER:id DOT SYNC LPAREN RPAREN SEMICOLON {: RESULT = new SyncStat(new NameExpr(new Name(id))); :}
+      ;
 
 // TimeoutStat :> Statement :> AST
 timeout_statement ::= 

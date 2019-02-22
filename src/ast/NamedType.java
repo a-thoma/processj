@@ -65,18 +65,21 @@ public class NamedType extends Type implements DefineTopLevelDecl {
     
     // TODO
     @Override public boolean typeEqual(Type t) {
-        return false;
+	if (!t.isNamedType())
+	    return false;
+	NamedType nt = (NamedType)t;
+	return name().getname().equals(nt.name().getname());
     }
 
     // TODO
     @Override
     public boolean typeEquivalent(Type t) {
-        return false;
+        return typeEqual(t);
     }
 
     // TODO
     @Override
     public boolean typeAssignmentCompatible(Type t) {
-        return false;
+        return typeEqual(t);
     }
 }

@@ -162,7 +162,7 @@ public class PrettyPrinter<T extends AST> extends Visitor<T> {
                 System.out.println(tab() + ";");
             } else {
                 st.visit(this);
-		System.out.println(";");
+		//System.out.println(";");
             }
             indent -= 2;
         }
@@ -172,11 +172,12 @@ public class PrettyPrinter<T extends AST> extends Visitor<T> {
     }
 
     public T visitBreakStat(BreakStat bs) {
-        System.out.print("break");
+        System.out.print(tab() + "break");
         if (bs.target() != null) {
             System.out.print(" ");
             bs.target().visit(this);
         }
+	System.out.println(";");
         return null;
     }
 
@@ -226,10 +227,12 @@ public class PrettyPrinter<T extends AST> extends Visitor<T> {
     }
 
     public T visitChannelWriteStat(ChannelWriteStat cw) {
+	System.out.print(tab());
+
         cw.channel().visit(this);
         System.out.print(".write(");
         cw.expr().visit(this);
-        System.out.print(")");
+        System.out.println(");");
         return null;
     }
 
@@ -290,7 +293,7 @@ public class PrettyPrinter<T extends AST> extends Visitor<T> {
     public T visitExprStat(ExprStat es) {
         System.out.print(tab());
         es.expr().visit(this);
-        //System.out.println("");
+        System.out.println(";");
         return null;
     }
 
@@ -409,17 +412,27 @@ public class PrettyPrinter<T extends AST> extends Visitor<T> {
     }
 
     public T visitInvocation(Invocation in) {
-        // TODO
-        return in.visitChildren(this);
+	if (in.target() != null)
+	    in.target().visit(this);
+	System.out.print(in.procedureName() + "(");
+	for (int i=0; i<in.params().size(); i++) {
+	    in.params().child(i).visit(this);
+	    if (i <in.params().size()-1)
+		System.out.print(",");
+	}
+	System.out.print(")");
+	return null;
     }
 
     public T visitLocalDecl(LocalDecl ld) {
         System.out.print(tab());
         if (ld.isConst())
             System.out.print("const ");
+	
         ld.type().visit(this);
         System.out.print(" ");
         ld.var().visit(this);
+	System.out.println(";");
         return null;
     }
 
@@ -474,8 +487,15 @@ public class PrettyPrinter<T extends AST> extends Visitor<T> {
     }
 
     public T visitParBlock(ParBlock pb) {
+
+	
         // TODO - don't forget that there are barriers to enroll on.
-        return pb.visitChildren(this);
+	System.out.println(tab() + "par {");
+	indent += 2;
+	pb.stats().visit(this);
+	indent -=2;
+	System.out.println(tab() + "}");
+	return null;
     }
 
     public T visitPragma(Pragma pr) {
@@ -589,7 +609,7 @@ public class PrettyPrinter<T extends AST> extends Visitor<T> {
     }
 
     public T visitReturnStat(ReturnStat rs) {
-        System.out.print("return");
+        System.out.print(tab() + "return");
         if (rs.expr() != null) {
             System.out.print(" ");
             rs.expr().visit(this);
@@ -622,24 +642,36 @@ public class PrettyPrinter<T extends AST> extends Visitor<T> {
     }
 
     public T visitSwitchGroup(SwitchGroup sg) {
-        // TODO
-        return sg.visitChildren(this);
+	sg.labels().visit(this);
+	indent += 2;
+	sg.statements().visit(this);
+	indent -= 2;
+	return null;
     }
 
     public T visitSwitchLabel(SwitchLabel sl) {
-        // TODO
-        return sl.visitChildren(this);
+	if (sl.isDefault())
+	    System.out.println(tab() + "default:");
+	else
+	    System.out.println(tab() + "case " + sl.expr() + ":");
+	return null;
     }
 
     public T visitSwitchStat(SwitchStat st) {
-        // TODO
-        return st.visitChildren(this);
+	System.out.print(tab() + "switch (");
+	st.expr().visit(this);
+	System.out.println(") {");
+	indent += 2;
+	st.switchBlocks().visit(this);
+	indent -= 2;
+	System.out.println(tab()+"}");
+	return null;
     }
 
     public T visitSyncStat(SyncStat st) {
-        System.out.print("sync(");
+	System.out.print(tab());
         st.barrier().visit(this);
-        System.out.print(")");
+        System.out.println(".sync();");
         return null;
     }
 
@@ -653,10 +685,11 @@ public class PrettyPrinter<T extends AST> extends Visitor<T> {
     }
 
     public T visitTimeoutStat(TimeoutStat ts) {
+	System.out.print(tab());
         ts.timer().visit(this);
         System.out.print(".timeout(");
         ts.delay().visit(this);
-        System.out.print(")");
+        System.out.println(");");
         return null;
     }
 

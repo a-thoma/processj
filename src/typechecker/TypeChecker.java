@@ -1029,12 +1029,16 @@ public class TypeChecker extends Visitor<Type> {
                 // Find the field and make the type of the record access equal to the field.
 		// TODO: test inheritence here
 		RecordMember rm = ((RecordTypeDecl) tType).getMember(ra.field().getname());
+
+		System.out.println("is RM null?" + (rm == null));
                 if (rm == null) {
                     ra.type = Error.addError(ra, "Record type '" + ((RecordTypeDecl) tType).name().getname()
                             + "' has no member '" + ra.field().getname() + "'.", 3062);
                     return ra.type;
                 }
-                Type rmt = resolve(rm.type().visit(this));
+		System.out.println("RM.type: " + rm.type());
+
+                Type rmt = resolve(rm.type());
                 ra.type = rmt;
 	    } else {
 		// Must be a protocol type.
@@ -1142,6 +1146,10 @@ public class TypeChecker extends Visitor<Type> {
     
     @Override
     public Type visitSyncStat(SyncStat ss) {
+	Type t = ss.barrier().visit(this);
+	if (!t.isBarrierType()) 
+	    Error.addError(ss,"Cannot sync on anything but a barrier type", 0000);	    
+	
 	return null;
     }
    
