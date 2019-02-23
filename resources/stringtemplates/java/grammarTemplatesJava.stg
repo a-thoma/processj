@@ -330,6 +330,8 @@ SwitchGroup(labels, stats) ::= <<
 
 //========================================================================================
 //
+// 1) expr:
+// 2) block:
 SwitchStat(expr, block) ::= <<
 switch(<expr>) {
 <block; separator="\n">
@@ -399,7 +401,11 @@ ProtocolClass(modifiers, name, body) ::= <<
 
 //========================================================================================
 //
-ProtocolTypeDecl(modifier, name, types, vars) ::= <<
+// 1) modifier:
+// 2) name:
+// 3) types:
+// 4) vars:
+ProtocolCase(modifier, name, types, vars) ::= <<
 <if(modifier)><modifier> <else>protected <endif>static class <name> extends PJProtocolCase {
     <! -------- Member variables -------- !>
     <if(vars)><types,vars:{t,v | public <t> <v>}; separator=";\n">;<\n><endif>
@@ -407,6 +413,16 @@ ProtocolTypeDecl(modifier, name, types, vars) ::= <<
     public <name>(<types,vars:{t,v | <t> <v>}; separator=", ">) {
         <! Initialize member fields !>
         <if(vars)><vars:{v | this.<v> = <v>}; separator=";\n">;<endif>
+        this.tag = "<name>";
     }
 }
+>>
+
+//========================================================================================
+//
+// 1) name:
+// 2) tag:
+// 3) vals:
+ProtocolLiteral(type, tag, vals) ::= <<
+new <type>.<tag>(<if(vals)><vals; separator=", "><endif>)
 >>

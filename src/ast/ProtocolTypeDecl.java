@@ -35,10 +35,9 @@ public class ProtocolTypeDecl extends Type implements DefineTopLevelDecl {
         return (Sequence<ProtocolCase>) children[4];
     }
 
-
     // *************************************************************************
     // ** Misc. Methods
- 
+
     public String toString() {
         return typeName();
     }
@@ -61,22 +60,29 @@ public class ProtocolTypeDecl extends Type implements DefineTopLevelDecl {
         return "Protocol: " + name();
     }
 
-    @Override public boolean isProtocolType() {
-	return true;
+    @Override
+    public boolean isProtocolType() {
+        return true;
     }
 
     // TODO
-    @Override public boolean typeEqual(Type t) {
-        return false;
+    @Override
+    public boolean typeEqual(Type t) {
+        if (!t.isProtocolType())
+            return false;
+        ProtocolTypeDecl other = (ProtocolTypeDecl) t;
+        return name().getname().equals(other.name().getname());
     }
 
     // TODO
-    @Override public boolean typeEquivalent(Type t) {
-        return false;
+    @Override
+    public boolean typeEquivalent(Type t) {
+        return typeEqual(t);
     }
 
     // TODO
-    @Override public boolean typeAssignmentCompatible(Type t) {
-        return false;
+    @Override
+    public boolean typeAssignmentCompatible(Type t) {
+        return typeEqual(t);
     }
 }

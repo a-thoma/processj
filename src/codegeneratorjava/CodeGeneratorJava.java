@@ -124,6 +124,11 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
     private HashMap<String, String> _recordMemberMap = new LinkedHashMap<>();
     
     /**
+     * Map of protocol names to name tags.
+     */
+    private HashMap<String, String> _protocMap = new LinkedHashMap<>();
+    
+    /**
      * List of switch labels.
      */
     private List<String> _switchLabelList = new ArrayList<>();
@@ -158,6 +163,9 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      */
     private boolean _fieldName = true;
     
+    /**
+     * This is used for uninitialized variables.
+     */
     private static final String EMPTY_STRING = "";
 
     /**
@@ -639,6 +647,9 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         if (name == null && _recordMap.containsKey(name))
             name = _recordMap.get(name);
         
+        if (name == null && _protocMap.containsKey(name))
+            name = _protocMap.get(name);
+        
         if (name == null)
             name = na.getname();
         
@@ -662,8 +673,13 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      */
     public T visitNamedType(NamedType nt) {
         Log.log(nt.line + ": Visiting a NamedType (" + nt.name().getname() + ")");
+        
+        String type = (String) nt.name().getname();
+        
+        if (nt.type().isProtocolType()) // This is for protocol 'inheritance'
+            type = PJProtocolCase.class.getSimpleName();
 
-        return (T) nt.name().getname();
+        return (T) type;
     }
     
     /**
@@ -1088,7 +1104,87 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
     public T visitProtocolTypeDecl(ProtocolTypeDecl pd) {
         Log.log(pd.line + ": Visiting a ProtocolTypeDecl (" + pd.name().getname() + ")");
         
-        return null;
+        // Generated template after evaluating this visitor
+        ST stProtocolClass = _stGroup.getInstanceOf("ProtocolClass");
+        
+        String name = (String) pd.name().visit(this);
+        List<String> modifiers = new ArrayList<>();
+        List<String> body = new ArrayList<>();
+        
+        for (Modifier m : pd.modifiers())
+            modifiers.add((String) m.visit(this));
+        
+        // Add this protocol to the collection of protocols for reference
+        _protocMap.put(name, name);
+        
+        // TODO: annotations??
+        
+        // The scope in which all members appear in a protocol
+        for (ProtocolCase pc : pd.body())
+            body.add((String) pc.visit(this));
+        
+        stProtocolClass.add("name", name);
+        stProtocolClass.add("modifiers", modifiers);
+        stProtocolClass.add("body", body);
+        
+        return (T) stProtocolClass.render();
+    }
+    
+    /**
+     * -----------------------------------------------------------------------------
+     * VISIT PROTOCOL_CASE
+     */
+    public T visitProtocolCase(ProtocolCase pc) {
+        Log.log(pc.line + ": Visiting a ProtocolCase (" + pc.name().getname() + ")");
+        
+        // Generated template after evaluating this visitor
+        ST stProtocolCase = _stGroup.getInstanceOf("ProtocolCase");
+        
+        // Since we are keeping the name of a tag as it is, this
+        // shouldn't cause any name collision
+        String protocName = (String) pc.name().visit(this);
+        // This may create name collision problems because protocol members
+        // are also record members
+        _recordFieldMap.clear();
+        
+        // The scope in which all members of this tag appeared
+        for (RecordMember rm : pc.body())
+            rm.visit(this);
+        
+        // The list of fields that should be passed to the constructor
+        // of the static class that the record belongs to
+        if (!_recordFieldMap.isEmpty()) {
+            stProtocolCase.add("types", _recordFieldMap.values());
+            stProtocolCase.add("vars", _recordFieldMap.keySet());
+        }
+        
+        stProtocolCase.add("name", protocName);
+        
+        return (T) stProtocolCase.render();
+    }
+    
+    /**
+     * -----------------------------------------------------------------------------
+     * VISIT PROTOCOL_LITERAL
+     */
+    public T visitProtocolLiteral(ProtocolLiteral pl) {
+        Log.log(pl.line + ": Visiting a ProtocolLiteral (" + pl.name().getname() + ")");
+        
+        // Generated template after evaluating this visitor
+        ST stProtocolLiteral = _stGroup.getInstanceOf("ProtocolLiteral");
+        
+        String type = (String) pl.name().visit(this);
+        String tag = (String) pl.tag().visit(this);
+        List<String> params = new ArrayList<>();
+        
+        for (Expression ex : pl.expressions())
+            params.add((String) ex.visit(this));
+        
+        stProtocolLiteral.add("type", type);
+        stProtocolLiteral.add("tag", tag);
+        stProtocolLiteral.add("vals", params);
+        
+        return (T) stProtocolLiteral.render();
     }
     
     /**
@@ -1111,7 +1207,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         _recordMap.put(rt.name().getname(), recName);
         _recordFieldMap.clear();
         
-        // The scope in which all members appear in a record
+        // The scope in which all members appeared in a record
         for (RecordMember rm : rt.body())
             rm.visit(this);
         
@@ -1212,8 +1308,9 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
             
             stRecordAccess.add("name", name);
             stRecordAccess.add("member", field);
-        } else
-            ; // TODO: Don't forget to resolve protocol access
+        } else if (ra.record().type.isProtocolType()) {
+            // TODO: add record stuff
+        }
         
         return (T) stRecordAccess.render();
     }
@@ -1347,9 +1444,8 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         if (t.isNamedType()) {
             NamedType nt = (NamedType) t;
             baseType = (String) nt.visit(this);
-        } else if (t.isPrimitiveType()) {
+        } else if (t.isPrimitiveType()) // This is needed because we can only have wrapper class
             baseType = Helper.getWrapperType(t);
-        }
         
         return baseType;
     }

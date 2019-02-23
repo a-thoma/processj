@@ -4,8 +4,9 @@ import utilities.Visitor;
 
 public class RecordTypeDecl extends Type implements DefineTopLevelDecl {
 
-    public RecordTypeDecl(Sequence<Modifier> modifiers, Name name, Sequence<AST> extend,
-                        Annotations annotations, Sequence<RecordMember> body) {
+    public RecordTypeDecl(Sequence<Modifier> modifiers, Name name, 
+                          Sequence<AST> extend, Annotations annotations,
+                          Sequence<RecordMember> body) {
         super(name);
         nchildren = 5;
         children = new AST[] { modifiers, name, extend, annotations, body };

@@ -74,6 +74,50 @@ public class Demo {
         }
     }
 
+    public static class PP {
+        protected static class request extends PJProtocolCase {
+            public int number;
+            public double amount;
+
+            public request(int number, double amount) {
+                this.number = number;
+                this.amount = amount;
+                this.tag = "request";
+            }
+        }
+
+        protected static class reply extends PJProtocolCase {
+            public boolean status;
+
+            public reply(boolean status) {
+                this.status = status;
+                this.tag = "reply";
+            }
+        }
+    }
+
+    public static class P1 {
+        protected static class deny extends PJProtocolCase {
+            public int code;
+
+            public deny(int code) {
+                this.code = code;
+                this.tag = "deny";
+            }
+        }
+    }
+
+    public static class XX {
+        protected static class accept extends PJProtocolCase {
+            public int code;
+
+            public accept(int code) {
+                this.code = code;
+                this.tag = "accept";
+            }
+        }
+    }
+
     public static class _proc$writer$cwLL extends PJProcess {
         protected PJOne2OneChannel<L> _pd$out1;
 
@@ -136,6 +180,20 @@ public class Demo {
 
             label(2);
 
+            switch(_ld$value1.k.t.a) {
+            case 4:
+                io.println("case 4");
+                break;
+            case 5:
+                io.println("case 5");
+                break;
+            case 6:
+                io.println("case 6");
+                break;
+            default:
+                io.println("some case!");
+                break;
+            }
             io.println("The value is " + _ld$value1.k.t.a);
             terminate();
         }
@@ -147,6 +205,7 @@ public class Demo {
 
         protected PJOne2OneChannel<L> _ld$c1;
         protected int _ld$a2;
+        protected PJProtocolCase _ld$xx3;
 
         public _proc$main$arT(String[] _pd$args1) {
             this._pd$args1 = _pd$args1;
@@ -162,6 +221,7 @@ public class Demo {
 
             _ld$c1 = new PJOne2OneChannel<L>();
             _ld$a2 = 2;
+            _ld$xx3 = new XX.accept(35);
             final PJPar _ld$par1 = new PJPar(2, this);
 
             (new Demo._proc$writer$cwLL(_ld$c1) {
