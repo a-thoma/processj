@@ -274,10 +274,13 @@ public class ProcessJc {
 	    c.visit(new semanticcheck.LiteralInits());
 
 
-            new rewriters.Test().go(c, null);
-	    System.out.println("Lets reprint it all");
-	    c.visit(new printers.ParseTreePrinter());
-	    c.visit(new printers.PrettyPrinter());
+            new rewriters.ChannelReadRewrite().go(c, null);
+	    //System.out.println("Lets reprint it all");
+	    //c.visit(new printers.ParseTreePrinter());
+	    //c.visit(new printers.PrettyPrinter());
+
+	    new rewriters.LabeledBreakContinueCheck().go(c);
+
 //            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
 //                CompilerMessageManager.INSTANCE.printTrace("yield");
 //                System.exit(1);

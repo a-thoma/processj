@@ -5,7 +5,23 @@ import utilities.Visitor;
 import printers.*;
 import utilities.Error;
 
-public class Test {
+/**
+ * The purpose of this rewriter is to lift yielding Channel Read Expressions out of other expressions. For example:
+ *
+ * x = c.read() + 2;
+ *
+ * causes a problem because the code generated for the 'c.read' expression yields. This is solved by turning all 
+ * channel read expressions into simple assignments with simple (NameExpr) target channels (the channel expression
+ * from which the read happens. The above example generates:
+ *
+ * temp_0 = c.read();
+ * x = temp_0 + 2;
+ *
+ * Errors generated in this file:
+ *
+ * XXX - 
+ */
+public class ChannelReadRewrite {
     private int tempCounter = 0;
     private String nextTemp() {
 	return "temp" + tempCounter++;
@@ -68,7 +84,6 @@ public class Test {
      * If 'a' is not a Sequence, then travers the children of it by iterating through its 'children' array.
      */
     public void go(AST a, Statement currentStatement) {
-
 	if (a instanceof ProcTypeDecl) { 
 	    // Rewrite the body.
 	    ProcTypeDecl pd = (ProcTypeDecl)a;	
@@ -84,14 +99,13 @@ public class Test {
 		if (s.child(i) != null && s.child(i) instanceof Statement) {
 		    Statement st = (Statement)s.child(i);
 		    if (st instanceof AltStat) { // AltStat
-			// TODO: Alt Stats cannot have channel reads in the precondition.
+			// Alt Stats cannot have channel reads in the precondition.
 			AltStat as = (AltStat)st;
 			for (int j=0; j<as.body().size(); j++) {
 			    AltCase ac = (AltCase)as.body().child(j);
 			    if (ac.precondition().doesYield())
-				;//Error.addError("Something here");
+				;//TODO: Error.addError("Something here");
 			}
-			
 		    } else if (st instanceof Block || st instanceof ChannelWriteStat || st instanceof IfStat ||
 			       st instanceof ParBlock || st instanceof ReturnStat || st instanceof SyncStat ||
 			       st instanceof TimeoutStat) {
@@ -99,19 +113,25 @@ public class Test {
 			st.assignments = new Sequence<Statement>();
 			go(st, st);
 		    } else if (st instanceof BreakStat || st instanceof ContinueStat || st instanceof SkipStat ||
-			       st instanceof StopStat) { 
-			// BreakStat, ContinueStat, SkipStat, StopStat
+			       st instanceof StopStat || st instanceof SuspendStat) { 
+			// BreakStat, ContinueStat, SkipStat, StopStat, SuspendStat
 			// Nothing to do.
 		    } else if (st instanceof ExprStat) { // ExprStat
 			ExprStat es = (ExprStat)st;
+			es.assignments = new Sequence<Statement>();
 			// Don't bother with simple v = c.read();
 			if (es.doesYield()) {
 			    if (es.expr() instanceof Assignment) {
 				Assignment as = (Assignment)es.expr();
-				if (as.right() instanceof ChannelReadExpr)
-				    continue; // don't bother with simple assignments of reads.
+				if (as.right() instanceof ChannelReadExpr) {
+				    ChannelReadExpr cre = (ChannelReadExpr)as.right();
+				    if (!cre.channel().doesYield()) {
+					// Don't bother with simple assignments of reads.
+					continue; 
+				    } else
+					go(cre, es);
+				}
 			    }
-			    es.assignments = new Sequence<Statement>();
 			    go(es, es);
 			}
 		    } else if (st instanceof LocalDecl) { // LocalDecl
@@ -135,14 +155,11 @@ public class Test {
 			    go(b, b);
 			    s.set(i, b);
 			}
-		    } else if (st instanceof SuspendStat) { // SuspendStat
-			// TODO:
 		    } else if (st instanceof SwitchStat) { // SwithStat
 			// Only the expression in the switch should be handled.
 			st.assignments = new Sequence<Statement>();
 			SwitchStat ss = (SwitchStat)st;
-			go(ss, ss);
-			
+			go(ss, ss);			
 		    } 		   
 		    if (st.assignments != null && st.assignments.size() > 0) {
 			st.assignments.append(st);
@@ -155,22 +172,16 @@ public class Test {
 		    if (s.child(i) instanceof ChannelReadExpr) {                                                          
 			if (currentStatement != null) {
 			    ChannelReadExpr cre = (ChannelReadExpr)s.child(i);
-			    // if (!(cre.channel() instanceof NameExpr)) {
-				// The channel expression of this read is compliated. If it yields - rewrite it.
-
-			    //	if (cre.channel().doesYield())
-			    //    System.out.println("----->>> channel expression of channel read should be rewritten");
-			    //}
-			    
 			    Type type = cre.type;
 			    String temp = nextTemp();
-			    // TODO: what about the channel expression of the read - can it be a read itself ? (yes: chanArray[c.read()].read() -- crazy but true
-
+			    // Rewrite the Channel Read Expression if needed.
+			    go (s.child(i), currentStatement);
+			    
 			    LocalDecl ld = new LocalDecl(type, new Var(new Name(temp), null), false /*not constant*/);
 			    ExprStat es = new ExprStat(new Assignment(new NameExpr(new Name(temp)), (ChannelReadExpr)s.child(i), Assignment.EQ));
 			    currentStatement.assignments.append(ld);
 			    currentStatement.assignments.append(es);
-			    // replace the channel read expression with the temp name expression
+			    // Replace the channel read expression with the temp name expression.
 			    s.set(i, new NameExpr(new Name(temp)));
 			}
 		    } else  
@@ -181,25 +192,19 @@ public class Test {
 	} else {
 	    for (int i=0; i<a.nchildren; i++) {
 		if (a.children[i] != null && a.children[i] instanceof ChannelReadExpr && currentStatement != null) {
-		    // if currentExprStat is not null, then we were called from
-		    // a read that yields.
+		    // If currentExprStat is not null, then we were called from a read that yields.
 		    if (currentStatement != null) {
 			ChannelReadExpr cre = (ChannelReadExpr)a.children[i];
-			//if (!(cre.channel() instanceof NameExpr)) {
-			    // SEE TODO BELOW
-			    // The channel expression of this read is compliated. If it yields - rewrite it.
-			    //if (cre.channel().doesYield())
-			    //System.out.println("----->>> channel expression of channel read should be rewritten");
-			//}
+			// Rewrite the channel read expression if needed.
+			go (a.children[i], currentStatement);
 
 			Type type = cre.type;
 			String temp = nextTemp();
-			// TODO: what about the channel expression of the read - can it be a read itself ? (yes: chanArray[c.read()].read() -- crazy but true
 			LocalDecl ld = new LocalDecl(type, new Var(new Name(temp), null), false /*not constant*/);
 			ExprStat es = new ExprStat(new Assignment(new NameExpr(new Name(temp)), (ChannelReadExpr)a.children[i], Assignment.EQ));
 			currentStatement.assignments.append(ld);
 			currentStatement.assignments.append(es);
-			// replace the channel read expression with the temp name expression
+			// Replace the channel read expression with the temp name expression.
 			a.children[i] = new NameExpr(new Name(temp));
 		    }
 		} else  {
