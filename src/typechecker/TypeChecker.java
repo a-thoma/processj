@@ -33,8 +33,11 @@ public class TypeChecker extends Visitor<Type> {
     // Contains the protocol name and the corresponding tags currently switched on.
     Hashtable<String, ProtocolCase> protocolTagsSwitchedOn = new Hashtable<String, ProtocolCase>();
 
+    // Set of nested protocols in nested switch statements
+    HashSet<String> protocolsSwitchedOn = new HashSet<String>();
+
     public TypeChecker(SymbolTable topLevelDecls) {
-	    debug = true; // TODO: WHAT DOES THIS DO?
+	debug = true; // TODO: WHAT DOES THIS DO?
         this.topLevelDecls = topLevelDecls;
 
         Log.log("======================================");
@@ -708,15 +711,15 @@ public class TypeChecker extends Visitor<Type> {
                     ProcTypeDecl ptd = (ProcTypeDecl) pd;
 		    //System.out.println("Handling Procedure : " + ptd.typeName() + ptd.signature());
                     // set the qualified name in pd such that we can get at it later.
-		    System.out.println(ptd.formalParams().size() + "  " + in.params().size());
+		    //System.out.println(ptd.formalParams().size() + "  " + in.params().size());
                     if (ptd.formalParams().size() == in.params().size()) {
                         // TODO: this should store this somwhere
                         boolean candidate = true;
                         Log.log(" checking if Assignment Compatible proc: " + ptd.typeName() + " ( " + ptd.signature()
                                 + " ) ");
                         for (int i = 0; i < in.params().size(); i++) {
-			     System.out.println("Formal's type: " + ptd.formalParams().child(i).type());
-			     System.out.println("Actual's type: " + in.params().child(i).type);
+			    //System.out.println("Formal's type: " + ptd.formalParams().child(i).type());
+			    //System.out.println("Actual's type: " + in.params().child(i).type);
 			
 
 
@@ -724,12 +727,12 @@ public class TypeChecker extends Visitor<Type> {
 				(resolve(((ParamDecl) ptd.formalParams().child(i)).type())).typeAssignmentCompatible(resolve(in.params().child(i).type));
                         }
 			if (candidate) {
-			    System.out.println("Candidate kept");
+			    //System.out.println("Candidate kept");
                             candidateProcs.append(ptd);
                             Log.log("Possible proc: " + ptd.typeName() + " " + ptd.formalParams());
                         }
 			else 
-			    System.out.println("Candidate thrown away");
+			    ;//System.out.println("Candidate thrown away");
                     }
                 }
 	    
@@ -951,6 +954,14 @@ public class TypeChecker extends Visitor<Type> {
         return pl.type;
     }
     
+    @Override
+    public Type visitPrimitiveType(PrimitiveType pt) {
+ 	Log.log(pt.line + ": Visiting a Primitive type.");
+	Log.log(pt.line + ": Primitive type has type: " + pt);
+	return pt;
+    }
+	
+
     @Override 
     public Type visitProcTypeDecl(ProcTypeDecl pd) {
 	Log.log(pd.line + ": visiting a procedure type declaration (" + pd.name().getname() + ").");
@@ -1030,13 +1041,12 @@ public class TypeChecker extends Visitor<Type> {
 		// TODO: test inheritence here
 		RecordMember rm = ((RecordTypeDecl) tType).getMember(ra.field().getname());
 
-		System.out.println("is RM null?" + (rm == null));
-                if (rm == null) {
+		                if (rm == null) {
                     ra.type = Error.addError(ra, "Record type '" + ((RecordTypeDecl) tType).name().getname()
                             + "' has no member '" + ra.field().getname() + "'.", 3062);
                     return ra.type;
                 }
-		System.out.println("RM.type: " + rm.type());
+				//System.out.println("RM.type: " + rm.type());
 
                 Type rmt = resolve(rm.type());
                 ra.type = rmt;
@@ -1050,30 +1060,48 @@ public class TypeChecker extends Visitor<Type> {
                 //
                 // We have <expr>.<field> that means a field <field> in the tag associated with
                 // the type of <expr>.
-                
+         
                 ProtocolTypeDecl pt = (ProtocolTypeDecl) tType;
+
+
+		if (!protocolsSwitchedOn.contains(pt.name().getname())) {
+		    Error.addError(pt, "Illegal access to non-switched protocol type '" + pt + "'.", 0000);
+		    ra.type = new ErrorType();
+		    Log.log(ra.line + ": record access expression has type: " + ra.type);
+		    return ra.type;
+		}
                 // Lookup the appropriate ProtocolCase associated with the protocol's name in
                 // protocolTagsSwitchedOn
-                ProtocolCase pc = protocolTagsSwitchedOn.get(pt.name().getname());
+		
+		//System.out.println("HashSet: "+protocolsSwitchedOn);
+		
+		//System.out.println("[RecordAccess]: " + pt.name().getname());
+		ProtocolCase pc = protocolTagsSwitchedOn.get(pt.name().getname());
+		
+		//System.out.println("[RecordAccess]: Found protocol tag: " + pc.name().getname());
+
                 String fieldName = ra.field().getname();
                 // there better be a field in pc that has that name!
                 boolean found = false;
-		for (RecordMember rm : pc.body()) {
-                    Log.log("Looking at field " + rm.name().getname());
-                    if (rm.name().getname().equals(fieldName)) {
-                        // yep we found it; now set the type
-                        Type rmt = resolve(rm.type().visit(this));
-                        ra.type = rmt;
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    Error.addError(ra, "Unknown field reference '" + fieldName + "' in protocol tag '"
-				   + pc.name().getname() + "' in protocol '" + pt.name().getname() + "'.", 3073);
-                    ra.type = new ErrorType();
-                }
-           }
+		
+		if (pc != null)
+		    for (RecordMember rm : pc.body()) {
+			Log.log("Looking at field " + rm.name().getname());
+			if (rm.name().getname().equals(fieldName)) {
+			    // yep we found it; now set the type
+			    //System.out.println("FOUND IT - it is type " + rm.type());
+			    Type rmt = resolve(rm.type());
+			    ra.type = rmt;
+			    found = true;
+			    break;
+			}
+		    }
+		if (!found) {
+		    Error.addError(ra, "Unknown field reference '" + fieldName + "' in protocol tag '"
+				   + pt.name().getname() + "' in protocol '" + pt.name().getname() + "'.", 3073);
+		    ra.type = new ErrorType();
+		}
+	    }
         }
         Log.log(ra.line + ": record access expression has type: " + ra.type);
         return ra.type;
@@ -1139,10 +1167,94 @@ public class TypeChecker extends Visitor<Type> {
     // SwitchGroup -- nothing to do - handled in SwitchStat
     // SwitchLabel -- nothing to do - handled in SwitchStat
 
-    // TODO
-    /*
-    @Override public Type visitSwitchStat(SwitchStat ss) { return null; }
-    */
+    @Override public Type visitSwitchStat(SwitchStat ss) {
+	Type exprType = resolve(ss.expr().visit(this));
+	
+	// The switch expression must be integral, string or a protocol type (we then switch on the tag).
+	if (!(exprType.isProtocolType() || exprType.isIntegralType() || exprType.isStringType()))
+	    Error.addError(ss, "Illegal type '" + exprType + "' in expression in switch statement.", 0000);
+
+	// String and Intergral types.
+	if (exprType.isIntegralType() || exprType.isStringType()) {
+	    for (SwitchGroup sg : ss.switchBlocks()) {
+		// For each Switch Group, cycle through the Switch Labels and check they are assignment compatible with ...
+		for (SwitchLabel sl : sg.labels()) {
+		    if (!sl.isDefault()) {
+			// Get the type of the (constant expression)
+			if (exprType.isStringType() || exprType.isIntegralType()) {
+			    // For string and Integral types, the constant expression must be assignable
+			    // to the type of the switching expression.
+			    Type labelType = resolve(sl.expr().visit(this));
+			    //System.out.println("Type of tag " + sl.expr() + " is " + labelType);
+			    
+			    if (!exprType.typeAssignmentCompatible(labelType))
+				Error.addError(ss, "Switch label '" + sl.expr() + "' of type '" + labelType + "' not compatible with switch expression's type '" + exprType + "'.", 0000);
+			    sg.statements().visit(this);
+			}
+		    }
+		}
+	    }
+	} else { // Protocol Type.
+	    // Get the name of the protocol.
+	    String protocolName = ((ProtocolTypeDecl)exprType).name().getname();
+
+	    if (protocolsSwitchedOn.contains(protocolName))
+		Error.addError(ss, "Illegally nested switch on protocol '" + protocolName + "'.", 0000);
+	    else
+		protocolsSwitchedOn.add(protocolName);
+
+	    //System.out.println("protocolsSwitchedOn before visiting body: " + protocolsSwitchedOn.toString());
+	    
+
+	    // Cycle through the SwitchGroups one at a time. 
+	    for (SwitchGroup sg : ss.switchBlocks()) {
+		// For each Switch Group, cycle through the Switch Labels and check they are assignment compatible with ...
+		//System.out.println("-- New Group --");
+		for (SwitchLabel sl : sg.labels()) {
+		    if (!sl.isDefault()) {
+			// The label must ne a name.
+			if (!(sl.expr() instanceof NameExpr))
+			    Error.addError(sl, "Switch label '" + sl.expr() + "' is not a protocol tag.", 0000);
+		    
+			// Get the name of the tag.
+			// TODO: We should probably use properly qualified names here - what if there are two different protocols named the same ?
+			String tag = ((NameExpr)sl.expr()).name().getname();			
+			//System.out.println("Processing tag: " + tag);
+			//System.out.println(protocolTagsSwitchedOn.toString());
+			
+			ProtocolTypeDecl ptd = (ProtocolTypeDecl)exprType;
+			ProtocolCase pc = ptd.getCase(tag);
+		    
+			if (pc == null)
+			    Error.addError(sl, "Tag '" + tag + "' is not found in protocol '" + protocolName + "'.", 0000);
+			else {
+			    //System.out.println("pc is not null: " + pc.name().getname());
+			    //System.out.println("Fields: ");
+			    //for (RecordMember rm : pc.body()) {
+			    //	System.out.println("  " + rm.name().getname());
+			    //}
+			    
+			    
+			    //System.out.println(protocolTagsSwitchedOn.toString());
+			    
+			    // insert into protocol Cases Swithced on
+			    // visit the body.
+			    protocolTagsSwitchedOn.put(protocolName, pc); // TODO: perhaps a hash table here isn't a good idea - something in reverse order may be what we need.                          
+			}
+			//System.out.println("ABOUT TO VISIT STATEMENTS");
+		    }
+		    sg.statements().visit(this);
+		    if (!sl.isDefault())
+			protocolTagsSwitchedOn.remove(protocolName);
+		}
+	    }
+	    // remove from protocol Cases Switched on
+	    protocolsSwitchedOn.remove(protocolName);	   	
+	    //System.out.println("protocolsSwitchedOn after evaluating body: " + protocolsSwitchedOn);
+	}
+	return null;
+    }
+
     
     @Override
     public Type visitSyncStat(SyncStat ss) {

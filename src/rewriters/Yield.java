@@ -67,7 +67,7 @@ public class Yield extends Visitor<Boolean> {
         boolean b = visitChildren(bl.children);
         if (b)
             bl.setYield();
-        System.out.println("[Yield]: Block yields: " + b);
+        //System.out.println("[Yield]: Block yields: " + b);
         return b;
     }   
 
@@ -112,7 +112,7 @@ public class Yield extends Visitor<Boolean> {
 
     public Boolean visitCompilation(Compilation co) {
         // At the compilation level we don't really care.
-        System.out.println("[Yield]: Visiting a Compilation");
+        //System.out.println("[Yield]: Visiting a Compilation");
         visitChildren(co.children);
         return false;
     }
@@ -241,10 +241,10 @@ public class Yield extends Visitor<Boolean> {
     }
 
     public Boolean visitProcTypeDecl(ProcTypeDecl pd) {
-        System.out.println("[Yield]: Visiting " + pd.name());
+        //System.out.println("[Yield]: Visiting " + pd.name());
         boolean b = visitChildren(pd.children);
         pd.yields = b;
-        System.out.println("[Yield]: Procedure " + pd.name() + " " + (b?"yields":"does not yield"));
+        //System.out.println("[Yield]: Procedure " + pd.name() + " " + (b?"yields":"does not yield"));
         return b;
     }
 
@@ -294,7 +294,7 @@ public class Yield extends Visitor<Boolean> {
         boolean b = false;
         for (int i = 0; i < se.size(); i++)
             if (se.child(i) != null) {
-		System.out.println(i + " " + (se==null) + " " + (se.child(i) == null) + " " + se.child(i));	       
+		//System.out.println(i + " " + (se==null) + " " + (se.child(i) == null) + " " + se.child(i));	       
                 boolean bb = se.child(i).visit(this);
                 b = b || bb;
             }
