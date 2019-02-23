@@ -176,6 +176,17 @@ public enum VisitorMessageNumber implements IMessageNumber {
     REACHABILITY_810(810, ErrorSeverity.ERROR),
     REACHABILITY_811(811, ErrorSeverity.ERROR),
     REACHABILITY_812(812, ErrorSeverity.ERROR),
+	
+	
+    // =====================================
+    // S E M A N T I C  C H E C K S (900-999)
+    //=====================================
+
+    // =====================================
+    // R E W R I T E R S (1000-1020)
+    // =====================================
+
+    REWRITE_900(900, ErrorSeverity.ERROR)
     ;
     
     /**

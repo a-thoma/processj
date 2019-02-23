@@ -3,7 +3,11 @@ package rewriters;
 import ast.*;
 import utilities.Visitor;
 import printers.*;
-import utilities.Error;
+import utilities.PJMessage;
+import utilities.CompilerMessageManager;
+import utilities.MessageType;
+import utilities.VisitorMessageNumber;
+
 
 /**
  * The purpose of this rewriter is to lift yielding Channel Read Expressions out of other expressions. For example:
@@ -19,7 +23,7 @@ import utilities.Error;
  *
  * Errors generated in this file:
  *
- * XXX - 
+ * 900 - Precondition in alt statement cannot contain channel reads 
  */
 public class ChannelReadRewrite {
     private int tempCounter = 0;
@@ -104,7 +108,11 @@ public class ChannelReadRewrite {
 			for (int j=0; j<as.body().size(); j++) {
 			    AltCase ac = (AltCase)as.body().child(j);
 			    if (ac.precondition().doesYield())
-				;//TODO: Error.addError("Something here");
+				 CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+									       .addAST(ac.precondition())
+									       .addError(VisitorMessageNumber.REWRITE_900)
+									       .build(), MessageType.PRINT_CONTINUE);
+			    ;//TODO: Error.addError("Something here");
 			}
 		    } else if (st instanceof Block || st instanceof ChannelWriteStat || st instanceof IfStat ||
 			       st instanceof ParBlock || st instanceof ReturnStat || st instanceof SyncStat ||
