@@ -279,7 +279,7 @@ public class ProcessJc {
 	    //c.visit(new printers.ParseTreePrinter());
 	    //c.visit(new printers.PrettyPrinter());
 
-	    new rewriters.LabeledBreakContinueCheck().go(c);
+	    new semanticcheck.LabeledBreakContinueCheck().go(c);
 
 //            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
 //                CompilerMessageManager.INSTANCE.printTrace("yield");
