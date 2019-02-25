@@ -21,7 +21,7 @@ public abstract class Expression extends AST {
     public Object constantValue() {
         return null;
     }
-
+    
     public boolean doesYield() { 
         return yields;
     }
@@ -29,5 +29,4 @@ public abstract class Expression extends AST {
     public void setYield() {
         yields = true;
     }
-
 }

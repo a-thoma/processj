@@ -1588,7 +1588,6 @@ record_literal_argument_list ::=
         | record_literal_argument_list:rl COMMA IDENTIFIER:id EQ expression:e  {: RESULT = rl.append(new RecordMemberLiteral(new Name(id), e)); :}
         ;
 
-
 // ProtocolLiteral :> Literal :> Expression :> AST
 protocol_literal ::=
         NEW type_name:tn LBRACE IDENTIFIER:id2 COLON argument_list_opt:l RBRACE 

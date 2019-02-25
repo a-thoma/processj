@@ -5,7 +5,7 @@ import utilities.Visitor;
 public class NamedType extends Type implements DefineTopLevelDecl {
 
     private DefineTopLevelDecl resolvedTopLevelDecl = null; // could be a SymbolTable
-    // This field is set to the actual type this named type resolved to. 
+    // This field is set to the actual type this named type resolved to.
     // This is done in the resolve method in typechecker/TypeChecker.java
     private Type actualType = null;
 
@@ -57,18 +57,19 @@ public class NamedType extends Type implements DefineTopLevelDecl {
     // ********************
     // Type Related Stuff
     // ********************
-    
-    @Override public boolean isNamedType() {
-	return true;
+
+    @Override
+    public boolean isNamedType() {
+        return true;
     }
 
-    
     // TODO
-    @Override public boolean typeEqual(Type t) {
-	if (!t.isNamedType())
-	    return false;
-	NamedType nt = (NamedType)t;
-	return name().getname().equals(nt.name().getname());
+    @Override
+    public boolean typeEqual(Type t) {
+        if (!t.isNamedType())
+            return false;
+        NamedType nt = (NamedType) t;
+        return name().getname().equals(nt.name().getname());
     }
 
     // TODO

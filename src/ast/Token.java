@@ -2,11 +2,11 @@ package ast;
 
 public class Token {
 
-    public int kind; // Gets its value from sym.java.
-    public String lexeme; // The actual text scanned for this token.
-    public int line; // Tne line number on which this token appears.
-    public int charBegin; // The column number in which the token begins.
-    public int charEnd; // The column number in which the token ends.
+    public int kind;        // Gets its value from sym.java.
+    public String lexeme;   // The actual text scanned for this token.
+    public int line;        // The line number on which this token appears.
+    public int charBegin;   // The column number in which the token begins.
+    public int charEnd;     // The column number in which the token ends.
     // TODO: add strings
     public static final String names[] = { "EOF", "error", "" };
 

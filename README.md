@@ -1,4 +1,3 @@
 # The ProcessJ Language
 
-A new programming language currently in development at the University of Nevada, Las Vegas.
-ProcessJ.org
+A new programming language being developed at the University of Nevada, Las Vegas.

@@ -5,7 +5,8 @@ package utilities;
  * methods that when building useful compiler messages would
  * enforce {@code enum}s to provide an implementation for
  * {@link #getMessage()}, and for {@link #getErrorSeverity()}
- * or {@link #getNumber()} if needed.
+ * or {@link #getNumber()} and {@link #getMessageType()} if
+ * needed.
  * 
  * @author Ben
  * @version 10/21/2018
@@ -22,4 +23,6 @@ public interface IMessageNumber {
     }
     
     String getMessage();
+    
+    MessageType getMessageType();
 }

@@ -1,0 +1,8 @@
+#!/bin/bash
+
+for run in {1..100}
+do
+    RESULT=`pjava Demo2`
+    echo "${RESULT}"
+    echo "=========================================="
+done

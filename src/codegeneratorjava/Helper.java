@@ -10,6 +10,7 @@ import java.util.HashSet;
 import java.util.Set;
 
 import ast.ProcTypeDecl;
+import ast.Type;
 import utilities.Assert;
 import utilities.Settings;
 
@@ -63,16 +64,6 @@ public class Helper {
      * {@code name} is a protocol tag and '{@code X}' is the protocol's unique
      * identifier.
      * </li>
-     *
-     * <li>
-     * For records, the record is encoded as '{@code _rec$nameX}' where
-     * {@code name} is a record tag and '{@code X}' is the records' unique identifier.
-     * </li>
-     *
-     * <li>For channels, the channel is encoded as '{@code _chan$nameX}' where
-     * '{@code name}' is either '{@code READ}' or '{@code WRITE}' and '{@code X}' is
-     * the channel's unique identifier.
-     * </li>
      * </ul>
      *
      * @param name
@@ -101,15 +92,7 @@ public class Helper {
         case LOCAL_NAME:
             varName = Tag.LOCAL_NAME.getTag() + name + X; break;
         case PROTOCOL_NAME:
-            varName = Tag.PROTOCOL_NAME.getTag() + name + X; break;
-        case RECORD_NAME:
-            varName = Tag.RECORD_NAME.getTag() + name + X; break;
-        case CHANNEL_NAME:
-            varName = Tag.CHANNEL_NAME.getTag() + name + X; break;
-        case CHANNEL_READ_NAME:
-            varName = Tag.CHANNEL_NAME.getTag() + name + X + Tag.CHANNEL_READ_NAME.getTag(); break;
-        case CHANNEL_WRITE_NAME:
-            varName = Tag.CHANNEL_NAME.getTag() + name + X + Tag.CHANNEL_WRITE_NAME.getTag(); break;
+            varName = Tag.PROTOCOL_NAME.getTag() + name; break;
         default:
             break;
         }
@@ -128,10 +111,12 @@ public class Helper {
      * @return {@code true} if the procedure can yield or {@code false} otherwise.
      */
     public static boolean doesProcedureYield(final ProcTypeDecl pd) {
-        if (pd == null) {
+        if (pd == null)
             return false;
-        }
-        return pd.annotations().isDefined("yield") && Boolean.valueOf(pd.annotations().get("yield"));
+        
+        return pd.yields ||
+               (pd.annotations().isDefined("yield") &&
+               Boolean.valueOf(pd.annotations().get("yield")));
     }
     
     /**
@@ -141,27 +126,28 @@ public class Helper {
      *          A primitive class type or the class itself.
      * @return The type instances represented by a class.
      */
-    public static Class<?> getWrapperClass(Class<?> type) {
+    public static Class<?> getWrapperClass(Type type) {
         type = Assert.nonNull(type, "The parameter type cannot be null.");
-        if (type == Integer.TYPE) {
-            type = Integer.TYPE;
-        } else if (type == Byte.TYPE) {
-            type = Byte.TYPE;
-        } else if (type == Long.TYPE) {
-            type = Long.TYPE;
-        } else if (type == Double.TYPE) {
-            type = Double.TYPE;
-        } else if (type == Float.TYPE) {
-            type = Float.TYPE;
-        } else if (type == Boolean.TYPE) {
-            type = Boolean.TYPE;
-        } else if (type == Character.TYPE) {
-            type = Character.TYPE;
-        } else if (type == Short.TYPE) {
-            type = Short.TYPE;
+        Class<?> typeName = null;
+        if (type.isIntegerType()) {
+            typeName = Integer.class;
+        } else if (type.isByteType()) {
+            typeName = Byte.class;
+        } else if (type.isLongType()) {
+            typeName = Long.class;
+        } else if (type.isDoubleType()) {
+            typeName = Double.class;
+        } else if (type.isFloatType()) {
+            typeName = Float.class;
+        } else if (type.isBooleanType()) {
+            typeName = Boolean.class;
+        } else if (type.isCharType()) {
+            typeName = Character.class;
+        } else if (type.isShortType()) {
+            typeName = Short.class;
         }
         
-        return type;
+        return typeName;
     }
     
     /**
@@ -172,20 +158,24 @@ public class Helper {
      *          A primitive class type or the class itself.
      * @return A {@code String} representation of class {@code type}.
      */
-    public static String getWrapperType(Class<?> type) {
-        return getWrapperClass(type).toString();
+    public static String getWrapperType(Type type) {
+        return getWrapperClass(type).getSimpleName();
     }
     
     // ==========================================
     // I N V A L I D   I D E N T I F I E R S
     // ==========================================
     
-    // This is to prevent collision of names with special keywords in Java
+    // This is to prevent collision of names with special keywords
     // when generating Java class files
     private static final Set<String> INVALID_NAMES = new HashSet<>(Arrays.asList(
-            new String[] { "abstract", "assert", "class", "catch", "enum", "extends", "final",
+            new String[] {
+                    /* Java keywords */
+                    "abstract", "assert", "class", "catch", "enum", "extends", "final",
                     "goto", "instanceof", "interface", "static", "super", "synchronized",
-                    "this", "throw", "throws", "try", "null"
+                    "this", "throw", "throws", "try", "null",
+                    /* ProcessJ keywords */
+                    "label", "jump", "terminate", "yield"
             }));
     
     /**
@@ -244,24 +234,5 @@ public class Helper {
         } catch (Exception e) {
             System.out.println(e);
         }
-    }
-    
-    // =========================
-    // T Y P E   S Y S T E M
-    // =========================
-    
-    public static boolean isRangeInt(Class<?> type) {
-        return type == Integer.class || type == Integer.TYPE ||
-               type == Byte.class || type == Byte.TYPE ||
-               type == Short.class || type == Short.TYPE;
-    }
-    
-    public static boolean isRangeLong(Class<?> type) {
-        return type == Long.class || type == Long.TYPE || isRangeInt(type);
-    }
-    
-    public static boolean isRangeDouble(Class<?> type) {
-        return type == Float.class || type == Float.TYPE ||
-               type == Double.class || type == Double.TYPE;
     }
 }

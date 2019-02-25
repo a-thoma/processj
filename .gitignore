@@ -13,6 +13,4 @@ docs\+notes/ProcessJ-TypeSystem\.synctex\.gz
 
 #Ignore All binary files. ez
 bin/
-\.settings/org\.eclipse\.jdt\.core\.prefs
-
-src/typechecker/TypeChecker\.txt
+Demo\.jar

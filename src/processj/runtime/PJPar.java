@@ -45,7 +45,7 @@ public class PJPar {
 
     /**
      * Decrements the number of processes in the par block. The last process of the
-     * par block to call this method causes the process in which the par appers to
+     * par block to call this method causes the process in which the par appears to
      * become ready to run again.
      */
     public void decrement() {

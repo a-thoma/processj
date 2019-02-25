@@ -87,6 +87,10 @@ public enum CompilerMessageManager {
         }
     }
     
+    public void reportMessage(CompilerMessage cm) {
+        reportMessage(cm, cm.getMessageNumber().getMessageType());
+    }
+    
     public int getErrorCount() {
         return errorCount;
     }
@@ -100,7 +104,9 @@ public enum CompilerMessageManager {
     }
     
     public void printTrace(String source) {
-        System.out.println("=============== E R R O R   R E P O R T ===============");
+        System.out.println("****************************************");
+        System.out.println("*        E R R O R   R E P O R T       *");
+        System.out.println("****************************************");
         System.out.println(String.format("%d error(s) in '%s'", errorCount, source));
         Iterator<CompilerMessage> it = stackTrace.iterator();
         while (it.hasNext()) {
