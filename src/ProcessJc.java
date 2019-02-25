@@ -9,6 +9,7 @@ import codegeneratorjava.CodeGeneratorJava;
 import codegeneratorjava.Helper;
 import library.Library;
 import parser.parser;
+import rewriters.CastRewrite;
 import scanner.Scanner;
 import utilities.ConfigFileReader;
 import utilities.Error;
@@ -66,7 +67,8 @@ public class ProcessJc {
         List<File> files = pjMain.files;
         // Turn on/off colour mode
         if (pjMain.ansiColour == null) {
-            // Only set the colour mode if the default value in properties file is 'yes'
+            // Only set the colour mode if the default value in 
+            // properties file is 'yes'
             if (config.getProperty("colour").equalsIgnoreCase("yes"))
                 Settings.isAnsiColour = true;
         } else {
@@ -77,7 +79,7 @@ public class ProcessJc {
             // Update 'colour' code value in properties file
             config.setProperty("colour", ansiColorvalue);
             ConfigFileReader.closeConfiguration(config);
-            System.exit(0);
+//            System.exit(0);
         }
         
         // Display usage page
@@ -185,6 +187,10 @@ public class ProcessJc {
 	    System.out.println("-- Not sure what is happening here.");
             c.visit(new namechecker.ResolveProcTypeDecl<AST>());
             //
+            
+            ///////
+            c.visit(new namechecker.ResolveImportTopTypeDecl<AST>());
+            //
 
 //            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
 //                CompilerMessageManager.INSTANCE.printTrace("top level declarations");
@@ -196,6 +202,7 @@ public class ProcessJc {
             // Dump the symbol table structure
 //            if (symbolTable)
 //                globalTypeTable.printStructure("");
+            
             
             // ========================================================
             // V I S I T R E S O L V E   P A C K A G E   T Y P E S
@@ -246,6 +253,12 @@ public class ProcessJc {
 //            }
             
             // ========================================
+            // V I S I T   R E W R I T E S
+            // ========================================
+            
+            c.visit(new CastRewrite());
+            
+            // ========================================
             // V I S I T   R E A C H A B I L I T Y
             // ========================================
 	    System.out.println("-- Computing reachability.");
@@ -271,7 +284,7 @@ public class ProcessJc {
             // V I S I T   Y I E L D
             // ==========================
             
-	    //            c.visit(new yield.Yield());
+            c.visit(new yield.Yield());
 	    System.out.println("-- Marking yielding statements and expressions.");
             c.visit(new rewriters.Yield());
 	    //c.visit(new rewriters.Expr());
@@ -304,6 +317,7 @@ public class ProcessJc {
                 System.exit(1);
             }
             
+            System.out.println("============= S = U = C = C = E = S = S =================");
             System.out.println(String.format("*** File '%s' was compiled successfully ***", inFile.getName()));
         }
     }

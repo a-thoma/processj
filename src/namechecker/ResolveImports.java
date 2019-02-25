@@ -23,11 +23,10 @@ import utilities.VisitorMessageNumber;
 public class ResolveImports<T extends AST> extends Visitor<T> {
     
     public static String currentFileName = CompilerMessageManager.INSTANCE.fileName;
-    
     private SymbolTable importChild = null;
-
+    
     public ResolveImports(SymbolTable importChild) {
-	this.importChild = importChild;
+        this.importChild = importChild;
         Log.logHeader("==============================================================");
         Log.logHeader("*                  R E S O L V E   I M P O R T S             *");
         Log.logHeader("*       -----------------------------------------------      *");
@@ -78,9 +77,10 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
             parser p1 = new parser(s1);
             java_cup.runtime.Symbol r = p1.parse();
             
-            // Check the path of the imported file and compare the *import* statements found
-            // in it with the imported file's path format. Throw an error if the *import* statements
-            // do not match the path of the package name in which 'fileName' exists
+            // Check the path of the imported file and compare the *import* statements
+            // found in the given file with the imported file's path format. Throw an
+            // error if the *import* statements do not match the path of the package
+            // name in which 'fileName' exists
             String packageName = packageNameToString(((Compilation) r.value).packageName());
             String importPathWithDot = importPath.replaceAll(File.separator, "\\.");
             if (!importPathWithDot.equals(packageName)) {
@@ -88,7 +88,7 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
                             .addAST(a)
                             .addError(VisitorMessageNumber.RESOLVE_IMPORTS_103)
                             .addArguments(packageName)
-                            .build(), MessageType.PRINT_STOP);
+                            .build());
             }
             
             TopLevelDecls.alreadyImportedFiles.put(fileName,
@@ -99,13 +99,13 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
                         .addAST(a)
                         .addError(VisitorMessageNumber.RESOLVE_IMPORTS_102)
                         .addArguments(fileName)
-                        .build(), MessageType.PRINT_STOP);
+                        .build());
         } catch (Exception e) {
             CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                         .addAST(a)
                         .addError(VisitorMessageNumber.RESOLVE_IMPORTS_106)
                         .addArguments(fileName)
-                        .build(), MessageType.PRINT_STOP);
+                        .build());
         }
         return null;
     }
@@ -132,7 +132,7 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
      *
      * @param list
      *            After execution list will contain the list of file names in the
-     *            directory given by the `directory' parameter.
+     *            directory given by the 'directory' parameter.
      * @param directory
      *            The name of the directory from which to import files.
      */
@@ -213,7 +213,7 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
                                 .addAST(im)
                                 .addError(VisitorMessageNumber.RESOLVE_IMPORTS_103)
                                 .addArguments(packageName)
-                                .build(), MessageType.PRINT_CONTINUE);
+                                .build());
                 }
             }
             Log.log("visitImport(): About to import '" + im.file().getname() + ".pj'");
@@ -242,7 +242,7 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
                                     .addAST(im)
                                     .addError(VisitorMessageNumber.RESOLVE_IMPORTS_102)
                                     .addArguments(im.file().getname())
-                                    .build(), MessageType.PRINT_CONTINUE);
+                                    .build());
                     } else {
                         String packageName = path.replaceAll("/", ".");
                         packageName = packageName.substring(0, packageName.length() - 1);
@@ -250,7 +250,7 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
                                     .addAST(im)
                                     .addError(VisitorMessageNumber.RESOLVE_IMPORTS_105)
                                     .addArguments(im.file().getname(), path)
-                                    .build(), MessageType.PRINT_CONTINUE);
+                                    .build());
                     }
                 }
             }
@@ -271,20 +271,22 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
             im.addCompilation(c);
             // Create a symboltable for it
             SymbolTable symtab = new SymbolTable("Import: " + fn);
-
-	    importChild.setImportParent(symtab);
-	    symtab.setParent(SymbolTable.hook);
-	    SymbolTable.hook = symtab;
-
-	    SymbolTable oldHook = SymbolTable.hook;
-	    SymbolTable.hook = null;
+            
+            importChild.setImportParent(symtab);
+            // Point to whoever called you
+            symtab.setParent(SymbolTable.hook);
+            SymbolTable.hook = symtab;
+            
+            SymbolTable oldHook = SymbolTable.hook;
+            SymbolTable.hook = null;
+            
             // Visit imports in the current process file
             c.visit(new ResolveImports<AST>(symtab));
-	    // Declare types and constants for handling it's imports
+            // Declare types and constants for handling it's imports
             c.visit(new TopLevelDecls<AST>(symtab));
-	    SymbolTable.hook = oldHook;
-
-	    currentFileName = oldCurrentFileName;
+            SymbolTable.hook = oldHook;
+            
+            currentFileName = oldCurrentFileName;
             // Reset filename
             CompilerMessageManager.INSTANCE.setFileName(oldCurrentFileName);
         }

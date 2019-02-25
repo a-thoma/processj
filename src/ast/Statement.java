@@ -11,7 +11,7 @@ public abstract class Statement extends AST {
 
 
     private String label = "";
-    private boolean yields = false;
+    public boolean yields = false;
 
     public Statement(Token t) {
         super(t);
@@ -35,5 +35,13 @@ public abstract class Statement extends AST {
 
     public void setYield() {
 	    yields = true;
+    }
+    
+    public boolean doesYield() { 
+        return yields;
+    }
+
+    public void setYield() {
+        yields = true;
     }
 }

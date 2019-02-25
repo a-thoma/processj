@@ -9,7 +9,7 @@ public class ChannelEndType extends Type {
 
     public static final int READ_END = 0;
     public static final int WRITE_END = 1;
-    public static final int byteSizeC = 4; //32-bit pointer.
+    public static final int byteSizeC = 4; // 32-bit pointer.
 
     private int shared;
     private int end;
@@ -56,9 +56,8 @@ public class ChannelEndType extends Type {
         return (Type) children[0];
     }
 
-    
     public boolean isChannelEndType() {
-	return true;
+        return true;
     }
 
 
@@ -79,10 +78,10 @@ public class ChannelEndType extends Type {
     @Override
     public boolean typeAssignmentCompatible(Type t) {
         if (!t.isChannelEndType())
-	    return false;
-	else {	    
-	    ChannelEndType cet = (ChannelEndType)t;
-	    return baseType().typeAssignmentCompatible(cet.baseType());
-	}
+            return false;
+        else {
+            ChannelEndType cet = (ChannelEndType) t;
+            return baseType().typeAssignmentCompatible(cet.baseType());
+        }
     }
 }

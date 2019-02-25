@@ -56,13 +56,13 @@ public class Reachability extends Visitor<Boolean> {
             CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                                   .addAST(is)
                                   .addError(VisitorMessageNumber.REACHABILITY_800)
-                                  .build(), MessageType.PRINT_CONTINUE);
+                                  .build());
         // if (false) S1 ... - S1 is unreachable
         if (is.expr().isConstant() && (!(Boolean) is.expr().constantValue()))
             CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                                   .addAST(is)
                                   .addError(VisitorMessageNumber.REACHABILITY_801)
-                                  .build(), MessageType.PRINT_CONTINUE);
+                                  .build());
         boolean thenBranch = true;
         boolean elseBranch = true;
         thenBranch = is.thenpart().visit(this);
@@ -77,7 +77,7 @@ public class Reachability extends Visitor<Boolean> {
         LoopStatement oldLoopConstruct = loopConstruct;
         loopConstruct = ws;
 
-        boolean b = ws.stat().visit(this);
+        boolean b = ws.stat() != null ? ws.stat().visit(this) : true; // Only the compiler will know
         if (ws.expr().isConstant() && ((Boolean) ws.expr().constantValue())
                 && ((b && // the statement can run to completion
                 !ws.hasBreak && !ws.hasReturn) // but has no breaks, so it will loop forever
@@ -85,7 +85,7 @@ public class Reachability extends Visitor<Boolean> {
             CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                                   .addAST(ws)
                                   .addError(VisitorMessageNumber.REACHABILITY_802)
-                                  .build(), MessageType.PRINT_CONTINUE);
+                                  .build());
             ws.foreverLoop = true;
             loopConstruct = oldLoopConstruct;
             return new Boolean(false);
@@ -96,7 +96,7 @@ public class Reachability extends Visitor<Boolean> {
             CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                                   .addAST(ws)
                                   .addError(VisitorMessageNumber.REACHABILITY_810)
-                                  .build(), MessageType.PRINT_CONTINUE);
+                                  .build());
             loopConstruct = oldLoopConstruct;
             return new Boolean(true);
         }
@@ -123,7 +123,7 @@ public class Reachability extends Visitor<Boolean> {
             CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                                   .addAST(ds)
                                   .addError(VisitorMessageNumber.REACHABILITY_809)
-                                  .build(), MessageType.PRINT_CONTINUE);
+                                  .build());
             return new Boolean(false);
         }
         loopConstruct = oldLoopConstruct;
@@ -151,7 +151,7 @@ public class Reachability extends Visitor<Boolean> {
                                           .addAST(bl.stats().child(i))
                                           .addError(VisitorMessageNumber.REACHABILITY_803)
                                           .addArguments(bl.stats().child(i).line)
-                                          .build(), MessageType.PRINT_CONTINUE);
+                                          .build());
                     canFinish = false;
                 }
             }
@@ -173,7 +173,7 @@ public class Reachability extends Visitor<Boolean> {
             CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                                   .addAST(fs)
                                   .addError(VisitorMessageNumber.REACHABILITY_804)
-                                  .build(), MessageType.PRINT_CONTINUE);
+                                  .build());
             loopConstruct = oldLoopConstruct;
             return new Boolean(true);
         }
@@ -190,7 +190,7 @@ public class Reachability extends Visitor<Boolean> {
             CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                                   .addAST(fs)
                                   .addError(VisitorMessageNumber.REACHABILITY_805)
-                                  .build(), MessageType.PRINT_CONTINUE);
+                                  .build());
             fs.foreverLoop = true;
             loopConstruct = oldLoopConstruct;
             return new Boolean(false);
@@ -209,13 +209,13 @@ public class Reachability extends Visitor<Boolean> {
             CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                                   .addAST(bs)
                                   .addError(VisitorMessageNumber.REACHABILITY_808)
-                                  .build(), MessageType.PRINT_CONTINUE);
+                                  .build());
 
         if (loopConstruct == null && switchConstruct == null) {
             CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                                   .addAST(bs)
                                   .addError(VisitorMessageNumber.REACHABILITY_806)
-                                  .build(), MessageType.PRINT_CONTINUE);
+                                  .build());
             return new Boolean(true); // this break doesn't matter cause it can't be here anyways!
         }
         if (loopConstruct != null && !insideSwitch)
@@ -242,12 +242,12 @@ public class Reachability extends Visitor<Boolean> {
             CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                                   .addAST(cs)
                                   .addError(VisitorMessageNumber.REACHABILITY_811)
-                                  .build(), MessageType.PRINT_CONTINUE);
+                                  .build());
         if (loopConstruct == null) {
             CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                                   .addAST(cs)
                                   .addError(VisitorMessageNumber.REACHABILITY_812)
-                                  .build(), MessageType.PRINT_CONTINUE);
+                                  .build());
             return new Boolean(true); // this continue doesn't matter cause it can't be here anyways!
         }
         if (loopConstruct != null)
@@ -277,7 +277,7 @@ public class Reachability extends Visitor<Boolean> {
             CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                                   .addAST(rs)
                                   .addError(VisitorMessageNumber.REACHABILITY_807)
-                                  .build(), MessageType.PRINT_CONTINUE);
+                                  .build());
         if (loopConstruct != null)
             loopConstruct.hasReturn = true;
         return new Boolean(false);

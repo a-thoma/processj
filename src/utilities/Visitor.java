@@ -211,6 +211,10 @@ public abstract class Visitor<T extends Object> {
     public T visitRecordAccess(RecordAccess ra) {
         return ra.visitChildren(this);
     }
+    
+    public T visitRecordMemberLiteral(RecordMemberLiteral rm) {
+        return rm.visitChildren(this);
+    }
 
     public T visitRecordMemberLiteral(RecordMemberLiteral rm) {
         return rm.visitChildren(this);

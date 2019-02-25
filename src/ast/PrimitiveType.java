@@ -246,5 +246,4 @@ public class PrimitiveType extends Type {
     public boolean isIntegralType() {
         return (isIntegerType() || isShortType() || isByteType() || isCharType() || isLongType());
     }
-
 }

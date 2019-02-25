@@ -53,7 +53,7 @@ public class PJProcess {
     /**
      * Returns true if the process is ready to be scheduled.
      *
-     * @return Returns the `ready' field.
+     * @return Returns the 'ready' field.
      */
     public boolean isReady() {
         return ready;
@@ -89,7 +89,7 @@ public class PJProcess {
     /**
      * Returns true if the process has terminated.
      *
-     * @return returns the `terminated' field.
+     * @return returns the 'terminated' field.
      */
     public boolean terminated() {
         return terminated;

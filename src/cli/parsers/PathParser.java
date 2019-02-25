@@ -5,7 +5,7 @@ import cli.OptionParser;
 /**
  * This is to override the user ProcessJ library path.
  * 
- * @author Ben Cisneros
+ * @author Ben
  * @version 07/14/2018
  * @since 1.2
  */

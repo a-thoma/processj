@@ -174,7 +174,7 @@ public final class OptionGroup {
         builder.addHidden(annotation.hidden()).addRequired(annotation.required());
         
         // This is to retrieve information about the type of data each field
-        // holds at run-time. Basic types such as byte, short, int, long, float,
+        // holds at runtime. Basic types such as byte, short, int, long, float,
         // double, String and parameterized fields (of basic types) can be inferred.
         // Complex data types such as user-defined types must be explicitly specified
         Class<?>[] fieldFinalTypes = findFieldFinalTypes(field);
@@ -261,7 +261,7 @@ public final class OptionGroup {
                .addMetavar(annotation.metavar())
                .addDefaultValue(annotation.defaultValue());
         
-        // Build option and parse the value assigned to `defaultValue'
+        // Build option and parse the value assigned to 'defaultValue'
         OptionValue option = builder.build();
         if (!StringUtil.isStringEmpty(annotation.defaultValue()))
             addValue(option, annotation.defaultValue());

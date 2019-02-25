@@ -260,7 +260,7 @@ public class CLIBuilder {
             try {
                 OptionValue optionValue = optGroup.getOption(optName);
                 options.add(optName, optionValue);
-                // Keep track of every required `Option'
+                // Keep track of every required 'Option'
                 if (optionValue.isRequired())
                     requiredOptionMap.put(optionValue.getSimpleName(), optionValue);
             } catch (Exception e) {

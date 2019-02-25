@@ -118,7 +118,7 @@ public class Formatter {
     public String formatUsage(String usage) {
         Parameters parameter = optionBuilder.getMainCommand().getAnnotation(Parameters.class); 
         StringBuilder stringBuilder = new StringBuilder();
-        // Split words by `[..]', or by `<..>', or by `word'
+        // Split words by '[..]', or by '<..>', or by 'word'
         Pattern pattern = Pattern.compile("\\[.*?\\]|\\<.*?\\>|\\w+");
         Matcher matcher = pattern.matcher(usage);
         List<String> words = new ArrayList<>();

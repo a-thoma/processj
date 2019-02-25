@@ -35,10 +35,9 @@ public class ProtocolTypeDecl extends Type implements DefineTopLevelDecl {
         return (Sequence<ProtocolCase>) children[4];
     }
 
-
     // *************************************************************************
     // ** Misc. Methods
- 
+
     public String toString() {
         return typeName();
     }
@@ -87,8 +86,9 @@ public class ProtocolTypeDecl extends Type implements DefineTopLevelDecl {
         return "Protocol: " + name();
     }
 
-    @Override public boolean isProtocolType() {
-	return true;
+    @Override
+    public boolean isProtocolType() {
+        return true;
     }
 
 

@@ -43,7 +43,8 @@ public class Scheduler extends Thread {
 //        System.err.println("[Scheduler] Scheduler running");
         tq.start();
 
-	Thread t[] = new Thread[2];
+                System.err.println("[Scheduler] Total Context Switches: " + contextSwitches);
+                System.err.println("[Scheduler] Max RunQueue Size: " + maxrqsize);
 
 	for (int i=0;i<2;i++) {
 	    t[i] =  new Thread(){
