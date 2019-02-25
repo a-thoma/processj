@@ -391,6 +391,7 @@ non terminal Expression		left_hand_side, expression_opt, expression, constant_ex
 // 11.0 Literals (See 8.0 for Array Literals) 
 non terminal Literal 		literal;
 non terminal RecordLiteral	record_literal;
+non terminal Sequence           record_literal_argument_list;
 non terminal ProtocolLiteral	protocol_literal;
 
 
@@ -1070,8 +1071,9 @@ empty_statement ::=
 // SyncStat :> Statement :> AST
 barrier_sync_statement ::= 
 //          SYNC primary_no_new_array_or_mobile:e SEMICOLON {: RESULT = new SyncStat(e); :}
-     primary:e DOT SYNC LPAREN RPAREN SEMICOLON {: RESULT = new SyncStat(e); :}
-        ;
+        primary:e DOT SYNC LPAREN RPAREN SEMICOLON {: RESULT = new SyncStat(e); :}
+     | IDENTIFIER:id DOT SYNC LPAREN RPAREN SEMICOLON {: RESULT = new SyncStat(new NameExpr(new Name(id))); :}
+      ;
 
 // TimeoutStat :> Statement :> AST
 timeout_statement ::= 
@@ -1406,7 +1408,7 @@ pre_increment_expression ::=
 
 // UnaryPreExpr :> Expression :> AST
 pre_decrement_expression ::=
-          MINUSMINUS unary_expression:e {: RESULT = new UnaryPreExpr(e, UnaryPreExpr.PLUSPLUS); :}
+          MINUSMINUS unary_expression:e {: RESULT = new UnaryPreExpr(e, UnaryPreExpr.MINUSMINUS); :}
         ;
 
 // Expression :> AST
@@ -1576,9 +1578,16 @@ literal ::=
 
 // RecordLiteral :> Literal :> Expression :> AST
 record_literal ::=
-         NEW type_name:tn LBRACE argument_list:l RBRACE {: RESULT = new RecordLiteral(tn, l); :}
+         NEW type_name:tn LBRACE record_literal_argument_list:l RBRACE {: RESULT = new RecordLiteral(tn, l); :}
       // | NEW type_name:tn LBRACE RBRACE {: RESULT = new RecordLiteral(tn, new Sequence()); :}
        ;
+
+// Sequence<RecordMemberLiteral :> AST> :> AST
+record_literal_argument_list ::= 
+          IDENTIFIER:id EQ expression:e                                 {: RESULT = new Sequence(new RecordMemberLiteral(new Name(id), e)); :}
+        | record_literal_argument_list:rl COMMA IDENTIFIER:id EQ expression:e  {: RESULT = rl.append(new RecordMemberLiteral(new Name(id), e)); :}
+        ;
+
 
 // ProtocolLiteral :> Literal :> Expression :> AST
 protocol_literal ::=

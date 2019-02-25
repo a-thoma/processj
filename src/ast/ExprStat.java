@@ -3,7 +3,6 @@ package ast;
 import utilities.Visitor;
 
 public class ExprStat extends Statement {
-
     public ExprStat(Expression expr) {
         super(expr);
         nchildren = 1;

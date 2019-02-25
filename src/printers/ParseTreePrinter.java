@@ -424,7 +424,7 @@ public class ParseTreePrinter extends Visitor<AST> {
                 b.visit(this);
                 indent -= 2;
             } else
-                System.out.println(indent(b.line) + "Sequence[" + i++ + "]: = null");
+                System.out.println(indent(se.line) + "Sequence[" + i++ + "]: = null");
         }
         return null;
     }
@@ -499,6 +499,7 @@ public class ParseTreePrinter extends Visitor<AST> {
         System.out.println(indent(up.line) + "UnaryPostExpr:");
         indent += 2;
         super.visitUnaryPostExpr(up);
+	System.out.println(indent(up.line) + "Operator = " + up.opString());
         indent -= 2;
         return null;
     }
@@ -507,6 +508,7 @@ public class ParseTreePrinter extends Visitor<AST> {
         System.out.println(indent(up.line) + "UnaryPreExpr:");
         indent += 2;
         super.visitUnaryPreExpr(up);
+        System.out.println(indent(up.line) + "Operator = " + up.opString());
         indent -= 2;
         return null;
     }
