@@ -183,14 +183,9 @@ public class ProcessJc {
 	    System.out.println("-- Declaring Top Level Declarations.");
             c.visit(new namechecker.TopLevelDecls<AST>(globalTypeTable));
             
-            ///////
 	    System.out.println("-- Not sure what is happening here.");
-            c.visit(new namechecker.ResolveProcTypeDecl<AST>());
-            //
-            
-            ///////
             c.visit(new namechecker.ResolveImportTopTypeDecl<AST>());
-            //
+
 
 //            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
 //                CompilerMessageManager.INSTANCE.printTrace("top level declarations");

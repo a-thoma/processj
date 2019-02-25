@@ -176,7 +176,11 @@ public enum VisitorMessageNumber implements IMessageNumber {
     REACHABILITY_810(810, ErrorSeverity.ERROR, MessageType.PRINT_CONTINUE),
     REACHABILITY_811(811, ErrorSeverity.ERROR, MessageType.PRINT_CONTINUE),
     REACHABILITY_812(812, ErrorSeverity.ERROR, MessageType.PRINT_CONTINUE),
+    
+
+    REWRITE_900(900, ErrorSeverity.ERROR, MessageType.PRINT_CONTINUE),
     ;
+
     
     /**
      * File loader.

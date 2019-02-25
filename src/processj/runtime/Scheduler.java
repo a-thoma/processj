@@ -46,9 +46,9 @@ public class Scheduler extends Thread {
                 System.err.println("[Scheduler] Total Context Switches: " + contextSwitches);
                 System.err.println("[Scheduler] Max RunQueue Size: " + maxrqsize);
 
-	for (int i=0;i<2;i++) {
-	    t[i] =  new Thread(){
-		    public void run() {
+		//	for (int i=0;i<2;i++) {
+		//t[i] =  new Thread(){
+		//  public void run() {
 			while (rq.size() > 0) {
 			    incMaxrqsize(rq.size());
 			    // grab the next process in the run queue
@@ -88,18 +88,18 @@ public class Scheduler extends Thread {
 			    }
 			}
 			
-		    }
-		};
-	    t[i].start();
-	}
+			//}
 
-	try {
+    //	    t[i].start();
+    //}
+
+//	try {
 	    
-	    for (int i=0;i<2;i++)
-		t[i].join();
-	} catch (InterruptedException ie) {
-	    System.out.println("join in Scheduler.java was interrupted.");
-	}
+//	    for (int i=0;i<2;i++)
+//		t[i].join();
+//	} catch (InterruptedException ie) {
+//	    System.out.println("join in Scheduler.java was interrupted.");
+//	}
 	tq.kill();
 
         System.err.println("[Scheduler] Total Context Switches: " + contextSwitches);
