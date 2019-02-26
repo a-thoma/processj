@@ -586,25 +586,27 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         if (expr != null) {
             if (ld.type() instanceof PrimitiveType)
                 val = (String) expr.visit(this);
-            else if (ld.type() instanceof NamedType) // Must be a record
+            else if (ld.type() instanceof NamedType) // Must be a record or protocol
                 val = (String) expr.visit(this);
         }
         
-        // Must be a simple declaration for a channel type
+        // Is it a simple declaration for a channel type? If so, and since
+        // channels cannot be created using the operator 'new' in ProcessJ,
+        // we generate code to create a channel object.
         if (ld.type().isChannelType() && expr == null) {
             ST stChannelDecl = _stGroup.getInstanceOf("ChannelDecl");
             stChannelDecl.add("type", type);
             val = stChannelDecl.render();
         }
         
-        // After making a local declaration a field of the procedure in
-        // which it was declared, we return the 'empty' string iff this
-        // local variable is not initialized
+        // After making this local declaration a field of the procedure in
+        // which it was declared, we return the 'empty' string if and only
+        // if this local variable is not initialized
 //        if (ld.type().isPrimitiveType() && expr == null)
 //            return (T) EMPTY_STRING;
         if (expr == null) {
             if (ld.type().isPrimitiveType() ||
-                ld.type().isNamedType())
+                ld.type().isNamedType())    // Could be records or protocols
                 return (T) EMPTY_STRING;
         }
 
@@ -614,7 +616,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         ST stVar = _stGroup.getInstanceOf("Var");
         stVar.add("name", newName);
         stVar.add("val", val);
-
+        
         return (T) stVar.render();
     }
     
@@ -734,7 +736,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         case ChannelType.SHARED_READ_WRITE:
 //            chanType = PJMany2ManyChannel.class.getSimpleName(); break;
         }
-        // Resolve parameterized type for channel; e.g., chan<T>
+        // Resolve parameterized type for channel, e.g., chan<T>
         // where 'T' is the type to be resolved
         String type = getChannelType(ct.baseType());
         
@@ -763,7 +765,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         
         // Channel class type
         String chanType = PJOne2OneChannel.class.getSimpleName();
-        // Resolve parameterized type for channel; e.g., chan<T>
+        // Resolve parameterized type for channel, e.g., chan<T>
         // where 'T' is the type to be resolved
         String type = getChannelType(ct.baseType());
         
@@ -784,8 +786,8 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         Expression chanExpr = cw.channel();
         // 'c' is the name of the channel
         String chanWriteName = null;
-        if (chanExpr instanceof NameExpr)
-            chanWriteName = (String) chanExpr.visit(this);
+//        if (chanExpr instanceof NameExpr)
+        chanWriteName = (String) chanExpr.visit(this);
         stChanWriteStat.add("chanName", chanWriteName);
         // Expression sent through channel
         String expr = (String) cw.expr().visit(this);
@@ -813,8 +815,8 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         Expression chanExpr = cr.channel();
         // 'c' is the name of the channel
         String chanEndName = null;
-        if (chanExpr instanceof NameExpr)
-            chanEndName = (String) chanExpr.visit(this);
+//        if (chanExpr instanceof NameExpr)
+        chanEndName = (String) chanExpr.visit(this);
         stChannelReadExpr.add("chanName", chanEndName);
         // Add the 'switch' block for resumption
         for (int label = 0; label < 2; ++label) {

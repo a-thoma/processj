@@ -56,18 +56,33 @@ public proc void reader(chan<L>.read in) {
   switch (value.k.t.a) {
     case 4: println("case 4"); break;
     case 5: println("case 5"); break;
+    case 45: println("case 45"); break;
     case 6: println("case 6"); break;
     default: println("some case!"); break;
   }
   println("The value is " + value.k.t.a);
 }
 
+public proc void readXX(chan<XX>.read in) {
+  XX value;
+  value = in.read();
+  println("Done reading xx!");
+}
+
+public proc void writeXX(chan<XX>.write out) {
+  XX xx = new XX { accept : 35 };
+  out.write(xx);
+}
+
 public proc void main(string args[]) {
   chan<L> c;
+  chan<XX> x;
   int a = 2;
-  XX xx = new XX { accept : 35 };
   par {
     writer(c.write);
     reader(c.read);
+
+    writeXX(x.write);
+    readXX(x.read);
   }
 }

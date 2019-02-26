@@ -187,6 +187,9 @@ public class Demo {
             case 5:
                 io.println("case 5");
                 break;
+            case 45:
+                io.println("case 45");
+                break;
             case 6:
                 io.println("case 6");
                 break;
@@ -200,12 +203,76 @@ public class Demo {
     }
 
 
+    public static class _proc$readXX$crLXX extends PJProcess {
+        protected PJOne2OneChannel<PJProtocolCase> _pd$in1;
+
+        protected PJProtocolCase _ld$value1;
+
+        public _proc$readXX$crLXX(PJOne2OneChannel<PJProtocolCase> _pd$in1) {
+            this._pd$in1 = _pd$in1;
+        }
+
+        @Override
+        public synchronized void run() {
+            switch (this.runLabel) {
+                case 0: break;
+                case 1: resume(1); break;
+                case 2: resume(2); break;
+                default: break;
+            }
+
+            if (!_pd$in1.isReadyToRead(this)) {
+                this.runLabel = 1;
+                yield();
+            }
+
+            label(1);
+            _ld$value1 = _pd$in1.read(this);
+            this.runLabel = 2;
+            yield();
+
+            label(2);
+
+            io.println("Done reading xx!");
+            terminate();
+        }
+    }
+
+
+    public static class _proc$writeXX$cwLXX extends PJProcess {
+        protected PJOne2OneChannel<PJProtocolCase> _pd$out1;
+
+        protected PJProtocolCase _ld$xx1;
+
+        public _proc$writeXX$cwLXX(PJOne2OneChannel<PJProtocolCase> _pd$out1) {
+            this._pd$out1 = _pd$out1;
+        }
+
+        @Override
+        public synchronized void run() {
+            switch (this.runLabel) {
+                case 0: break;
+                case 1: resume(1); break;
+                default: break;
+            }
+
+            _ld$xx1 = new XX.accept(35);
+            _pd$out1.write(this, ((PJProtocolCase) (_ld$xx1)));
+            this.runLabel = 1;
+            yield();
+            label(1);
+
+            terminate();
+        }
+    }
+
+
     public static class _proc$main$arT extends PJProcess {
         protected String[] _pd$args1;
 
         protected PJOne2OneChannel<L> _ld$c1;
-        protected int _ld$a2;
-        protected PJProtocolCase _ld$xx3;
+        protected PJOne2OneChannel<PJProtocolCase> _ld$x2;
+        protected int _ld$a3;
 
         public _proc$main$arT(String[] _pd$args1) {
             this._pd$args1 = _pd$args1;
@@ -220,9 +287,9 @@ public class Demo {
             }
 
             _ld$c1 = new PJOne2OneChannel<L>();
-            _ld$a2 = 2;
-            _ld$xx3 = new XX.accept(35);
-            final PJPar _ld$par1 = new PJPar(2, this);
+            _ld$x2 = new PJOne2OneChannel<PJProtocolCase>();
+            _ld$a3 = 2;
+            final PJPar _ld$par1 = new PJPar(4, this);
 
             (new Demo._proc$writer$cwLL(_ld$c1) {
                 @Override
@@ -232,6 +299,20 @@ public class Demo {
             }).schedule();
 
             (new Demo._proc$reader$crLL(_ld$c1) {
+                @Override
+                public void finalize() {
+                    _ld$par1.decrement();
+                }
+            }).schedule();
+
+            (new Demo._proc$writeXX$cwLXX(_ld$x2) {
+                @Override
+                public void finalize() {
+                    _ld$par1.decrement();
+                }
+            }).schedule();
+
+            (new Demo._proc$readXX$crLXX(_ld$x2) {
                 @Override
                 public void finalize() {
                     _ld$par1.decrement();
