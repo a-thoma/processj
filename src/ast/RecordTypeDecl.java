@@ -58,7 +58,7 @@ public class RecordTypeDecl extends Type implements DefineTopLevelDecl {
 
     // *************************************************************************
     // ** Type Related Methods
-
+    
     @Override
     public String signature() {
         return "<R" + name().getname() + ";";

@@ -65,8 +65,7 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
         Log.log(a.line + " Attempting to import: " + fileName);
         Compilation c = TopLevelDecls.alreadyImportedFiles.get(fileName);
         if (c != null) {
-            Log.log(a.line + " Import of '" + fileName
-                    + "' already done before!");
+            Log.log(a.line + " Import of '" + fileName + "' already done before!");
             return c;
         }
         try {
@@ -256,6 +255,8 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
                 }
             }
         }
+
+
 
         // 'fileList' now contains the list of all the files that this import caused to be imported
         for (String fn : fileList) {

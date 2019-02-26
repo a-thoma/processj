@@ -49,7 +49,7 @@ import utilities.Language;
                         },
             footer = {  "Run 'pjc -info <command>' or 'pjc -info <option>' for help with a specific\n" +
                         "subcommand or option.\n",
-                        "See https://processj.org for more details.",
+                        "See www.processj.org for more details.",
                         "Bug reports, feedback, complains, love, food, etc, to matt.pedersen@unlv.edu"
                         },
             name = "pjc",
@@ -69,7 +69,7 @@ public class PJMain extends Command {
     
     @Option(names = {"-I", "-include"},
             metavar = "<dir>",
-            defaultValue = "/Users/Ben/Desktop/processj/include", // Default included
+            defaultValue = "/Users/matt/Dropbox/workspace/processj/include", // Default included
             help = "Override the default include directory which is set to be the Include "
                     + "subdirectory of the ProcessJ directory")
     public String include;

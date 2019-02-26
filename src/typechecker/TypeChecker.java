@@ -1,107 +1,59 @@
-/**
- *
- */
+
 package typechecker;
 
 import java.math.BigDecimal;
 import java.util.HashSet;
 import java.util.Hashtable;
 import java.util.Set;
-
-import ast.AltCase;
-import ast.ArrayAccessExpr;
-import ast.ArrayLiteral;
-import ast.ArrayType;
-import ast.Assignment;
-import ast.BinaryExpr;
-import ast.BreakStat;
-import ast.CastExpr;
-import ast.ChannelEndExpr;
-import ast.ChannelEndType;
-import ast.ChannelReadExpr;
-import ast.ChannelType;
-import ast.ChannelWriteStat;
-import ast.ConstantDecl;
-import ast.DoStat;
-import ast.ErrorType;
-import ast.ExternType;
-import ast.Expression;
-import ast.ForStat;
-import ast.IfStat;
-import ast.Invocation;
-import ast.LocalDecl;
-import ast.Modifier;
-import ast.Name;
-import ast.NameExpr;
-import ast.NamedType;
-import ast.NewArray;
-import ast.ParamDecl;
-import ast.PrimitiveLiteral;
-import ast.PrimitiveType;
-import ast.ProcTypeDecl;
-import ast.ProtocolCase;
-import ast.ProtocolLiteral;
-import ast.ProtocolTypeDecl;
-import ast.RecordAccess;
-import ast.RecordLiteral;
-import ast.RecordMember;
-import ast.RecordTypeDecl;
-import ast.ReturnStat;
-import ast.Sequence;
-import ast.SuspendStat;
-import ast.SwitchGroup;
-import ast.SwitchLabel;
-import ast.SwitchStat;
-import ast.SyncStat;
-import ast.Ternary;
-import ast.TimeoutStat;
-import ast.Type;
-import ast.UnaryPostExpr;
-import ast.UnaryPreExpr;
-import ast.Var;
-import ast.VarDecl;
-import ast.WhileStat;
+import ast.*;
 import utilities.Error;
 import utilities.Log;
 import utilities.SymbolTable;
 import utilities.Visitor;
+import utilities.PJMessage;
+import utilities.CompilerMessageManager;
+import utilities.Log;
+import utilities.MessageType;
+import utilities.Visitor;
+import utilities.VisitorMessageNumber;
 
 /**
+ * 
  * @author Matt Pedersen
+ * @version 02/10/2019
+ * @since 1.2
  */
 public class TypeChecker extends Visitor<Type> {
-
     // The top level symbol table.
     private SymbolTable topLevelDecls = null;
 
-    
     // The procedure currently being type checked.
     private ProcTypeDecl currentProcedure = null;
-
 
     // Contains the protocol name and the corresponding tags currently switched on.
     Hashtable<String, ProtocolCase> protocolTagsSwitchedOn = new Hashtable<String, ProtocolCase>();
 
-    
+    // Set of nested protocols in nested switch statements
+    HashSet<String> protocolsSwitchedOn = new HashSet<String>();
+
     public TypeChecker(SymbolTable topLevelDecls) {
 	debug = true; // TODO: WHAT DOES THIS DO?
         this.topLevelDecls = topLevelDecls;
 
         Log.log("======================================");
-        Log.log("*>       T Y P E   C H E C K E R      *");
+        Log.log("*       T Y P E   C H E C K E R      *");
         Log.log("======================================");
     }
 
-    
     public Type resolve(Type t) {
         Log.log("  > Resolve: " + t);
 	
-	// Error types do not resolve to anything by themselves.
+        // Error types do not resolve to anything by themselves.
         if (t.isErrorType())
             return t;
-	// A named type must resolve to an actual type.
+        // A named type must resolve to an actual type.
         if (t.isNamedType()) {
-            //--Log.log("  > Resolving named type: " + ((NamedType) t).name().getname());
+            Log.log("  > Resolving named type: " + ((NamedType) t).name().getname());
 	    NamedType nt = (NamedType)t;
 	    Type actualType = nt.type();
 	    if (actualType == null) {
@@ -119,10 +71,13 @@ public class TypeChecker extends Visitor<Type> {
 
     // AltStat -- Nothing to do
     
+    // Alt Case
+    //
     // Syntax: (Expr) && Guard : Statement
+    //
     // Expr must be Boolean and Guard and Statement must be visited    
     //
-    // T(expr) =T Boolean
+    // Boolean?(T(expr))
     @Override
     public Type visitAltCase(AltCase ac) {
 	Log.log(ac.line + ": Visiting an alt case.");
@@ -130,51 +85,80 @@ public class TypeChecker extends Visitor<Type> {
         // Check the pre-condition if there is one.
         if (ac.precondition() != null) {
             Type t = ac.precondition().visit(this);
-            // probably not necessary: t = resolve(t.visit(this));
-            if (!t.isBooleanType())
-                ;//!!Error.addError(ac.precondition(), "Boolean type expected in precondition of alt case, found: " + t, 3035); // test ok
+            //if (!t.isBooleanType())
+            //CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+             //   .addAST(ac)
+                //.addError(VisitorMessageNumber.TYPE_CHECKER_660)
+                // TODO REMOVE COMMENT
+             //   .addArguments(t.typeName())
+             //   .build(), MessageType.PRINT_CONTINUE);
         }
         ac.guard().visit(this);
         ac.stat().visit(this);
         return null;
     }
 
+    // ArrayAccessExpr
+    //
     // Syntax: Expr1[Expr2]
+    //
     // Expr1 must be array type and Expr2 my be integer.
     //
-    // T(Expr1) = Array(...), T(Expr2) = Boolean
+    // Array?(T(Expr1)) /\ Integer?(T(Expr2))
+    // 
+    // If T(Expr1) = Array(BaseType) => T(Expr1[Expr2]) := BaseType 
     @Override
     public Type visitArrayAccessExpr(ArrayAccessExpr ae) {
 	Log.log(ae.line + ": Visiting ArrayAccessExpr");
         Type t = resolve(ae.target().visit(this));
         if (!t.isArrayType()) {
             ae.type = new ErrorType();
-	    // Error.addError(ae, "Array type required, but found type " + t.typeName() + ".", 3000); // test ok
+            //CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                //.addAST(ae)
+                //.addError(VisitorMessageNumber.TYPE_CHECKER_661)
+                // TODO: REMOVE COMMENT
+               // .addArguments(t.typeName())
+               // .build(), MessageType.PRINT_CONTINUE);
         } else {
+            // Build a new array type with one dimension less.
             ArrayType at = (ArrayType)t;
             if (at.getDepth() == 1)
                 ae.type = at.baseType();
             else
                 ae.type = new ArrayType(at.baseType(), at.getDepth() - 1);
-            //--Log.log(ae.line + ": ArrayAccessExpr has type " + ae.type);
+            Log.log(ae.line + ": ArrayAccessExpr has type " + ae.type);
             Type indexType = resolve(ae.index().visit(this));
-            // This error does not create an error type cause the baseType is still the
-            // array expression's type
+            // This error does not create an error type cause the baseType() is 
+            // still the array expression's type.
             if (!indexType.isIntegerType())
-                ;//!!Error.addError(ae, "Array access index must be of integral type.", 3001); // test ok
+            CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                .addAST(ae)
+                .addError(VisitorMessageNumber.TYPE_CHECKER_655)
+                .addArguments(indexType.typeName())
+                .build(), MessageType.PRINT_CONTINUE);
         }
-	Log.log(ae.line + ": Array Expression has type: " + ae.type);
+	    Log.log(ae.line + ": Array Expression has type: " + ae.type);
         return ae.type;
     }
 
+    // ArrayLiteral
+    //
+    // Syntax: { ... }
+    //
     @Override
     public Type visitArrayLiteral(ArrayLiteral al) {
-	Log.log(al.line + ": visiting an array literal.");
-        Error.error(al, "Array literal without the keyword 'new'.", false, 3002); // TODO: not sure what this is and
-                                                                                  // what it means
+	    Log.log(al.line + ": visiting an array literal.");
+	
+	    // Array Literals cannot appear without a 'new' keyword.
+	    CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+	        .addAST(al)
+	        .addError(VisitorMessageNumber.TYPE_CHECKER_656)
+	        .build(), MessageType.PRINT_CONTINUE);
         return null;
     }
 
+    // ArrayType
+    //  
     // An ArrayType's type is itself.
     @Override
     public Type visitArrayType(ArrayType at) {
@@ -183,8 +167,30 @@ public class TypeChecker extends Visitor<Type> {
         return at;
     }
 
-    // Syntax: Name = Expr
-    //     or: Name <op>= Expr
+    // Assignment
+    //
+    // Syntax: Name <op> Expr   [ shoreted to v <op> e below ]
+    //   where op is one of =, +=, -=, *=, /=, %=, <<=, >>=, &=, |=, ^=
+    //
+    // = : (v := e)
+    // 
+    // T(v) :=T T(e) 
+    // T(v = e) := T(v)
+    // (Some variables are not assingable: channels, barriers, more ??)
+    // TODO: RECORDS and PROTOCOLS
+    //
+    // +=, -=, *=, /=, %= : ( v ?= e) [ ? is one of {+,-,*,/,%} ] 
+    //  
+    // (op = + /\ String?(T(v)) /\ 
+    //            (Numeric?(T(e)) \/ Boolean?(T(e)) \/ String?(T(e) \/
+    //             Char?(T(e)))) \/
+    // (op != + /\ (T(v) :=T T(e)))
+    //
+    //  
+ 
+ 
+ 
+ 
     @Override
     public Type visitAssignment(Assignment as) {
         Log.log(as.line + ": Visiting an assignment");
@@ -206,7 +212,10 @@ public class TypeChecker extends Visitor<Type> {
          */
 	// TODO: Check the implementation of Assignable.
         if (!vType.assignable())
-            Error.error(as, "Left hand side of assignment not assignable.", false, 3036);
+	    CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+							  .addAST(as)
+							  .addError(VisitorMessageNumber.TYPE_CHECKER_630)
+							  .build(), MessageType.PRINT_CONTINUE);
 
 	// Now switch on the operators
         switch (as.op()) {
@@ -214,8 +223,11 @@ public class TypeChecker extends Visitor<Type> {
 	    // =
             if (!vType.typeAssignmentCompatible(eType)) {
                 as.type = new ErrorType();
-		//Error.addError(as, "Cannot assign value of type " + eType.typeName() + " to variable of type "
-		//+ vType.typeName() + ".", 3003); // test OK
+		CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+							      .addAST(as)
+							      .addError(VisitorMessageNumber.TYPE_CHECKER_601)
+							      .addArguments(eType.typeName(), vType.typeName())
+							      .build(), MessageType.PRINT_CONTINUE);
 	    }
             break;
         }
@@ -233,8 +245,11 @@ public class TypeChecker extends Visitor<Type> {
 	    else if (!vType.typeAssignmentCompatible(eType)) {
 		// Left-hand side is not assignment compatible with the right-hand side.
                 as.type = new ErrorType();
-		//--Error.addError(as, "Cannot assign value of type " + eType.typeName() + " to variable of type "
-		//          + vType.typeName() + ".", 3004); // test OK
+		CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                                              .addAST(as)
+                                                              .addError(VisitorMessageNumber.TYPE_CHECKER_600)
+                                                              .addArguments(eType.typeName(), vType.typeName())
+                                                              .build(), MessageType.PRINT_CONTINUE);
 	    }
             break;
         case Assignment.LSHIFTEQ:
@@ -243,11 +258,19 @@ public class TypeChecker extends Visitor<Type> {
 	    // <<=, >>=, >>>=
             if (!vType.isIntegralType()) {
                 as.type = new ErrorType();
-		//--Error.addError(as,"Left hand side operand of operator '" + as.opString() + "' must be of integral type.", 3007);
+		CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                                              .addAST(as)
+							      .addError(VisitorMessageNumber.TYPE_CHECKER_604)
+                                                              .addArguments(as.opString())
+                                                              .build(), MessageType.PRINT_CONTINUE);
 	    }
             if (!eType.isIntegralType()) {
                 as.type = new ErrorType();
-		//--Error.addError(as,"Right hand side operand of operator '" + as.opString() + "' must be of integral type.", 3008);
+		CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                                              .addAST(as)
+                                                              .addError(VisitorMessageNumber.TYPE_CHECKER_605)
+                                                              .addArguments(as.opString())
+                                                              .build(), MessageType.PRINT_CONTINUE);
 	    }
             break;
         case Assignment.ANDEQ:
@@ -686,17 +709,17 @@ public class TypeChecker extends Visitor<Type> {
             if (procs != null)
                 for (Object pd : procs.entries.values().toArray()) {
                     ProcTypeDecl ptd = (ProcTypeDecl) pd;
-		    //Log.log("Handling Procedure : " + ptd.typeName() + ptd.signature());
+		    //System.out.println("Handling Procedure : " + ptd.typeName() + ptd.signature());
                     // set the qualified name in pd such that we can get at it later.
-		    Log.log(ptd.formalParams().size() + "  " + in.params().size());
+		    //System.out.println(ptd.formalParams().size() + "  " + in.params().size());
                     if (ptd.formalParams().size() == in.params().size()) {
                         // TODO: this should store this somwhere
                         boolean candidate = true;
                         Log.log(" checking if Assignment Compatible proc: " + ptd.typeName() + " ( " + ptd.signature()
                                 + " ) ");
                         for (int i = 0; i < in.params().size(); i++) {
-			     Log.log("Formal's type: " + ptd.formalParams().child(i).type());
-			     Log.log("Actual's type: " + in.params().child(i).type);
+			    //System.out.println("Formal's type: " + ptd.formalParams().child(i).type());
+			    //System.out.println("Actual's type: " + in.params().child(i).type);
 			
 
 
@@ -704,12 +727,12 @@ public class TypeChecker extends Visitor<Type> {
 				(resolve(((ParamDecl) ptd.formalParams().child(i)).type())).typeAssignmentCompatible(resolve(in.params().child(i).type));
                         }
 			if (candidate) {
-			    Log.log("Candidate kept");
+			    //System.out.println("Candidate kept");
                             candidateProcs.append(ptd);
                             Log.log("Possible proc: " + ptd.typeName() + " " + ptd.formalParams());
                         }
 			else 
-			    Log.log("Candidate thrown away");
+			    ;//System.out.println("Candidate thrown away");
                     }
                 }
 	    
@@ -931,6 +954,14 @@ public class TypeChecker extends Visitor<Type> {
         return pl.type;
     }
     
+    @Override
+    public Type visitPrimitiveType(PrimitiveType pt) {
+ 	Log.log(pt.line + ": Visiting a Primitive type.");
+	Log.log(pt.line + ": Primitive type has type: " + pt);
+	return pt;
+    }
+	
+
     @Override 
     public Type visitProcTypeDecl(ProcTypeDecl pd) {
 	Log.log(pd.line + ": visiting a procedure type declaration (" + pd.name().getname() + ").");
@@ -1009,13 +1040,15 @@ public class TypeChecker extends Visitor<Type> {
                 // Find the field and make the type of the record access equal to the field.
 		// TODO: test inheritence here
 		RecordMember rm = ((RecordTypeDecl) tType).getMember(ra.field().getname());
-                if (rm == null) {
+
+		                if (rm == null) {
                     ra.type = Error.addError(ra, "Record type '" + ((RecordTypeDecl) tType).name().getname()
                             + "' has no member '" + ra.field().getname() + "'.", 3062);
                     return ra.type;
                 }
-//                Type rmt = resolve(rm.type().visit(this));
-                Type rmt = resolve(rm.type());  // Quick fixed made for record member access
+				//System.out.println("RM.type: " + rm.type());
+
+                Type rmt = resolve(rm.type());
                 ra.type = rmt;
 	    } else {
 		// Must be a protocol type.
@@ -1027,30 +1060,48 @@ public class TypeChecker extends Visitor<Type> {
                 //
                 // We have <expr>.<field> that means a field <field> in the tag associated with
                 // the type of <expr>.
-                
+         
                 ProtocolTypeDecl pt = (ProtocolTypeDecl) tType;
+
+
+		if (!protocolsSwitchedOn.contains(pt.name().getname())) {
+		    Error.addError(pt, "Illegal access to non-switched protocol type '" + pt + "'.", 0000);
+		    ra.type = new ErrorType();
+		    Log.log(ra.line + ": record access expression has type: " + ra.type);
+		    return ra.type;
+		}
                 // Lookup the appropriate ProtocolCase associated with the protocol's name in
                 // protocolTagsSwitchedOn
-                ProtocolCase pc = protocolTagsSwitchedOn.get(pt.name().getname());
+		
+		//System.out.println("HashSet: "+protocolsSwitchedOn);
+		
+		//System.out.println("[RecordAccess]: " + pt.name().getname());
+		ProtocolCase pc = protocolTagsSwitchedOn.get(pt.name().getname());
+		
+		//System.out.println("[RecordAccess]: Found protocol tag: " + pc.name().getname());
+
                 String fieldName = ra.field().getname();
                 // there better be a field in pc that has that name!
                 boolean found = false;
-		for (RecordMember rm : pc.body()) {
-                    Log.log("Looking at field " + rm.name().getname());
-                    if (rm.name().getname().equals(fieldName)) {
-                        // yep we found it; now set the type
-                        Type rmt = resolve(rm.type().visit(this));
-                        ra.type = rmt;
-                        found = true;
-                        break;
-                    }
-                }
-                if (!found) {
-                    Error.addError(ra, "Unknown field reference '" + fieldName + "' in protocol tag '"
-				   + pc.name().getname() + "' in protocol '" + pt.name().getname() + "'.", 3073);
-                    ra.type = new ErrorType();
-                }
-           }
+		
+		if (pc != null)
+		    for (RecordMember rm : pc.body()) {
+			Log.log("Looking at field " + rm.name().getname());
+			if (rm.name().getname().equals(fieldName)) {
+			    // yep we found it; now set the type
+			    //System.out.println("FOUND IT - it is type " + rm.type());
+			    Type rmt = resolve(rm.type());
+			    ra.type = rmt;
+			    found = true;
+			    break;
+			}
+		    }
+		if (!found) {
+		    Error.addError(ra, "Unknown field reference '" + fieldName + "' in protocol tag '"
+				   + pt.name().getname() + "' in protocol '" + pt.name().getname() + "'.", 3073);
+		    ra.type = new ErrorType();
+		}
+	    }
         }
         Log.log(ra.line + ": record access expression has type: " + ra.type);
         return ra.type;
@@ -1116,13 +1167,101 @@ public class TypeChecker extends Visitor<Type> {
     // SwitchGroup -- nothing to do - handled in SwitchStat
     // SwitchLabel -- nothing to do - handled in SwitchStat
 
-    // TODO
-    /*
-    @Override public Type visitSwitchStat(SwitchStat ss) { return null; }
-    */
+    @Override public Type visitSwitchStat(SwitchStat ss) {
+	Type exprType = resolve(ss.expr().visit(this));
+	
+	// The switch expression must be integral, string or a protocol type (we then switch on the tag).
+	if (!(exprType.isProtocolType() || exprType.isIntegralType() || exprType.isStringType()))
+	    Error.addError(ss, "Illegal type '" + exprType + "' in expression in switch statement.", 0000);
+
+	// String and Intergral types.
+	if (exprType.isIntegralType() || exprType.isStringType()) {
+	    for (SwitchGroup sg : ss.switchBlocks()) {
+		// For each Switch Group, cycle through the Switch Labels and check they are assignment compatible with ...
+		for (SwitchLabel sl : sg.labels()) {
+		    if (!sl.isDefault()) {
+			// Get the type of the (constant expression)
+			if (exprType.isStringType() || exprType.isIntegralType()) {
+			    // For string and Integral types, the constant expression must be assignable
+			    // to the type of the switching expression.
+			    Type labelType = resolve(sl.expr().visit(this));
+			    //System.out.println("Type of tag " + sl.expr() + " is " + labelType);
+			    
+			    if (!exprType.typeAssignmentCompatible(labelType))
+				Error.addError(ss, "Switch label '" + sl.expr() + "' of type '" + labelType + "' not compatible with switch expression's type '" + exprType + "'.", 0000);
+			    sg.statements().visit(this);
+			}
+		    }
+		}
+	    }
+	} else { // Protocol Type.
+	    // Get the name of the protocol.
+	    String protocolName = ((ProtocolTypeDecl)exprType).name().getname();
+
+	    if (protocolsSwitchedOn.contains(protocolName))
+		Error.addError(ss, "Illegally nested switch on protocol '" + protocolName + "'.", 0000);
+	    else
+		protocolsSwitchedOn.add(protocolName);
+
+	    //System.out.println("protocolsSwitchedOn before visiting body: " + protocolsSwitchedOn.toString());
+	    
+
+	    // Cycle through the SwitchGroups one at a time. 
+	    for (SwitchGroup sg : ss.switchBlocks()) {
+		// For each Switch Group, cycle through the Switch Labels and check they are assignment compatible with ...
+		//System.out.println("-- New Group --");
+		for (SwitchLabel sl : sg.labels()) {
+		    if (!sl.isDefault()) {
+			// The label must ne a name.
+			if (!(sl.expr() instanceof NameExpr))
+			    Error.addError(sl, "Switch label '" + sl.expr() + "' is not a protocol tag.", 0000);
+		    
+			// Get the name of the tag.
+			// TODO: We should probably use properly qualified names here - what if there are two different protocols named the same ?
+			String tag = ((NameExpr)sl.expr()).name().getname();			
+			//System.out.println("Processing tag: " + tag);
+			//System.out.println(protocolTagsSwitchedOn.toString());
+			
+			ProtocolTypeDecl ptd = (ProtocolTypeDecl)exprType;
+			ProtocolCase pc = ptd.getCase(tag);
+		    
+			if (pc == null)
+			    Error.addError(sl, "Tag '" + tag + "' is not found in protocol '" + protocolName + "'.", 0000);
+			else {
+			    //System.out.println("pc is not null: " + pc.name().getname());
+			    //System.out.println("Fields: ");
+			    //for (RecordMember rm : pc.body()) {
+			    //	System.out.println("  " + rm.name().getname());
+			    //}
+			    
+			    
+			    //System.out.println(protocolTagsSwitchedOn.toString());
+			    
+			    // insert into protocol Cases Swithced on
+			    // visit the body.
+			    protocolTagsSwitchedOn.put(protocolName, pc); // TODO: perhaps a hash table here isn't a good idea - something in reverse order may be what we need.                          
+			}
+			//System.out.println("ABOUT TO VISIT STATEMENTS");
+		    }
+		    sg.statements().visit(this);
+		    if (!sl.isDefault())
+			protocolTagsSwitchedOn.remove(protocolName);
+		}
+	    }
+	    // remove from protocol Cases Switched on
+	    protocolsSwitchedOn.remove(protocolName);	   	
+	    //System.out.println("protocolsSwitchedOn after evaluating body: " + protocolsSwitchedOn);
+	}
+	return null;
+    }
+
     
     @Override
     public Type visitSyncStat(SyncStat ss) {
+	Type t = ss.barrier().visit(this);
+	if (!t.isBarrierType()) 
+	    Error.addError(ss,"Cannot sync on anything but a barrier type", 0000);	    
+	
 	return null;
     }
    

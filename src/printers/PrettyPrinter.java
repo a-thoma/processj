@@ -88,23 +88,23 @@ public class PrettyPrinter<T extends AST> extends Visitor<T> {
     }
 
     private void p(String s) {
-        Log.log(tab() + s);
+        System.out.println(tab() + s);
     }
 
     public PrettyPrinter() {
-        Log.log("ProcessJ Pretty Print");
+        System.out.println("ProcessJ Pretty Print");
         debug = true;
     }
 
     public T visitAltCase(AltCase ac) {
-        Log.logNoNewline(tab());
+        System.out.print(tab());
         if (ac.precondition() != null) {
-            Log.logNoNewline("(");
+            System.out.print("(");
             ac.precondition().visit(this);
-            Log.logNoNewline(") && ");
+            System.out.print(") && ");
         }
         ac.guard().visit(this);
-        Log.logNoNewline(" : ");
+        System.out.print(" : ");
         indent += 2;
         ac.stat().visit(this);
         return null;
@@ -121,9 +121,9 @@ public class PrettyPrinter<T extends AST> extends Visitor<T> {
 
     public T visitArrayAccessExpr(ArrayAccessExpr ae) {
         ae.target().visit(this);
-        Log.logNoNewline("[");
+        System.out.print("[");
         ae.index().visit(this);
-        Log.logNoNewline("]");
+        System.out.print("]");
         return null;
     }
 
@@ -135,49 +135,49 @@ public class PrettyPrinter<T extends AST> extends Visitor<T> {
     public T visitArrayType(ArrayType at) {
         at.baseType().visit(this);
         for (int i = 0; i < at.getDepth(); i++)
-            Log.logNoNewline("[]");
+            System.out.print("[]");
         return null;
     }
 
     public T visitAssignment(Assignment as) {
         as.left().visit(this);
-        Log.logNoNewline(" " + as.opString() + " ");
+        System.out.print(" " + as.opString() + " ");
         as.right().visit(this);
         return null;
     }
 
     public T visitBinaryExpr(BinaryExpr be) {
         be.left().visit(this);
-        Log.logNoNewline(" " + be.opString() + " ");
+        System.out.print(" " + be.opString() + " ");
         be.right().visit(this);
         return null;
     }
 
     public T visitBlock(Block bl) {
-        Log.log("{");
+        System.out.println(tab() + "{");
         indent += 2;
         for (Statement st : bl.stats()) {
+	    indent += 2;
             if (st == null) {
-                indent += 2;
-                Log.log(tab() + ";");
-                indent -= 2;
+                System.out.println(tab() + ";");
             } else {
                 st.visit(this);
-                if (st instanceof LocalDecl)
-                    Log.log(";");
+		//System.out.println(";");
             }
+            indent -= 2;
         }
         indent -= 2;
-        Log.log("}");
+        System.out.println(tab() + "}");
         return null;
     }
 
     public T visitBreakStat(BreakStat bs) {
-        Log.logNoNewline("break");
+        System.out.print(tab() + "break");
         if (bs.target() != null) {
-            Log.logNoNewline(" ");
+            System.out.print(" ");
             bs.target().visit(this);
         }
+	System.out.println(";");
         return null;
     }
 
@@ -188,49 +188,51 @@ public class PrettyPrinter<T extends AST> extends Visitor<T> {
 
     public T visitChannelType(ChannelType ct) {
         String modString = ct.modString();
-        Log.logNoNewline(modString);
+        System.out.print(modString);
         if (!modString.equals(""))
-            Log.logNoNewline(" ");
-        Log.logNoNewline("chan<");
+            System.out.print(" ");
+        System.out.print("chan<");
         ct.baseType().visit(this);
-        Log.logNoNewline(">");
+        System.out.print(">");
         return null;
     }
 
     public T visitChannelEndExpr(ChannelEndExpr ce) {
         ce.channel().visit(this);
-        Log.logNoNewline("." + (ce.isRead() ? "read" : "write"));
+        System.out.print("." + (ce.isRead() ? "read" : "write"));
         return null;
     }
 
     public T visitChannelEndType(ChannelEndType ct) {
         if (ct.isShared())
-            Log.logNoNewline("shared ");
-        Log.logNoNewline("chan<");
+            System.out.print("shared ");
+        System.out.print("chan<");
         ct.baseType().visit(this);
-        Log.logNoNewline(">." + (ct.isRead() ? "read" : "write"));
+        System.out.print(">." + (ct.isRead() ? "read" : "write"));
         return null;
     }
 
     public T visitChannelReadExpr(ChannelReadExpr cr) {
         cr.channel().visit(this);
-        Log.logNoNewline(".read(");
+        System.out.print(".read(");
         if (cr.extRV() != null) {
-            Log.log("{");
+            System.out.println("{");
             indent += 2;
             cr.extRV().stats().visit(this);
             indent -= 2;
-            Log.logNoNewline("}");
+            System.out.print("}");
         }
-        Log.logNoNewline(")");
+        System.out.print(")");
         return null;
     }
 
     public T visitChannelWriteStat(ChannelWriteStat cw) {
+	System.out.print(tab());
+
         cw.channel().visit(this);
-        Log.logNoNewline(".write(");
+        System.out.print(".write(");
         cw.expr().visit(this);
-        Log.logNoNewline(")");
+        System.out.println(");");
         return null;
     }
 
@@ -240,74 +242,75 @@ public class PrettyPrinter<T extends AST> extends Visitor<T> {
     }
 
     public T visitCompilation(Compilation co) {
+	System.out.println("Compilation");
         return co.visitChildren(this);
     }
 
     public T visitConstantDecl(ConstantDecl cd) {
-        Log.logNoNewline(tab());
+        System.out.print(tab());
         printModifierSequence(cd.modifiers());
         if (cd.modifiers().size() > 0)
-            Log.logNoNewline(" ");
+            System.out.print(" ");
         cd.type().visit(this);
-        Log.logNoNewline(" ");
+        System.out.print(" ");
         cd.var().visit(this);
-        Log.log(";");
+        System.out.println(";");
         return null;
     }
 
     public T visitContinueStat(ContinueStat cs) {
-        Log.logNoNewline("continue");
+        System.out.print("continue");
         if (cs.target() != null) {
-            Log.logNoNewline(" ");
+            System.out.print(" ");
             cs.target().visit(this);
         }
         return null;
     }
 
     public T visitDoStat(DoStat ds) {
-        Log.logNoNewline(tab() + "do ");
+        System.out.print(tab() + "do ");
         if (ds.stat() instanceof Block) {
-            Log.log("{");
+            System.out.println("{");
             indent += 2;
             ((Block) ds.stat()).stats().visit(this);
             indent -= 2;
-            Log.logNoNewline(tab() + "} while (");
+            System.out.print(tab() + "} while (");
             ds.expr().visit(this);
-            Log.logNoNewline(")");
+            System.out.print(")");
         } else {
-            Log.log("");
+            System.out.println("");
             indent += 2;
             ds.stat().visit(this);
             indent -= 2;
-            Log.logNoNewline(tab() + "while (");
+            System.out.print(tab() + "while (");
             ds.expr().visit(this);
-            Log.logNoNewline(");");
+            System.out.print(");");
         }
-        Log.log("");
+        System.out.println("");
         return null;
     }
 
     public T visitExprStat(ExprStat es) {
-        Log.logNoNewline(tab());
+        System.out.print(tab());
         es.expr().visit(this);
-        Log.log("");
+        System.out.println(";");
         return null;
     }
 
     public T visitForStat(ForStat fs) {
-        Log.logNoNewline(tab());
-        Log.logNoNewline("for (");
+        System.out.print(tab());
+        System.out.print("for (");
         if (fs.init() != null) {
             if (fs.init().size() > 0) {
                 // there are some children - if the first is a localDecl so are the rest!
                 if (fs.init().child(0) instanceof LocalDecl) {
                     LocalDecl ld = (LocalDecl) fs.init().child(0);
-                    Log.logNoNewline(ld.type().typeName() + " ");
+                    System.out.print(ld.type().typeName() + " ");
                     for (int i = 0; i < fs.init().size(); i++) {
                         ld = (LocalDecl) fs.init().child(i);
                         ld.var().visit(this);
                         if (i < fs.init().size() - 1)
-                            Log.logNoNewline(",");
+                            System.out.print(",");
                     }
                 } else {
                     for (Statement es : fs.init())
@@ -315,10 +318,10 @@ public class PrettyPrinter<T extends AST> extends Visitor<T> {
                 }
             }
         }
-        Log.logNoNewline(";");
+        System.out.print(";");
         if (fs.expr() != null)
             fs.expr().visit(this);
-        Log.logNoNewline(";");
+        System.out.print(";");
         if (fs.incr() != null) {
             for (int i = 0; i < fs.incr().size(); i++) {
                 if (fs.incr().child(i) instanceof ExprStat) {
@@ -328,15 +331,15 @@ public class PrettyPrinter<T extends AST> extends Visitor<T> {
             }
 
         }
-        Log.logNoNewline(")");
+        System.out.print(")");
         if (fs.stats() instanceof Block) {
-            Log.log(" {");
+            System.out.println(" {");
             indent += 2;
             ((Block) fs.stats()).stats().visit(this);
             indent -= 2;
-            Log.log(tab() + "}");
+            System.out.println(tab() + "}");
         } else {
-            Log.log("");
+            System.out.println("");
             fs.stats().visit(this);
         }
         return null;
@@ -346,26 +349,26 @@ public class PrettyPrinter<T extends AST> extends Visitor<T> {
         if (gu.guard() instanceof ExprStat)
             ((ExprStat) gu.guard()).expr().visit(this);
         else if (gu.guard() instanceof SkipStat)
-            Log.logNoNewline("skip");
+            System.out.print("skip");
         else if (gu.guard() instanceof TimeoutStat) {
             TimeoutStat ts = (TimeoutStat) gu.guard();
             ts.timer().visit(this);
-            Log.logNoNewline(".timeout(");
+            System.out.print(".timeout(");
             ts.delay().visit(this);
-            Log.logNoNewline(")");
+            System.out.print(")");
         }
         return null;
     }
 
     public T visitIfStat(IfStat is) {
-        Log.logNoNewline(tab());
-        Log.logNoNewline("if (");
+        System.out.print(tab());
+        System.out.print("if (");
         is.expr().visit(this);
-        Log.logNoNewline(")");
+        System.out.print(")");
         if (is.thenpart() instanceof Block)
-            Log.log(" {");
+            System.out.println(" {");
         else
-            Log.log("");
+            System.out.println("");
         indent += 2;
         if (is.thenpart() instanceof Block)
             ((Block) is.thenpart()).stats().visit(this);
@@ -373,20 +376,20 @@ public class PrettyPrinter<T extends AST> extends Visitor<T> {
             is.thenpart().visit(this);
         indent -= 2;
         if (is.thenpart() instanceof Block)
-            Log.logNoNewline(tab() + "}");
+            System.out.print(tab() + "}");
 
         if (is.thenpart() instanceof Block && is.elsepart() != null)
-            Log.logNoNewline(" else");
+            System.out.print(" else");
         if (!(is.thenpart() instanceof Block) && is.elsepart() != null)
-            Log.logNoNewline(tab() + "else");
+            System.out.print(tab() + "else");
         if (is.thenpart() instanceof Block && is.elsepart() == null)
-            Log.log("");
+            System.out.println("");
 
         if (is.elsepart() != null) {
             if (is.elsepart() instanceof Block)
-                Log.log(" {");
+                System.out.println(" {");
             else
-                Log.log("");
+                System.out.println("");
             indent += 2;
             if (is.elsepart() instanceof Block)
                 ((Block) is.elsepart()).stats().visit(this);
@@ -394,36 +397,47 @@ public class PrettyPrinter<T extends AST> extends Visitor<T> {
                 is.elsepart().visit(this);
             indent -= 2;
             if (is.elsepart() instanceof Block)
-                Log.log(tab() + "}");
+                System.out.println(tab() + "}");
         }
         return null;
     }
 
     public T visitImport(Import im) {
-        // Log.logNoNewline(tab() + "import " + im.packageName() + ".");
+        // System.out.print(tab() + "import " + im.packageName() + ".");
         // if (im.all())
-        // Log.log("*;");
+        // System.out.println("*;");
         // else
-        // Log.log(im.file() + ";");
+        // System.out.println(im.file() + ";");
         return null;
     }
 
     public T visitInvocation(Invocation in) {
-        // TODO
-        return in.visitChildren(this);
+	if (in.target() != null)
+	    in.target().visit(this);
+	System.out.print(in.procedureName() + "(");
+	for (int i=0; i<in.params().size(); i++) {
+	    in.params().child(i).visit(this);
+	    if (i <in.params().size()-1)
+		System.out.print(",");
+	}
+	System.out.print(")");
+	return null;
     }
 
     public T visitLocalDecl(LocalDecl ld) {
+        System.out.print(tab());
         if (ld.isConst())
-            Log.logNoNewline("const ");
+            System.out.print("const ");
+	
         ld.type().visit(this);
-        Log.logNoNewline(" ");
+        System.out.print(" ");
         ld.var().visit(this);
+	System.out.println(";");
         return null;
     }
 
     public T visitModifier(Modifier mo) {
-        Log.logNoNewline(mo.toString());
+        System.out.print(mo.toString());
         return null;
     }
 
@@ -432,13 +446,13 @@ public class PrettyPrinter<T extends AST> extends Visitor<T> {
         for (Modifier m : mods) {
             m.visit(this);
             if (i < mods.size() - 1)
-                Log.logNoNewline(" ");
+                System.out.print(" ");
             i++;
         }
     }
 
     public T visitName(Name na) {
-        Log.logNoNewline(na.getname());
+        System.out.print(na.getname());
         return null;
     }
 
@@ -458,72 +472,79 @@ public class PrettyPrinter<T extends AST> extends Visitor<T> {
     }
 
     public T visitNewMobile(NewMobile nm) {
-        Log.logNoNewline(tab() + "new mobile ");
+        System.out.print(tab() + "new mobile ");
         nm.name().visit(this);
         return null;
     }
 
     public T visitParamDecl(ParamDecl pd) {
         if (pd.isConstant())
-            Log.logNoNewline("const ");
+            System.out.print("const ");
         pd.type().visit(this);
-        Log.logNoNewline(" ");
+        System.out.print(" ");
         pd.paramName().visit(this);
         return null;
     }
 
     public T visitParBlock(ParBlock pb) {
+
+	
         // TODO - don't forget that there are barriers to enroll on.
-        return pb.visitChildren(this);
+	System.out.println(tab() + "par {");
+	indent += 2;
+	pb.stats().visit(this);
+	indent -=2;
+	System.out.println(tab() + "}");
+	return null;
     }
 
     public T visitPragma(Pragma pr) {
-        Log.log(tab() + "#pragma " + pr.pname() + " " + (pr.value() == null ? "" : pr.value()));
+        System.out.println(tab() + "#pragma " + pr.pname() + " " + (pr.value() == null ? "" : pr.value()));
         return null;
     }
 
     public T visitPrimitiveLiteral(PrimitiveLiteral li) {
-        Log.logNoNewline(li.getText());
+        System.out.print(li.getText());
         return null;
     }
 
     public T visitPrimitiveType(PrimitiveType pt) {
-        Log.logNoNewline(pt.typeName());
+        System.out.print(pt.typeName());
         return null;
     }
 
     public T visitProcTypeDecl(ProcTypeDecl pd) {
-        Log.logNoNewline(tab());
+        System.out.print(tab());
         printModifierSequence(pd.modifiers());
         if (pd.modifiers().size() > 0)
-            Log.logNoNewline(" ");
+            System.out.print(" ");
         pd.returnType().visit(this);
-        Log.logNoNewline(" ");
+        System.out.print(" ");
         pd.name().visit(this);
-        Log.logNoNewline("(");
+        System.out.print("(");
         for (int i = 0; i < pd.formalParams().size(); i++) {
             pd.formalParams().child(i).visit(this);
             if (i < pd.formalParams().size() - 1)
-                Log.logNoNewline(", ");
+                System.out.print(", ");
         }
-        Log.logNoNewline(")");
+        System.out.print(")");
         if (pd.implement().size() > 0) {
-            Log.logNoNewline(" implements ");
+            System.out.print(" implements ");
             for (int i = 0; i < pd.implement().size(); i++) {
                 pd.implement().child(i).visit(this);
                 if (i < pd.implement().size() - 1)
-                    Log.logNoNewline(", ");
+                    System.out.print(", ");
             }
         }
 
         if (pd.body() != null) {
-            Log.log(" {");
+            System.out.println(" {");
             indent += 2;
             pd.body().stats().visit(this);
             indent -= 2;
-            Log.log(tab() + "}");
+            System.out.println(tab() + "}");
         } else
-            Log.log(" ;");
+            System.out.println(" ;");
 
         return null;
     }
@@ -545,7 +566,7 @@ public class PrettyPrinter<T extends AST> extends Visitor<T> {
 
     public T visitRecordAccess(RecordAccess ra) {
         ra.record().visit(this);
-        Log.logNoNewline(".)");
+        System.out.print(".)");
         ra.field().visit(this);
         return null;
     }
@@ -556,138 +577,153 @@ public class PrettyPrinter<T extends AST> extends Visitor<T> {
     }
 
     public T visitRecordMember(RecordMember rm) {
-        Log.logNoNewline(tab());
+        System.out.print(tab());
         rm.type().visit(this);
-        Log.logNoNewline(" ");
+        System.out.print(" ");
         rm.name().visit(this);
-        Log.log(";");
+        System.out.println(";");
         return null;
     }
 
     public T visitRecordTypeDecl(RecordTypeDecl rt) {
-        Log.logNoNewline(tab());
+        System.out.print(tab());
         printModifierSequence(rt.modifiers());
         if (rt.modifiers().size() > 0)
-            Log.logNoNewline(" ");
-        Log.logNoNewline("record ");
+            System.out.print(" ");
+        System.out.print("record ");
         rt.name().visit(this);
         if (rt.extend().size() > 0) {
-            Log.logNoNewline(" extends ");
+            System.out.print(" extends ");
             for (int i = 0; i < rt.extend().size(); i++) {
                 rt.extend().child(i).visit(this);
                 if (i < rt.extend().size() - 1)
-                    Log.logNoNewline(", ");
+                    System.out.print(", ");
             }
         }
-        Log.log(" {");
+        System.out.println(" {");
         indent += 2;
         rt.body().visit(this);
         indent -= 2;
-        Log.log(tab() + "}");
+        System.out.println(tab() + "}");
         return null;
     }
 
     public T visitReturnStat(ReturnStat rs) {
-        Log.logNoNewline("return");
+        System.out.print(tab() + "return");
         if (rs.expr() != null) {
-            Log.logNoNewline(" ");
+            System.out.print(" ");
             rs.expr().visit(this);
         }
         return null;
     }
 
     public T visitSequence(Sequence se) {
-        se.visitChildren(this);
+        //se.visitChildren(this);
+	for (int i=0;i<se.size();i++)
+	    se.child(i).visit(this);
         return null;
     }
 
     public T visitSkipStat(SkipStat ss) {
-        Log.log("skip;");
+        System.out.println("skip;");
         return null;
     }
 
     public T visitStopStat(StopStat ss) {
-        Log.log("stop;");
+        System.out.println("stop;");
         return null;
     }
 
     public T visitSuspendStat(SuspendStat ss) {
-        Log.logNoNewline("suspend resume with (");
+        System.out.print("suspend resume with (");
         ss.params().visit(this);
-        Log.logNoNewline(")");
+        System.out.print(")");
         return null;
     }
 
     public T visitSwitchGroup(SwitchGroup sg) {
-        // TODO
-        return sg.visitChildren(this);
+	sg.labels().visit(this);
+	indent += 2;
+	sg.statements().visit(this);
+	indent -= 2;
+	return null;
     }
 
     public T visitSwitchLabel(SwitchLabel sl) {
-        // TODO
-        return sl.visitChildren(this);
+	if (sl.isDefault())
+	    System.out.println(tab() + "default:");
+	else
+	    System.out.println(tab() + "case " + sl.expr() + ":");
+	return null;
     }
 
     public T visitSwitchStat(SwitchStat st) {
-        // TODO
-        return st.visitChildren(this);
+	System.out.print(tab() + "switch (");
+	st.expr().visit(this);
+	System.out.println(") {");
+	indent += 2;
+	st.switchBlocks().visit(this);
+	indent -= 2;
+	System.out.println(tab()+"}");
+	return null;
     }
 
     public T visitSyncStat(SyncStat st) {
-        Log.logNoNewline("sync(");
+	System.out.print(tab());
         st.barrier().visit(this);
-        Log.logNoNewline(")");
+        System.out.println(".sync();");
         return null;
     }
 
     public T visitTernary(Ternary te) {
         te.expr().visit(this);
-        Log.logNoNewline(" ? ");
+        System.out.print(" ? ");
         te.trueBranch().visit(this);
-        Log.logNoNewline(" : ");
+        System.out.print(" : ");
         te.falseBranch().visit(this);
         return null;
     }
 
     public T visitTimeoutStat(TimeoutStat ts) {
+	System.out.print(tab());
         ts.timer().visit(this);
-        Log.logNoNewline(".timeout(");
+        System.out.print(".timeout(");
         ts.delay().visit(this);
-        Log.logNoNewline(")");
+        System.out.println(");");
         return null;
     }
 
     public T visitUnaryPostExpr(UnaryPostExpr up) {
         up.expr().visit(this);
-        Log.logNoNewline(up.opString());
+        System.out.print(up.opString());
         return null;
     }
 
     public T visitUnaryPreExpr(UnaryPreExpr up) {
-        Log.logNoNewline(up.opString());
+        System.out.print(up.opString());
         up.expr().visit(this);
         return null;
     }
 
     public T visitVar(Var va) {
-        Log.logNoNewline(va.name().getname());
+        System.out.print(va.name().getname());
         if (va.init() != null) {
-            Log.logNoNewline(" = ");
+            System.out.print(" = ");
             va.init().visit(this);
         }
         return null;
     }
 
     public T visitWhileStat(WhileStat ws) {
-        Log.logNoNewline(tab() + "while (");
+        System.out.print(tab() + "while (");
         ws.expr().visit(this);
-        Log.logNoNewline(")");
+        System.out.print(")");
         if (ws.stat() instanceof Block) {
-            Log.log(" {");
+            System.out.println(" {");
             indent += 2;
             ((Block) ws.stat()).stats().visit(this);
             indent -= 2;
-            Log.log(tab() + "}");
+            System.out.println(tab() + "}");
         } else
             ws.stat().visit(this);
         return null;

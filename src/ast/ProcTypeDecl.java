@@ -98,7 +98,7 @@ public class ProcTypeDecl extends Type implements DefineTopLevelDecl {
         for (int i = 0; i < formalParams().size(); i++) {
             eq = eq && formalParams().child(i).type().typeEqual(other.formalParams().child(i).type());
         }
-        return eq;
+	return eq;
     }
 
     // α ∼T β ⇔ α =T β

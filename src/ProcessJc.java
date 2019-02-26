@@ -1,9 +1,8 @@
 import java.io.File;
 import java.util.*;
 
-import ast.AST;
-import ast.Compilation;
-import cli.CLIBuilder;
+import ast.*;
+import cli.*;
 import cli.Formatter;
 import cli.StringUtil;
 import codegeneratorjava.CodeGeneratorJava;
@@ -164,29 +163,29 @@ public class ProcessJc {
             // =====================================================
             // V I S I T   I M P O R T   D E C L A R A T I O N S
             // =====================================================
-            SymbolTable.hook = null;
+            
+	    SymbolTable.hook = null;
+	    System.out.println("-- Resolving imports.");
             c.visit(new namechecker.ResolveImports<AST>(globalTypeTable));
-//            globalTypeTable.printStructure("");
+            globalTypeTable.printStructure("");
             
 //            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
 //                CompilerMessageManager.INSTANCE.printTrace("import declarations");
 //                CompilerMessageManager.INSTANCE.writeToFile("PJErrors");
 //                System.exit(1);
 //            }
+//            globalTypeTable.setImportParent(SymbolTable.hook);
             
             // ===========================================================
             // V I S I T   T O P   L E V E L   D E C L A R A T I O N S
             // ===========================================================
-            
+
+	    System.out.println("-- Declaring Top Level Declarations.");
             c.visit(new namechecker.TopLevelDecls<AST>(globalTypeTable));
             
-            ///////
-            c.visit(new rewriters.RecordRewrite<>(globalTypeTable));
-            //
-            
-            ///////
+	    System.out.println("-- Not sure what is happening here.");
             c.visit(new namechecker.ResolveImportTopTypeDecl<AST>());
-            //
+
 
 //            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
 //                CompilerMessageManager.INSTANCE.printTrace("top level declarations");
@@ -205,6 +204,7 @@ public class ProcessJc {
             // ========================================================
 
             // Resolve types from imported packages.
+	    System.out.println("-- Resolving imported types.");
             c.visit(new namechecker.ResolvePackageTypes());
             
 //            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
@@ -215,7 +215,7 @@ public class ProcessJc {
             // =======================================
             // V I S I T   N A M E   C H E C K E R
             // =======================================
-            
+	    System.out.println("-- Checking name usage.");
             c.visit(new namechecker.NameChecker<AST>(globalTypeTable));
             
 //            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
@@ -228,6 +228,7 @@ public class ProcessJc {
             // =======================================
 
             // Re-construct Array Types correctly
+	    System.out.println("-- Reconstrucing array types.");
             root.visit(new namechecker.ArrayTypeConstructor());
             
 //            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
@@ -238,7 +239,7 @@ public class ProcessJc {
             // ========================================
             // V I S I T   T Y P E   C H E C K E R
             // ========================================
-            
+	    System.out.println("-- Checking types.");
             c.visit(new typechecker.TypeChecker(globalTypeTable));
             
 //            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
@@ -255,7 +256,7 @@ public class ProcessJc {
             // ========================================
             // V I S I T   R E A C H A B I L I T Y
             // ========================================
-            
+	    System.out.println("-- Computing reachability.");
             c.visit(new reachability.Reachability());
             
 //            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
@@ -266,7 +267,7 @@ public class ProcessJc {
             // ===========================================
             // V I S I T   P A R A L L E L   U S A G E
             // ===========================================
-            
+	    System.out.println("-- Performing parallel usage check.");
             c.visit(new parallel_usage_check.ParallelUsageCheck());
             
 //            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
@@ -279,9 +280,22 @@ public class ProcessJc {
             // ==========================
             
             c.visit(new yield.Yield());
-            
+	    System.out.println("-- Marking yielding statements and expressions.");
             c.visit(new rewriters.Yield());
-            
+	    //c.visit(new rewriters.Expr());
+	    
+	    System.out.println("-- Checking literal inits are free of channel communication.");
+	    c.visit(new semanticcheck.LiteralInits());
+
+
+	    System.out.println("-- Rewriting yielding expressions.");
+            new rewriters.ChannelReadRewrite().go(c, null);
+	    //System.out.println("Lets reprint it all");
+	    //c.visit(new printers.ParseTreePrinter());
+	    //c.visit(new printers.PrettyPrinter());
+	    System.out.println("-- Checking break and continue labels.");
+	    new semanticcheck.LabeledBreakContinueCheck().go(c);
+
 //            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
 //                CompilerMessageManager.INSTANCE.printTrace("yield");
 //                System.exit(1);
@@ -292,7 +306,7 @@ public class ProcessJc {
             // ===============================
             
             if (Settings.targetLanguage == Language.JVM) {
-                generateCodeJava(c, inFile, globalTypeTable);
+                ;//generateCodeJava(c, inFile, globalTypeTable);
             } else {
                 System.err.println(String.format("Unknown target language '%s' selected.", Settings.targetLanguage));
                 System.exit(1);

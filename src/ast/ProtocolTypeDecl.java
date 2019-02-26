@@ -52,6 +52,32 @@ public class ProtocolTypeDecl extends Type implements DefineTopLevelDecl {
     // *************************************************************************
     // ** Type Related Methods
 
+    public boolean doesExtend(ProtocolTypeDecl pd) {
+	if (typeEqual(pd))
+	    return true;
+	boolean b = false;
+	for (Name n : extend()) {
+	    b = b || doesExtend((ProtocolTypeDecl)n.myDecl);
+	}
+	return b;
+    }
+
+    public ProtocolCase getCase(String name) {
+	// Search our own body first.
+	for (ProtocolCase pc : body()) {
+	    if (pc.name().getname().equals(name))
+		return pc;
+	}
+	// This protocol type did not have the case.
+	ProtocolCase p = null;
+	for (Name n : extend()) {
+	    p = ((ProtocolTypeDecl)n.myDecl).getCase(name);
+	    if (p != null)
+		return p;
+	}
+	return null;
+    }
+
     public String signature() {
         return "<P" + name().getname() + ";";
     }
@@ -65,24 +91,23 @@ public class ProtocolTypeDecl extends Type implements DefineTopLevelDecl {
         return true;
     }
 
+
+    @Override public boolean typeEqual(Type t) {
+	if (!t.isProtocolType())
+	    return false;
+	ProtocolTypeDecl pt = (ProtocolTypeDecl)t;
+	return name().getname().equals(pt.name().getname());
+    }
+
+     @Override public boolean typeEquivalent(Type t) {
+        return typeEqual(t);
+    }
+
     // TODO
-    @Override
-    public boolean typeEqual(Type t) {
-        if (!t.isProtocolType())
+    @Override public boolean typeAssignmentCompatible(Type t) {
+	if (!t.isProtocolType())
             return false;
-        ProtocolTypeDecl other = (ProtocolTypeDecl) t;
-        return name().getname().equals(other.name().getname());
-    }
-
-    // TODO
-    @Override
-    public boolean typeEquivalent(Type t) {
-        return typeEqual(t);
-    }
-
-    // TODO
-    @Override
-    public boolean typeAssignmentCompatible(Type t) {
-        return typeEqual(t);
+        ProtocolTypeDecl pt = (ProtocolTypeDecl)t;
+	return pt.doesExtend(this);
     }
 }

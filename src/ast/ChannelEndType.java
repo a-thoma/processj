@@ -60,6 +60,7 @@ public class ChannelEndType extends Type {
         return true;
     }
 
+
     public <S extends Object> S visit(Visitor<S> v) {
         return v.visitChannelEndType(this);
     }

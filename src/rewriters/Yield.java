@@ -1,11 +1,10 @@
 package rewriters;
 
 import ast.*;
-import utilities.Log;
 import utilities.Visitor;
 
 public class Yield extends Visitor<Boolean> {
-    
+
     public Boolean visitChildren(AST[] children) {
         boolean b = false;
         for (AST c : children) {
@@ -16,62 +15,62 @@ public class Yield extends Visitor<Boolean> {
         }
         return b;
     }
-    
+
     public Boolean visitAnnotations(Annotations as) {
         return false;
     }
-    
+
     public Boolean visitAltCase(AltCase ac) {
         // This seems silly cause any Alt yields!
         return visitChildren(ac.children);
     }
-    
+
     public Boolean visitAltStat(AltStat as) {
         visitChildren(as.children);
         as.setYield();
         return true;
     }
-    
+
     public Boolean visitArrayAccessExpr(ArrayAccessExpr ae) {
         boolean b = visitChildren(ae.children);
         if (b) 
             ae.setYield();
         return b;
     }
-    
+
     public Boolean visitArrayLiteral(ArrayLiteral al) {
         boolean b = visitChildren(al.children); 
         if (b)
             al.setYield();
         return b;
     }
-    
+
     public Boolean visitArrayType(ArrayType at) {
         return false;
     }
-    
+
     public Boolean visitAssignment(Assignment as) {
         boolean b = visitChildren(as.children);
         if (b)
             as.setYield();
         return b;
     }
-    
+
     public Boolean visitBinaryExpr(BinaryExpr be) {
         boolean b = visitChildren(be.children);
         if (b) 
             be.setYield();
         return b;
     }
-    
+
     public Boolean visitBlock(Block bl) {
         boolean b = visitChildren(bl.children);
         if (b)
             bl.setYield();
-        Log.log("[Yield]: Block yields: " + b);
+        //System.out.println("[Yield]: Block yields: " + b);
         return b;
-    }
-    
+    }   
+
     public Boolean visitBreakStat(BreakStat bs) {
         return false;
     }
@@ -113,7 +112,7 @@ public class Yield extends Visitor<Boolean> {
 
     public Boolean visitCompilation(Compilation co) {
         // At the compilation level we don't really care.
-        Log.log("[Yield]: Visiting a Compilation");
+        //System.out.println("[Yield]: Visiting a Compilation");
         visitChildren(co.children);
         return false;
     }
@@ -242,10 +241,10 @@ public class Yield extends Visitor<Boolean> {
     }
 
     public Boolean visitProcTypeDecl(ProcTypeDecl pd) {
-        Log.log("[Yield]: Visiting " + pd.name());
+        //System.out.println("[Yield]: Visiting " + pd.name());
         boolean b = visitChildren(pd.children);
         pd.yields = b;
-        Log.log("[Yield]: Procedure " + pd.name() + " " + (b?"yields":"does not yield"));
+        //System.out.println("[Yield]: Procedure " + pd.name() + " " + (b?"yields":"does not yield"));
         return b;
     }
 
@@ -295,6 +294,7 @@ public class Yield extends Visitor<Boolean> {
         boolean b = false;
         for (int i = 0; i < se.size(); i++)
             if (se.child(i) != null) {
+		//System.out.println(i + " " + (se==null) + " " + (se.child(i) == null) + " " + se.child(i));	       
                 boolean bb = se.child(i).visit(this);
                 b = b || bb;
             }
@@ -329,11 +329,12 @@ public class Yield extends Visitor<Boolean> {
             st.setYield();
         return b;
     }
-    
+
     public Boolean visitRecordMemberLiteral(RecordMemberLiteral rm) {
-        return rm.expr().visit(this);
+	return rm.expr().visit(this);
     }
-    
+
+
     public Boolean visitSyncStat(SyncStat st) {
         st.setYield();
         return true;

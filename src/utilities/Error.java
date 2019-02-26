@@ -77,7 +77,7 @@ public class Error {
     public static Type addError(AST e, String msg, int errorno) {
 //        System.out.print(fileName + ":" + e.line + ": " + msg);
         System.out.println(CompilerMessageManager.INSTANCE.fileName + ":" + e.line + ": " + msg);
-        System.out.print("Error number: " + errorno);
+        System.out.println("Error number: " + errorno);
         errorCount++;
 //        errors += "\n" + fileName + ":" + e.line + ": " + msg;
         errors += "\n" + CompilerMessageManager.INSTANCE.fileName + ":" + e.line + ": " + msg;

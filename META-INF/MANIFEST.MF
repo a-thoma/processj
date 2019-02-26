@@ -1,1 +1,1 @@
-Main-Class: Demo
+Main-Class: -console-ansi-code=true Demo
