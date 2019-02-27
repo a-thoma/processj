@@ -1,0 +1,5 @@
+package Pkg.Import;
+
+record a {
+    int b;
+}

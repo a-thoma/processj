@@ -1,0 +1,40 @@
+import std.io;
+
+public protocol P {
+  request : { int number; double amount; }
+  reply : { boolean status; }
+}
+
+public protocol P1 extends P {
+  deny : { int code; }
+}
+
+public protocol X {
+  accept : { int code; }
+}
+
+public proc void main(string args[]) {
+
+  P p = new P { request : 122, 34.6 };
+  P1 p1 = new P1 { deny : 111 };
+  switch (p1) {
+    /*case deny:
+        println("deny :" + p1.code); break;
+        switch (p) {
+	  case reply: 
+	       println("reply " + p.status);
+	       break;
+	  case request:
+	       println("request " + p.number + " " + p.amount);
+	       int x = p1.code;
+//	       switch(p1) {
+	//       default: break;
+	  //     }
+	       break;
+	}*/
+    default:
+        println("nada");
+	int xy;	
+	xy = p.request; 
+ }
+}

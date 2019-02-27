@@ -1,0 +1,94 @@
+ 
+public record R {
+ int a;
+ int b;
+ int c;
+}
+
+
+public protocol P {
+ allow: { int a; }
+ deny: {}
+}
+
+public proc int bar(int j, int i, double d) { return 0;}
+public proc void foo() {
+
+/*  chan<int> c;
+
+//  chan<int>[] cc;
+//  R r;
+//  r = new R{a=2,b=4,c=8};
+
+ int a,b,d;
+  a = 1 + 2;
+
+  a = c.read();
+  b = c.read() + a * a + a - 5 + c.read() + c.read();
+  d = 42 + c.read() + c.read() + 67;
+  d = 12 + c.read() + c.read();
+  d = c.read() + 34;
+  d = --(12-45); //c.read();
+  d = -c.read();
+  //d = cc[c.read()].read(); -- still broken
+  d = bar(c.read(), 12, 34.56);
+  bar(c.read(), 12, 34.56);
+  
+  c.write(c.read());
+  {
+    d = c.read()+c.read();
+  }
+
+  if (c.read() > 12) {
+    d = c.read() + 56;
+  } else {
+    d = c.read*c.read();
+  }
+
+
+  c.read().timeout(12);
+    
+  c.read().sync();
+
+  par {
+    d = c.read()+c.read();
+    d = c.read();
+  }
+
+  switch(c.read()) {
+  case 12: {
+     int d;
+     d = c.read()+45;
+     break;
+    }
+  }
+
+  int i = c.read();
+
+  int j = c.read() + 67;
+
+
+  switch(c.read()) {
+  case 1: {
+    int x;
+    x = c.read() + 2;
+  }
+  }
+
+  int k = c.read().read();
+
+  int k1;
+  k1 = c.read().read().read();
+
+  c.read().sync();
+*/
+
+P p = new P{allow: "Hello"};
+
+
+}
+
+
+
+
+

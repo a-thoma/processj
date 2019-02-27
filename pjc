@@ -1,0 +1,70 @@
+#!/bin/bash
+
+PACKAGE_DIR="/Users/matt/Dropbox/workspace/processj"
+workingdir="~/.processj"
+
+#RESULT=`java -cp $PACKAGE_DIR/bin:$PACKAGE_DIR/src/utilities/java_cup_runtime.jar:$PACKAGE_DIR/src/utilities/ST-4.0.7.jar:$PACKAGE_DIR/src/utilities/asm-all-3.3.1.jar:$PACKAGE_DIR:$PACKAGE_DIR/bin:. ProcessJc $@`
+
+#RESULT=`
+java -cp $PACKAGE_DIR/bin:$PACKAGE_DIR/resources/jars/java_cup_runtime.jar:$PACKAGE_DIR/resources/jars/ST-4.0.7.jar:$PACKAGE_DIR/resources/jars/asm-all-3.3.1.jar:$PACKAGE_DIR:$PACKAGE_DIR/bin:. ProcessJc $@
+#`
+
+ERRORS=`echo "${RESULT}" | awk '{print;}'`
+
+#STATUS=`echo "${RESULT}" | awk '/./{line=$0} END{print line}'`
+
+echo "${ERRORS}"
+
+#echo "${RESULT}" | awk '/./{line=$0} END{print line}' #this is to test command line options
+
+#if [ "${STATUS}" = "** COMPILATION SUCCEEDED **" ] ; then
+#  echo "Compilation successful"
+#else
+#  echo "${ERRORS}"
+#  exit 1
+#fi
+
+exit
+## !!!!!!! remove this !!!!!! this is a temporary variable used to test a single java file
+varname=$(echo $1 | cut -f1 -d".")
+varname=$(echo $varname | cut -f2 -d"/")
+#echo "${varname}"
+## compile the .java file using Java compiler
+#O=`javac -classpath $PACKAGE_DIR/bin/:$PACKAGE_DIR/lib/JVM:. $workingdir/*.java`
+O=`javac -classpath $PACKAGE_DIR/bin/:$PACKAGE_DIR/lib/JVM:. $workingdir/$varname.java`
+if [ "${O}" != "" ] ; then
+  #in the unlikely event of a Java issue
+  echo "An error has ocurred. Please send the .pj file and this output"
+  echo "to matt.pedersen@unlv.edu"
+  echo "${O}"
+  exit 1
+else
+  echo "Java compilation successful"
+fi
+
+
+
+
+## let's create an executable jar file now.
+pushd $workingdir > /dev/null
+rm -rf META-INF
+mkdir META-INF ## create dir for manifest file
+filename="${@##*/}" ## $@ is the full path'ed filename of .pj file. we extract just the file name x.pj
+just_filename="${filename%.*}" ## now extract just the name of the file
+echo "Main-Class: "$just_filename > META-INF/MANIFEST.MF ## write the manifest file
+
+O=`jar cmvf META-INF/MANIFEST.MF $just_filename.jar *.class > /dev/null`
+if [ "${O}" != "" ] ; then
+  #in the unlikely event of a Java issue
+  echo "An error has ocurred. Please send the .pj file and this output"
+  echo "to matt.pedersen@unlv.edu"
+  echo "${O}"
+  exit 1
+else
+  echo "JAR file creation succesfull"
+fi
+
+printf "\nOutput written to ${just_filename}.jar\n"
+
+popd > /dev/null
+mv $workingdir/$just_filename.jar .
