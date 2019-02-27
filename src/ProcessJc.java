@@ -183,7 +183,10 @@ public class ProcessJc {
 	    System.out.println("-- Declaring Top Level Declarations.");
             c.visit(new namechecker.TopLevelDecls<AST>(globalTypeTable));
             
-	    System.out.println("-- Not sure what is happening here.");
+            System.out.println("-- Reconstructing records.");
+            c.visit(new rewriters.RecordRewrite<>(globalTypeTable));
+            
+	    System.out.println("-- Checking native procedures.");
             c.visit(new namechecker.ResolveImportTopTypeDecl<AST>());
 
 
