@@ -159,6 +159,16 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
     private boolean _isChanRead = false;
     
     /**
+     * Access to protocol case.
+     */
+    private boolean _isProtocolCase = false;
+    
+    /**
+     * 
+     */
+    private String _currProtocolTag = null;
+    
+    /**
      * This is used to avoid name collisions.
      */
     private boolean _fieldName = true;
@@ -954,7 +964,12 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         String label = null;
         if (!sl.isDefault())
             label = (String) sl.expr().visit(this);
+        // Silly way to keep track of a protocol 'tag', however, this
+        // should (in theory) _always_ work. The type checker should
+        // catch any invalid 'tag' in a switch label for a protocol
+        _currProtocolTag = label;
         
+        stSwitchLabel.add("tag", _isProtocolCase);
         stSwitchLabel.add("label", label);
         
         return (T) stSwitchLabel.render();
@@ -993,6 +1008,9 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         
         // Generated template after evaluating this visitor
         ST stSwitchStat = _stGroup.getInstanceOf("SwitchStat");
+        // Is this a protocol 'tag'?
+        if (st.expr().type.isProtocolType())
+            _isProtocolCase = true;
         
         String expr = (String) st.expr().visit(this);
         List<String> switchGroup = new ArrayList<>();
@@ -1000,8 +1018,12 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         for (SwitchGroup sg : st.switchBlocks())
             switchGroup.add((String) sg.visit(this));
         
+        stSwitchStat.add("tag", _isProtocolCase);
         stSwitchStat.add("expr", expr);
         stSwitchStat.add("block", switchGroup);
+        
+        // Reset value
+        _isProtocolCase = false;
         
         return (T) stSwitchStat.render();
     }
@@ -1141,8 +1163,8 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         // Since we are keeping the name of a tag as it is, this
         // shouldn't cause any name collision
         String protocName = (String) pc.name().visit(this);
-        // This may create name collision problems because protocol members
-        // are also record members
+        // This may create name collision problems because we use 'RecordAccess'
+        // for protocols and records
         _recordFieldMap.clear();
         
         // The scope in which all members of this tag appeared
@@ -1321,7 +1343,16 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
             stRecordAccess.add("name", name);
             stRecordAccess.add("member", field);
         } else if (ra.record().type.isProtocolType()) {
-            // TODO: add record stuff
+            stRecordAccess = _stGroup.getInstanceOf("ProtocolAccess");
+            ProtocolTypeDecl pt = (ProtocolTypeDecl) ra.record().type;
+            String protocName = (String) pt.name().visit(this); // wrapper class
+            String name = (String) ra.record().visit(this);     // reference to inner class type
+            String field = (String) ra.field().visit(this);     // field in inner class
+            
+            stRecordAccess.add("protocName", protocName);
+            stRecordAccess.add("tag", _currProtocolTag);
+            stRecordAccess.add("var", name);
+            stRecordAccess.add("member", field);
         }
         
         return (T) stRecordAccess.render();

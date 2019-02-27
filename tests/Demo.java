@@ -116,6 +116,15 @@ public class Demo {
                 this.tag = "accept";
             }
         }
+
+        protected static class yeah extends PJProtocolCase {
+            public double d;
+
+            public yeah(double d) {
+                this.d = d;
+                this.tag = "yeah";
+            }
+        }
     }
 
     public static class _proc$writer$cwLL extends PJProcess {
@@ -255,7 +264,12 @@ public class Demo {
                 default: break;
             }
 
-            _ld$xx1 = new XX.accept(35);
+            _ld$xx1 = new XX.yeah(35);
+            switch(_ld$xx1.tag) {
+            case "yeah":
+                io.println("the tag value is " + (((XX.yeah) _ld$xx1).d));
+                break;
+            }
             _pd$out1.write(this, ((PJProtocolCase) (_ld$xx1)));
             this.runLabel = 1;
             yield();

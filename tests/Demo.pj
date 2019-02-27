@@ -40,6 +40,7 @@ public protocol P1 extends PP {
 
 public protocol XX {
   accept : { int code; }
+  yeah : { double d; }
 }
 
 public proc void writer(chan<L>.write out) {
@@ -70,7 +71,10 @@ public proc void readXX(chan<XX>.read in) {
 }
 
 public proc void writeXX(chan<XX>.write out) {
-  XX xx = new XX { accept : 35 };
+  XX xx = new XX { yeah : 35 };
+  switch (xx) {
+    case yeah: println("the tag value is " + xx.d); break;
+  }
   out.write(xx);
 }
 
