@@ -974,12 +974,15 @@ public class TypeChecker extends Visitor<Type> {
     public Type visitProtocolLiteral(ProtocolLiteral pl) {
 	Log.log(pl.line + ": Visiting a protocol literal");
 
+
+	return pl.myTypeDecl;
+
         // Validity of the tag was already checked in NameChecker.
 
         // TODO: below code is incorrect as it does not take 'extends' into account
 
         // Name{ tag: exp_1, exp_2, ... ,exp_n }
-        ProtocolCase pc = pl.myChosenCase;
+	/*        ProtocolCase pc = pl.myChosenCase;
         ProtocolTypeDecl pd = pl.myTypeDecl;
         if (pc.body().size() != pl.expressions().size())
             Error.addError(pl, "Incorrect number of expressions in protocol literal '" + pd.name().getname() + "'.",
@@ -993,7 +996,7 @@ public class TypeChecker extends Visitor<Type> {
                         + "' of type '" + vType + "'.", 3034);
         }
         Log.log(pl.line + ": protocol literal has type: " + pl.myTypeDecl);
-        return pl.myTypeDecl;
+        return pl.myTypeDecl;*/
     }
 
     

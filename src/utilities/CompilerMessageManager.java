@@ -138,7 +138,7 @@ public enum CompilerMessageManager {
     
     public void writeToFile(String outputFile) {
         // TODO: Write to home folder
-        String javafile = "/Users/Ben/Documents/" + outputFile + ".txt";
+        String javafile = "/Users/matt/Documents/" + outputFile + ".txt";
         StringBuilder stringBuilder = new StringBuilder();
         for (CompilerMessage cm : stackTrace)
             stringBuilder.append(cm.getMessageNumber().getNumber()).append("\n");
