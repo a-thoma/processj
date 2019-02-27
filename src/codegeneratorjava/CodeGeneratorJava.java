@@ -785,9 +785,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         // is the writing end of a channel.
         Expression chanExpr = cw.channel();
         // 'c' is the name of the channel
-        String chanWriteName = null;
-//        if (chanExpr instanceof NameExpr)
-        chanWriteName = (String) chanExpr.visit(this);
+        String chanWriteName = (String) chanExpr.visit(this);
         stChanWriteStat.add("chanName", chanWriteName);
         // Expression sent through channel
         String expr = (String) cw.expr().visit(this);
@@ -814,9 +812,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         // is the reading end of a channel.
         Expression chanExpr = cr.channel();
         // 'c' is the name of the channel
-        String chanEndName = null;
-//        if (chanExpr instanceof NameExpr)
-        chanEndName = (String) chanExpr.visit(this);
+        String chanEndName = (String) chanExpr.visit(this);
         stChannelReadExpr.add("chanName", chanEndName);
         // Add the 'switch' block for resumption
         for (int label = 0; label < 2; ++label) {
@@ -1275,17 +1271,31 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         // is the literal value used to initialized 'z' with. This is
         // something we don't want to do. Instead, we need to return
         // the literal value assigned to 'z'
-        for (Expression ex : rl.members()) {
-            if (ex instanceof Assignment) {
-                Assignment as = (Assignment) ex;
-                String lhs = (String) as.left().visit(this);
-                String rhs = (String) as.right().visit(this);
-                if (members.put(lhs, rhs) == null)
-                    Log.log(rl.line + ":  Setting '" + lhs + "' with '" + rhs + "'");
+        Sequence se = rl.members();
+        for (int i = 0; i < se.size(); ++i) {
+            if (se.child(i) instanceof Expression)
+                ; // TODO: what am i to do?
+            else if (se.child(i) instanceof RecordMemberLiteral) {
+                RecordMemberLiteral rm = (RecordMemberLiteral) se.child(i);
+                String lhs = (String) rm.name().visit(this);
+                String expr = (String) rm.expr().visit(this);
+                if (members.put(lhs, expr) == null)
+                    Log.log(rl.line + ":   Setting '" + lhs + "' with '" + expr + "'");
                 else
-                    Log.log(rl.line + ":  Updating '" + lhs + "' with '" + rhs + "'");
+                    Log.log(rl.line + ":   Updating '" + lhs + "' with '" + expr + "'");
             }
         }
+//        for (Expression ex : rl.members()) {
+//            if (ex instanceof Assignment) {
+//                Assignment as = (Assignment) ex;
+//                String lhs = (String) as.left().visit(this);
+//                String rhs = (String) as.right().visit(this);
+//                if (members.put(lhs, rhs) == null)
+//                    Log.log(rl.line + ":  Setting '" + lhs + "' with '" + rhs + "'");
+//                else
+//                    Log.log(rl.line + ":  Updating '" + lhs + "' with '" + rhs + "'");
+//            }
+//        }
         
         stRecordListeral.add("type", type);
         stRecordListeral.add("vals", members.values());

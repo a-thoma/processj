@@ -58,7 +58,7 @@ public proc void reader(chan<L>.read in) {
     case 5: println("case 5"); break;
     case 45: println("case 45"); break;
     case 6: println("case 6"); break;
-    default: println("some case!"); break;
+    default: break;
   }
   println("The value is " + value.k.t.a);
 }
