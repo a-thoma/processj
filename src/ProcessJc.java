@@ -306,7 +306,7 @@ public class ProcessJc {
             // ===============================
             
             if (Settings.targetLanguage == Language.JVM) {
-                ;//generateCodeJava(c, inFile, globalTypeTable);
+                generateCodeJava(c, inFile, globalTypeTable);
             } else {
                 System.err.println(String.format("Unknown target language '%s' selected.", Settings.targetLanguage));
                 System.exit(1);

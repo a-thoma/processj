@@ -69,7 +69,7 @@ public class PJMain extends Command {
     
     @Option(names = {"-I", "-include"},
             metavar = "<dir>",
-            defaultValue = "/Users/matt/Dropbox/workspace/processj/include", // Default included
+            defaultValue = "/Users/Ben/Desktop/processj/include", // Default included
             help = "Override the default include directory which is set to be the Include "
                     + "subdirectory of the ProcessJ directory")
     public String include;
