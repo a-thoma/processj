@@ -1,7 +1,6 @@
-package tests;
+//package tests;
 
 import std.io;
-import tests.Matt;
 
 //// BOOK
 // Concurrent programming in Java: design principles and patterns (D.lea)

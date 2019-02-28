@@ -316,7 +316,7 @@ BreakStat(name) ::= <<
 //
 // 1) label:
 SwitchLabel(label, tag) ::= <<
-<if(label)>case <if(tag)>"<label>"<else><label><endif><else>default<endif>
+<if(label)>case <label><else>default<endif>
 >>
 
 //========================================================================================

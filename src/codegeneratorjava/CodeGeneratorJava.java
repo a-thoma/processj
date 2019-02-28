@@ -964,12 +964,13 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         String label = null;
         if (!sl.isDefault())
             label = (String) sl.expr().visit(this);
+        if (_isProtocolCase)
+            label = "\"" + label + "\"";
         // Silly way to keep track of a protocol 'tag', however, this
         // should (in theory) _always_ work. The type checker should
         // catch any invalid 'tag' in a switch label for a protocol
         _currProtocolTag = label;
         
-        stSwitchLabel.add("tag", _isProtocolCase);
         stSwitchLabel.add("label", label);
         
         return (T) stSwitchLabel.render();

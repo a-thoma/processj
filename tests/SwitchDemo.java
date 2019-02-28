@@ -50,6 +50,7 @@ public class SwitchDemo {
             case 5:
                 break;
             default:
+                io.println("default case");
                 break;
             }
             terminate();
