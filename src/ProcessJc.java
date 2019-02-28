@@ -8,6 +8,7 @@ import cli.StringUtil;
 import codegeneratorjava.CodeGeneratorJava;
 import codegeneratorjava.Helper;
 import library.Library;
+import namechecker.ResolveImports;
 import parser.parser;
 import rewriters.CastRewrite;
 import scanner.Scanner;
@@ -147,6 +148,12 @@ public class ProcessJc {
 
             // Cast the result from the parse to a Compilation - this is the root of the tree
             Compilation c = (Compilation) root;
+            // Set absolute path, file and package name from where this Compilation is created
+            System.out.println("-- Setting absolute path, file and package name for '" + inFile.getName() + "'.");
+            c.sourceFile = inFile.getName();
+            c.path = inFile.getAbsolutePath();
+            if (c.packageName() != null)  // A package declaration is optional, so this can be 'null'
+                c.packageName = ResolveImports.packageNameToString(c.packageName());
 
             // Decode pragmas - these are used for generating stubs from libraries.
             // No regular program would have them.
@@ -186,7 +193,7 @@ public class ProcessJc {
             System.out.println("-- Reconstructing records.");
             c.visit(new rewriters.RecordRewrite<>(globalTypeTable));
             
-	    System.out.println("-- Checking native procedures.");
+	    System.out.println("-- Checking native Top Level Declarations.");
             c.visit(new namechecker.ResolveImportTopTypeDecl<AST>());
 
 

@@ -1071,16 +1071,13 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         // Check local procedures, if none is found then the procedure must come
         // from a different file (and package) 
         if (invokedProc.myPackage.contains(_sourceFile)) {
-            // The procedure is looked up by its signature.
-            // Note that this should never return 'null'!
-            String signature = "";
-            if (Helper.doesProcedureYield(invokedProc))
-                signature = Helper.makeVariableName(
-                        invokedProcName + changeSignature(invokedProc), 0, Tag.PROCEDURE_NAME);
-            else
-                signature = Helper.makeVariableName(
-                        invokedProcName + changeSignature(invokedProc), 0, Tag.METHOD_NAME);
-            invokedProcName = packageName + "." + signature;
+            String name = "";
+            if (Helper.doesProcedureYield(invokedProc)) {
+                name = Helper.makeVariableName(invokedProcName + changeSignature(invokedProc), 0, Tag.PROCEDURE_NAME);
+            } else {
+                name = Helper.makeVariableName(invokedProcName + changeSignature(invokedProc), 0, Tag.METHOD_NAME);
+            }
+            invokedProcName = packageName + "." + name;
         } else if (invokedProc.isNative) {
             // Make the package visible on import by using the qualified name of the
             // class the procedure belongs to and the name of the folder the procedure's

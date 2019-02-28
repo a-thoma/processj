@@ -14,15 +14,158 @@ import std.io;
  *
  */
 public class Demo {
+    public static class T implements PJRecord {
+        public int a;
+
+        public T(int a) {
+            this.a = a;
+        }
+    }
+
+    public static class K implements PJRecord {
+        public int z;
+        public T t;
+
+        public K(int z, T t) {
+            this.z = z;
+            this.t = t;
+        }
+    }
+
+    protected static class X implements PJRecord {
+        public int a;
+        public int p;
+        public String b;
+
+        public X(int a, int p, String b) {
+            this.a = a;
+            this.p = p;
+            this.b = b;
+        }
+    }
+
+    protected static class P implements PJRecord {
+        public int z;
+        public T t;
+        public int a;
+        public int p;
+        public String b;
+        public int x;
+        public int y;
+
+        public P(int z, T t, int a, int p, String b, int x, int y) {
+            this.z = z;
+            this.t = t;
+            this.a = a;
+            this.p = p;
+            this.b = b;
+            this.x = x;
+            this.y = y;
+        }
+    }
+
+    private static class L implements PJRecord {
+        public K k;
+        public String str;
+
+        public L(K k, String str) {
+            this.k = k;
+            this.str = str;
+        }
+    }
+
+    public static class _proc$writer$cwLL extends PJProcess {
+        protected PJOne2OneChannel<L> _pd$out1;
+
+        protected K _ld$k1;
+        protected X _ld$x2;
+        protected L _ld$l3;
+
+        public _proc$writer$cwLL(PJOne2OneChannel<L> _pd$out1) {
+            this._pd$out1 = _pd$out1;
+        }
+
+        @Override
+        public synchronized void run() {
+            switch (this.runLabel) {
+                case 0: break;
+                case 1: resume(1); break;
+                default: break;
+            }
+
+            _ld$k1 = new K(3, new T(45));
+            _ld$x2 = new X(20, 300, "Ben");
+            _ld$l3 = new L(_ld$k1, "Benjamin");
+            _pd$out1.write(this, ((L) (_ld$l3)));
+            this.runLabel = 1;
+            yield();
+            label(1);
+
+            terminate();
+        }
+    }
+
+
+    public static class _proc$reader$crLL extends PJProcess {
+        protected PJOne2OneChannel<L> _pd$in1;
+
+        protected L _ld$value1;
+
+        public _proc$reader$crLL(PJOne2OneChannel<L> _pd$in1) {
+            this._pd$in1 = _pd$in1;
+        }
+
+        @Override
+        public synchronized void run() {
+            switch (this.runLabel) {
+                case 0: break;
+                case 1: resume(1); break;
+                case 2: resume(2); break;
+                default: break;
+            }
+
+            if (!_pd$in1.isReadyToRead(this)) {
+                this.runLabel = 1;
+                yield();
+            }
+
+            label(1);
+            _ld$value1 = _pd$in1.read(this);
+            this.runLabel = 2;
+            yield();
+
+            label(2);
+
+            switch(_ld$value1.k.t.a) {
+            case 4:
+                io.println("case 4");
+                break;
+            case 5:
+                io.println("case 5");
+                break;
+            case 45:
+                io.println("case 45");
+                break;
+            case 6:
+                io.println("case 6");
+                break;
+            default:
+                break;
+            }
+            io.println("The value is " + _ld$value1.k.t.a);
+            terminate();
+        }
+    }
+
+
     public static void _method$foo$I(int _pd$x1) {
     }
 
     public static class _proc$main$arT extends PJProcess {
         protected String[] _pd$args1;
 
-        protected int _ld$x1;
-        protected int _ld$y2;
-        protected int _ld$z3;
+        protected PJOne2OneChannel<L> _ld$c1;
+        protected int _ld$a2;
 
         public _proc$main$arT(String[] _pd$args1) {
             this._pd$args1 = _pd$args1;
@@ -30,20 +173,35 @@ public class Demo {
 
         @Override
         public synchronized void run() {
-            switch(_ld$x1) {
-            case 1:
-                _ld$y2 = 2;
-                Demo._method$foo$I(_ld$y2);
-            case 2:
-                _ld$z3 = 4;
-                io.println("default!!" + 4);
-                break;
-            default:
-                _ld$z3 = 45;
-                _ld$y2 = 56;
-                Demo._method$foo$I(_ld$y2);
-                break;
+            switch (this.runLabel) {
+                case 0: break;
+                case 1: resume(1); break;
+                default: break;
             }
+
+            _ld$c1 = new PJOne2OneChannel<L>();
+            _ld$a2 = 2;
+            final PJPar _ld$par1 = new PJPar(2, this);
+
+            (new Demo._proc$writer$cwLL(_ld$c1) {
+                @Override
+                public void finalize() {
+                    _ld$par1.decrement();
+                }
+            }).schedule();
+
+            (new Demo._proc$reader$crLL(_ld$c1) {
+                @Override
+                public void finalize() {
+                    _ld$par1.decrement();
+                }
+            }).schedule();
+
+            setNotReady();
+            this.runLabel = 1;
+            yield();
+            label(1);
+
             terminate();
         }
     }
