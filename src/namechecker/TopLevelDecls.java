@@ -33,6 +33,8 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
 
     // All imported files are kept in this table - indexed by absolute path and name.
     public static Hashtable<String, Compilation> alreadyImportedFiles = new Hashtable<String, Compilation>();
+    private Compilation currentCompilation;
+
 
     public TopLevelDecls(SymbolTable symtab) {
         Log.logHeader("==============================================================");
@@ -61,6 +63,7 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
     public T visitCompilation(Compilation co) {
         Log.log(" Defining forward referencable names (" + CompilerMessageManager.INSTANCE.fileName
                 + ").");
+	currentCompilation = co;
         // 'symtab' is either passed in here from the driver (ProcessJ.java) or from
         // the visitImport() method in this file. Save it cause we need to put all
         // the types and constants for this compilation into it after we handle
@@ -106,6 +109,7 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
     public T visitConstantDecl(ConstantDecl cd) {
         Log.log(cd.line + ": Visiting a ConstantDecl "
                 + cd.var().name().getname());
+	cd.myCompilation = currentCompilation;
         if (!symtab.put(cd.var().name().getname(), cd))
             CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                         .addAST(cd)
@@ -118,6 +122,8 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
     // ProcTypeDecl
     public T visitProcTypeDecl(ProcTypeDecl pd) {
         Log.log(pd.line + ": Visiting a ProcTypeDecl " + pd.name().getname());
+	pd.myCompilation = currentCompilation;
+
         // Procedures can be overloaded, so an entry in the symbol table for a procedure is
         // another symbol table which is indexed by signature.
         if (Modifier.hasModifierSet(pd.modifiers(), Modifier.MOBILE))
@@ -169,6 +175,7 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
     // RecordTypeDecl
     public T visitRecordTypeDecl(RecordTypeDecl rd) {
         Log.log(rd.line + ": Visiting a RecordTypeDecl " + rd.name().getname());
+	rd.myCompilation = currentCompilation;
         if (!symtab.put(rd.name().getname(), rd))
             CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                         .addAST(rd)
@@ -180,8 +187,8 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
 
     // ProtocolTypeDecl
     public T visitProtocolTypeDecl(ProtocolTypeDecl pd) {
-        Log.log(pd.line + ": Visiting a ProtocolTypeDecl "
-                + pd.name().getname());
+        Log.log(pd.line + ": Visiting a ProtocolTypeDecl " + pd.name().getname());
+	pd.myCompilation = currentCompilation;
         if (!symtab.put(pd.name().getname(), pd))
             CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                         .addAST(pd)
@@ -194,6 +201,7 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
     // NamedType
     public T visitNamedType(NamedType nt) {
         Log.log("Toplevel Named Type:" + nt);
+	nt.myCompilation = currentCompilation;
         if (!symtab.put(nt.name().getname(), nt))
             CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                         .addAST(nt)
