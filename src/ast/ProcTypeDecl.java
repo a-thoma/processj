@@ -4,6 +4,7 @@ import utilities.Visitor;
 
 public class ProcTypeDecl extends Type implements DefineTopLevelDecl {
 
+    public Compilation myCompilation = null; // Points to the compilation in which this ProcTypeDecl lives.
     public boolean isNative = false;
     public String library; // Name of the library, e.g. math.h
     public String filename; // Name of the file, e.g math

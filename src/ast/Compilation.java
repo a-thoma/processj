@@ -5,6 +5,10 @@ import utilities.Visitor;
 public class Compilation extends AST {
     
     public boolean visited = false;
+    public String sourceFile = "";    // The name of the file that caused this compilation to exist. Read by the ProcTypeDel.
+    public String path = "";          // Absolute path to where the file is located.
+    public boolean isImport = false;  // Is it an import?
+    public String packageName = "";   // Name of the package.
     
     public Compilation(Sequence<Pragma> pragmas,
                        Sequence<Name> packageName,

@@ -34,7 +34,7 @@ import utilities.VisitorMessageNumber;
 
 public class NameChecker<T extends Object> extends Visitor<T> {
     SymbolTable currentScope = null;
-
+    Compilation currentCompilation = null;
     // The topScope is the SymbolTable originally passed to the constructor.
     // It contains the top level declaration of the file being compiled.
     SymbolTable topScope = null;
@@ -103,6 +103,7 @@ public class NameChecker<T extends Object> extends Visitor<T> {
     /** COMPILATION */
     public T visitCompilation(Compilation co) {
         super.visitCompilation(co);
+	currentCompilation = co;
         Log.log("---=== Name Checker done ===---");
         return null;
     }
@@ -306,7 +307,7 @@ public class NameChecker<T extends Object> extends Visitor<T> {
         Log.log(pd.line + ": Visiting ProcTypeDecl (" + pd.name().getname() + ").");
         currentScope = currentScope.openScope();
         pd.formalParams().visit(this);
-
+	pd.myCompilation = currentCompilation;
         for (Name name : pd.implement()) {
             Object o = resolveName(name);
             if (o == null)
