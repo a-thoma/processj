@@ -391,9 +391,9 @@ non terminal Expression		left_hand_side, expression_opt, expression, constant_ex
 // 11.0 Literals (See 8.0 for Array Literals) 
 non terminal Literal 		literal;
 non terminal RecordLiteral	record_literal;
+non terminal Sequence           record_literal_argument_list_opt;
 non terminal Sequence           record_literal_argument_list;
 non terminal ProtocolLiteral	protocol_literal;
-
 
 // ********************************************************************************
 // ********************************************************************************
@@ -1579,8 +1579,13 @@ literal ::=
 // RecordLiteral :> Literal :> Expression :> AST
 record_literal ::=
          NEW type_name:tn LBRACE record_literal_argument_list:l RBRACE {: RESULT = new RecordLiteral(tn, l); :}
-      // | NEW type_name:tn LBRACE RBRACE {: RESULT = new RecordLiteral(tn, new Sequence()); :}
        ;
+
+// Sequence<RecordMemberLiteral :> AST> :> AST
+record_literal_argument_list_opt ::=
+          record_literal_argument_list:a  {: RESULT = a; :}
+        | /* epsilon */                   {: RESULT = new Sequence(); :}
+        ;
 
 // Sequence<RecordMemberLiteral :> AST> :> AST
 record_literal_argument_list ::= 
@@ -1590,7 +1595,8 @@ record_literal_argument_list ::=
 
 // ProtocolLiteral :> Literal :> Expression :> AST
 protocol_literal ::=
-        NEW type_name:tn LBRACE IDENTIFIER:id2 COLON argument_list_opt:l RBRACE 
+//        NEW type_name:tn LBRACE IDENTIFIER:id2 COLON argument_list_opt:l RBRACE 
+        NEW type_name:tn LBRACE IDENTIFIER:id2 COLON record_literal_argument_list_opt:l RBRACE 
 	  {: RESULT = new ProtocolLiteral(tn, new Name(id2), l); :}
 	  //      | NEW type_name:tn LBRACE IDENTIFIER:id2 COLON RBRACE
       ;
