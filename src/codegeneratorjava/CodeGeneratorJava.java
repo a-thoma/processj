@@ -990,8 +990,11 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
             labels.add((String) sl.visit(this));
         
         List<String> stats = new ArrayList<>();
-        for (Statement st : sg.statements())
+        for (Statement st : sg.statements()) {
+            if (st == null)
+                continue;
             stats.add((String) st.visit(this));
+        }
         
         stSwitchGroup.add("labels", labels);
         stSwitchGroup.add("stats", stats);

@@ -1,5 +1,8 @@
+package tests;
+
 import std.*;
 
+//record R { int a; }
 
 public proc void main (string args[]) {
   chan<int> c,d;
