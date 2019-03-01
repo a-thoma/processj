@@ -1,4 +1,4 @@
-//package tests;
+package tests;
 
 import std.io;
 //import tests.Matt;
@@ -95,6 +95,8 @@ public proc void main(string args[]) {
     writeXX(x.write);
     readXX(x.read);
   }
+
+  println((a + (2 + 45)) * 4);
 
   //int x, y, z;
   //switch(x) {

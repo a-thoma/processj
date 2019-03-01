@@ -412,12 +412,17 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      */
     public T visitBinaryExpr(BinaryExpr be) {
         Log.log(be.line + ": Visiting a BinaryExpr");
-        
+
+        // Generated template after evaluating this visitor
+        ST stBinaryExpr = _stGroup.getInstanceOf("BinaryExpr");
         String op = be.opString();
         String lhs = (String) be.left().visit(this);
         String rhs = (String) be.right().visit(this);
+        stBinaryExpr.add("lhs", lhs);
+        stBinaryExpr.add("rhs", rhs);
+        stBinaryExpr.add("op", op);
 
-        return (T) (lhs + " " + op + " " + rhs);
+        return (T) stBinaryExpr.render();
     }
     
     /**
@@ -1039,6 +1044,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         
         // Generated template after evaluating this invocation
         ST stInvocation = null;
+        ST stImport = null;
         // Target procedure
         ProcTypeDecl invokedProc = in.targetProc;
         // Name of invoked procedure
@@ -1062,9 +1068,12 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
             //      'io' is the name of the class/file,
             //      'println' is the method declared in the class
             invokedProcName = invokedProc.filename + "." + invokedProcName;
-            _importList.add("import " + invokedProc.library + ";");
-        } else
-            ; // TODO: Procedures called from other packages
+            stImport = _stGroup.getInstanceOf("Import");
+            stImport.add("package", invokedProc.library);
+            _importList.add(stImport.render());
+        } else {
+            // TODO: Procedures called from other packages
+        }
         
         // These are the formal parameters of a procedure/method which are specified
         // by a list of comma-separated arguments
