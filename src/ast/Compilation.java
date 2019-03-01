@@ -1,5 +1,7 @@
 package ast;
 
+import java.io.File;
+
 import utilities.Visitor;
 
 public class Compilation extends AST {
@@ -37,5 +39,15 @@ public class Compilation extends AST {
 
     public <S extends Object> S visit(Visitor<S> v) {
         return v.visitCompilation(this);
+    }
+    
+    public String fileNoExtension() {
+        return sourceFile.substring(0, sourceFile.lastIndexOf("."));
+    }
+    
+    public String packageNoName() {
+        if (packageName.isEmpty()) // If packageName is 'null' then it must be a local directory
+            return path.substring(path.lastIndexOf(File.separator) + 1, path.length());
+        return packageName;
     }
 }

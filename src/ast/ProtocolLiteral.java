@@ -21,8 +21,8 @@ public class ProtocolLiteral extends Literal {
         return (Name) children[1];
     }
 
-    public Sequence<Expression> expressions() {
-        return (Sequence<Expression>) children[2];
+    public Sequence<RecordMemberLiteral> expressions() {
+        return (Sequence<RecordMemberLiteral>) children[2];
     }
 
     public <S extends Object> S visit(Visitor<S> v) {

@@ -151,7 +151,7 @@ public class ProcessJc {
             // Set absolute path, file and package name from where this Compilation is created
             System.out.println("-- Setting absolute path, file and package name for '" + inFile.getName() + "'.");
             c.sourceFile = inFile.getName();
-            c.path = inFile.getAbsolutePath();
+            c.path = inFile.getParentFile().getAbsolutePath(); // get file's parent absolute path
             if (c.packageName() != null)  // A package declaration is optional, so this can be 'null'
                 c.packageName = ResolveImports.packageNameToString(c.packageName());
 
@@ -351,9 +351,7 @@ public class ProcessJc {
         // types, and set the symbol table for top level declarations
         CodeGeneratorJava<Object> generator = new CodeGeneratorJava<>(topLevelDecls);
 
-        // Associate this file to the compiled ProcessJ program and then set the
-        // user working directory
-        generator.setSourceFile(name);
+        // Set the user working directory
         //generator.setWorkingDirectory(configFile.getProperty("workingdir"));
 
         // Visit this compilation unit and recursively build the program
@@ -361,6 +359,6 @@ public class ProcessJc {
         String templateResult = (String) compilation.visit(generator);
 
         // Write the output to a file
-        Helper.writeToFile(templateResult, generator.getSourceFile());
+        Helper.writeToFile(templateResult, compilation.fileNoExtension());
     }
 }
