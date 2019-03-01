@@ -940,12 +940,13 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         String label = null;
         if (!sl.isDefault())
             label = (String) sl.expr().visit(this);
-        if (_isProtocolCase)
+        if (_isProtocolCase) {
+            // Silly way to keep track of a protocol 'tag', however, this
+            // should (in theory) _always_ work. The type checker should
+            // catch any invalid 'tag' in a switch label for a protocol
+            _currProtocolTag = label;
             label = "\"" + label + "\"";
-        // Silly way to keep track of a protocol 'tag', however, this
-        // should (in theory) _always_ work. The type checker should
-        // catch any invalid 'tag' in a switch label for a protocol
-        _currProtocolTag = label;
+        }
         
         stSwitchLabel.add("label", label);
         
@@ -1046,11 +1047,12 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         // from a different file (and package)
         if (_currCompilation.packageName.equals(invokedProc.myCompilation.packageName)) {
             String name = "";
-            if (Helper.doesProcedureYield(invokedProc)) {
-                name = Helper.makeVariableName(invokedProcName + signature(invokedProc), 0, Tag.PROCEDURE_NAME);
-            } else {
-                name = Helper.makeVariableName(invokedProcName + signature(invokedProc), 0, Tag.METHOD_NAME);
-            }
+            if (Helper.doesProcedureYield(invokedProc))
+                name = Helper.makeVariableName(invokedProcName + signature(invokedProc),
+                        0, Tag.PROCEDURE_NAME);
+            else
+                name = Helper.makeVariableName(invokedProcName + signature(invokedProc),
+                        0, Tag.METHOD_NAME);
             invokedProcName = invokedProc.myCompilation.fileNoExtension() + "." + name;
         } else if (invokedProc.isNative) {
             // Make the package visible on import by using the qualified name of the
@@ -1167,17 +1169,46 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         
         // Generated template after evaluating this visitor
         ST stProtocolLiteral = _stGroup.getInstanceOf("ProtocolLiteral");
-        
         String type = (String) pl.name().visit(this);
         String tag = (String) pl.tag().visit(this);
-        List<String> params = new ArrayList<>();
         
-        for (RecordMemberLiteral rm : pl.expressions())
-            params.add((String) rm.visit(this));
+        // This map is used to determine the order in which values are
+        // used with the constructor of the class associated with this
+        // protocol's 'type'
+        HashMap<String, String> members = new LinkedHashMap<>();
+        // We only need the members of the 'tag' being used
+        ProtocolCase target = null;
+        ProtocolTypeDecl pt = (ProtocolTypeDecl) _topLevelDecls.get(type);
+        if (pt != null) { // This should never be 'null'
+            for (ProtocolCase pc : pt.body()) {
+                if (pc.name().getname().equals(tag)) {
+                    target = pc;
+                    break;
+                }
+            }
+            // Now that we have the target 'tag', iterate over all
+            // of its members
+            for (RecordMember rm : target.body()) {
+                String name = (String) rm.name().visit(this);
+                members.put(name, null);
+            }
+        }
+        
+        // Similar to a 'RecordLiteral', a visit to a 'RecordMemberLiteral'
+        // would returns a string "z = 3", where 'z' is the member of a protocol
+        // and '3' is the literal value used to initialized 'z' with. 
+        for (RecordMemberLiteral rm : pl.expressions()) {
+            String lhs = (String) rm.name().visit(this);
+            String expr = (String) rm.expr().visit(this);
+            if (members.put(lhs, expr) == null)
+                Log.log(pl.line + ":    Settings '" + lhs + "' with '" + expr + "'");
+            else
+                Log.log(pl.line + ":    Updating '" + lhs + "' with '" + expr + "'");
+        }
         
         stProtocolLiteral.add("type", type);
         stProtocolLiteral.add("tag", tag);
-        stProtocolLiteral.add("vals", params);
+        stProtocolLiteral.add("vals", members.values());
         
         return (T) stProtocolLiteral.render();
     }
@@ -1253,7 +1284,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         
         // This map is used to determine the order in which values are
         // used with the constructor of the class associated with this
-        // record 'type'
+        // record's 'type'
         HashMap<String, String> members = new LinkedHashMap<>();
         RecordTypeDecl rt = (RecordTypeDecl) _topLevelDecls.get(type);
         if (rt != null) { // This should never be 'null'

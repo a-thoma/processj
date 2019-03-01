@@ -9,7 +9,7 @@ import std.io;
  * Target class 'Demo'.
  * Java code version '1.8.0_66'.
  *
- * @author ProcessJ Group
+ * @author ProcessJ Group - University of Nevada, Las Vegas
  * @since 1.2
  *
  */
@@ -110,9 +110,11 @@ public class Demo {
     public static class XX {
         protected static class accept extends PJProtocolCase {
             public int code;
+            public double b;
 
-            public accept(int code) {
+            public accept(int code, double b) {
                 this.code = code;
+                this.b = b;
                 this.tag = "accept";
             }
         }
@@ -148,7 +150,7 @@ public class Demo {
 
             _ld$k1 = new K(3, new T(45));
             _ld$x2 = new X(20, 300, "Ben");
-            _ld$l3 = new L(_ld$k1, "Benjamin");
+            _ld$l3 = new L(new K(4, new T(65)), "Benjamin");
             _pd$out1.write(this, ((L) (_ld$l3)));
             this.runLabel = 1;
             yield();
@@ -247,6 +249,39 @@ public class Demo {
     }
 
 
+    public static class _proc$writeXX$cwLXX extends PJProcess {
+        protected PJOne2OneChannel<PJProtocolCase> _pd$out1;
+
+        protected PJProtocolCase _ld$xx1;
+
+        public _proc$writeXX$cwLXX(PJOne2OneChannel<PJProtocolCase> _pd$out1) {
+            this._pd$out1 = _pd$out1;
+        }
+
+        @Override
+        public synchronized void run() {
+            switch (this.runLabel) {
+                case 0: break;
+                case 1: resume(1); break;
+                default: break;
+            }
+
+            _ld$xx1 = new XX.accept(45, 35);
+            switch(_ld$xx1.tag) {
+            case "accept":
+                io.println("the tag value is " + (((XX.accept) _ld$xx1).code));
+                break;
+            }
+            _pd$out1.write(this, ((PJProtocolCase) (_ld$xx1)));
+            this.runLabel = 1;
+            yield();
+            label(1);
+
+            terminate();
+        }
+    }
+
+
     public static void _method$foo$I(int _pd$x1) {
     }
 
@@ -254,7 +289,8 @@ public class Demo {
         protected String[] _pd$args1;
 
         protected PJOne2OneChannel<L> _ld$c1;
-        protected int _ld$a2;
+        protected PJOne2OneChannel<PJProtocolCase> _ld$x2;
+        protected int _ld$a3;
 
         public _proc$main$arT(String[] _pd$args1) {
             this._pd$args1 = _pd$args1;
@@ -269,8 +305,9 @@ public class Demo {
             }
 
             _ld$c1 = new PJOne2OneChannel<L>();
-            _ld$a2 = 2;
-            final PJPar _ld$par1 = new PJPar(2, this);
+            _ld$x2 = new PJOne2OneChannel<PJProtocolCase>();
+            _ld$a3 = 2;
+            final PJPar _ld$par1 = new PJPar(4, this);
 
             (new Demo._proc$writer$cwLL(_ld$c1) {
                 @Override
@@ -280,6 +317,20 @@ public class Demo {
             }).schedule();
 
             (new Demo._proc$reader$crLL(_ld$c1) {
+                @Override
+                public void finalize() {
+                    _ld$par1.decrement();
+                }
+            }).schedule();
+
+            (new Demo._proc$writeXX$cwLXX(_ld$x2) {
+                @Override
+                public void finalize() {
+                    _ld$par1.decrement();
+                }
+            }).schedule();
+
+            (new Demo._proc$readXX$crLXX(_ld$x2) {
                 @Override
                 public void finalize() {
                     _ld$par1.decrement();
