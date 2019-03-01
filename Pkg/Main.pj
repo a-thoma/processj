@@ -1,0 +1,10 @@
+package Pkg;
+
+import Pkg.Import.A;
+import Pkg.Import.M;
+import Pkg.Import.N;
+
+proc void main(string[] args) {
+    a ben;
+    //aa matt;
+}

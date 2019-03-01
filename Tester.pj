@@ -1,0 +1,27 @@
+import std.io;
+
+public proc void foo() {
+
+	first:
+	for (int i = 0; i < 3; i++) {
+            for (int j = 0; j < 3; j++){
+		if(i == 1){
+		    continue first;
+		}
+		print(" [i = " + i + ", j = " + j + "] ");
+            }
+	}
+	println();
+     
+	second:
+	for (int i = 0; i < 3; i++) {
+            third: for (int j = 0; j < 3; j++){
+		if(i == 1){
+		    break first;
+		}
+		print(" [i = " + i + ", j = " + j + "] ");
+		
+
+            }
+	}
+    }

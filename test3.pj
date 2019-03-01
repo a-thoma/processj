@@ -1,0 +1,15 @@
+import std.io;
+
+record K {
+    int z;
+}
+
+
+proc void foo() {
+  chan<K> c;
+
+  K value = in.read();
+  int x = value.z;
+  //  println(value.z);
+
+}
