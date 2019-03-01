@@ -1,4 +1,7 @@
+//package tests;
+
 import std.io;
+//import tests.Matt;
 
 //// BOOK
 // Concurrent programming in Java: design principles and patterns (D.lea)
@@ -39,13 +42,14 @@ public protocol P1 extends PP {
 }
 
 public protocol XX {
-  accept : { int code; }
+  accept : { int code; double b; }
+  yeah : { double d; }
 }
 
 public proc void writer(chan<L>.write out) {
   K k = new K { z = 3, t = new T { a = 45 } };
   X x = new X { b = "Ben", p = 300, a = 20 };
-  L l = new L { k = k, str = "Benjamin" };
+  L l = new L { k = new K { z = 4, t = new T { a = 65 }}, str = "Benjamin" };
 
   out.write(l);
 }
@@ -56,18 +60,48 @@ public proc void reader(chan<L>.read in) {
   switch (value.k.t.a) {
     case 4: println("case 4"); break;
     case 5: println("case 5"); break;
+    case 45: println("case 45"); break;
     case 6: println("case 6"); break;
-    default: println("some case!"); break;
+    default: break;
   }
   println("The value is " + value.k.t.a);
 }
 
+public proc void readXX(chan<XX>.read in) {
+  XX value;
+  value = in.read();
+  println("Done reading xx!");
+}
+
+public proc void writeXX(chan<XX>.write out) {
+  XX xx = new XX { accept : b = 35, code = 45 };
+  switch (xx) {
+    case accept: println("the tag value is " + xx.code); break;
+  }
+  out.write(xx);
+}
+
+public proc void foo(int x) {
+}
+
 public proc void main(string args[]) {
   chan<L> c;
+  chan<XX> x;
   int a = 2;
-  XX xx = new XX { accept : 35 };
   par {
     writer(c.write);
     reader(c.read);
+  
+    writeXX(x.write);
+    readXX(x.read);
   }
+
+  //int x, y, z;
+  //switch(x) {
+  //  case 1: y = 2; foo(y);; //println("default!!");
+  //  case 2: z = 4; println("default!!" + 4); break;
+  //  default: z = 45; y = 56; foo(y); break;
+  //    //println("default!!");
+  //    //break;
+  //}
 }

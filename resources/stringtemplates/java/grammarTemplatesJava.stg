@@ -30,7 +30,7 @@ import processj.runtime.*;
  * Target class '<name>'.
  * Java code version '<version>'.
  *
- * @author ProcessJ Group
+ * @author ProcessJ Group - University of Nevada, Las Vegas
  * @since 1.2
  *
  */
@@ -315,7 +315,7 @@ BreakStat(name) ::= <<
 //========================================================================================
 //
 // 1) label:
-SwitchLabel(label) ::= <<
+SwitchLabel(label, tag) ::= <<
 <if(label)>case <label><else>default<endif>
 >>
 
@@ -332,8 +332,8 @@ SwitchGroup(labels, stats) ::= <<
 //
 // 1) expr:
 // 2) block:
-SwitchStat(expr, block) ::= <<
-switch(<expr>) {
+SwitchStat(expr, block, tag) ::= <<
+switch(<expr><if(tag)>.tag<endif>) {
 <block; separator="\n">
 }
 >>
@@ -425,4 +425,14 @@ ProtocolCase(modifier, name, types, vars) ::= <<
 // 3) vals:
 ProtocolLiteral(type, tag, vals) ::= <<
 new <type>.<tag>(<if(vals)><vals; separator=", "><endif>)
+>>
+
+//========================================================================================
+//
+// 1) protocName:
+// 2) tag:
+// 3) var:
+// 4) member:
+ProtocolAccess(protocName, tag, var, member) ::= <<
+<if(protocName)>(((<protocName>.<tag>) <var>).<member>)<endif>
 >>

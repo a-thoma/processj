@@ -8,6 +8,7 @@ import cli.StringUtil;
 import codegeneratorjava.CodeGeneratorJava;
 import codegeneratorjava.Helper;
 import library.Library;
+import namechecker.ResolveImports;
 import parser.parser;
 import rewriters.CastRewrite;
 import scanner.Scanner;
@@ -147,6 +148,12 @@ public class ProcessJc {
 
             // Cast the result from the parse to a Compilation - this is the root of the tree
             Compilation c = (Compilation) root;
+            // Set absolute path, file and package name from where this Compilation is created
+            System.out.println("-- Setting absolute path, file and package name for '" + inFile.getName() + "'.");
+            c.sourceFile = inFile.getName();
+            c.path = inFile.getParentFile().getAbsolutePath(); // get file's parent absolute path
+            if (c.packageName() != null)  // A package declaration is optional, so this can be 'null'
+                c.packageName = ResolveImports.packageNameToString(c.packageName());
 
             // Decode pragmas - these are used for generating stubs from libraries.
             // No regular program would have them.
@@ -183,14 +190,12 @@ public class ProcessJc {
 	    System.out.println("-- Declaring Top Level Declarations.");
             c.visit(new namechecker.TopLevelDecls<AST>(globalTypeTable));
             
-            ///////
-	    System.out.println("-- Not sure what is happening here.");
-            c.visit(new namechecker.ResolveProcTypeDecl<AST>());
-            //
+            System.out.println("-- Reconstructing records.");
+            c.visit(new rewriters.RecordRewrite<>(globalTypeTable));
             
-            ///////
+	    System.out.println("-- Checking native Top Level Declarations.");
             c.visit(new namechecker.ResolveImportTopTypeDecl<AST>());
-            //
+
 
 //            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
 //                CompilerMessageManager.INSTANCE.printTrace("top level declarations");
@@ -311,7 +316,7 @@ public class ProcessJc {
             // ===============================
             
             if (Settings.targetLanguage == Language.JVM) {
-                ;//generateCodeJava(c, inFile, globalTypeTable);
+                generateCodeJava(c, inFile, globalTypeTable);
             } else {
                 System.err.println(String.format("Unknown target language '%s' selected.", Settings.targetLanguage));
                 System.exit(1);
@@ -346,9 +351,7 @@ public class ProcessJc {
         // types, and set the symbol table for top level declarations
         CodeGeneratorJava<Object> generator = new CodeGeneratorJava<>(topLevelDecls);
 
-        // Associate this file to the compiled ProcessJ program and then set the
-        // user working directory
-        generator.setSourceFile(name);
+        // Set the user working directory
         //generator.setWorkingDirectory(configFile.getProperty("workingdir"));
 
         // Visit this compilation unit and recursively build the program
@@ -356,6 +359,6 @@ public class ProcessJc {
         String templateResult = (String) compilation.visit(generator);
 
         // Write the output to a file
-        Helper.writeToFile(templateResult, generator.getSourceFile());
+        Helper.writeToFile(templateResult, compilation.fileNoExtension());
     }
 }

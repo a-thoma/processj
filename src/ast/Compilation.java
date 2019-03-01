@@ -1,10 +1,16 @@
 package ast;
 
+import java.io.File;
+
 import utilities.Visitor;
 
 public class Compilation extends AST {
     
     public boolean visited = false;
+    public String sourceFile = "";    // The name of the file that caused this compilation to exist. Read by the ProcTypeDel.
+    public String path = "";          // Absolute path to where the file is located.
+    public boolean isImport = false;  // Is it an import?
+    public String packageName = "";   // Name of the package.
     
     public Compilation(Sequence<Pragma> pragmas,
                        Sequence<Name> packageName,
@@ -33,5 +39,15 @@ public class Compilation extends AST {
 
     public <S extends Object> S visit(Visitor<S> v) {
         return v.visitCompilation(this);
+    }
+    
+    public String fileNoExtension() {
+        return sourceFile.substring(0, sourceFile.lastIndexOf("."));
+    }
+    
+    public String packageNoName() {
+        if (packageName.isEmpty()) // If packageName is 'null' then it must be a local directory
+            return path.substring(path.lastIndexOf(File.separator) + 1, path.length());
+        return packageName;
     }
 }

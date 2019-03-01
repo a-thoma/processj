@@ -36,12 +36,4 @@ public abstract class Statement extends AST {
     public void setYield() {
 	    yields = true;
     }
-    
-    public boolean doesYield() { 
-        return yields;
-    }
-
-    public void setYield() {
-        yields = true;
-    }
 }
