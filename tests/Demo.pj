@@ -91,7 +91,7 @@ public proc void main(string args[]) {
   par {
     writer(c.write);
     reader(c.read);
-  
+
     writeXX(x.write);
     readXX(x.read);
   }

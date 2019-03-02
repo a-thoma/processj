@@ -1,0 +1,21 @@
+
+import std.io;
+
+public proc void foo(chan<int>.read r) {
+    int d;
+    d = r.read();
+    println("-> " + d);
+}
+
+public proc void bar(chan<int>.write w) {
+    w.write(3);
+}
+
+public proc void main(string args[]) {
+    chan<int> c;
+    barrier b;
+    par enroll (b) {
+        foo(c.read);
+        bar(c.write);
+    }
+}

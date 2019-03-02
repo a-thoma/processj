@@ -208,7 +208,7 @@ public class Demo {
             default:
                 break;
             }
-            io.println(("The value is ") + (_ld$value1.k.t.a));
+            io.println("The value is " + _ld$value1.k.t.a);
             terminate();
         }
     }
@@ -270,7 +270,7 @@ public class Demo {
             _ld$xx1 = new XX.accept(45, 35);
             switch(_ld$xx1.tag) {
             case "accept":
-                io.println(("the tag value is ") + ((((XX.accept) _ld$xx1).code)));
+                io.println("the tag value is " + (((XX.accept) _ld$xx1).code));
                 break;
             }
             _pd$out1.write(this, ((PJProtocolCase) (_ld$xx1)));
@@ -343,7 +343,7 @@ public class Demo {
             yield();
             label(1);
 
-            io.println(((_ld$a3) + ((2) + (45))) * (4));
+            io.println((_ld$a3 + (2 + 45)) * 4);
             terminate();
         }
     }

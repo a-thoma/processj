@@ -1,0 +1,19 @@
+
+import std.*;
+
+public proc void foo() {
+    println("foo");
+}
+
+public proc void bar() {
+    println("bar");
+}
+
+public proc void main(string args[]) {
+    barrier b;
+
+    par enroll (b) {
+        foo();
+        bar();
+    }
+}

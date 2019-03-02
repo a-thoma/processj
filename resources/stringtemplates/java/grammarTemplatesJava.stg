@@ -117,11 +117,13 @@ Invocation(name, vars) ::= <<
 // 1) name:
 // 2) vars:
 // 3) parBlock:
-InvocationProcType(name, vars, parBlock) ::= <<
+// 4) barrier:
+InvocationProcType(name, vars, parBlock, barrier) ::= <<
 (new <name>(<if(vars)><vars; separator=", "><endif>) {
     @Override
     public void finalize() {
         <parBlock>.decrement();
+        <if(barrier)><barrier:{b | <b>.resign()}; separator=";\n">;<endif>
     }
 }).schedule();
 >>
@@ -215,8 +217,10 @@ while (cntrLoop) {
 // 3) process: the reference to the process in which the 'par' block is defined.
 // 4) body: the statements inside the 'par' block.
 // 5) jump: the label to restart from.
-ParBlock(name, count, process, body, jump) ::= <<
+// 6) barrier:
+ParBlock(name, count, process, body, jump, barrier) ::= <<
 final PJPar <name> = new PJPar(<count>, <process>);
+<if(barrier)><barrier:{b | <b>.enroll(<count>)}; separator=";\n">;<endif>
 
 <if(body)><body; separator="\n\n"><endif>
 
@@ -234,7 +238,8 @@ label(<jump>);<\n>
 // 1) switchBlock: switch statement to jump through blocks to resume points.
 // 2) syncBody: the body (content) of synchronized method that runs/starts a process.
 // 3) parBlock:
-AnonymousProcess(switchBlock, syncBody, parBlock) ::= <<
+// 4) barrier:
+AnonymousProcess(switchBlock, syncBody, parBlock, barrier) ::= <<
 new PJProcess() {
     <! Synchronized run method !>
     @Override
@@ -248,6 +253,7 @@ new PJProcess() {
     @Override
     public void finalize() {
         <if(parBlock)><parBlock>.decrement();<endif>
+        <if(barrier)><barrier:{b | <b>.resign()}; separator=";\n">;<endif>
     }
 }.schedule();
 >>
@@ -256,6 +262,17 @@ new PJProcess() {
 //
 // 1) type:
 ChannelDecl(type) ::= "<if(type)>new <type>()<endif>"
+
+//========================================================================================
+//
+// 1) count:
+BarrierDecl(count) ::= "new PJBarrier(<if(count)><count><endif>)"
+
+//========================================================================================
+//
+// 1) value:
+// 2) type:
+PrimitiveLiteral(value, type) ::= "<value><if(type)><type><endif>"
 
 //========================================================================================
 //
@@ -362,7 +379,7 @@ CastExpr(type, expr) ::= "<if(type)>((<type>) (<expr>))<endif>"
 // 2) rhs:
 // 3) op:
 BinaryExpr(lhs, rhs, op) ::= <<
-(<lhs>) <op> (<rhs>)
+<lhs> <op> <rhs>
 >>
 
 //========================================================================================

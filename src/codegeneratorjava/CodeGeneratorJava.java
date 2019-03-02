@@ -127,6 +127,11 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * List of switch labels.
      */
     private List<String> _switchLabelList = new ArrayList<>();
+    
+    /**
+     * List of barrier expressions.
+     */
+    private List<String> _barrierList = new ArrayList<>();
 
     /**
      * Identifier for a parameter declaration.
@@ -302,6 +307,9 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
             
             stProcTypeDecl.add("parBlock", _currParBlock);
             stProcTypeDecl.add("syncBody", body);
+            // Add the 'barrier' expression
+            if (!_barrierList.isEmpty())
+                stProcTypeDecl.add("barrier", _barrierList);
             // Add the 'switch' block
             if (!_switchLabelList.isEmpty()) {
                 ST stSwitchBlock = _stGroup.getInstanceOf("SwitchBlock");
@@ -417,7 +425,9 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         ST stBinaryExpr = _stGroup.getInstanceOf("BinaryExpr");
         String op = be.opString();
         String lhs = (String) be.left().visit(this);
+        lhs = be.left().hasParens ? "(" + lhs + ")" : lhs;
         String rhs = (String) be.right().visit(this);
+        rhs = be.right().hasParens ? "(" + rhs + ")" : rhs;
         stBinaryExpr.add("lhs", lhs);
         stBinaryExpr.add("rhs", rhs);
         stBinaryExpr.add("op", op);
@@ -442,16 +452,9 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         if (ws.expr() != null)
             condExpr = (String) ws.expr().visit(this);
         
-        // TODO: Temporary dirty fix for unreachable code due to
-        // infinite loop. This invokes a static method defined in
-        // the 'Compilation' template called 'isTrue()'
-//        if (ws.foreverLoop)
-//            condExpr = "isTrue()";
-        
         if (ws.stat() != null)
             stats = (String[]) ws.stat().visit(this);
-        else
-            // The body of a 'while' could be empty
+        else // The body of a 'while' could be empty
             stats = new String[] { ";" };
         
         stWhileStat.add("expr", condExpr);
@@ -581,9 +584,15 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
                 val = (String) expr.visit(this);
         }
         
+        // Is it a barrier declaration? If so, we must generate
+        // code that creates a barrier object.
+        if (ld.type().isBarrierType() && expr == null) {
+            ST stBarrierDecl = _stGroup.getInstanceOf("BarrierDecl");
+            val = stBarrierDecl.render();
+        }
         // Is it a simple declaration for a channel type? If so, and since
-        // channels cannot be created using the operator 'new' in ProcessJ,
-        // we generate code to create a channel object.
+        // channels cannot be created using the operator 'new', we generate
+        // code to create a channel object.
         if (ld.type().isChannelType() && expr == null) {
             ST stChannelDecl = _stGroup.getInstanceOf("ChannelDecl");
             stChannelDecl.add("type", type);
@@ -593,17 +602,14 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         // After making this local declaration a field of the procedure in
         // which it was declared, we return the 'empty' string if and only
         // if this local variable is not initialized
-//        if (ld.type().isPrimitiveType() && expr == null)
-//            return (T) EMPTY_STRING;
         if (expr == null) {
-            if (ld.type().isPrimitiveType() ||
-                ld.type().isNamedType())    // Could be records or protocols
+            if (!ld.type().isBarrierType() && (ld.type().isPrimitiveType() ||
+                ld.type().isNamedType()))    // Could be records or protocols
                 return (T) EMPTY_STRING;
         }
-
-        // If we reach this section, then we have a simple variable declaration
-        // inside the body of a procedure or a static Java method. This declaration
-        // becomes a member variable of a procedure
+        
+        // If we reach this section, then we have a variable declaration with
+        // some initial value
         ST stVar = _stGroup.getInstanceOf("Var");
         stVar.add("name", newName);
         stVar.add("val", val);
@@ -690,8 +696,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         } else if (py.isTimerType()) {
             typeStr = PJTimer.class.getSimpleName();
         } else if (py.isBarrierType()) {
-            // TODO: Remember adding the barrier
-//            typeStr = PJBarrier.class.getSimpleName();
+            typeStr = PJBarrier.class.getSimpleName();
         }
 
         return (T) typeStr;
@@ -703,8 +708,13 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      */
     public T visitPrimitiveLiteral(PrimitiveLiteral li) {
         Log.log(li.line + ": Visiting a Primitive Literal (" + li.getText() + ")");
-
-        return (T) li.getText();
+        
+        ST stPrimitiveLiteral = _stGroup.getInstanceOf("PrimitiveLiteral");
+        if (li.isSuffixed())
+            stPrimitiveLiteral.add("type", li.suffix());
+        stPrimitiveLiteral.add("value", li.getText());
+        
+        return (T) stPrimitiveLiteral.render();
     }
     
     /**
@@ -1093,6 +1103,8 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         if (Helper.doesProcedureYield(invokedProc)) {
             stInvocation = _stGroup.getInstanceOf("InvocationProcType");
             stInvocation.add("parBlock", _currParBlock);
+            if (!_barrierList.isEmpty())
+                stInvocation.add("barrier", _barrierList);
         } else
             // Must be an invocation made through a static Java method
             stInvocation = _stGroup.getInstanceOf("Invocation");
@@ -1370,6 +1382,10 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         ST stParBlock = _stGroup.getInstanceOf("ParBlock");
         // Save previous 'par' block
         String prevParBlock = _currParBlock;
+        // Save previous 'barrier' expressions
+        List<String> prevBarrier = _barrierList;
+        if (!_barrierList.isEmpty())
+            _barrierList = new ArrayList<>();
         // Create a name for this new 'par' block
         _currParBlock = Helper.makeVariableName(Tag.PAR_BLOCK_NAME.getTag(), ++_parDecId, Tag.LOCAL_NAME);
         // Is this 'par' block new?
@@ -1391,6 +1407,12 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         stParBlock.add("jump", ++_jumLabel);
         // Add jump label to the 'switch' list
         _switchLabelList.add(renderSwitchLabel(_jumLabel));
+        // Add the 'barrier' this par block enrolls in
+        Sequence<Expression> barriers = pb.barriers();
+        if (barriers != null) {
+            for (Expression ex : barriers)
+                _barrierList.add((String) ex.visit(this));
+        }
         
         // Visit the sequence of statements in the 'par' block
         Sequence<Statement> statements = pb.stats();
@@ -1416,17 +1438,21 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
                     //      }.schedule();
                     if (Helper.doesProcedureYield(in.targetProc))
                         stmts.add((String) in.visit(this));
-                    else
-                        // Otherwise, the invocation is made through a static Java method
+                    else // Otherwise, the invocation is made through a static Java method
                         stmts.add((String) createAnonymousProcTypeDecl(st).visit(this));
                 } else
                     stmts.add((String) createAnonymousProcTypeDecl(st).visit(this));
             }
             stParBlock.add("body", stmts);
         }
+        // Add 'barrier' to par block
+        if (!_barrierList.isEmpty())
+            stParBlock.add("barrier", _barrierList);
         
         // Restore 'par' block
         _currParBlock = prevParBlock;
+        // Restore 'barrier' expressions
+        _barrierList = prevBarrier;
         
         return (T) stParBlock.render();
     }

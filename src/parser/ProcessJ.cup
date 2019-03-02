@@ -1253,7 +1253,7 @@ primary ::=
 // Expression :> AST
 primary_no_new_array_or_mobile ::=
           literal:e                       {: RESULT = e; :}
-        | LPAREN expression:e RPAREN      {: RESULT = e; :}
+        | LPAREN expression:e RPAREN      {: RESULT = e; RESULT.hasParens = true; :}
         | record_access:e                 {: RESULT = e; :}
         | invocation:e                    {: RESULT = e; :}
         | array_access:e                  {: RESULT = e; :}
