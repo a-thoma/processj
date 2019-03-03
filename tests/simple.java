@@ -1,6 +1,6 @@
 import java.util.*;
 import processj.runtime.*;
-import std.io;
+import std.*;
 
 
 /**
@@ -45,11 +45,10 @@ public class simple {
 
             label(2);
 
-            io.println("-> " + _ld$d1);
+            io.println(" > " + _ld$d1);
             terminate();
         }
     }
-
 
     public static class _proc$bar$cwI extends PJProcess {
         protected PJOne2OneChannel<Integer> _pd$w1;
@@ -75,12 +74,13 @@ public class simple {
         }
     }
 
-
     public static class _proc$main$arT extends PJProcess {
         protected String[] _pd$args1;
 
         protected PJOne2OneChannel<Integer> _ld$c1;
         protected PJBarrier _ld$b2;
+        protected PJBarrier _ld$bb3;
+        protected PJBarrier _ld$bbb4;
 
         public _proc$main$arT(String[] _pd$args1) {
             this._pd$args1 = _pd$args1;
@@ -96,14 +96,20 @@ public class simple {
 
             _ld$c1 = new PJOne2OneChannel<Integer>();
             _ld$b2 = new PJBarrier();
+            _ld$bb3 = new PJBarrier();
+            _ld$bbb4 = new PJBarrier();
             final PJPar _ld$par1 = new PJPar(2, this);
             _ld$b2.enroll(2);
+            _ld$bb3.enroll(2);
+            _ld$bbb4.enroll(2);
 
             (new simple._proc$foo$crI(_ld$c1) {
                 @Override
                 public void finalize() {
                     _ld$par1.decrement();
                     _ld$b2.resign();
+                    _ld$bb3.resign();
+                    _ld$bbb4.resign();
                 }
             }).schedule();
 
@@ -112,6 +118,8 @@ public class simple {
                 public void finalize() {
                     _ld$par1.decrement();
                     _ld$b2.resign();
+                    _ld$bb3.resign();
+                    _ld$bbb4.resign();
                 }
             }).schedule();
 

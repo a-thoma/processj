@@ -161,7 +161,6 @@ public class Demo {
         }
     }
 
-
     public static class _proc$reader$crLL extends PJProcess {
         protected PJOne2OneChannel<L> _pd$in1;
 
@@ -213,7 +212,6 @@ public class Demo {
         }
     }
 
-
     public static class _proc$readXX$crLXX extends PJProcess {
         protected PJOne2OneChannel<PJProtocolCase> _pd$in1;
 
@@ -249,7 +247,6 @@ public class Demo {
         }
     }
 
-
     public static class _proc$writeXX$cwLXX extends PJProcess {
         protected PJOne2OneChannel<PJProtocolCase> _pd$out1;
 
@@ -281,7 +278,6 @@ public class Demo {
             terminate();
         }
     }
-
 
     public static void _method$foo$I(int _pd$x1) {
     }

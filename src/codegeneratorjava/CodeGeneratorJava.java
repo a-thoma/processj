@@ -307,7 +307,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
             
             stProcTypeDecl.add("parBlock", _currParBlock);
             stProcTypeDecl.add("syncBody", body);
-            // Add the 'barrier' expression
+            // Add the 'barrier' this procedure should resign from
             if (!_barrierList.isEmpty())
                 stProcTypeDecl.add("barrier", _barrierList);
             // Add the 'switch' block
@@ -1103,6 +1103,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         if (Helper.doesProcedureYield(invokedProc)) {
             stInvocation = _stGroup.getInstanceOf("InvocationProcType");
             stInvocation.add("parBlock", _currParBlock);
+            // Add the 'barrier' this procedure should resign from
             if (!_barrierList.isEmpty())
                 stInvocation.add("barrier", _barrierList);
         } else

@@ -70,7 +70,6 @@ public class commstime {
         }
     }
 
-
     public static class _proc$succ$crJ$cwJ extends PJProcess {
         protected PJOne2OneChannel<Long> _pd$in1;
         protected PJOne2OneChannel<Long> _pd$out2;
@@ -117,7 +116,6 @@ public class commstime {
             terminate();
         }
     }
-
 
     public static class _proc$delta$crJ$cwJ$cwJ extends PJProcess {
         protected PJOne2OneChannel<Long> _pd$in1;
@@ -218,7 +216,6 @@ public class commstime {
         }
     }
 
-
     public static class _proc$consume$crJ extends PJProcess {
         protected PJOne2OneChannel<Long> _pd$in1;
 
@@ -258,7 +255,6 @@ public class commstime {
             terminate();
         }
     }
-
 
     public static class _proc$main$arT extends PJProcess {
         protected String[] _pd$args1;

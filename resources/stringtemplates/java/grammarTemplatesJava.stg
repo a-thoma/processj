@@ -92,11 +92,10 @@ public static class <name> extends PJProcess {
         <if(syncBody)><syncBody; separator="\n"><endif>
         terminate();
     }
-}
-<! Entry point of the program,
-   e.g. public static void main(String[] args) { ... }
+<! Entry point of the program, e.g.,
+   public static void main(String[] args) { ... }
 !>
-<if(main)><"\n"><main><endif>
+<if(main)>}<\n><\n><main><else>}<endif>
 >>
 
 //========================================================================================
@@ -306,7 +305,7 @@ label(<resume0>);
 this.runLabel = <resume1>;
 yield();
 
-label(<resume1>);<"\n">
+label(<resume1>);<\n>
 >>
 
 //========================================================================================

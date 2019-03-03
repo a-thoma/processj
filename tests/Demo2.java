@@ -64,7 +64,6 @@ public class Demo2 {
         }
     }
 
-
     public static void _method$ben() {
         io.println("form ben");
     }
@@ -145,7 +144,6 @@ public class Demo2 {
             terminate();
         }
     }
-
 
     public static class _proc$main$arT extends PJProcess {
         protected String[] _pd$args1;
