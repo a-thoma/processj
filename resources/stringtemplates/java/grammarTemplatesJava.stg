@@ -467,3 +467,14 @@ new <type>.<tag>(<if(vals)><vals; separator=", "><endif>)
 ProtocolAccess(protocName, tag, var, member) ::= <<
 <if(protocName)>(((<protocName>.<tag>) <var>).<member>)<endif>
 >>
+
+//========================================================================================
+//
+// 1) barrier:
+// 2) resume0:
+SyncStat(barrier, resume0) ::= <<
+<barrier>.sync(this);
+this.runLabel = <resume0>;
+yield();
+label(<resume0>);
+>>

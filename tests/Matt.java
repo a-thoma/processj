@@ -82,7 +82,7 @@ public class Matt {
 
                     label(4);
 
-                    _ld$x3 = ((_ld$temp04) + (_ld$temp15)) + (3);
+                    _ld$x3 = _ld$temp04 + _ld$temp15 + 3;
                     terminate();
                 }
 

@@ -1460,6 +1460,26 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
     
     /**
      * -----------------------------------------------------------------------------
+     * VISIT SYNC_STAT
+     */
+    public T visitSyncStat(SyncStat st) {
+        Log.log(st.line + ": Visiting a SyncStat");
+        
+        // Generated template after evaluating this visitor
+        ST stSyncStat = _stGroup.getInstanceOf("SyncStat");
+        String barrier = (String) st.barrier().visit(this);
+        stSyncStat.add("barrier", barrier);
+        
+        // Increment jump label
+        stSyncStat.add("resume0", ++_jumLabel);
+        // Add jump label to the 'switch' list
+        _switchLabelList.add(renderSwitchLabel(_jumLabel));
+        
+        return (T) stSyncStat.render();
+    }
+    
+    /**
+     * -----------------------------------------------------------------------------
      * VISIT UNARY_POST_EXPR
      */
     public T visitUnaryPostExpr(UnaryPostExpr ue) {
@@ -1529,6 +1549,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
 
         _localParamFieldMap.clear();
         _switchLabelList.clear();
+        _barrierList.clear(); //
         
         _formalParamFieldMap.clear();
         _paramDeclNameMap.clear();

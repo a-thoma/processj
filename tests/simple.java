@@ -45,7 +45,7 @@ public class simple {
 
             label(2);
 
-            io.println(" > " + _ld$d1);
+            io.println("read: " + _ld$d1);
             terminate();
         }
     }
@@ -98,30 +98,111 @@ public class simple {
             _ld$b2 = new PJBarrier();
             _ld$bb3 = new PJBarrier();
             _ld$bbb4 = new PJBarrier();
-            final PJPar _ld$par1 = new PJPar(2, this);
-            _ld$b2.enroll(2);
-            _ld$bb3.enroll(2);
-            _ld$bbb4.enroll(2);
+            final PJPar _ld$par1 = new PJPar(1, this);
+            _ld$b2.enroll(1);
 
-            (new simple._proc$foo$crI(_ld$c1) {
+            new PJProcess() {
+                @Override
+                public synchronized void run() {
+                    switch (this.runLabel) {
+                        case 0: break;
+                        case 1: resume(1); break;
+                        default: break;
+                    }
+
+                    final PJPar _ld$par2 = new PJPar(3, this);
+                    _ld$b2.enroll(3);
+                    _ld$bb3.enroll(3);
+                    _ld$bbb4.enroll(3);
+
+                    (new simple._proc$foo$crI(_ld$c1) {
+                        @Override
+                        public void finalize() {
+                            _ld$par2.decrement();
+                            _ld$b2.resign();
+                            _ld$bb3.resign();
+                            _ld$bbb4.resign();
+                        }
+                    }).schedule();
+
+                    (new simple._proc$bar$cwI(_ld$c1) {
+                        @Override
+                        public void finalize() {
+                            _ld$par2.decrement();
+                            _ld$b2.resign();
+                            _ld$bb3.resign();
+                            _ld$bbb4.resign();
+                        }
+                    }).schedule();
+
+                    new PJProcess() {
+                        @Override
+                        public synchronized void run() {
+                            switch (this.runLabel) {
+                                case 0: break;
+                                case 1: resume(1); break;
+                                default: break;
+                            }
+
+                            final PJPar _ld$par3 = new PJPar(2, this);
+
+                            new PJProcess() {
+                                @Override
+                                public synchronized void run() {
+                                    io.println("third barrier");
+                                    terminate();
+                                }
+
+                                @Override
+                                public void finalize() {
+                                    _ld$par3.decrement();
+                                }
+                            }.schedule();
+
+                            new PJProcess() {
+                                @Override
+                                public synchronized void run() {
+                                    io.println("barrier third");
+                                    terminate();
+                                }
+
+                                @Override
+                                public void finalize() {
+                                    _ld$par3.decrement();
+                                }
+                            }.schedule();
+
+                            setNotReady();
+                            this.runLabel = 1;
+                            yield();
+                            label(1);
+
+                            terminate();
+                        }
+
+                        @Override
+                        public void finalize() {
+                            _ld$par2.decrement();
+                            _ld$b2.resign();
+                            _ld$bb3.resign();
+                            _ld$bbb4.resign();
+                        }
+                    }.schedule();
+
+                    setNotReady();
+                    this.runLabel = 1;
+                    yield();
+                    label(1);
+
+                    terminate();
+                }
+
                 @Override
                 public void finalize() {
                     _ld$par1.decrement();
                     _ld$b2.resign();
-                    _ld$bb3.resign();
-                    _ld$bbb4.resign();
                 }
-            }).schedule();
-
-            (new simple._proc$bar$cwI(_ld$c1) {
-                @Override
-                public void finalize() {
-                    _ld$par1.decrement();
-                    _ld$b2.resign();
-                    _ld$bb3.resign();
-                    _ld$bbb4.resign();
-                }
-            }).schedule();
+            }.schedule();
 
             setNotReady();
             this.runLabel = 1;

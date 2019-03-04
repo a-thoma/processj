@@ -1,19 +1,23 @@
 
 import std.*;
 
-public proc void foo() {
-    println("foo");
+public proc void foo(barrier b, chan<int>.read r) {
+    b.sync();
+    int d;
+    d = r.read();
+    println("read: " + d);
 }
 
-public proc void bar() {
-    println("bar");
+public proc void bar(barrier b, chan<int>.write w) {
+    b.sync();
+    w.write(5);
 }
 
 public proc void main(string args[]) {
     barrier b;
-
+    chan<int> c;
     par enroll (b) {
-        foo();
-        bar();
+        foo(b, c.read);
+        bar(b, c.write);
     }
 }

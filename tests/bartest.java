@@ -15,18 +15,85 @@ import std.*;
  *
  */
 public class bartest {
-    public static void _method$foo() {
-        io.println("foo");
+    public static class _proc$foo$R$crI extends PJProcess {
+        protected PJBarrier _pd$b1;
+        protected PJOne2OneChannel<Integer> _pd$r2;
+
+        protected int _ld$d1;
+
+        public _proc$foo$R$crI(PJBarrier _pd$b1, PJOne2OneChannel<Integer> _pd$r2) {
+            this._pd$b1 = _pd$b1;
+            this._pd$r2 = _pd$r2;
+        }
+
+        @Override
+        public synchronized void run() {
+            switch (this.runLabel) {
+                case 0: break;
+                case 1: resume(1); break;
+                case 2: resume(2); break;
+                case 3: resume(3); break;
+                default: break;
+            }
+
+            _pd$b1.sync(this);
+            this.runLabel = 1;
+            yield();
+            label(1);
+
+            if (!_pd$r2.isReadyToRead(this)) {
+                this.runLabel = 2;
+                yield();
+            }
+
+            label(2);
+            _ld$d1 = _pd$r2.read(this);
+            this.runLabel = 3;
+            yield();
+
+            label(3);
+
+            io.println("read: " + _ld$d1);
+            terminate();
+        }
     }
 
-    public static void _method$bar() {
-        io.println("bar");
+    public static class _proc$bar$R$cwI extends PJProcess {
+        protected PJBarrier _pd$b1;
+        protected PJOne2OneChannel<Integer> _pd$w2;
+
+        public _proc$bar$R$cwI(PJBarrier _pd$b1, PJOne2OneChannel<Integer> _pd$w2) {
+            this._pd$b1 = _pd$b1;
+            this._pd$w2 = _pd$w2;
+        }
+
+        @Override
+        public synchronized void run() {
+            switch (this.runLabel) {
+                case 0: break;
+                case 1: resume(1); break;
+                case 2: resume(2); break;
+                default: break;
+            }
+
+            _pd$b1.sync(this);
+            this.runLabel = 1;
+            yield();
+            label(1);
+            _pd$w2.write(this, 5);
+            this.runLabel = 2;
+            yield();
+            label(2);
+
+            terminate();
+        }
     }
 
     public static class _proc$main$arT extends PJProcess {
         protected String[] _pd$args1;
 
         protected PJBarrier _ld$b1;
+        protected PJOne2OneChannel<Integer> _ld$c2;
 
         public _proc$main$arT(String[] _pd$args1) {
             this._pd$args1 = _pd$args1;
@@ -41,36 +108,25 @@ public class bartest {
             }
 
             _ld$b1 = new PJBarrier();
+            _ld$c2 = new PJOne2OneChannel<Integer>();
             final PJPar _ld$par1 = new PJPar(2, this);
             _ld$b1.enroll(2);
 
-            new PJProcess() {
-                @Override
-                public synchronized void run() {
-                    bartest._method$foo();
-                    terminate();
-                }
-
+            (new bartest._proc$foo$R$crI(_ld$b1, _ld$c2) {
                 @Override
                 public void finalize() {
                     _ld$par1.decrement();
                     _ld$b1.resign();
                 }
-            }.schedule();
+            }).schedule();
 
-            new PJProcess() {
-                @Override
-                public synchronized void run() {
-                    bartest._method$bar();
-                    terminate();
-                }
-
+            (new bartest._proc$bar$R$cwI(_ld$b1, _ld$c2) {
                 @Override
                 public void finalize() {
                     _ld$par1.decrement();
                     _ld$b1.resign();
                 }
-            }.schedule();
+            }).schedule();
 
             setNotReady();
             this.runLabel = 1;

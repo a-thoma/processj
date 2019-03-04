@@ -4,7 +4,7 @@ import std.*;
 public proc void foo(chan<int>.read r) {
     int d;
     d = r.read();
-    println(" > " + d);
+    println("read: " + d);
 }
 
 public proc void bar(chan<int>.write w) {
@@ -14,8 +14,14 @@ public proc void bar(chan<int>.write w) {
 public proc void main(string args[]) {
     chan<int> c;
     barrier b, bb, bbb;
-    par enroll (b, bb, bbb) {
-        foo(c.read);
-        bar(c.write);
+    par enroll (b) {
+        par enroll (b, bb, bbb) {
+            foo(c.read);
+            bar(c.write);
+            par {
+                println("third barrier");
+                println("barrier third");
+            }
+        }
     }
 }
