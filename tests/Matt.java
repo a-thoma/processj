@@ -69,7 +69,6 @@ public class Matt {
 
                     label(2);
 
-
                     if (!_ld$c1.isReadyToRead(this)) {
                         this.runLabel = 3;
                         yield();
@@ -81,7 +80,6 @@ public class Matt {
                     yield();
 
                     label(4);
-
                     _ld$x3 = _ld$temp04 + _ld$temp15 + 3;
                     terminate();
                 }

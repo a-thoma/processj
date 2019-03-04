@@ -193,6 +193,11 @@ public class PrimitiveType extends Type {
     }
     
     @Override
+    public boolean isTimerType() {
+        return (kind == TimerKind);
+    }
+    
+    @Override
     public boolean isBarrierType() {
         return (kind == BarrierKind);
     }

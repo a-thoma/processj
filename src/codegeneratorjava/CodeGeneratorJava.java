@@ -598,13 +598,12 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
             stChannelDecl.add("type", type);
             val = stChannelDecl.render();
         }
-        
         // After making this local declaration a field of the procedure in
         // which it was declared, we return the 'empty' string if and only
         // if this local variable is not initialized
         if (expr == null) {
             if (!ld.type().isBarrierType() && (ld.type().isPrimitiveType() ||
-                ld.type().isNamedType()))    // Could be records or protocols
+                ld.type().isNamedType()))  // Could be records or protocols
                 return (T) EMPTY_STRING;
         }
         
@@ -1593,9 +1592,15 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         // is the reading end of a channel.
         Expression chanExpr = cr.channel();
         // 'c' is the name of the channel
-        String chanEndName = "";
-        if (chanExpr instanceof NameExpr)
-            chanEndName = (String) chanExpr.visit(this);
+        String chanEndName = (String) chanExpr.visit(this);
+        
+        // Is it a 'timer' read expression
+        if (chanExpr.type.isTimerType()) {
+            ST stTimerRedExpr = _stGroup.getInstanceOf("TimerRedExpr");
+            stTimerRedExpr.add("name", lhs);
+            return (T) stTimerRedExpr.render();
+        }
+        
         stChannelReadExpr.add("chanName", chanEndName);
         // Add the 'switch' block for resumption
         for (int label = 0; label < 2; ++label) {

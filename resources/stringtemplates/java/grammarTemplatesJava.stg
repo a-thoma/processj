@@ -269,6 +269,11 @@ BarrierDecl(count) ::= "new PJBarrier(<if(count)><count><endif>)"
 
 //========================================================================================
 //
+// 1) name:
+TimerRedExpr(name) ::= "<name> = PJTimer.read();"
+
+//========================================================================================
+//
 // 1) value:
 // 2) type:
 PrimitiveLiteral(value, type) ::= "<value><if(type)><type><endif>"
@@ -279,11 +284,10 @@ PrimitiveLiteral(value, type) ::= "<value><if(type)><type><endif>"
 // 2) resume0:
 // 3) resume1:
 ChanWriteStat(chanName, writeExpr, resume0) ::= <<
-
 <chanName>.write(this, <writeExpr>);
 this.runLabel = <resume0>;
 yield();
-label(<resume0>);<"\n">
+label(<resume0>);<\n>
 >>
 
 //========================================================================================
@@ -292,7 +296,6 @@ label(<resume0>);<"\n">
 // 2) resume0:
 // 3) resume1:
 ChannelReadExpr(chanName, lhs, op, resume0, resume1) ::= <<
-
 if (!<chanName>.isReadyToRead(this)) {
     this.runLabel = <resume0>;
     yield();
@@ -305,7 +308,7 @@ label(<resume0>);
 this.runLabel = <resume1>;
 yield();
 
-label(<resume1>);<\n>
+label(<resume1>);<!-- remove 'line-feed' --!>
 >>
 
 //========================================================================================

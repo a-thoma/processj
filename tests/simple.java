@@ -44,7 +44,6 @@ public class simple {
             yield();
 
             label(2);
-
             io.println("read: " + _ld$d1);
             terminate();
         }

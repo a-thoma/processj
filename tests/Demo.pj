@@ -46,15 +46,17 @@ public protocol XX {
   yeah : { double d; }
 }
 
-public proc void writer(chan<L>.write out) {
+public proc void writer(chan<L>.write out, barrier b1) {
   K k = new K { z = 3, t = new T { a = 45 } };
   X x = new X { b = "Ben", p = 300, a = 20 };
   L l = new L { k = new K { z = 4, t = new T { a = 65 }}, str = "Benjamin" };
+  b1.sync();
 
   out.write(l);
 }
 
-public proc void reader(chan<L>.read in) {
+public proc void reader(chan<L>.read in, barrier b1) {
+  b1.sync();
   L value;
   value = in.read();
   switch (value.k.t.a) {
@@ -67,13 +69,15 @@ public proc void reader(chan<L>.read in) {
   println("The value is " + value.k.t.a);
 }
 
-public proc void readXX(chan<XX>.read in) {
+public proc void readXX(chan<XX>.read in, barrier b2) {
+  b2.sync();
   XX value;
   value = in.read();
   println("Done reading xx!");
 }
 
-public proc void writeXX(chan<XX>.write out) {
+public proc void writeXX(chan<XX>.write out, barrier b2) {
+  b2.sync();
   XX xx = new XX { accept : b = 35, code = 45 };
   switch (xx) {
     case accept: println("the tag value is " + xx.code); break;
@@ -88,12 +92,13 @@ public proc void main(string args[]) {
   chan<L> c;
   chan<XX> x;
   int a = 2;
+  barrier b1, b2;
   par {
-    writer(c.write);
-    reader(c.read);
+    writer(c.write, b1);
+    reader(c.read, b1);
 
-    writeXX(x.write);
-    readXX(x.read);
+    writeXX(x.write, b2);
+    readXX(x.read, b2);
   }
 
   println((a + (2 + 45)) * 4);

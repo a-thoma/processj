@@ -15,15 +15,18 @@ import std.*;
  *
  */
 public class bartest {
-    public static class _proc$foo$R$crI extends PJProcess {
+    public static class _proc$foo$R$crI$M extends PJProcess {
         protected PJBarrier _pd$b1;
         protected PJOne2OneChannel<Integer> _pd$r2;
+        protected PJTimer _pd$t3;
 
         protected int _ld$d1;
+        protected long _ld$time2;
 
-        public _proc$foo$R$crI(PJBarrier _pd$b1, PJOne2OneChannel<Integer> _pd$r2) {
+        public _proc$foo$R$crI$M(PJBarrier _pd$b1, PJOne2OneChannel<Integer> _pd$r2, PJTimer _pd$t3) {
             this._pd$b1 = _pd$b1;
             this._pd$r2 = _pd$r2;
+            this._pd$t3 = _pd$t3;
         }
 
         @Override
@@ -53,7 +56,8 @@ public class bartest {
 
             label(3);
 
-            io.println("read: " + _ld$d1);
+            _ld$time2 = PJTimer.read();
+            io.println("read: " + _ld$d1 + ", time: " + _ld$time2);
             terminate();
         }
     }
@@ -92,8 +96,9 @@ public class bartest {
     public static class _proc$main$arT extends PJProcess {
         protected String[] _pd$args1;
 
-        protected PJBarrier _ld$b1;
-        protected PJOne2OneChannel<Integer> _ld$c2;
+        protected PJTimer _ld$t1;
+        protected PJBarrier _ld$b2;
+        protected PJOne2OneChannel<Integer> _ld$c3;
 
         public _proc$main$arT(String[] _pd$args1) {
             this._pd$args1 = _pd$args1;
@@ -107,24 +112,24 @@ public class bartest {
                 default: break;
             }
 
-            _ld$b1 = new PJBarrier();
-            _ld$c2 = new PJOne2OneChannel<Integer>();
+            _ld$b2 = new PJBarrier();
+            _ld$c3 = new PJOne2OneChannel<Integer>();
             final PJPar _ld$par1 = new PJPar(2, this);
-            _ld$b1.enroll(2);
+            _ld$b2.enroll(2);
 
-            (new bartest._proc$foo$R$crI(_ld$b1, _ld$c2) {
+            (new bartest._proc$foo$R$crI$M(_ld$b2, _ld$c3, _ld$t1) {
                 @Override
                 public void finalize() {
                     _ld$par1.decrement();
-                    _ld$b1.resign();
+                    _ld$b2.resign();
                 }
             }).schedule();
 
-            (new bartest._proc$bar$R$cwI(_ld$b1, _ld$c2) {
+            (new bartest._proc$bar$R$cwI(_ld$b2, _ld$c3) {
                 @Override
                 public void finalize() {
                     _ld$par1.decrement();
-                    _ld$b1.resign();
+                    _ld$b2.resign();
                 }
             }).schedule();
 

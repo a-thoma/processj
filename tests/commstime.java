@@ -58,7 +58,6 @@ public class commstime {
                 yield();
 
                 label(3);
-
                 _pd$out3.write(this, _ld$l1);
                 this.runLabel = 4;
                 yield();
@@ -105,7 +104,6 @@ public class commstime {
                 yield();
 
                 label(2);
-
                 _pd$out2.write(this, _ld$l1 + 1);
                 this.runLabel = 3;
                 yield();
@@ -154,7 +152,6 @@ public class commstime {
                 yield();
 
                 label(2);
-
                 final PJPar _ld$par1 = new PJPar(2, this);
 
                 new PJProcess() {
@@ -248,7 +245,6 @@ public class commstime {
                 yield();
 
                 label(2);
-
                 io.println(_ld$l1);
                 cntrLoop = (_ld$l1 < 1000000);
             }
@@ -306,7 +302,6 @@ public class commstime {
                     yield();
 
                     label(2);
-
                     terminate();
                 }
 
