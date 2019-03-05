@@ -136,10 +136,11 @@ public class Matt {
                 }
             }.schedule();
 
-            setNotReady();
-            this.runLabel = 1;
-            yield();
-            label(1);
+            if (_ld$par1.shouldYield()) {
+                this.runLabel = 1;
+                yield();
+                label(1);
+            }
 
             io.println(_ld$x3);
             Matt._method$foo1();

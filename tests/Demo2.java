@@ -55,10 +55,11 @@ public class Demo2 {
                 }
             }.schedule();
 
-            setNotReady();
-            this.runLabel = 1;
-            yield();
-            label(1);
+            if (_ld$par1.shouldYield()) {
+                this.runLabel = 1;
+                yield();
+                label(1);
+            }
 
             terminate();
         }
@@ -109,10 +110,11 @@ public class Demo2 {
                 }
             }.schedule();
 
-            setNotReady();
-            this.runLabel = 1;
-            yield();
-            label(1);
+            if (_ld$par1.shouldYield()) {
+                this.runLabel = 1;
+                yield();
+                label(1);
+            }
 
             final PJPar _ld$par2 = new PJPar(2, this);
 
@@ -136,10 +138,11 @@ public class Demo2 {
                 }
             }.schedule();
 
-            setNotReady();
-            this.runLabel = 2;
-            yield();
-            label(2);
+            if (_ld$par2.shouldYield()) {
+                this.runLabel = 2;
+                yield();
+                label(2);
+            }
 
             terminate();
         }
@@ -289,10 +292,11 @@ public class Demo2 {
                                 }
                             }.schedule();
 
-                            setNotReady();
-                            this.runLabel = 1;
-                            yield();
-                            label(1);
+                            if (_ld$par3.shouldYield()) {
+                                this.runLabel = 1;
+                                yield();
+                                label(1);
+                            }
 
                             terminate();
                         }
@@ -303,10 +307,11 @@ public class Demo2 {
                         }
                     }.schedule();
 
-                    setNotReady();
-                    this.runLabel = 1;
-                    yield();
-                    label(1);
+                    if (_ld$par2.shouldYield()) {
+                        this.runLabel = 1;
+                        yield();
+                        label(1);
+                    }
 
                     terminate();
                 }
@@ -317,10 +322,11 @@ public class Demo2 {
                 }
             }.schedule();
 
-            setNotReady();
-            this.runLabel = 1;
-            yield();
-            label(1);
+            if (_ld$par1.shouldYield()) {
+                this.runLabel = 1;
+                yield();
+                label(1);
+            }
 
             terminate();
         }

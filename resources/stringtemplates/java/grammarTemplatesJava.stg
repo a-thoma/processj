@@ -189,7 +189,7 @@ switch (this.runLabel) {
 //========================================================================================
 // Defines a statement in a 'switch' block with one case. The
 // case evaluates to a label representing the resume point of
-// a PJProcess. 
+// a process. 
 // 1) jump: the label to restart from.
 SwitchCase(jump) ::= "case <jump>: resume(<jump>); break;"
 
@@ -224,10 +224,11 @@ final PJPar <name> = new PJPar(<count>, <process>);
 <if(body)><body; separator="\n\n"><endif>
 
 <! Not to be scheduled again until 'data' is ready !>
-setNotReady();
-this.runLabel = <jump>;
-yield();
-label(<jump>);<\n>
+if (<name>.shouldYield()) {
+    this.runLabel = <jump>;
+    yield();
+    label(<jump>);
+}<\n>
 >>
 
 //========================================================================================
@@ -277,6 +278,24 @@ TimerRedExpr(name) ::= "<name> = PJTimer.read();"
 // 1) value:
 // 2) type:
 PrimitiveLiteral(value, type) ::= "<value><if(type)><type><endif>"
+
+//========================================================================================
+//
+// 1) name:
+// 2) delay:
+// 3) resume0:
+TimeoutStat(name, delay, resume0) ::= <<
+<name> = new PJTimer(this, <delay>);
+try {
+    <name>.start();
+    setNotReady();
+    this.runLabel = <resume0>;
+    yield();
+} catch (InterruptedException e) {
+    System.out.println("An Interrupted exception occurred for a timer!");
+}
+label(<resume0>);
+>>
 
 //========================================================================================
 //

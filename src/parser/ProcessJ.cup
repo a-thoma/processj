@@ -859,7 +859,8 @@ block_statements ::=
 //- ParBlock  :> Statement :> AST
 par_block ::= 
           PAR block:bl                                 {: RESULT = new ParBlock(bl.stats(), new Sequence<Expression>()); :}
-        | PAR ENROLL LPAREN barriers:b RPAREN block:bl {: RESULT = new ParBlock(bl.stats(), b); :}
+        | PAR ENROLL barriers:b block:bl {: RESULT = new ParBlock(bl.stats(), b); :}
+        //| PAR ENROLL LPAREN barriers:b RPAREN block:bl {: RESULT = new ParBlock(bl.stats(), b); :}
         ;
 
 //- Sequence[Expression :> AST] :> AST

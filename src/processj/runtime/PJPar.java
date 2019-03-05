@@ -48,10 +48,18 @@ public class PJPar {
      * par block to call this method causes the process in which the par appears to
      * become ready to run again.
      */
-    public void decrement() {
+    public synchronized void decrement() {
         processCount--;
         if (processCount == 0) {
             process.setReady();
         }
+    }
+    
+    // TODO:
+    public synchronized boolean shouldYield() {
+        if (processCount == 0)
+            return false;
+        process.setNotReady();
+        return true;
     }
 }

@@ -14,14 +14,18 @@ public proc void bar(chan<int>.write w) {
 public proc void main(string args[]) {
     chan<int> c;
     barrier b, bb, bbb;
-    par enroll (b) {
-        par enroll (b, bb, bbb) {
-            foo(c.read);
-            bar(c.write);
-            par {
-                println("third barrier");
-                println("barrier third");
-            }
-        }
+    //par enroll b {
+    //    par enroll b, bb, bbb {
+    //        foo(c.read);
+    //        bar(c.write);
+    //        par {
+    //            println("third barrier");
+    //            println("barrier third");
+    //        }
+    //    }
+    //}
+    par {
+        foo(c.read);
+        bar(c.write);
     }
 }

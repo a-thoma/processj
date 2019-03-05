@@ -1459,6 +1459,29 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
     
     /**
      * -----------------------------------------------------------------------------
+     * VISIT TIMEOUT_STAT
+     */
+    public T visitTimeoutStat(TimeoutStat ts) {
+        Log.log(ts.line + ": Visiting a TimeoutStat");
+        
+        // Generated template after evaluating this visitor
+        ST stTimeoutStat = _stGroup.getInstanceOf("TimeoutStat");
+        String timer = (String) ts.timer().visit(this);
+        String delay = (String) ts.delay().visit(this);
+        
+        stTimeoutStat.add("name", timer);
+        stTimeoutStat.add("delay", delay);
+        
+        // Increment jump label
+        stTimeoutStat.add("resume0", ++_jumLabel);
+        // Add jump label to the 'switch' list
+        _switchLabelList.add(renderSwitchLabel(_jumLabel));
+        
+        return (T) stTimeoutStat.render();
+    }
+    
+    /**
+     * -----------------------------------------------------------------------------
      * VISIT SYNC_STAT
      */
     public T visitSyncStat(SyncStat st) {
