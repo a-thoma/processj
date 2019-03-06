@@ -15,6 +15,95 @@ import std.*;
  *
  */
 public class bartest {
+    public static class _proc$foo$R$crI$M extends PJProcess {
+        protected PJBarrier _pd$b1;
+        protected PJOne2OneChannel<Integer> _pd$r2;
+        protected PJTimer _pd$t3;
+
+        protected int _ld$d1;
+        protected long _ld$time2;
+
+        public _proc$foo$R$crI$M(PJBarrier _pd$b1, PJOne2OneChannel<Integer> _pd$r2, PJTimer _pd$t3) {
+            this._pd$b1 = _pd$b1;
+            this._pd$r2 = _pd$r2;
+            this._pd$t3 = _pd$t3;
+        }
+
+        @Override
+        public synchronized void run() {
+            switch (this.runLabel) {
+                case 0: break;
+                case 1: resume(1); break;
+                case 2: resume(2); break;
+                case 3: resume(3); break;
+                case 4: resume(4); break;
+                default: break;
+            }
+
+            _pd$b1.sync(this);
+            this.runLabel = 1;
+            yield();
+            label(1);
+
+            if (!_pd$r2.isReadyToRead(this)) {
+                this.runLabel = 2;
+                yield();
+            }
+
+            label(2);
+            _ld$d1 = _pd$r2.read(this);
+            this.runLabel = 3;
+            yield();
+
+            label(3);
+
+            _ld$time2 = PJTimer.read();
+            _pd$t3 = new PJTimer(this, 1000);
+            try {
+                _pd$t3.start();
+                setNotReady();
+                this.runLabel = 4;
+                yield();
+            } catch (InterruptedException e) {
+                System.out.println("An Interrupted exception occurred for a timer!");
+            }
+            label(4);
+            io.println("read: " + _ld$d1 + ", time: " + _ld$time2);
+            terminate();
+        }
+    }
+
+    public static class _proc$bar$R$cwI extends PJProcess {
+        protected PJBarrier _pd$b1;
+        protected PJOne2OneChannel<Integer> _pd$w2;
+
+        public _proc$bar$R$cwI(PJBarrier _pd$b1, PJOne2OneChannel<Integer> _pd$w2) {
+            this._pd$b1 = _pd$b1;
+            this._pd$w2 = _pd$w2;
+        }
+
+        @Override
+        public synchronized void run() {
+            switch (this.runLabel) {
+                case 0: break;
+                case 1: resume(1); break;
+                case 2: resume(2); break;
+                default: break;
+            }
+
+            _pd$b1.sync(this);
+            this.runLabel = 1;
+            yield();
+            label(1);
+            _pd$w2.write(this, 5);
+            this.runLabel = 2;
+            yield();
+            label(2);
+
+            terminate();
+        }
+    }
+
     public static class _proc$f$I extends PJProcess {
         protected int _pd$i1;
 
@@ -46,7 +135,9 @@ public class bartest {
     public static class _proc$main$arT extends PJProcess {
         protected String[] _pd$args1;
 
-        protected int _ld$i1;
+        protected PJTimer _ld$t1;
+        protected PJBarrier _ld$b2;
+        protected PJOne2OneChannel<Integer> _ld$c3;
 
         public _proc$main$arT(String[] _pd$args1) {
             this._pd$args1 = _pd$args1;
@@ -60,20 +151,24 @@ public class bartest {
                 default: break;
             }
 
-            _ld$i1 = 0;
+            _ld$b2 = new PJBarrier();
+            _ld$c3 = new PJOne2OneChannel<Integer>();
             final PJPar _ld$par1 = new PJPar(2, this);
+            _ld$b2.enroll(2);
 
-            (new bartest._proc$f$I(_ld$i1) {
+            (new bartest._proc$bar$R$cwI(_ld$b2, _ld$c3) {
                 @Override
                 public void finalize() {
                     _ld$par1.decrement();
+                    _ld$b2.resign();
                 }
             }).schedule();
 
-            (new bartest._proc$b$I(_ld$i1 + 1) {
+            (new bartest._proc$foo$R$crI$M(_ld$b2, _ld$c3, _ld$t1) {
                 @Override
                 public void finalize() {
                     _ld$par1.decrement();
+                    _ld$b2.resign();
                 }
             }).schedule();
 
@@ -83,7 +178,6 @@ public class bartest {
                 label(1);
             }
 
-            _ld$i1 = 7;
             terminate();
         }
     }

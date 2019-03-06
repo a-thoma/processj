@@ -39,7 +39,7 @@ public class Demo2 {
                 @Override
                 public void finalize() {
                     _ld$par1.decrement();
-                }
+                } 
             }.schedule();
 
             new PJProcess() {
@@ -52,7 +52,7 @@ public class Demo2 {
                 @Override
                 public void finalize() {
                     _ld$par1.decrement();
-                }
+                } 
             }.schedule();
 
             if (_ld$par1.shouldYield()) {
@@ -94,7 +94,7 @@ public class Demo2 {
                 @Override
                 public void finalize() {
                     _ld$par1.decrement();
-                }
+                } 
             }.schedule();
 
             new PJProcess() {
@@ -107,7 +107,7 @@ public class Demo2 {
                 @Override
                 public void finalize() {
                     _ld$par1.decrement();
-                }
+                } 
             }.schedule();
 
             if (_ld$par1.shouldYield()) {
@@ -135,7 +135,7 @@ public class Demo2 {
                 @Override
                 public void finalize() {
                     _ld$par2.decrement();
-                }
+                } 
             }.schedule();
 
             if (_ld$par2.shouldYield()) {
@@ -175,7 +175,7 @@ public class Demo2 {
                 @Override
                 public void finalize() {
                     _ld$par1.decrement();
-                }
+                } 
             }.schedule();
 
             new PJProcess() {
@@ -188,7 +188,7 @@ public class Demo2 {
                 @Override
                 public void finalize() {
                     _ld$par1.decrement();
-                }
+                } 
             }.schedule();
 
             (new Demo2._proc$say() {
@@ -208,7 +208,7 @@ public class Demo2 {
                 @Override
                 public void finalize() {
                     _ld$par1.decrement();
-                }
+                } 
             }.schedule();
 
             (new Demo2._proc$yeah() {
@@ -239,7 +239,7 @@ public class Demo2 {
                         @Override
                         public void finalize() {
                             _ld$par2.decrement();
-                        }
+                        } 
                     }.schedule();
 
                     new PJProcess() {
@@ -252,7 +252,7 @@ public class Demo2 {
                         @Override
                         public void finalize() {
                             _ld$par2.decrement();
-                        }
+                        } 
                     }.schedule();
 
                     new PJProcess() {
@@ -276,7 +276,7 @@ public class Demo2 {
                                 @Override
                                 public void finalize() {
                                     _ld$par3.decrement();
-                                }
+                                } 
                             }.schedule();
 
                             new PJProcess() {
@@ -289,7 +289,7 @@ public class Demo2 {
                                 @Override
                                 public void finalize() {
                                     _ld$par3.decrement();
-                                }
+                                } 
                             }.schedule();
 
                             if (_ld$par3.shouldYield()) {
@@ -304,7 +304,7 @@ public class Demo2 {
                         @Override
                         public void finalize() {
                             _ld$par2.decrement();
-                        }
+                        } 
                     }.schedule();
 
                     if (_ld$par2.shouldYield()) {
@@ -319,7 +319,7 @@ public class Demo2 {
                 @Override
                 public void finalize() {
                     _ld$par1.decrement();
-                }
+                } 
             }.schedule();
 
             if (_ld$par1.shouldYield()) {

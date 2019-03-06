@@ -234,13 +234,20 @@ if (<name>.shouldYield()) {
 //========================================================================================
 // Defines an expression for an anonymous process which consist of a
 // switch block that contains jump labels, a synchronized body that
-// runs all, and a 'par' block defined in a procedure.
+// runs all, and a 'par' block defined in a procedure. Note that the
+// process's schedule() method is excluded iff it is created inside
+// a 'par-for'. If this is case, then we generated code similar to
+// that of a ProcessClass (e.g., with member fields).
 // 1) switchBlock: switch statement to jump through blocks to resume points.
 // 2) syncBody: the body (content) of synchronized method that runs/starts a process.
 // 3) parBlock:
 // 4) barrier:
-AnonymousProcess(switchBlock, syncBody, parBlock, barrier) ::= <<
+// 5) ltypes: data types for local parameters that are used in a 'par-for'.
+// 6) lvars: unique names for fields preceded by '_ld' that are used in a 'par-for'.
+AnonymousProcess(switchBlock, syncBody, parBlock, barrier, ltypes, lvars) ::= <<
 new PJProcess() {
+    <! -------- Instance variables for local parameters -------- !>
+    <if(lvars)><ltypes,lvars:{t,v | protected <t> <v>}; separator=";\n">;<\n><endif>
     <! Synchronized run method !>
     @Override
     public synchronized void run() {
@@ -254,8 +261,11 @@ new PJProcess() {
     public void finalize() {
         <if(parBlock)><parBlock>.decrement();<endif>
         <if(barrier)><barrier:{b | <b>.resign()}; separator=";\n">;<endif>
-    }
-}.schedule();
+    } <!-- The setter should be called inside the generated code for a 'par-for'.
+           Such an invocation means that the 'anonymous' process will be scheduled
+           later in a separate for loop. Otherwise, the process should be schedule
+           right away. --!>
+}<if(lvars)>.set(<lvars; separator=", ">)<else>.schedule()<endif>;
 >>
 
 //========================================================================================
