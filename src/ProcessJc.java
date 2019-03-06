@@ -10,6 +10,7 @@ import codegeneratorjava.Helper;
 import library.Library;
 import parser.parser;
 import rewriters.CastRewrite;
+import rewriters.ParFor;
 import scanner.Scanner;
 import utilities.ConfigFileReader;
 import utilities.Error;
@@ -147,7 +148,12 @@ public class ProcessJc {
 
             // Cast the result from the parse to a Compilation - this is the root of the tree
             Compilation c = (Compilation) root;
-
+				    // Set the soruce file name of the compilation.
+				    c.sourceFile = inFile.getName();
+				    c.path = inFile.getAbsolutePath();
+				    c.isImport = false;
+				    System.out.println("Importing " + c.path + " " + c.sourceFile);
+	    
             // Decode pragmas - these are used for generating stubs from libraries.
             // No regular program would have them.
             Library.decodePragmas(c);
@@ -296,6 +302,12 @@ public class ProcessJc {
 	    System.out.println("-- Checking break and continue labels.");
 	    new semanticcheck.LabeledBreakContinueCheck().go(c);
 
+	    System.out.println("-- Collecting left-hand sides for par for code generation");
+	    c.visit(new rewriters.ParFor());
+
+
+
+
 //            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
 //                CompilerMessageManager.INSTANCE.printTrace("yield");
 //                System.exit(1);
@@ -306,7 +318,7 @@ public class ProcessJc {
             // ===============================
             
             if (Settings.targetLanguage == Language.JVM) {
-                ;//generateCodeJava(c, inFile, globalTypeTable);
+                generateCodeJava(c, inFile, globalTypeTable);
             } else {
                 System.err.println(String.format("Unknown target language '%s' selected.", Settings.targetLanguage));
                 System.exit(1);
