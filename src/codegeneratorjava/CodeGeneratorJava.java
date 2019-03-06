@@ -463,10 +463,50 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         return (T) stWhileStat.render();
     }
     
+    /**
+     * -----------------------------------------------------------------------------
+     * VISIT FOR_STAT
+     */
     public T visitForStat(ForStat fs) {
         Log.log(fs.line + ": Visiting a ForStat");
         
-        return null;
+        // Generated template after evaluating this visitor
+        ST stForStat = _stGroup.getInstanceOf("ForStat");
+        
+        List<String> init = new ArrayList<>();  // Initialization part
+        List<String> incr = new ArrayList<>();  // Increment part
+        // Sequence of statements enclosed in a 'block' statement
+        String[] stats = null;
+        
+        if (!fs.isPar()) { // Is it a regular for loop?
+            if (fs.init() != null) {
+                for (Statement st : fs.init())
+                    init.add(((String) st.visit(this)).replace(";", ""));  // Remove the ';' added in LocalDecl
+            }
+            
+            if (fs.incr() != null) {
+                for (ExprStat expr : fs.incr())
+                    incr.add(((String) expr.visit(this)).replace(";", "")); // Remove the ';' added (if any)
+            }
+            
+            if (fs.expr() != null) {
+                String expr = (String) fs.expr().visit(this);
+                stForStat.add("expr", expr);
+            }
+            
+            if (fs.stats() != null) {
+                stats = (String[]) fs.stats().visit(this);
+                stForStat.add("stats", stats);
+            }
+        } else // No! then this is a 'par for'
+            ;
+        
+        if (!init.isEmpty())
+            stForStat.add("init", init);
+        if (!incr.isEmpty())
+            stForStat.add("incr", incr);
+        
+        return (T) stForStat.render();
     }
     
     /**

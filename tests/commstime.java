@@ -174,7 +174,7 @@ public class commstime {
                     @Override
                     public void finalize() {
                         _ld$par1.decrement();
-                    }
+                    } 
                 }.schedule();
 
                 new PJProcess() {
@@ -199,13 +199,14 @@ public class commstime {
                     @Override
                     public void finalize() {
                         _ld$par1.decrement();
-                    }
+                    } 
                 }.schedule();
 
-                setNotReady();
-                this.runLabel = 3;
-                yield();
-                label(3);
+                if (_ld$par1.shouldYield()) {
+                    this.runLabel = 3;
+                    yield();
+                    label(3);
+                }
 
                 cntrLoop = (_ld$l1 < 1000000);
             }
@@ -308,7 +309,7 @@ public class commstime {
                 @Override
                 public void finalize() {
                     _ld$par1.decrement();
-                }
+                } 
             }.schedule();
 
             new PJProcess() {
@@ -331,13 +332,14 @@ public class commstime {
                 @Override
                 public void finalize() {
                     _ld$par1.decrement();
-                }
+                } 
             }.schedule();
 
-            setNotReady();
-            this.runLabel = 1;
-            yield();
-            label(1);
+            if (_ld$par1.shouldYield()) {
+                this.runLabel = 1;
+                yield();
+                label(1);
+            }
 
             final PJPar _ld$par2 = new PJPar(4, this);
 
@@ -369,10 +371,11 @@ public class commstime {
                 }
             }).schedule();
 
-            setNotReady();
-            this.runLabel = 2;
-            yield();
-            label(2);
+            if (_ld$par2.shouldYield()) {
+                this.runLabel = 2;
+                yield();
+                label(2);
+            }
 
             terminate();
         }

@@ -87,7 +87,7 @@ public class Matt {
                 @Override
                 public void finalize() {
                     _ld$par1.decrement();
-                }
+                } 
             }.schedule();
 
             new PJProcess() {
@@ -110,7 +110,7 @@ public class Matt {
                 @Override
                 public void finalize() {
                     _ld$par1.decrement();
-                }
+                } 
             }.schedule();
 
             new PJProcess() {
@@ -133,7 +133,7 @@ public class Matt {
                 @Override
                 public void finalize() {
                     _ld$par1.decrement();
-                }
+                } 
             }.schedule();
 
             if (_ld$par1.shouldYield()) {

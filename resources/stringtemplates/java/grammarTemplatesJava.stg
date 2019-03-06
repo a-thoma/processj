@@ -510,3 +510,17 @@ this.runLabel = <resume0>;
 yield();
 label(<resume0>);
 >>
+
+//========================================================================================
+//
+// 1) init:
+// 2) expr:
+// 3) incr:
+// 4) stats:
+ForStat(init, expr, incr, stats) ::= <<
+for (<if(init)><init; separator=", "><endif>;
+     <if(expr)><expr><endif>;
+     <if(incr)><incr; separator=", "><endif>) {
+     <stats; separator="\n">
+}
+>>
