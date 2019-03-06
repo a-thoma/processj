@@ -11,6 +11,7 @@ import library.Library;
 import namechecker.ResolveImports;
 import parser.parser;
 import rewriters.CastRewrite;
+import rewriters.ParFor;
 import scanner.Scanner;
 import utilities.ConfigFileReader;
 import utilities.Error;
@@ -305,6 +306,12 @@ public class ProcessJc {
 	    //c.visit(new printers.PrettyPrinter());
 	    System.out.println("-- Checking break and continue labels.");
 	    new semanticcheck.LabeledBreakContinueCheck().go(c);
+
+	    System.out.println("-- Collecting left-hand sides for par for code generation");
+	    c.visit(new rewriters.ParFor());
+
+
+
 
 //            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
 //                CompilerMessageManager.INSTANCE.printTrace("yield");
