@@ -446,11 +446,10 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         ST stWhileStat = _stGroup.getInstanceOf("WhileStat");
         // Sequence of statements enclosed in a 'block' statement
         String[] stats = null;
-        
         String condExpr = null;
         
         if (ws.expr() != null)
-            condExpr = (String) ws.expr().visit(this);
+            condExpr = ((String) ws.expr().visit(this)).replace(";", "");
         
         if (ws.stat() != null)
             stats = (String[]) ws.stat().visit(this);
@@ -461,6 +460,32 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         stWhileStat.add("body", stats);
         
         return (T) stWhileStat.render();
+    }
+    
+    /**
+     * -----------------------------------------------------------------------------
+     * VISIT DO_STAT
+     * 
+     */
+    public T visitDoStat(DoStat ds) {
+        Log.log(ds.line + ": Visiting a DoStat");
+        
+        // Generated template after evaluating this visitor
+        ST stDoStat = _stGroup.getInstanceOf("DoStat");
+        // Sequence of statements enclosed in a 'block' statement
+        String[] stats = null;
+        String condExpr = null;
+        
+        if (ds.expr() != null)
+            condExpr = ((String) ds.expr().visit(this)).replace(";", "");
+        
+        if (ds.stat() != null)
+            stats = (String[]) ds.stat().visit(this);
+        
+        stDoStat.add("expr", condExpr);
+        stDoStat.add("body", stats);
+        
+        return (T) stDoStat.render();
     }
     
     /**
@@ -490,7 +515,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
             }
             
             if (fs.expr() != null) {
-                String expr = (String) fs.expr().visit(this);
+                String expr = ((String) fs.expr().visit(this)).replace(";", "");
                 stForStat.add("expr", expr);
             }
             

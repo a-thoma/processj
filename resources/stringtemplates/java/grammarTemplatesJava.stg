@@ -194,18 +194,6 @@ switch (this.runLabel) {
 SwitchCase(jump) ::= "case <jump>: resume(<jump>); break;"
 
 //========================================================================================
-//
-// 1) expr:
-// 2) body:
-WhileStat(expr, body) ::= <<
-boolean cntrLoop = (<expr>);
-while (cntrLoop) {
-    <if(body)><body; separator="\n"><endif>
-    cntrLoop = (<expr>);
-}
->>
-
-//========================================================================================
 // Initializes a declaration for a 'par' statement (an object of type PJPar)
 // defined in a process (an object of type PJProcess). This 'par' statement
 // becomes a variable of the process in which it is declared. A reference
@@ -513,14 +501,35 @@ label(<resume0>);
 
 //========================================================================================
 //
+// 1) expr:
+// 2) body:
+WhileStat(expr, body) ::= <<
+while (<expr>) {
+    <if(body)><body; separator="\n"><endif>
+}
+>>
+
+//========================================================================================
+//
+// 1) expr:
+// 2) stats:
+DoStat(expr, body) ::= <<
+do {
+    <if(body)><body; separator="\n"><endif>
+} while (<expr>);
+>>
+
+//========================================================================================
+//
 // 1) init:
 // 2) expr:
 // 3) incr:
 // 4) stats:
 ForStat(init, expr, incr, stats) ::= <<
-for (<if(init)><init; separator=", "><endif>;
-     <if(expr)><expr><endif>;
-     <if(incr)><incr; separator=", "><endif>) {
+for (<if(init)><init; separator=", "><else>/* empty */<endif>;
+     <if(expr)><expr><else>/* emtpy */<endif>;
+     <if(incr)><incr; separator=", "><else>/* empty */<endif>) {
+     
      <stats; separator="\n">
 }
 >>

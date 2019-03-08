@@ -49,8 +49,13 @@ public class Scheduler extends Thread {
 			while (rq.size() > 0) {
 			    incMaxrqsize(rq.size());
 			    // grab the next process in the run queue
-			    PJProcess p = rq.getNext();
-			    
+			    PJProcess p;
+			    int i = ((int)(Math.random()*100.0))%4;
+			    while (i-->0) {
+			        p = rq.getNext();
+			        rq.insert(p);
+			    }
+			    p = rq.getNext();
 			    // is it ready to run?
 			    if (p.isReady()) {
 				// yes, so run it

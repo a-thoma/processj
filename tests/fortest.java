@@ -24,7 +24,7 @@ public class fortest {
     }
 
     static void _method$fooK$I(int _pd$k1) {
-        io.println("K = " + _pd$k1);
+        io.println("k = " + _pd$k1);
     }
 
     public static class _proc$main$arT extends PJProcess {
@@ -33,6 +33,7 @@ public class fortest {
         protected int _ld$i1;
         protected int _ld$j2;
         protected int _ld$k3;
+        protected int _ld$i4;
 
         public _proc$main$arT(String[] _pd$args1) {
             this._pd$args1 = _pd$args1;
@@ -40,14 +41,97 @@ public class fortest {
 
         @Override
         public synchronized void run() {
+            switch (this.runLabel) {
+                case 0: break;
+                case 1: resume(1); break;
+                default: break;
+            }
+
             io.println("Hi from main!");
             for (_ld$i1 = 0, _ld$j2 = 0, _ld$k3 = 1;
                  (_ld$i1 < 4) && (_ld$j2 < 10);
                  _ld$i1++, _ld$j2 = _ld$j2 + 3 + _ld$i1, _ld$k3 = _ld$k3 + 2) {
-                 fortest._method$fooI$I(_ld$i1);
-                 fortest._method$fooJ$I(_ld$j2);
-                 fortest._method$fooK$I(_ld$k3);
+
+                 final PJPar _ld$par1 = new PJPar(3, this);
+
+                 new PJProcess() {
+                     @Override
+                     public synchronized void run() {
+                         fortest._method$fooI$I(_ld$i1);
+                         terminate();
+                     }
+
+                     @Override
+                     public void finalize() {
+                         _ld$par1.decrement();
+                     } 
+                 }.schedule();
+
+                 new PJProcess() {
+                     @Override
+                     public synchronized void run() {
+                         fortest._method$fooJ$I(_ld$j2);
+                         terminate();
+                     }
+
+                     @Override
+                     public void finalize() {
+                         _ld$par1.decrement();
+                     } 
+                 }.schedule();
+
+                 new PJProcess() {
+                     @Override
+                     public synchronized void run() {
+                         fortest._method$fooK$I(_ld$k3);
+                         terminate();
+                     }
+
+                     @Override
+                     public void finalize() {
+                         _ld$par1.decrement();
+                     } 
+                 }.schedule();
+
+                 if (_ld$par1.shouldYield()) {
+                     this.runLabel = 1;
+                     yield();
+                     label(1);
+                 }
+
             }
+            _ld$i4 = 0;
+            for (/* empty */;
+                 /* emtpy */;
+                 /* empty */) {
+
+                 if (_ld$i4 < 5) {
+                     io.println("i = " + _ld$i4 + " less that 5");
+                 }
+                 if (_ld$i4 == 5) {
+                     break;
+                 }
+                 _ld$i4++;
+            }
+            _ld$i4 = 0;
+            for (/* empty */;
+                 _ld$i4++ < 5;
+                 /* empty */) {
+
+                 io.println("i = " + _ld$i4 + " less that 5");
+            }
+            _ld$i4 = 0;
+            while (true) {
+                if (_ld$i4 == 6) {
+                    break;
+                }
+                _ld$i4++;
+            }
+            _ld$i4 = 0;
+            do {
+                io.println("Entering a 'do-while' loop");
+                io.println("The value of i is " + _ld$i4);
+            } while (_ld$i4++ < 6);
             terminate();
         }
     }

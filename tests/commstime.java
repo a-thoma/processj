@@ -45,8 +45,7 @@ public class commstime {
             label(1);
 
             _ld$l1 = 0;
-            boolean cntrLoop = (_ld$l1 < 1000000);
-            while (cntrLoop) {
+            while (_ld$l1 < 1000000) {
                 if (!_pd$in2.isReadyToRead(this)) {
                     this.runLabel = 2;
                     yield();
@@ -63,7 +62,6 @@ public class commstime {
                 yield();
                 label(4);
 
-                cntrLoop = (_ld$l1 < 1000000);
             }
             terminate();
         }
@@ -91,8 +89,7 @@ public class commstime {
             }
 
             _ld$l1 = 0;
-            boolean cntrLoop = (_ld$l1 < 999999);
-            while (cntrLoop) {
+            while (_ld$l1 < 999999) {
                 if (!_pd$in1.isReadyToRead(this)) {
                     this.runLabel = 1;
                     yield();
@@ -109,7 +106,6 @@ public class commstime {
                 yield();
                 label(3);
 
-                cntrLoop = (_ld$l1 < 999999);
             }
             terminate();
         }
@@ -139,8 +135,7 @@ public class commstime {
             }
 
             _ld$l1 = 0;
-            boolean cntrLoop = (_ld$l1 < 1000000);
-            while (cntrLoop) {
+            while (_ld$l1 < 1000000) {
                 if (!_pd$in1.isReadyToRead(this)) {
                     this.runLabel = 1;
                     yield();
@@ -208,7 +203,6 @@ public class commstime {
                     label(3);
                 }
 
-                cntrLoop = (_ld$l1 < 1000000);
             }
             terminate();
         }
@@ -233,8 +227,7 @@ public class commstime {
             }
 
             _ld$l1 = 0;
-            boolean cntrLoop = (_ld$l1 < 1000000);
-            while (cntrLoop) {
+            while (_ld$l1 < 1000000) {
                 if (!_pd$in1.isReadyToRead(this)) {
                     this.runLabel = 1;
                     yield();
@@ -247,7 +240,6 @@ public class commstime {
 
                 label(2);
                 io.println(_ld$l1);
-                cntrLoop = (_ld$l1 < 1000000);
             }
             terminate();
         }
