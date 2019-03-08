@@ -545,7 +545,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         ST stIfStat = _stGroup.getInstanceOf("IfStat");
         // Sequence of statements enclosed in a 'block' statement
         String[] thenStats = null;
-        
+        String[] thenParts = null;
         String condExpr = null;
         
         if (is.expr() != null)
@@ -558,9 +558,18 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
                 thenStats = new String[] { stat };
             }
         }
+        if (is.elsepart() != null) {
+            if (is.elsepart() instanceof Block)
+                thenParts = (String[]) is.elsepart().visit(this);
+            else {
+                String stat = (String) is.elsepart().visit(this);
+                thenParts = new String[] { stat };
+            }
+        }
         
         stIfStat.add("expr", condExpr);
         stIfStat.add("thenPart", thenStats);
+        stIfStat.add("elsePart", thenParts);
         
         return (T) stIfStat.render();
     }
