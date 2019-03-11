@@ -15,6 +15,9 @@ import std.io;
  *
  */
 public class Demo {
+    // Temporary dirty fix for unreachable code due to infinite loop
+    public static boolean isTrue() { return true; }
+
     public static class T implements PJRecord {
         public int a;
 

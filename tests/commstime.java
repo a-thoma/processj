@@ -15,6 +15,9 @@ import std.io;
  *
  */
 public class commstime {
+    // Temporary dirty fix for unreachable code due to infinite loop
+    public static boolean isTrue() { return true; }
+
     public static class _proc$prefix$J$crJ$cwJ extends PJProcess {
         protected long _pd$n1;
         protected PJOne2OneChannel<Long> _pd$in2;

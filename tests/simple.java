@@ -15,6 +15,9 @@ import std.*;
  *
  */
 public class simple {
+    // Temporary dirty fix for unreachable code due to infinite loop
+    public static boolean isTrue() { return true; }
+
     public static class _proc$foo$crI extends PJProcess {
         protected PJOne2OneChannel<Integer> _pd$r1;
 

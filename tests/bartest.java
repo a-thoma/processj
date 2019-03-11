@@ -15,6 +15,9 @@ import std.*;
  *
  */
 public class bartest {
+    // Temporary dirty fix for unreachable code due to infinite loop
+    public static boolean isTrue() { return true; }
+
     public static class _proc$foo$R$crI$M extends PJProcess {
         protected PJBarrier _pd$b1;
         protected PJOne2OneChannel<Integer> _pd$r2;
@@ -35,8 +38,6 @@ public class bartest {
                 case 0: break;
                 case 1: resume(1); break;
                 case 2: resume(2); break;
-                case 3: resume(3); break;
-                case 4: resume(4); break;
                 default: break;
             }
 
@@ -44,31 +45,98 @@ public class bartest {
             this.runLabel = 1;
             yield();
             label(1);
+            final PJPar _ld$par1 = new PJPar(4, this);
 
-            if (!_pd$r2.isReadyToRead(this)) {
+            new PJProcess() {
+                @Override
+                public synchronized void run() {
+                    switch (this.runLabel) {
+                        case 0: break;
+                        case 1: resume(1); break;
+                        case 2: resume(2); break;
+                        default: break;
+                    }
+
+                    if (!_pd$r2.isReadyToRead(this)) {
+                        this.runLabel = 1;
+                        yield();
+                    }
+
+                    label(1);
+                    _ld$d1 = _pd$r2.read(this);
+                    this.runLabel = 2;
+                    yield();
+
+                    label(2);
+                    terminate();
+                }
+
+                @Override
+                public void finalize() {
+                    _ld$par1.decrement();
+                } 
+            }.schedule();
+
+            new PJProcess() {
+                @Override
+                public synchronized void run() {
+                    _ld$time2 = PJTimer.read();
+                    terminate();
+                }
+
+                @Override
+                public void finalize() {
+                    _ld$par1.decrement();
+                } 
+            }.schedule();
+
+            new PJProcess() {
+                @Override
+                public synchronized void run() {
+                    switch (this.runLabel) {
+                        case 0: break;
+                        case 1: resume(1); break;
+                        default: break;
+                    }
+
+                    _pd$t3 = new PJTimer(this, 1000);
+                    try {
+                        _pd$t3.start();
+                        setNotReady();
+                        this.runLabel = 1;
+                        yield();
+                    } catch (InterruptedException e) {
+                        System.out.println("An Interrupted exception occurred for a timer!");
+                    }
+                    label(1);
+                    terminate();
+                }
+
+                @Override
+                public void finalize() {
+                    _ld$par1.decrement();
+                } 
+            }.schedule();
+
+            new PJProcess() {
+                @Override
+                public synchronized void run() {
+                    io.println("read: " + _ld$d1 + ", time: " + _ld$time2);
+                    terminate();
+                }
+
+                @Override
+                public void finalize() {
+                    _ld$par1.decrement();
+                } 
+            }.schedule();
+
+            if (_ld$par1.shouldYield()) {
                 this.runLabel = 2;
                 yield();
+                label(2);
             }
 
-            label(2);
-            _ld$d1 = _pd$r2.read(this);
-            this.runLabel = 3;
-            yield();
-
-            label(3);
-
-            _ld$time2 = PJTimer.read();
-            _pd$t3 = new PJTimer(this, 1000);
-            try {
-                _pd$t3.start();
-                setNotReady();
-                this.runLabel = 4;
-                yield();
-            } catch (InterruptedException e) {
-                System.out.println("An Interrupted exception occurred for a timer!");
-            }
-            label(4);
-            io.println("read: " + _ld$d1 + ", time: " + _ld$time2);
             terminate();
         }
     }

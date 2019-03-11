@@ -109,6 +109,15 @@ public class Scheduler extends Thread {
 
         logExecutionTime();
     }
+    
+    @Override
+    public String toString() {
+        String str = "";
+        for (PJProcess p : rq.queue) {
+            str += (p.isReady() ? "*" + p.runLabel : "- ");
+        }
+        return str;
+    }
 
     private void logExecutionTime() {
         long endTime = System.nanoTime();

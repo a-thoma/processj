@@ -15,6 +15,9 @@ import std.*;
  *
  */
 public class Matt {
+    // Temporary dirty fix for unreachable code due to infinite loop
+    public static boolean isTrue() { return true; }
+
     public static void _method$foo1() {
         io.println("foo1 from Matt.pj");
     }

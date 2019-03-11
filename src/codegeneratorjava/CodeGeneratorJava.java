@@ -451,6 +451,12 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         if (ws.expr() != null)
             condExpr = ((String) ws.expr().visit(this)).replace(";", "");
         
+        // TODO: Temporary dirty fix for unreachable code due to
+        // infinite loop. This invokes a static method defined in
+        // the 'Compilation' template called 'isTrue()'
+        if (ws.foreverLoop)
+            condExpr = "isTrue()";
+        
         if (ws.stat() != null)
             stats = (String[]) ws.stat().visit(this);
         else // The body of a 'while' could be empty
@@ -804,9 +810,11 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
             chanType = PJOne2OneChannel.class.getSimpleName();
             break;
         case ChannelType.SHARED_READ:
-//            chanType = PJOne2ManyChannel.class.getSimpleName(); break;
+            chanType = PJOne2ManyChannel.class.getSimpleName();
+            break;
         case ChannelType.SHARED_WRITE:
-//            chanType = PJMany2OneChannel.class.getSimpleName(); break;
+            chanType = PJMany2OneChannel.class.getSimpleName();
+            break;
         case ChannelType.SHARED_READ_WRITE:
 //            chanType = PJMany2ManyChannel.class.getSimpleName(); break;
         }
@@ -839,6 +847,12 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         
         // Channel class type
         String chanType = PJOne2OneChannel.class.getSimpleName();
+        if (ct.isShared()) {  // Is it a shared channel?
+            if (ct.isRead())  // one-2-many
+                chanType = PJOne2ManyChannel.class.getSimpleName();
+            else // many-2-one
+                chanType = PJMany2OneChannel.class.getSimpleName();
+        }
         // Resolve parameterized type for channel, e.g., chan<T>
         // where 'T' is the type to be resolved
         String type = getChannelType(ct.baseType());
@@ -860,15 +874,26 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         Expression chanExpr = cw.channel();
         // 'c' is the name of the channel
         String chanWriteName = (String) chanExpr.visit(this);
-        stChanWriteStat.add("chanName", chanWriteName);
         // Expression sent through channel
         String expr = (String) cw.expr().visit(this);
+        
+        int countLabel = 1; // One for the 'runLabel'
+        // Is the writing end of this channel shared?
+        if (chanExpr.type.isChannelEndType() && ((ChannelEndType) chanExpr.type).isShared()) {
+            stChanWriteStat = _stGroup.getInstanceOf("ChannelMany2One");
+            ++countLabel;
+        }
+        
+        stChanWriteStat.add("chanName", chanWriteName);
         stChanWriteStat.add("writeExpr", expr);
         
-        // Increment jump label
-        stChanWriteStat.add("resume0", ++_jumLabel);
-        // Add jump label to the 'switch' list
-        _switchLabelList.add(renderSwitchLabel(_jumLabel));
+        // Add the 'switch' block for resumption
+        for (int label = 0; label < countLabel; ++label) {
+            // Increment jump label
+            stChanWriteStat.add("resume" + label, ++_jumLabel);
+            // Add jump label to the 'switch' list
+            _switchLabelList.add(renderSwitchLabel(_jumLabel));
+        }
         
         return (T) stChanWriteStat.render();
     }
@@ -1698,9 +1723,16 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
             return (T) stTimerRedExpr.render();
         }
         
-        stChannelReadExpr.add("chanName", chanEndName);
+        int countLabel = 2;  // One for the 'runLabel' and one for the 'read' operation
+        // Is the reading end of this channel shared?
+        if (chanExpr.type.isChannelEndType() && ((ChannelEndType) chanExpr.type).isShared()) {
+            stChannelReadExpr = _stGroup.getInstanceOf("ChannelOne2Many");
+            ++countLabel;
+        }
+        
+        stChannelReadExpr.add("chanName", chanEndName);        
         // Add the 'switch' block for resumption
-        for (int label = 0; label < 2; ++label) {
+        for (int label = 0; label < countLabel; ++label) {
             // Increment jump label
             stChannelReadExpr.add("resume" + label, ++_jumLabel);
             // Add jump label to the 'switch' list

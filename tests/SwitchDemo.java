@@ -15,6 +15,9 @@ import std.io;
  *
  */
 public class SwitchDemo {
+    // Temporary dirty fix for unreachable code due to infinite loop
+    public static boolean isTrue() { return true; }
+
     public static class _proc$main$arT extends PJProcess {
         protected String[] _pd$args1;
 

@@ -35,6 +35,9 @@ import processj.runtime.*;
  *
  */
 public class <name> {
+    // Temporary dirty fix for unreachable code due to infinite loop
+    public static boolean isTrue() { return true; }
+    
     <if(body)><body; separator="\n\n"><endif>
 }
 >>
@@ -326,6 +329,58 @@ this.runLabel = <resume1>;
 yield();
 
 label(<resume1>);<!-- remove 'line-feed' --!>
+>>
+
+//========================================================================================
+//
+// 1) chanName:
+// 2) resume0:
+// 3) resume1:
+// 4) resume2:
+ChannelOne2Many(chanName, lhs, op, resume0, resume1, resume2) ::= <<
+if (!<chanName>.claimRead(this)) {
+    this.runLabel = <resume0>;
+    yield();
+}
+label(<resume0>);
+
+if (!<chanName>.isReadyToRead(this)) {
+    this.runLabel = <resume1>;
+    yield();
+}
+
+label(<resume1>);
+<if(lhs)><lhs> <op> <chanName>.read(this);
+<else><chanName>.read(this);
+<endif>
+this.runLabel = <resume2>;
+
+<chanName>.unclaimRead();
+
+yield();
+label(<resume2>);
+>>
+
+//========================================================================================
+//
+// 1) chanName:
+// 2) writeExpr:
+// 3) resume0:
+// 4) resume1:
+ChannelMany2One(chanName, writeExpr, resume0, resume1) ::= <<
+if (!<chanName>.claimWrite(this)) {
+    this.runLabel = <resume0>;
+    yield();
+}
+label(<resume0>);
+
+<chanName>.write(this, <writeExpr>);
+this.runLabel = <resume1>;
+
+yield();
+label(<resume1>);
+
+<chanName>.unclaimWrite();<\n>
 >>
 
 //========================================================================================

@@ -2,10 +2,12 @@ import std.*;
 
 public proc void foo(barrier b, chan<int>.read r, timer t) {
     b.sync();
-    int d = r.read();
-    long time = t.read();
-    t.timeout(1000);
-    println("read: " + d + ", time: " + time);
+    par {
+        int d = r.read();
+        long time = t.read();
+        t.timeout(1000);
+        println("read: " + d + ", time: " + time);
+    }
 }
 
 public proc void bar(barrier b, chan<int>.write w) {
