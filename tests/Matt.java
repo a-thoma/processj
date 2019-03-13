@@ -25,8 +25,8 @@ public class Matt {
     public static class _proc$main$arT extends PJProcess {
         protected String[] _pd$args1;
 
-        protected PJOne2OneChannel<Integer> _ld$c1;
-        protected PJOne2OneChannel<Integer> _ld$d2;
+        protected PJChannel<Integer> _ld$c1;
+        protected PJChannel<Integer> _ld$d2;
         protected int _ld$x3;
         protected int _ld$temp04;
         protected int _ld$temp15;

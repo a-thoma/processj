@@ -617,6 +617,11 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         String name = (String) pd.paramName().visit(this);
         String type = (String) pd.type().visit(this);
         
+        // TODO: Quick dirty fixed for channel types
+        if (pd.type().isChannelType() || pd.type().isChannelEndType()) {
+            type = PJChannel.class.getSimpleName() + type.substring(type.indexOf("<"), type.length());
+        }
+        
         // Create a tag for this parameter and then add it to the collection
         // of parameters for reference
         String newName = Helper.makeVariableName(name, ++_varDecId, Tag.PARAM_NAME);
@@ -647,6 +652,12 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         String name = (String) ld.var().name().getname();
         String type = (String) ld.type().visit(this);
         String val = null;
+        
+        // TODO: Quick dirty fixed for channel end types
+        String t = type;
+        if (ld.type().isChannelType() || ld.type().isChannelEndType()) {
+            type = PJChannel.class.getSimpleName() + type.substring(type.indexOf("<"), type.length());
+        }
 
         // Create a tag for this local channel expr parameter
         String newName = Helper.makeVariableName(name, ++_localDecId, Tag.LOCAL_NAME);
@@ -675,7 +686,8 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         // code to create a channel object.
         if (ld.type().isChannelType() && expr == null) {
             ST stChannelDecl = _stGroup.getInstanceOf("ChannelDecl");
-            stChannelDecl.add("type", type);
+//            stChannelDecl.add("type", type);
+            stChannelDecl.add("type", t); // 't' is the channel type (e.g., one-2-one, one-2-many, many-2-one, many-to-many)
             val = stChannelDecl.render();
         }
         // After making this local declaration a field of the procedure in
@@ -816,7 +828,8 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
             chanType = PJMany2OneChannel.class.getSimpleName();
             break;
         case ChannelType.SHARED_READ_WRITE:
-//            chanType = PJMany2ManyChannel.class.getSimpleName(); break;
+            chanType = PJMany2ManyChannel.class.getSimpleName();
+            break;
         }
         // Resolve parameterized type for channel, e.g., chan<T>
         // where 'T' is the type to be resolved
@@ -850,8 +863,10 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         if (ct.isShared()) {  // Is it a shared channel?
             if (ct.isRead())  // one-2-many
                 chanType = PJOne2ManyChannel.class.getSimpleName();
-            else // many-2-one
+            else if (ct.isWrite()) // many-2-one
                 chanType = PJMany2OneChannel.class.getSimpleName();
+            else // many-2-many
+                chanType = PJMany2ManyChannel.class.getSimpleName();
         }
         // Resolve parameterized type for channel, e.g., chan<T>
         // where 'T' is the type to be resolved

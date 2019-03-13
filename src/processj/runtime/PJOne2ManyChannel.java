@@ -9,6 +9,7 @@ public class PJOne2ManyChannel<T> extends PJOne2OneChannel<T> {
     
     protected Queue<PJProcess> readQueue = new LinkedList<>();
     
+    @Override
     public synchronized boolean claimRead(PJProcess p) {
         if (readclaim == null || readclaim == p) {
             readclaim = p;
@@ -20,6 +21,7 @@ public class PJOne2ManyChannel<T> extends PJOne2OneChannel<T> {
         return false;
     }
     
+    @Override
     public synchronized void unclaimRead() {
         if (readQueue.isEmpty()) {
             readclaim = null;

@@ -134,14 +134,14 @@ public class Demo {
     }
 
     public static class _proc$writer$cwLL$R extends PJProcess {
-        protected PJOne2OneChannel<L> _pd$out1;
+        protected PJChannel<L> _pd$out1;
         protected PJBarrier _pd$b12;
 
         protected K _ld$k1;
         protected X _ld$x2;
         protected L _ld$l3;
 
-        public _proc$writer$cwLL$R(PJOne2OneChannel<L> _pd$out1, PJBarrier _pd$b12) {
+        public _proc$writer$cwLL$R(PJChannel<L> _pd$out1, PJBarrier _pd$b12) {
             this._pd$out1 = _pd$out1;
             this._pd$b12 = _pd$b12;
         }
@@ -172,12 +172,12 @@ public class Demo {
     }
 
     public static class _proc$reader$crLL$R extends PJProcess {
-        protected PJOne2OneChannel<L> _pd$in1;
+        protected PJChannel<L> _pd$in1;
         protected PJBarrier _pd$b12;
 
         protected L _ld$value1;
 
-        public _proc$reader$crLL$R(PJOne2OneChannel<L> _pd$in1, PJBarrier _pd$b12) {
+        public _proc$reader$crLL$R(PJChannel<L> _pd$in1, PJBarrier _pd$b12) {
             this._pd$in1 = _pd$in1;
             this._pd$b12 = _pd$b12;
         }
@@ -230,12 +230,12 @@ public class Demo {
     }
 
     public static class _proc$readXX$crLXX$R extends PJProcess {
-        protected PJOne2OneChannel<PJProtocolCase> _pd$in1;
+        protected PJChannel<PJProtocolCase> _pd$in1;
         protected PJBarrier _pd$b22;
 
         protected PJProtocolCase _ld$value1;
 
-        public _proc$readXX$crLXX$R(PJOne2OneChannel<PJProtocolCase> _pd$in1, PJBarrier _pd$b22) {
+        public _proc$readXX$crLXX$R(PJChannel<PJProtocolCase> _pd$in1, PJBarrier _pd$b22) {
             this._pd$in1 = _pd$in1;
             this._pd$b22 = _pd$b22;
         }
@@ -272,12 +272,12 @@ public class Demo {
     }
 
     public static class _proc$writeXX$cwLXX$R extends PJProcess {
-        protected PJOne2OneChannel<PJProtocolCase> _pd$out1;
+        protected PJChannel<PJProtocolCase> _pd$out1;
         protected PJBarrier _pd$b22;
 
         protected PJProtocolCase _ld$xx1;
 
-        public _proc$writeXX$cwLXX$R(PJOne2OneChannel<PJProtocolCase> _pd$out1, PJBarrier _pd$b22) {
+        public _proc$writeXX$cwLXX$R(PJChannel<PJProtocolCase> _pd$out1, PJBarrier _pd$b22) {
             this._pd$out1 = _pd$out1;
             this._pd$b22 = _pd$b22;
         }
@@ -316,8 +316,8 @@ public class Demo {
     public static class _proc$main$arT extends PJProcess {
         protected String[] _pd$args1;
 
-        protected PJOne2OneChannel<L> _ld$c1;
-        protected PJOne2OneChannel<PJProtocolCase> _ld$x2;
+        protected PJChannel<L> _ld$c1;
+        protected PJChannel<PJProtocolCase> _ld$x2;
         protected int _ld$a3;
         protected PJBarrier _ld$b14;
         protected PJBarrier _ld$b25;

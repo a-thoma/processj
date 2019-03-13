@@ -9,6 +9,7 @@ public class PJMany2OneChannel<T> extends PJOne2OneChannel<T> {
     
     protected Queue<PJProcess> writeQueue = new LinkedList<>();
     
+    @Override
     public synchronized boolean claimWrite(PJProcess p) {
         if (writeclaim == null || writeclaim == p) {
             writeclaim = p;
@@ -20,6 +21,7 @@ public class PJMany2OneChannel<T> extends PJOne2OneChannel<T> {
         return false;
     }
     
+    @Override
     public synchronized void unclaimWrite() {
         if (writeQueue.isEmpty()) {
             writeclaim = null;
