@@ -19,6 +19,6 @@ public proc void main(string args[]) {
       }
       break;
     case 5: break;
-    default: break;
+    default: println("default case");  break;
   }
 }

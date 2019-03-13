@@ -9,41 +9,50 @@ package processj.runtime;
  */
 public abstract class PJChannel<T> {
     
-    /**
-     * Value in channel.
-     */
     protected T data;
     
     protected PJChannelType type;
     
-    /**
-     * TODO
-     * 
-     * @param p
-     * @param data
-     */
+    //
+    // The methods below must be defined by the parent
+    // class of all channel types
+    //
+    
+    // ************************************
+    // One-2-One Channel
+    // ************************************
     public abstract void write(PJProcess p, T data);
     
-    /**
-     * TODO
-     * 
-     * @param p
-     */
     public abstract T read(PJProcess p);
     
-    /**
-     * TODO
-     * 
-     * @param p
-     * @return
-     */
     public abstract boolean isReadyToRead(PJProcess p);
     
-    /**
-     * TODO
-     * 
-     * @param p
-     * @return
-     */
     public abstract boolean isReadyToWrite();
+    
+    //
+    // The methods below must be overridden by the appropriate
+    // subclass (channel type)
+    //
+    
+    // ************************************
+    // One-2-Many Channel: Shared read end
+    // ************************************
+    public boolean claimRead(PJProcess p) {
+        return false;
+    }
+    
+    public void unclaimRead() {
+        // empty on purpose
+    }
+    
+    // ************************************
+    // Many-2-One Channel: Shared read end
+    // ************************************
+    public boolean claimWrite(PJProcess p) {
+        return false;
+    }
+    
+    public void unclaimWrite() {
+        // empty on purpose
+    }
 }

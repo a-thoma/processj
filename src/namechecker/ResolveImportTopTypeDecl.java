@@ -30,26 +30,17 @@ public class ResolveImportTopTypeDecl<T extends AST> extends Visitor<T> {
     public static Hashtable<String, String> pragmaTable = new Hashtable<>();
     
     public ResolveImportTopTypeDecl() {
-        Log.logHeader("==============================================================");
-        Log.logHeader("*                 R E S O L V E   N A T I V E                *");
-        Log.logHeader("*                T O P   L E V E L   D E C L S               *");
-        Log.logHeader("*       -----------------------------------------------      *");
-        Log.logHeader("*       File: " + CompilerMessageManager.INSTANCE.fileName);
-        Log.logHeader("");
+        Log.logHeader("****************************************");
+        Log.logHeader("*     R E S O L V E   N A T I V E      *");
+        Log.logHeader("*    T O P   L E V E L   D E C L S     *");
+        Log.logHeader("****************************************");
     }
     
     public T visitCompilation(Compilation co) {
         Log.log(" Finding native top type declarations for " + CompilerMessageManager.INSTANCE.fileName
                 + ".");
         Log.log(" Visiting type declarations for " + CompilerMessageManager.INSTANCE.fileName);
-        co.imports().visit(this);
-
-        Log.logHeader("");
-        Log.logHeader("*                 R E S O L V E   N A T I V E                *");
-        Log.logHeader("*            T O P   L E V E L   D E C L S   D O N E         *");
-        Log.logHeader("*       File: " + CompilerMessageManager.INSTANCE.fileName);
-        Log.logHeader("==============================================================");
-        
+        co.imports().visit(this);        
         return null;
     }
     
@@ -68,7 +59,7 @@ public class ResolveImportTopTypeDecl<T extends AST> extends Visitor<T> {
         Import prevImpot = currentImport;
         currentImport = im;
         Sequence<Compilation> compilations = im.getCompilations();
-        // For every top-level decl in a file, determine if this type
+        // For every top-level declaration in a file, determine if this type
         // is part of a ProcessJ native library
         for (Compilation c : compilations) {
             if (c == null)
@@ -88,8 +79,8 @@ public class ResolveImportTopTypeDecl<T extends AST> extends Visitor<T> {
     }
     
     public T visitProcTypeDecl(ProcTypeDecl pd) {
-        Log.log(pd.line + ": Visiting a ProcTypeDecl (" + pd.name().getname() + ")");
-        if (pragmaTable.size() > 0 && currentImport != null) {
+        Log.log(pd.line + ": Visiting a ProcTypeDecl (" + pd.name().getname() + " " + pd.signature() + ")");
+        if (!pragmaTable.isEmpty() && currentImport != null) {
             String path = ResolveImports.makeImportPath(currentImport);
             Log.log(pd.line + ": Package path is : " + path);
             if (pragmaTable.contains("LIBRARY") && pragmaTable.contains("NATIVE")) {

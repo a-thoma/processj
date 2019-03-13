@@ -56,12 +56,9 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
      *          An AST node - just used for line number information.
      * @param fileName
      *          The name of the file being imported.
-     * @param importPath
-     *          A fully qualified name that represents the path corresponding to a
-     *          file or a directory {@code fileName}.
      * @return Returns a Compilation representing the imported file.
      */
-    public static Compilation importFile(AST a, String fileName, String importPath) {
+    public static Compilation importFile(AST a, String fileName) {
         Log.log(a.line + " Attempting to import: " + fileName);
         Compilation c = TopLevelDecls.alreadyImportedFiles.get(fileName);
         if (c != null) {
@@ -76,20 +73,6 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
             Scanner s1 = new Scanner(new java.io.FileReader(fileName));
             parser p1 = new parser(s1);
             java_cup.runtime.Symbol r = p1.parse();
-            
-            // Check the path of the imported file and compare the *import* statements
-            // found in the given file with the imported file's path format. Throw an
-            // error if the *import* statements do not match the path of the package
-            // name in which 'fileName' exists
-            String packageName = packageNameToString(((Compilation) r.value).packageName());
-            String importPathWithDot = importPath.replaceAll(File.separator, "\\.");
-            if (!importPathWithDot.equals(packageName)) {
-                CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
-                            .addAST(a)
-                            .addError(VisitorMessageNumber.RESOLVE_IMPORTS_103)
-                            .addArguments(packageName)
-                            .build());
-            }
             
             TopLevelDecls.alreadyImportedFiles.put(fileName,
                     (Compilation) r.value);
@@ -265,7 +248,12 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
             currentFileName = fn;
             // Set current filename
             CompilerMessageManager.INSTANCE.setFileName(fn);
-            Compilation c = ResolveImports.importFile(im, fn, path /* packageName */);
+            Compilation c = ResolveImports.importFile(im, fn);
+            
+            // Set absolute path, file and package name from where the Import is created
+            c.sourceFile = fn.substring(fn.lastIndexOf(File.separator) + 1, fn.length());
+            c.path = fn.substring(0, fn.lastIndexOf(File.separator));
+            c.packageName = path.replaceAll(File.separator, "\\.");
 
             // Set the source file name of the compilation.
 				    c.sourceFile = fn;
