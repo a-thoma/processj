@@ -5,6 +5,8 @@ import utilities.Visitor;
 
 public abstract class AST {
     /*implements java.io.Serializable*/// temporarily removed.
+    public Compilation myCompilation = null; // Points to the compilation in which this node is defines. Only used for nodes that implement TopLevelDecl.
+
     public String myPackage; // set this field to the name of the package in which the parse tree node lives! (only for top level decls)
     public int line, charBegin;
     public int nchildren = 0;

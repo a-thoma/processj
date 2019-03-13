@@ -191,6 +191,16 @@ public class PrimitiveType extends Type {
     public boolean isIntegerType() {
 	return (kind == IntKind);
     }
+    
+    @Override
+    public boolean isTimerType() {
+        return (kind == TimerKind);
+    }
+    
+    @Override
+    public boolean isBarrierType() {
+        return (kind == BarrierKind);
+    }
 
     @Override 
     public boolean isBooleanType() {

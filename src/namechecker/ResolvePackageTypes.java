@@ -77,7 +77,7 @@ public class ResolvePackageTypes extends Visitor<AST> {
             }
             CompilerMessageManager.INSTANCE.setFileName(fileName);
             // Now import it
-            comp = ResolveImports.importFile(pa.child(0), fileName, makeImportFileName(pa));
+            comp = ResolveImports.importFile(pa.child(0), fileName);
 
             SymbolTable st = new SymbolTable();
             if (comp.visited == false) {

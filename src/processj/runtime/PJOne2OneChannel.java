@@ -2,14 +2,8 @@ package processj.runtime;
 
 public class PJOne2OneChannel<T> extends PJChannel<T> {
     
-    /**
-     * TODO
-     */
     protected PJProcess writer;
     
-    /**
-     * TODO
-     */
     protected PJProcess reader;
     
     public PJOne2OneChannel() {

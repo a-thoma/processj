@@ -7,7 +7,7 @@ public class ProtocolLiteral extends Literal {
     public ProtocolTypeDecl myTypeDecl = null; // set in NameChecker/NameChecker/visitProtocolLiteral()
     public ProtocolCase myChosenCase = null; // set in NameChecker/NameChecker/visitProtocolLiteral()
 
-    public ProtocolLiteral(Name name, Name tag, Sequence<Expression> expressions) {
+    public ProtocolLiteral(Name name, Name tag, Sequence<RecordMemberLiteral> expressions) {
         super(name);
         nchildren = 3;
         children = new AST[] { name, tag, expressions };
@@ -21,8 +21,8 @@ public class ProtocolLiteral extends Literal {
         return (Name) children[1];
     }
 
-    public Sequence<Expression> expressions() {
-        return (Sequence<Expression>) children[2];
+    public Sequence<RecordMemberLiteral> expressions() {
+        return (Sequence<RecordMemberLiteral>) children[2];
     }
 
     public <S extends Object> S visit(Visitor<S> v) {
