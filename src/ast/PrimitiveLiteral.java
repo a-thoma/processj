@@ -29,11 +29,13 @@ public class PrimitiveLiteral extends Literal {
 
     private int kind;
     private String text;
+    private String rawtext;
 
     public PrimitiveLiteral(Token p_t, int kind) {
         super(p_t);
         this.kind = kind;
         this.text = p_t.lexeme;
+        this.rawtext = p_t.lexeme;
         nchildren = 0;
 
         if (kind == CharKind)
@@ -231,6 +233,23 @@ public class PrimitiveLiteral extends Literal {
             i = ch;
         }
         return i;
+    }
+    
+    public boolean isSuffixed() {
+        if (kind == DoubleKind || kind == FloatKind || kind == LongKind) {
+            char suffix = rawtext.charAt(rawtext.length() - 1);
+            if (suffix == 'd' || suffix == 'D' ||
+                suffix == 'f' || suffix == 'F' ||
+                suffix == 'l' || suffix == 'L') {
+                return true;
+            }
+        }
+        return false;
+    }
+    
+    public char suffix() {
+        return kind == DoubleKind ? 'd' :
+               kind == FloatKind  ? 'f' : 'l';
     }
 
     public <S extends Object> S visit(Visitor<S> v) {

@@ -1,6 +1,7 @@
 package processj.runtime;
 
 import java.util.LinkedList;
+import java.util.Queue;
 
 /**
  * A very simple linked-list implementation of a queue of processes - a run
@@ -15,14 +16,14 @@ public class RunQueue {
      * A linked list of PJProcess objects. Both ready and not ready processes are
      * stored in this list.
      */
-    private LinkedList<PJProcess> queue = new LinkedList<>();
+    protected Queue<PJProcess> queue = new LinkedList<>();
 
     /**
      * @param p
      *          Inserts process p (of type PJProcess) into the run queue.
      */
     synchronized public void insert(PJProcess p) {
-        queue.addLast(p);
+        queue.add(p);
     }
 
     /**
@@ -31,7 +32,7 @@ public class RunQueue {
      * @return PJProcess The process at the head of the queue.
      */
     synchronized public PJProcess getNext() {
-        return queue.removeFirst();
+        return queue.remove();
     }
 
     /**

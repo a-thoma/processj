@@ -6,7 +6,7 @@ public class RecordLiteral extends Literal {
 
     public RecordTypeDecl myTypeDecl = null; // set in NameChecker/NameChecker/visitRecordLiteral()
 
-    public RecordLiteral(Name name, Sequence<Expression> members) {
+    public RecordLiteral(Name name, Sequence<RecordMemberLiteral> members) {
         super(name);
         nchildren = 2;
         children = new AST[] { name, members };
@@ -16,8 +16,8 @@ public class RecordLiteral extends Literal {
         return (Name) children[0];
     }
 
-    public Sequence<Expression> members() {
-        return (Sequence<Expression>) children[1];
+    public Sequence<RecordMemberLiteral> members() {
+        return (Sequence<RecordMemberLiteral>) children[1];
     }
 
     public <S extends Object> S visit(Visitor<S> v) {

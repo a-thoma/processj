@@ -1,8 +1,13 @@
 package ast;
 
 import utilities.Visitor;
+import java.util.ArrayList;
 
 public class ForStat extends LoopStatement {
+
+    // This list is filled by the ParFor visitor and will contain the expressions inside a 
+    // par for that alter states (assignment, pre and post increment/decrements).
+    public ArrayList<Expression> vars = null;
 
     /* Note that init() and incr() can be null */
     public boolean par;
