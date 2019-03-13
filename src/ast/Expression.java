@@ -4,6 +4,7 @@ public abstract class Expression extends AST {
 
     public Type type = null;
     private boolean yields;
+    public boolean hasParens = false;
 
 
     public Expression(Token t) {
