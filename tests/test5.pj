@@ -1,0 +1,23 @@
+
+
+
+protocol P {
+  a : { int b; int c; }
+  b : { double d; int a; }
+  c : { R r; }
+}
+
+record R {
+  int b;
+  int c;
+  double d;
+}
+
+public proc void mainddd(string args[]) {
+  
+//  P p = new P{b: 5.5, 2};
+
+  P p = new P{b: d=5.5, a=2};
+  R r = new R{b=6, c=5, d=5.5};
+  P p1 = new P{c: r=null};
+}

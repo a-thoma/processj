@@ -1,0 +1,19 @@
+
+
+public proc void foo(int i, chan<int>.read in) { 
+  int i = in.read(); 
+}
+
+public proc void bar(int i, chan<int>.write out) {
+  out.write(43);
+}
+
+public proc void main(string args[]) {
+  int j = 0;
+  chan<int>[] c = new chan<int>[100];
+  par for (int i=0; i<100;i++) {
+    foo(i,c[i].read);
+    bar(j,c[i].write);
+    j = j + 1;
+  }
+}

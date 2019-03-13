@@ -1,0 +1,19 @@
+import std.io; 
+
+public proc void f(chan<int>.read in) {
+  int x;
+  x = in.read();
+  println(x);
+}
+
+public proc void g(chan<int>.write out) {
+  out.write(42);
+}
+
+public proc void main(string args[]) {
+  chan<int> c;
+  par {
+    f(c.read);
+    g(c.write);
+  }
+}
