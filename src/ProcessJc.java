@@ -152,7 +152,9 @@ public class ProcessJc {
             // Set absolute path, file and package name from where this Compilation is created
             System.out.println("-- Setting absolute path, file and package name for '" + inFile.getName() + "'.");
             c.sourceFile = inFile.getName();
-            c.path = inFile.getParentFile().getAbsolutePath(); // get file's parent absolute path
+            String parentPath = inFile.getAbsolutePath(); // This line grabs parent path of source file
+            parentPath = parentPath.substring(0, parentPath.lastIndexOf(File.separator));
+            c.path = parentPath; // get file's parent absolute path
             if (c.packageName() != null)  // A package declaration is optional, so this can be 'null'
                 c.packageName = ResolveImports.packageNameToString(c.packageName());
 
