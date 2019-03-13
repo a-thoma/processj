@@ -40,10 +40,6 @@ proc void consume(chan<long>.read in) {
 proc void main(string args[]) {
   chan<long> a,b,c,d;
   long x;
-  par {
-    x = c.read();
-    c.write(54); //c.write.write();
-  }
 
   par {
     delta(d.read, a.write, b.write);

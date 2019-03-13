@@ -9,7 +9,7 @@ package processj.runtime;
  */
 public abstract class PJChannel<T> {
     
-    protected T data;
+    protected T data = null;
     
     protected PJChannelType type;
     
