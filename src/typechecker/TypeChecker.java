@@ -1192,9 +1192,9 @@ public class TypeChecker extends Visitor<Type> {
 			    
 			    if (!exprType.typeAssignmentCompatible(labelType))
 				Error.addError(ss, "Switch label '" + sl.expr() + "' of type '" + labelType + "' not compatible with switch expression's type '" + exprType + "'.", 0000);
-			    sg.statements().visit(this);
 			}
 		    }
+		    sg.statements().visit(this);			    
 		}
 	    }
 	} else { // Protocol Type.

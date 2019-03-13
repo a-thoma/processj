@@ -93,7 +93,7 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
             
             TopLevelDecls.alreadyImportedFiles.put(fileName,
                     (Compilation) r.value);
-            return (Compilation) r.value;
+            return (Compilation)r.value;
         } catch (java.io.FileNotFoundException e) {
             CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                         .addAST(a)
@@ -267,6 +267,12 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
             CompilerMessageManager.INSTANCE.setFileName(fn);
             Compilation c = ResolveImports.importFile(im, fn, path /* packageName */);
 
+            // Set the source file name of the compilation.
+				    c.sourceFile = fn;
+				    c.path = fn;
+				    c.isImport = true;
+            System.out.println("Importing " + c.path + " " + fn);
+				    
             // Add it to the list of compilations for this import
             im.addCompilation(c);
             // Create a symboltable for it

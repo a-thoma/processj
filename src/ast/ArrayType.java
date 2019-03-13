@@ -90,18 +90,18 @@ public class ArrayType extends Type {
     @Override
     public boolean typeEqual(Type t) {
         // TODO
-        return false;
+        return true;
     }
 
     @Override
     public boolean typeEquivalent(Type t) {
         // TODO
-        return false;
+        return true;
     }
 
     @Override
     public boolean typeAssignmentCompatible(Type t) {
 	// TODO
-        return false;
+        return true;
     }
 }

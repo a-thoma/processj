@@ -1,6 +1,7 @@
 package rewriters;
 
 import ast.*;
+import parser.*;
 import utilities.Visitor;
 import printers.*;
 import utilities.PJMessage;
@@ -128,18 +129,25 @@ public class ChannelReadRewrite {
 			ExprStat es = (ExprStat)st;
 			es.assignments = new Sequence<Statement>();
 			// Don't bother with simple v = c.read();
+			System.out.println("Here");
 			if (es.doesYield()) {
+			    System.out.println("Yields");
 			    if (es.expr() instanceof Assignment) {
 				Assignment as = (Assignment)es.expr();
+				System.out.println("Also here");
 				if (as.right() instanceof ChannelReadExpr) {
+				    
 				    ChannelReadExpr cre = (ChannelReadExpr)as.right();
 				    if (!cre.channel().doesYield()) {
-					// Don't bother with simple assignments of reads.
+					System.out.println("Skipped");// Don't bother with simple assignments of reads.
 					continue; 
-				    } else
+				    } else {
+					System.out.println("Weee");
 					go(cre, es);
+				    }
 				}
 			    }
+			    System.out.println("Weee 12");
 			    go(es, es);
 			}
 		    } else if (st instanceof LocalDecl) { // LocalDecl
@@ -168,7 +176,56 @@ public class ChannelReadRewrite {
 			st.assignments = new Sequence<Statement>();
 			SwitchStat ss = (SwitchStat)st;
 			go(ss, ss);			
-		    } 		   
+		    } else if (st instanceof ForStat) {
+			ForStat fs = (ForStat)st;
+			if (!fs.rewritten) {
+			    Sequence<Statement> b = new Sequence<Statement>();
+			    
+			    b.merge(fs.init());
+			    
+			    
+			    String temp = "";
+			    if (fs.expr() != null) {
+				temp = nextTemp();
+				LocalDecl ld = new LocalDecl(new PrimitiveType(new Token(sym.BOOLEAN,"boolean",0,0,0),PrimitiveType.BooleanKind), new Var(new Name(temp), null), false /*not constant*/);
+				b.append(ld);
+				b.append(new ExprStat(new Assignment(new NameExpr(new Name(temp)),fs.expr(), Assignment.EQ)));
+			    }
+			    
+			    Sequence<Statement> incrs = new Sequence<Statement>();
+			    for (int j=0; j<fs.incr().size(); j++) {
+				incrs.append(fs.incr().child(j));
+			    }
+			    
+			    Expression expr = (temp.equals("") ? null : new NameExpr(new Name(temp)));
+			    
+			    Sequence<Statement> stats;
+			    if (fs.stats() instanceof Block) 
+				stats = ((Block)fs.stats()).stats().merge(incrs).merge(new ExprStat(new Assignment(new NameExpr(new Name(temp)),fs.expr(), Assignment.EQ)));
+			    else
+				stats = new Sequence<Statement>(fs.stats()).merge(incrs).merge(new ExprStat(new Assignment(new NameExpr(new Name(temp)),fs.expr(), Assignment.EQ)));
+			    
+			    
+			    ForStat newfs = new ForStat(new Token(sym.FOR,"for",0,0,0),
+							new Sequence<Statement>(),
+							expr,
+							new Sequence<ExprStat>(),
+							fs.barriers(),
+							new Block(stats), fs.isPar());
+			    newfs.rewritten = true;
+			    b.append(newfs);
+			    
+			    s.set(i, new Block(b));
+			    st = (Statement)s.child(i);
+			    st.assignments = new Sequence();
+			    // TODO: body not properly rewritten.
+			    go (st, st);
+			} else {
+			    // not rewritten
+			    ;
+			    
+			}			
+		    }
 		    if (st.assignments != null && st.assignments.size() > 0) {
 			st.assignments.append(st);
 			Block b = new Block(st.assignments);

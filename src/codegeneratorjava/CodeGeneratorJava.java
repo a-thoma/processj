@@ -1273,7 +1273,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         // is the literal value used to initialized 'z' with. This is
         // something we don't want to do. Instead, we need to return
         // the literal value assigned to 'z'
-        for (Expression ex : rl.members()) {
+	/*        for (Expression ex : rl.members()) {
             if (ex instanceof Assignment) {
                 Assignment as = (Assignment) ex;
                 String lhs = (String) as.left().visit(this);
@@ -1284,7 +1284,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
                     Log.log(rl.line + ":  Updating '" + lhs + "' with '" + rhs + "'");
             }
         }
-        
+        */
         stRecordListeral.add("type", type);
         stRecordListeral.add("vals", members.values());
         

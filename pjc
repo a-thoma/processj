@@ -9,11 +9,11 @@ workingdir="~/.processj"
 java -cp $PACKAGE_DIR/bin:$PACKAGE_DIR/resources/jars/java_cup_runtime.jar:$PACKAGE_DIR/resources/jars/ST-4.0.7.jar:$PACKAGE_DIR/resources/jars/asm-all-3.3.1.jar:$PACKAGE_DIR:$PACKAGE_DIR/bin:. ProcessJc $@
 #`
 
-ERRORS=`echo "${RESULT}" | awk '{print;}'`
+#ERRORS=`echo "${RESULT}" | awk '{print;}'`
 
 #STATUS=`echo "${RESULT}" | awk '/./{line=$0} END{print line}'`
 
-echo "${ERRORS}"
+#echo "${ERRORS}"
 
 #echo "${RESULT}" | awk '/./{line=$0} END{print line}' #this is to test command line options
 
@@ -24,10 +24,10 @@ echo "${ERRORS}"
 #  exit 1
 #fi
 
-exit
+#exit
 ## !!!!!!! remove this !!!!!! this is a temporary variable used to test a single java file
-varname=$(echo $1 | cut -f1 -d".")
-varname=$(echo $varname | cut -f2 -d"/")
+#varname=$(echo $1 | cut -f1 -d".")
+#varname=$(echo $varname | cut -f2 -d"/")
 #echo "${varname}"
 ## compile the .java file using Java compiler
 #O=`javac -classpath $PACKAGE_DIR/bin/:$PACKAGE_DIR/lib/JVM:. $workingdir/*.java`

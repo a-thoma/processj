@@ -5,6 +5,8 @@ public abstract class LoopStatement extends Statement {
     public boolean hasContinue = false;
     public boolean hasReturn = false;
     public boolean foreverLoop = false;
+    public boolean rewritten = false;
+
 
     public LoopStatement(AST a) {
         super(a);

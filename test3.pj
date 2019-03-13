@@ -1,15 +1,28 @@
 import std.io;
 
-record K {
-    int z;
-}
+public proc void main(string args[]) {
+
+  // shared chan<int>[][] c;
+
+  PJMany2ManyChannnel<Integer>[][] c;
+  
+  // c = new shared chan<int>[10][10];
+  int t1 = 10;
+  int t2 = 10;
+  c = new PJMany2ManyChannel<Integer>[t1][t2];
+  for(i1=0;i1<t1;i1++)
+    for (i2=0;i2<t2;i2++)
+      c[i1][i2] = new PJMany2ManyChannel<Integer>();
+  
+  // int[][] ii = new int[10][10];
+
+  int[][] ii = new int[10][10];
 
 
-proc void foo() {
-  chan<K> c;
+  
 
-  K value = in.read();
-  int x = value.z;
-  //  println(value.z);
+
+  chan<int>[][] d = new chan<int>[10][10];
+
 
 }

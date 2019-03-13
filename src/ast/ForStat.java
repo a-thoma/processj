@@ -9,6 +9,28 @@ public class ForStat extends LoopStatement {
     // par for that alter states (assignment, pre and post increment/decrements).
     public ArrayList<Expression> vars = null;
 
+    // If these fields are not null they were rewirtten because they synchronize; the code 
+    // generator should use there rather than the original.
+    public Sequence<AST> rewrittenInit = null;
+    public Sequence<AST> rewrittenExpr = null;
+    public Sequence<AST> rewrittenIncr = null;
+    //
+    // par for(e1 ; e2; e3 ) ... {
+    //    ...
+    // }
+    //
+    // becomes
+    //
+    // e1' [ e1' is the rewritten e1 ]
+    // t = e2'
+    // while ( t ) {
+    //   ...   <-- this this original code should go into the new PJProcess;
+    //   e3'      <-- these should not go into the PJProcess
+    //   t = e2'  <-- 
+    // }
+    //
+    // if any of the e1, e2, e3 syncs.    
+
     /* Note that init() and incr() can be null */
     public boolean par;
 

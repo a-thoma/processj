@@ -297,8 +297,8 @@ public class ProcessJc {
 	    System.out.println("-- Rewriting yielding expressions.");
             new rewriters.ChannelReadRewrite().go(c, null);
 	    //System.out.println("Lets reprint it all");
-	    //c.visit(new printers.ParseTreePrinter());
-	    //c.visit(new printers.PrettyPrinter());
+	    c.visit(new printers.ParseTreePrinter());
+	    c.visit(new printers.PrettyPrinter());
 	    System.out.println("-- Checking break and continue labels.");
 	    new semanticcheck.LabeledBreakContinueCheck().go(c);
 
