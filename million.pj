@@ -1,0 +1,22 @@
+import std.io;
+
+public proc void ping(chan<int>.write out, chan<int>.read in, int x) {
+  int v;
+  out.write(x);
+  v = in.read();
+}
+
+public proc void pong(chan<int>.read in, chan<int>.write out) {
+  int v;
+  c = in.read();
+  out.write(v+1);
+}
+
+public proc void main(string args[]) {
+  int MAX = 100000000;
+  par for (int i=0; i<MAX; i++) {
+    chan<int> c, d;
+    ping (c.write, d.read, i);
+    pong (c.read, d.write);
+  }
+}

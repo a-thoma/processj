@@ -1,0 +1,13 @@
+import std.*;
+import test5;
+
+public proc void foo(int x) { }
+public proc void main(string args[]) {
+  int x,y,z;
+
+  switch(x) {
+  case 1: y = 2;
+  case 2: z = 4; foo(5); break;
+  default: z = 45; y=56; foo(4);  break;
+  }
+}
