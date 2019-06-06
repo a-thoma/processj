@@ -588,3 +588,75 @@ for (<if(init)><init; separator=", "><else>/* empty */<endif>;
      <stats; separator="\n">
 }
 >>
+
+
+//========================================================================================
+//
+// 1) number:
+// 2) guardExpr:
+// 3) stats:
+AltCase(number, guardExpr, stats) ::= <<
+case <number>:
+    <guardExpr>
+    <if(stats)><stats; separator="\n"><endif>
+    break;
+>>
+
+//========================================================================================
+//
+// 1) alt:
+// 2) count:
+// 3) initBooleanGuards:
+// 4) initGuards:
+// 5) bguards:
+// 6) guards:
+// 7) jump:
+// 8) cases:
+// 9) index:
+AltStat(alt, count, initBooleanGuards, initGuards, bguards, guards, jump, cases, index) ::= <<
+<alt> = new PJAlt(<count>, this);
+<initBooleanGuards>
+<initGuards>
+boolean ready = <alt>.setGuards(<bguards>, <guards>);
+
+if (!ready) {
+    System.out.println("RuntimeError: One of the boolean pre-guards must be true!");
+    System.exit(1);
+}
+
+this.setNotReady();
+<index> = <alt>.enable();
+this.runLabel = <jump>;
+yield();
+
+label(<jump>);
+int selected = <alt>.disable(<index>);
+
+switch(selected) {
+    <cases; separator="\n">
+    default:
+        break;
+}
+>>
+
+//========================================================================================
+//
+// 1) locals:
+// 2) constants:
+BooleanGuards(locals, constants) ::= <<
+<if(locals)><locals; separator="\n"><endif>
+<if(constants)>boolean[] booleanGuards = { <constants; separator=", "> };<endif>
+>>
+
+//========================================================================================
+//
+// 1) guards:
+ObjectGuards(guards) ::= <<
+<if(guards)>Object[] objectGuards = { <guards; separator=", "> };<endif>
+>>
+
+//========================================================================================
+//
+// 1) type:
+// 2) var:
+ConstantDecl(type, var) ::= "public static final <type> <var>"

@@ -1,48 +1,18 @@
 import std.io;
 
-proc void prefix(int n, chan<long>.read in, chan<long>.write out) {
-  out.write(n);
-  while (true) {
-    long l;
-    l = in.read();
-    out.write(l);
-  }
+protocol P {
+  a : { int b; int c; }
+  b : { double d; int a; }
+  c : { R r; }
 }
 
-proc void succ(chan<long>.read in, chan<long>.write out) {
-  while (true) {
-    long l;
-    l = in.read();
-    out.write(l+1);
-  }
+protocol A extends P {
+  tag1: {}
 }
 
-proc void delta(chan<long>.read in, chan<long>.write out1, chan<long>.write out2) {
-  while (true) {
-    long l;
-    l = in.read();
-    par {
-      out1.write(l);
-      out2.write(l);
-    }
-  }
-}
-
-proc void consume(chan<long>.read in) {
-  while (true) {
-    long l;
-    l = in.read();
-    println(l);
-  }
-}
-
-
-proc void main(string args[]) {
-  chan<long> a,b,c,d;
-  par {
-    delta(d.read, a.write, b.write);
-    succ(b.read, c.write);
-    prefix(0, c.read, d.write);
-    consume(a.read);
-  }
+record R {
+  int b;
+  int c;
+  double d;
+  P p;
 }

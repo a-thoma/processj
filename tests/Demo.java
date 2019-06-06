@@ -298,7 +298,7 @@ public class Demo {
             _ld$xx1 = new XX.accept(45, 35);
             switch(_ld$xx1.tag) {
             case "accept":
-                io.println("the tag value is " + (((XX.accept) _ld$xx1).code));
+                io.println("the tag value is " + (((XX.accept) _ld$xx1).code) + ", " + (((XX.accept) _ld$xx1).b));
                 break;
             }
             _pd$out1.write(this, ((PJProtocolCase) (_ld$xx1)));

@@ -107,7 +107,7 @@ public class ChannelReadRewrite {
 			AltStat as = (AltStat)st;
 			for (int j=0; j<as.body().size(); j++) {
 			    AltCase ac = (AltCase)as.body().child(j);
-			    if (ac.precondition().doesYield())
+			    if (ac.precondition() != null && ac.precondition().doesYield())
 				 CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
 									       .addAST(ac.precondition())
 									       .addError(VisitorMessageNumber.REWRITE_900)

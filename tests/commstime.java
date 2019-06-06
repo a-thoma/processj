@@ -255,7 +255,6 @@ public class commstime {
         protected PJChannel<Long> _ld$b2;
         protected PJChannel<Long> _ld$c3;
         protected PJChannel<Long> _ld$d4;
-        protected long _ld$x5;
 
         public _proc$main$arT(String[] _pd$args1) {
             this._pd$args1 = _pd$args1;
@@ -266,7 +265,6 @@ public class commstime {
             switch (this.runLabel) {
                 case 0: break;
                 case 1: resume(1); break;
-                case 2: resume(2); break;
                 default: break;
             }
 
@@ -274,102 +272,40 @@ public class commstime {
             _ld$b2 = new PJOne2OneChannel<Long>();
             _ld$c3 = new PJOne2OneChannel<Long>();
             _ld$d4 = new PJOne2OneChannel<Long>();
-
-            final PJPar _ld$par1 = new PJPar(2, this);
-
-            new PJProcess() {
-                @Override
-                public synchronized void run() {
-                    switch (this.runLabel) {
-                        case 0: break;
-                        case 1: resume(1); break;
-                        case 2: resume(2); break;
-                        default: break;
-                    }
-
-                    if (!_ld$c3.isReadyToRead(this)) {
-                        this.runLabel = 1;
-                        yield();
-                    }
-
-                    label(1);
-                    _ld$x5 = _ld$c3.read(this);
-                    this.runLabel = 2;
-                    yield();
-
-                    label(2);
-                    terminate();
-                }
-
-                @Override
-                public void finalize() {
-                    _ld$par1.decrement();
-                } 
-            }.schedule();
-
-            new PJProcess() {
-                @Override
-                public synchronized void run() {
-                    switch (this.runLabel) {
-                        case 0: break;
-                        case 1: resume(1); break;
-                        default: break;
-                    }
-
-                    _ld$c3.write(this, ((long) (54)));
-                    this.runLabel = 1;
-                    yield();
-                    label(1);
-
-                    terminate();
-                }
-
-                @Override
-                public void finalize() {
-                    _ld$par1.decrement();
-                } 
-            }.schedule();
-
-            if (_ld$par1.shouldYield()) {
-                this.runLabel = 1;
-                yield();
-                label(1);
-            }
-
-            final PJPar _ld$par2 = new PJPar(4, this);
+            final PJPar _ld$par1 = new PJPar(4, this);
 
             (new commstime._proc$delta$crJ$cwJ$cwJ(_ld$d4, _ld$a1, _ld$b2) {
                 @Override
                 public void finalize() {
-                    _ld$par2.decrement();
+                    _ld$par1.decrement();
                 }
             }).schedule();
 
             (new commstime._proc$succ$crJ$cwJ(_ld$b2, _ld$c3) {
                 @Override
                 public void finalize() {
-                    _ld$par2.decrement();
+                    _ld$par1.decrement();
                 }
             }).schedule();
 
             (new commstime._proc$prefix$J$crJ$cwJ(0, _ld$c3, _ld$d4) {
                 @Override
                 public void finalize() {
-                    _ld$par2.decrement();
+                    _ld$par1.decrement();
                 }
             }).schedule();
 
             (new commstime._proc$consume$crJ(_ld$a1) {
                 @Override
                 public void finalize() {
-                    _ld$par2.decrement();
+                    _ld$par1.decrement();
                 }
             }).schedule();
 
-            if (_ld$par2.shouldYield()) {
-                this.runLabel = 2;
+            if (_ld$par1.shouldYield()) {
+                this.runLabel = 1;
                 yield();
-                label(2);
+                label(1);
             }
 
             terminate();

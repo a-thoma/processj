@@ -4,11 +4,11 @@ import std.*;
 
 //record R { int a; }
 
-public proc void foo1() {
+public void foo1() {
     println("foo1 from Matt.pj");
 }
 
-public proc void main (string args[]) {
+public void main (string args[]) {
   chan<int> c,d;
 
   int x;

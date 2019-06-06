@@ -80,7 +80,12 @@ public class ChannelEndType extends Type {
         if (!t.isChannelEndType())
             return false;
         else {
+            // Protocols are NamedType's for channel ends and channels; therefore, we must
+            // use the 'actualType' which you can get from the 'type()' method.
             ChannelEndType cet = (ChannelEndType) t;
+            if (cet.baseType().isNamedType() && this.baseType().isNamedType()) {
+                return ((NamedType)baseType()).type().typeAssignmentCompatible(((NamedType)cet.baseType()).type());
+            }
             return baseType().typeAssignmentCompatible(cet.baseType());
         }
     }

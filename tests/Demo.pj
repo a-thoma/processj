@@ -80,7 +80,7 @@ public proc void writeXX(chan<XX>.write out, barrier b2) {
   b2.sync();
   XX xx = new XX { accept : b = 35, code = 45 };
   switch (xx) {
-    case accept: println("the tag value is " + xx.code); break;
+    case accept: println("the tag value is " + xx.code + ", " + xx.b); break;
   }
   out.write(xx);
 }

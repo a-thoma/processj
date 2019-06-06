@@ -44,4 +44,31 @@ public class PJOne2OneChannel<T> extends PJChannel<T> {
     public boolean isReadyToWrite() {
         return true;
     }
+
+    @Override
+    public T preReadRendezvous(PJProcess p) {
+        T myData = data;
+        data = null;
+        return myData;
+    }
+
+    @Override
+    public void postReadRendezvous(PJProcess p) {
+        writer.setReady();
+        writer = null;
+        reader = null;
+    }
+
+    @Override
+    synchronized public PJProcess altGetWriter(PJProcess p) {
+        if (writer == null)     // if a writer is absent
+            reader = p;         // register 'p' as the reader (alt) process
+        return writer;          // return writer
+    }
+
+    @Override
+    public PJProcess setReaderGetWriter(PJProcess p) {
+        reader = p;
+        return writer;
+    }
 }

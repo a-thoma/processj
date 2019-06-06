@@ -974,7 +974,7 @@ public class TypeChecker extends Visitor<Type> {
     public Type visitProtocolLiteral(ProtocolLiteral pl) {
 	Log.log(pl.line + ": Visiting a protocol literal");
 
-
+	pl.type = pl.myTypeDecl;
 	return pl.myTypeDecl;
 
         // Validity of the tag was already checked in NameChecker.
@@ -1005,6 +1005,7 @@ public class TypeChecker extends Visitor<Type> {
     @Override 
     public Type visitProtocolTypeDecl(ProtocolTypeDecl pt) {
 	Log.log(pt.line + ": Visiting a protocol type decl.");
+	    pt.visitChildren(this);
         Log.log(pt.line + ": Protocol type decl has type: " + pt);
         return pt;
     }
@@ -1125,7 +1126,7 @@ public class TypeChecker extends Visitor<Type> {
     @Override 
     public Type visitRecordTypeDecl(RecordTypeDecl rt) { 
 	Log.log(rt.line + ": Visiting a record type decl.");
-	
+	rt.visitChildren(this);
         Log.log(rt.line + ": Record type decl has type: " + rt);
         return rt;
     }

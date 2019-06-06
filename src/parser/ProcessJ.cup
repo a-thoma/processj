@@ -451,10 +451,12 @@ extern_type ::=
 
 // ProcTypeDecl :> Type :> AST
 procedure_type_declaration ::=
-          modifiers_opt:m PROC type:t IDENTIFIER:id 
+          //modifiers_opt:m PROC type:t IDENTIFIER:id 
+          modifiers_opt:m type:t IDENTIFIER:id 
           LPAREN formal_parameter_list_opt:f RPAREN annotations_opt:a implements_opt:i body_opt:b 
 	                                                    {: RESULT = new ProcTypeDecl(m, t, new Name(id), f, i, a, b); :} 
-        | modifiers_opt:m PROC VOID:t IDENTIFIER:id 
+        //| modifiers_opt:m PROC VOID:t IDENTIFIER:id
+        | modifiers_opt:m VOID:t IDENTIFIER:id  
           LPAREN formal_parameter_list_opt:f RPAREN annotations_opt:a implements_opt:i body_opt:b 
 	         {: RESULT = new ProcTypeDecl(m, new PrimitiveType(t, PrimitiveType.VoidKind), new Name(id), f, i, a, b); :}
         ;

@@ -57,17 +57,19 @@ public class ProtocolTypeDecl extends Type implements DefineTopLevelDecl {
 	    return true;
 	boolean b = false;
 	for (Name n : extend()) {
-	    b = b || doesExtend((ProtocolTypeDecl)n.myDecl);
+	    b = ((ProtocolTypeDecl)n.myDecl).doesExtend(pd) || b;
 	}
 	return b;
     }
 
     public ProtocolCase getCase(String name) {
 	// Search our own body first.
-	for (ProtocolCase pc : body()) {
-	    if (pc.name().getname().equals(name))
-		return pc;
-	}
+    if (body() != null) {
+        for (ProtocolCase pc : body()) {
+            if (pc.name().getname().equals(name))
+                return pc;
+        }
+    }
 	// This protocol type did not have the case.
 	ProtocolCase p = null;
 	for (Name n : extend()) {

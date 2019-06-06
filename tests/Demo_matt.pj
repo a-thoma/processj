@@ -1,7 +1,7 @@
 import std.*;
 
 
-public proc void main (string args[]) {
+public void main (string args[]) {
   chan<int> c;
 
   int x;

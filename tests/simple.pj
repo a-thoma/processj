@@ -1,19 +1,28 @@
 
 import std.*;
 
-public proc void foo(chan<int>.read r) {
-    int d;
-    d = r.read();
-    println("read: " + d);
+//public void foo(chan<int>.read r) {
+//    int d;
+//    d = r.read();
+//    println("read: " + d);
+//}
+//
+//public void bar(chan<int>.write w) {
+//    w.write(3);
+//}
+//
+//public void say(int a) {
+//    println("say " + a);
+//}
+
+public void foo(chan<int>.read r) {
+    string str = "...";
+    int a = r.read();
 }
 
-public proc void bar(chan<int>.write w) {
-    w.write(3);
-}
-
-public proc void main(string args[]) {
+public void main(string args[]) {
     chan<int> c;
-    barrier b, bb, bbb;
+    //barrier b, bb, bbb;
     //par enroll b {
     //    par enroll b, bb, bbb {
     //        foo(c.read);
@@ -24,8 +33,9 @@ public proc void main(string args[]) {
     //        }
     //    }
     //}
-    par {
-        foo(c.read);
-        bar(c.write);
-    }
+    //par {
+    //    foo(c.read);
+    //    bar(c.write);
+    //}
+    foo(c.read);
 }

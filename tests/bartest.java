@@ -20,13 +20,13 @@ public class bartest {
 
     public static class _proc$foo$R$crI$M extends PJProcess {
         protected PJBarrier _pd$b1;
-        protected PJOne2OneChannel<Integer> _pd$r2;
+        protected PJChannel<Integer> _pd$r2;
         protected PJTimer _pd$t3;
 
         protected int _ld$d1;
         protected long _ld$time2;
 
-        public _proc$foo$R$crI$M(PJBarrier _pd$b1, PJOne2OneChannel<Integer> _pd$r2, PJTimer _pd$t3) {
+        public _proc$foo$R$crI$M(PJBarrier _pd$b1, PJChannel<Integer> _pd$r2, PJTimer _pd$t3) {
             this._pd$b1 = _pd$b1;
             this._pd$r2 = _pd$r2;
             this._pd$t3 = _pd$t3;
@@ -143,9 +143,9 @@ public class bartest {
 
     public static class _proc$bar$R$cwI extends PJProcess {
         protected PJBarrier _pd$b1;
-        protected PJOne2OneChannel<Integer> _pd$w2;
+        protected PJChannel<Integer> _pd$w2;
 
-        public _proc$bar$R$cwI(PJBarrier _pd$b1, PJOne2OneChannel<Integer> _pd$w2) {
+        public _proc$bar$R$cwI(PJBarrier _pd$b1, PJChannel<Integer> _pd$w2) {
             this._pd$b1 = _pd$b1;
             this._pd$w2 = _pd$w2;
         }
@@ -205,7 +205,7 @@ public class bartest {
 
         protected PJTimer _ld$t1;
         protected PJBarrier _ld$b2;
-        protected PJOne2OneChannel<Integer> _ld$c3;
+        protected PJChannel<Integer> _ld$c3;
 
         public _proc$main$arT(String[] _pd$args1) {
             this._pd$args1 = _pd$args1;

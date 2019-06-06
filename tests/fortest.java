@@ -15,15 +15,18 @@ import std.io;
  *
  */
 public class fortest {
-    static void _method$fooI$I(int _pd$i1) {
+    // Temporary dirty fix for unreachable code due to infinite loop
+    public static boolean isTrue() { return true; }
+
+    public static void _method$fooI$I(int _pd$i1) {
         io.println("i = " + _pd$i1);
     }
 
-    static void _method$fooJ$I(int _pd$j1) {
+    public static void _method$fooJ$I(int _pd$j1) {
         io.println("j = " + _pd$j1);
     }
 
-    static void _method$fooK$I(int _pd$k1) {
+    public static void _method$fooK$I(int _pd$k1) {
         io.println("k = " + _pd$k1);
     }
 
