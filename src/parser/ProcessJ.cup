@@ -43,13 +43,13 @@ parser code  {:
     if(current.value == null) {
       System.out.println("Unexpected end of file." + Scanner.curLine);
       System.exit(1);
-    }	
+    }   
     else {
       Token t = (Token)current.value;
-	//System.out.println(Error.fileName + ":" + Scanner.lineCount + ": Syntax error:\n\n" + Scanner.curLine);
+    //System.out.println(Error.fileName + ":" + Scanner.lineCount + ": Syntax error:\n\n" + Scanner.curLine);
     System.out.println(CompilerMessageManager.INSTANCE.fileName + ":" + Scanner.lineCount + ": Syntax error:\n\n" + Scanner.curLine);
-	for (int i=1; i<Scanner.curLine.length()+1-t.lexeme.length(); i++) 
-	  System.out.print(" ");
+    for (int i=1; i<Scanner.curLine.length()+1-t.lexeme.length(); i++) 
+      System.out.print(" ");
         System.out.println("^");
 
       System.exit(1);
@@ -67,63 +67,63 @@ scan with {: return lexer.next_token(); :};
 // -----------------------------------------------------------------------------
 
 /* Atomic Types */
-terminal Token BOOLEAN;		// "boolean"
-terminal Token BYTE;		// "byte"
-terminal Token SHORT;		// "short"
-terminal Token INT;		// "int"
-terminal Token LONG;		// "long"
-terminal Token FLOAT;		// "float"
-terminal Token DOUBLE;		// "double"
-terminal Token CHAR;		// "char"
-terminal Token STRING;		// "string"
-terminal Token VOID;		// "void"
+terminal Token BOOLEAN;     // "boolean"
+terminal Token BYTE;        // "byte"
+terminal Token SHORT;       // "short"
+terminal Token INT;     // "int"
+terminal Token LONG;        // "long"
+terminal Token FLOAT;       // "float"
+terminal Token DOUBLE;      // "double"
+terminal Token CHAR;        // "char"
+terminal Token STRING;      // "string"
+terminal Token VOID;        // "void"
 
 /* Channel related keywords */
-terminal Token CHAN;		// "chan"
-terminal Token READ;		// "read"
-terminal Token WRITE;		// "write"
-terminal Token SHARED;		// "shared"
-terminal Token CLAIM;		// "claim"
+terminal Token CHAN;        // "chan"
+terminal Token READ;        // "read"
+terminal Token WRITE;       // "write"
+terminal Token SHARED;      // "shared"
+terminal Token CLAIM;       // "claim"
 
 /* Barrier related keywords */
-terminal Token BARRIER;		// "barrier"
-terminal Token SYNC;		// "sync"
-terminal Token ENROLL;		// "enroll"
+terminal Token BARRIER;     // "barrier"
+terminal Token SYNC;        // "sync"
+terminal Token ENROLL;      // "enroll"
 
 /* Timer related keywords */
-terminal Token TIMER;		// "timer"
-terminal Token TIMEOUT;		// "timeout"
+terminal Token TIMER;       // "timer"
+terminal Token TIMEOUT;     // "timeout"
 
 /* Silly keywords */
-terminal Token SKIP;		// "skip"
-terminal Token STOP;		// "stop"
+terminal Token SKIP;        // "skip"
+terminal Token STOP;        // "stop"
 
 /* Control flow related keywords */
-terminal Token IF;		// "if"
-terminal Token ELSE;		// "else"
-terminal Token FOR;		// "for"
-terminal Token WHILE;		// "while"
-terminal Token SWITCH;		// "switch"
-terminal Token CASE;		// "case"
-terminal Token DO;		// "do"
-terminal Token DEFAULT;		// "default"
-terminal Token BREAK;		// "break"
-terminal Token CONTINUE;	// "continue"
-terminal Token RETURN;		// "return"
-	
+terminal Token IF;      // "if"
+terminal Token ELSE;        // "else"
+terminal Token FOR;     // "for"
+terminal Token WHILE;       // "while"
+terminal Token SWITCH;      // "switch"
+terminal Token CASE;        // "case"
+terminal Token DO;      // "do"
+terminal Token DEFAULT;     // "default"
+terminal Token BREAK;       // "break"
+terminal Token CONTINUE;    // "continue"
+terminal Token RETURN;      // "return"
+    
 /* Other process oriented programming related keywords */
-terminal Token SEQ;		// "seq"
-terminal Token PAR;		// "par"
-terminal Token PRI;		// "pri"
-terminal Token ALT;		// "alt"
+terminal Token SEQ;     // "seq"
+terminal Token PAR;     // "par"
+terminal Token PRI;     // "pri"
+terminal Token ALT;     // "alt"
 
 /* Other non process oriented programming related keywords */
-terminal Token NEW;		// "new"
+terminal Token NEW;     // "new"
 
 /* Mobile processes related keywords */
-terminal Token RESUME;		// "resume"
-terminal Token SUSPEND;		// "suspend"
-terminal Token WITH;		// "with"
+terminal Token RESUME;      // "resume"
+terminal Token SUSPEND;     // "suspend"
+terminal Token WITH;        // "with"
 
 /* Top level element related keywords */
 terminal Token PROC;            // "proc"
@@ -133,20 +133,20 @@ terminal Token EXTENDS;         // "extends"
 terminal Token IMPLEMENTS;      // "implements"
 
 /* Package related keywords */
-terminal Token PACKAGE;		// "package"
-terminal Token IMPORT;		// "import"
+terminal Token PACKAGE;     // "package"
+terminal Token IMPORT;      // "import"
 
 /* Modifiers */
-terminal Token MOBILE;		// "mobile"
-terminal Token NATIVE;		// "native"
-terminal Token PUBLIC;		// "public"
-terminal Token PRIVATE;		// "private"
-terminal Token PROTECTED;	// "protected"
-terminal Token CONST;		// "const"
+terminal Token MOBILE;      // "mobile"
+terminal Token NATIVE;      // "native"
+terminal Token PUBLIC;      // "public"
+terminal Token PRIVATE;     // "private"
+terminal Token PROTECTED;   // "protected"
+terminal Token CONST;       // "const"
 terminal Token EXTERN;          // "extern"
 
 /* Boolean Literals */
-terminal Token BOOLEAN_LITERAL;	// "true" or "false"
+terminal Token BOOLEAN_LITERAL; // "true" or "false"
 
 /* Null Literal */
 terminal Token NULL_LITERAL;   // null
@@ -155,65 +155,65 @@ terminal Token NULL_LITERAL;   // null
 terminal Token PRAGMA;          // "pragma"
 
 /* Parentheses */
-terminal Token LPAREN;		// "("
-terminal Token RPAREN;		// ")"
-terminal Token LBRACE;		// "{"
-terminal Token RBRACE;		// "}"
-terminal Token LBRACK;		// "["
-terminal Token RBRACK;		// "]"
+terminal Token LPAREN;      // "("
+terminal Token RPAREN;      // ")"
+terminal Token LBRACE;      // "{"
+terminal Token RBRACE;      // "}"
+terminal Token LBRACK;      // "["
+terminal Token RBRACK;      // "]"
  
 /* Separators */
-terminal Token SEMICOLON;	// ";"
-terminal Token COMMA;		// ","
+terminal Token SEMICOLON;   // ";"
+terminal Token COMMA;       // ","
 
-/* Assignment Operators */	
-terminal Token EQ;		// "="
-terminal Token MULTEQ;		// "*="
-terminal Token DIVEQ;		// "/="
-terminal Token MODEQ;		// "%="
-terminal Token PLUSEQ;		// "+="
-terminal Token MINUSEQ;		// "-="
-terminal Token LSHIFTEQ;	// "<<="
-terminal Token RSHIFTEQ;	// ">>="
-terminal Token RRSHIFTEQ;	// ">>>="
-terminal Token ANDEQ;		// "&="
-terminal Token XOREQ;		// "^="
-terminal Token OREQ;		// "|="
+/* Assignment Operators */  
+terminal Token EQ;      // "="
+terminal Token MULTEQ;      // "*="
+terminal Token DIVEQ;       // "/="
+terminal Token MODEQ;       // "%="
+terminal Token PLUSEQ;      // "+="
+terminal Token MINUSEQ;     // "-="
+terminal Token LSHIFTEQ;    // "<<="
+terminal Token RSHIFTEQ;    // ">>="
+terminal Token RRSHIFTEQ;   // ">>>="
+terminal Token ANDEQ;       // "&="
+terminal Token XOREQ;       // "^="
+terminal Token OREQ;        // "|="
 
 /* Relational Operators */
-terminal Token GT;		// ">"
-terminal Token LT;		// "<"
-terminal Token EQEQ;		// "=="
-terminal Token LTEQ;		// "<="
-terminal Token GTEQ;		// ">="
-terminal Token NOTEQ;		// "!="
+terminal Token GT;      // ">"
+terminal Token LT;      // "<"
+terminal Token EQEQ;        // "=="
+terminal Token LTEQ;        // "<="
+terminal Token GTEQ;        // ">="
+terminal Token NOTEQ;       // "!="
 
 /* Binary Operators (Some Unary: +, -)*/
-terminal Token LSHIFT;		// "<<"
-terminal Token RSHIFT;		// ">>"
-terminal Token RRSHIFT;		// ">>>"
-terminal Token ANDAND;		// "&&"
-terminal Token OROR;		// "||"
-terminal Token PLUS;		// "+"
-terminal Token MINUS;		// "-"
-terminal Token MULT;		// "*"
-terminal Token DIV;		// "/"
-terminal Token AND;		// "&"
-terminal Token OR;		// "|"
-terminal Token XOR;		// "^"
-terminal Token MOD;		// "%"
+terminal Token LSHIFT;      // "<<"
+terminal Token RSHIFT;      // ">>"
+terminal Token RRSHIFT;     // ">>>"
+terminal Token ANDAND;      // "&&"
+terminal Token OROR;        // "||"
+terminal Token PLUS;        // "+"
+terminal Token MINUS;       // "-"
+terminal Token MULT;        // "*"
+terminal Token DIV;     // "/"
+terminal Token AND;     // "&"
+terminal Token OR;      // "|"
+terminal Token XOR;     // "^"
+terminal Token MOD;     // "%"
 
 /* Unary Operators */
-terminal Token NOT;		// "!"
-terminal Token COMP;		// "~"
-terminal Token PLUSPLUS;	// "++"
-terminal Token MINUSMINUS;	// "--"
+terminal Token NOT;     // "!"
+terminal Token COMP;        // "~"
+terminal Token PLUSPLUS;    // "++"
+terminal Token MINUSMINUS;  // "--"
 
 /* Other stuff */
-terminal Token QUEST;		// "?"
-terminal Token COLON;		// ":"
-terminal Token COLONCOLON;		// "::"
-terminal Token DOT;		// "."
+terminal Token QUEST;       // "?"
+terminal Token COLON;       // ":"
+terminal Token COLONCOLON;      // "::"
+terminal Token DOT;     // "."
 
 /* Numeric literals */
 terminal Token INTEGER_LITERAL;
@@ -231,16 +231,16 @@ terminal Token IDENTIFIER;
 // -----------------------------------------------------------------------------
 
 // 1.0 Source 
-non terminal Compilation 	source;
+non terminal Compilation    source;
 
 // 2.0 Type Declarations
-non terminal Sequence 		type_declarations_opt, type_declarations, type_declaration;
-non terminal Name		extern_type;
+non terminal Sequence       type_declarations_opt, type_declarations, type_declaration;
+non terminal Name       extern_type;
 // 2.1 Procedure Type Declarations
-non terminal ProcTypeDecl 	procedure_type_declaration;
-non terminal Block 		body_opt;
-non terminal Sequence		implements_opt, type_list, formal_parameter_list_opt, formal_parameter_list;
-non terminal ParamDecl		formal_parameter;
+non terminal ProcTypeDecl   procedure_type_declaration;
+non terminal Block      body_opt;
+non terminal Sequence       implements_opt, type_list, formal_parameter_list_opt, formal_parameter_list;
+non terminal ParamDecl      formal_parameter;
 non terminal Sequence           package_access;
 non terminal Name               type_name;
 non terminal Annotations        annotations_opt;
@@ -248,152 +248,152 @@ non terminal Sequence           annotations;
 non terminal Annotation         range;
 
 // 2.2 Protocol Type Declarations
-non terminal ProtocolTypeDecl 	protocol_type_declaration;
-non terminal Sequence		extends_opt, protocol_body, protocol_cases;
-non terminal ProtocolCase	protocol_case;
-non terminal Sequence		record_body_opt;
+non terminal ProtocolTypeDecl   protocol_type_declaration;
+non terminal Sequence       extends_opt, protocol_body, protocol_cases;
+non terminal ProtocolCase   protocol_case;
+non terminal Sequence       record_body_opt;
 
 
 // 2.3 Record Type Declarations
-non terminal RecordTypeDecl	record_type_declaration;
-non terminal Sequence		record_body, record_member_declarations, record_member_declaration, record_member_declarators;
-non terminal Name		record_member_declarator;
+non terminal RecordTypeDecl record_type_declaration;
+non terminal Sequence       record_body, record_member_declarations, record_member_declaration, record_member_declarators;
+non terminal Name       record_member_declarator;
 
 // 3.0 Types
-non terminal Type 		type;
-non terminal PrimitiveType	primitive_type;
-non terminal NamedType		named_type;		// I don't think we ever need this one in the parse tree to be honest.
-non terminal ArrayType		array_type;
-non terminal Type        	channel_type;
+non terminal Type       type;
+non terminal PrimitiveType  primitive_type;
+non terminal NamedType      named_type;     // I don't think we ever need this one in the parse tree to be honest.
+non terminal ArrayType      array_type;
+non terminal Type           channel_type;
 
 // 5.0 Packages 
-non terminal Compilation	compilation_unit;
-non terminal Sequence		package_declaration_opt, package_declaration;
+non terminal Compilation    compilation_unit;
+non terminal Sequence       package_declaration_opt, package_declaration;
 non terminal Sequence           pragmas_opt, pragmas;
 non terminal Pragma             pragma;
-non terminal Sequence		import_declarations_opt, import_declarations;
-non terminal Import		import_declaration;
+non terminal Sequence       import_declarations_opt, import_declarations;
+non terminal Import     import_declaration;
 
 // 6.0 Modifiers
-non terminal Sequence		modifiers_opt, modifiers;
-non terminal Modifier		modifier;
+non terminal Sequence       modifiers_opt, modifiers;
+non terminal Modifier       modifier;
 
 // 7.0 Constants and Variable Declarations
-non terminal Sequence		constant_declaration, constant_declarators;
-non terminal Var		constant_declarator;
-non terminal Sequence		variable_declarators;
-non terminal Var		variable_declarator;
-non terminal Name		variable_declarator_identifier;
-non terminal Expression		variable_initializer;
+non terminal Sequence       constant_declaration, constant_declarators;
+non terminal Var        constant_declarator;
+non terminal Sequence       variable_declarators;
+non terminal Var        variable_declarator;
+non terminal Name       variable_declarator_identifier;
+non terminal Expression     variable_initializer;
 
 // 8.0 Arrays
-non terminal ArrayLiteral	array_initializer;
-non terminal Sequence		variable_initializers_opt, variable_initializers;
+non terminal ArrayLiteral   array_initializer;
+non terminal Sequence       variable_initializers_opt, variable_initializers;
 
 // 9.0 Blocks and Statements
-non terminal Block		block_opt, block;
-non terminal Sequence		block_statements_opt, block_statements;
-non terminal ParBlock		par_block;
-non terminal Sequence		barriers, block_statement, local_variable_declaration;
-non terminal Statement		statement, statement_no_short_if, statement_without_trailing_substatement;
+non terminal Block      block_opt, block;
+non terminal Sequence       block_statements_opt, block_statements;
+non terminal ParBlock       par_block;
+non terminal Sequence       barriers, block_statement, local_variable_declaration;
+non terminal Statement      statement, statement_no_short_if, statement_without_trailing_substatement;
 
 // 9.1 If Statements
-non terminal IfStat		if_then_statement, if_then_else_statement, if_then_else_statement_no_short_if;
+non terminal IfStat     if_then_statement, if_then_else_statement, if_then_else_statement_no_short_if;
 
 // 9.2 While/For/Do Statements
-non terminal WhileStat		while_statement, while_statement_no_short_if;
-non terminal ForStat		for_statement, for_statement_no_short_if;
-non terminal Sequence 		for_init_opt, for_init, for_update_opt, for_update, statement_expressions, enroll_opt;
-non terminal DoStat		do_statement;
+non terminal WhileStat      while_statement, while_statement_no_short_if;
+non terminal ForStat        for_statement, for_statement_no_short_if;
+non terminal Sequence       for_init_opt, for_init, for_update_opt, for_update, statement_expressions, enroll_opt;
+non terminal DoStat     do_statement;
 
 // 9.3 Claim Statement
-non terminal ClaimStat		claim_statement, claim_statement_no_short_if;
-non terminal Sequence		channels;
-non terminal AST		channel;
+non terminal ClaimStat      claim_statement, claim_statement_no_short_if;
+non terminal Sequence       channels;
+non terminal AST        channel;
 
 // 9.4 Empty Statement
-non terminal Statement		empty_statement;
+non terminal Statement      empty_statement;
 
 // 9.5 Barrier Sync & Timeout Statements
-non terminal SyncStat		barrier_sync_statement;
-non terminal TimeoutStat	timeout_statement;
+non terminal SyncStat       barrier_sync_statement;
+non terminal TimeoutStat    timeout_statement;
 
 // 9.6 Suspend Statement
-non terminal SuspendStat	suspend_statement;
+non terminal SuspendStat    suspend_statement;
 
 // 9.7 Expression Statement & Labelled Statements
-non terminal ExprStat		expression_statement;
-non terminal Expression		statement_expression;
-non terminal Statement		labeled_statement;
+non terminal ExprStat       expression_statement;
+non terminal Expression     statement_expression;
+non terminal Statement      labeled_statement;
 
 // 9.8 Break/Continue/Return Statements
-non terminal BreakStat		break_statement;
-non terminal ContinueStat	continue_statement;
-non terminal Name		identifier_opt;
-non terminal ReturnStat		return_statement;
+non terminal BreakStat      break_statement;
+non terminal ContinueStat   continue_statement;
+non terminal Name       identifier_opt;
+non terminal ReturnStat     return_statement;
 
 // 9.9 Switch Statement
-non terminal SwitchStat		switch_statement;
-non terminal Sequence		switch_block, switch_block_statement_groups_opt, switch_block_statement_groups;
-non terminal SwitchGroup	switch_block_statement_group;
-non terminal Sequence		switch_labels;
-non terminal SwitchLabel	switch_label;
+non terminal SwitchStat     switch_statement;
+non terminal Sequence       switch_block, switch_block_statement_groups_opt, switch_block_statement_groups;
+non terminal SwitchGroup    switch_block_statement_group;
+non terminal Sequence       switch_labels;
+non terminal SwitchLabel    switch_label;
 
 // 9.10 Skip/Stop Statements
-non terminal StopStat 		stop_statement;
-non terminal SkipStat 		skip_statement;
+non terminal StopStat       stop_statement;
+non terminal SkipStat       skip_statement;
 
 // 9.11 Alt Statement
-non terminal AltStat 		alt_statement;
-non terminal Sequence 		alt_body;
-non terminal AltCase		alt_case;
-non terminal Guard		guard;
+non terminal AltStat        alt_statement;
+non terminal Sequence       alt_body;
+non terminal AltCase        alt_case;
+non terminal Guard      guard;
 
 // 10.0 Expressions
-non terminal Expression		primary, primary_no_new_array_or_mobile;
+non terminal Expression     primary, primary_no_new_array_or_mobile;
 
 // 10.1 Array Creation Expressions
-non terminal NewArray		array_creation_expression;
-non terminal Sequence		dim_exprs;
-non terminal Expression		dim_expr;
-non terminal Sequence		dims_opt, dims;
+non terminal NewArray       array_creation_expression;
+non terminal Sequence       dim_exprs;
+non terminal Expression     dim_expr;
+non terminal Sequence       dims_opt, dims;
 
 // 10.2 Mobile Creation Expression
-non terminal NewMobile		mobile_creation;
+non terminal NewMobile      mobile_creation;
 
 // 10.3 Channel Expression/Channel Read Expression
-non terminal ChannelEndExpr	chan_expression;
-non terminal ChannelReadExpr	chan_read_expression;
+non terminal ChannelEndExpr chan_expression;
+non terminal ChannelReadExpr    chan_read_expression;
 
 // 10.4 Structure Access
-non terminal Expression	        record_access;
-non terminal ArrayAccessExpr	array_access;
+non terminal Expression         record_access;
+non terminal ArrayAccessExpr    array_access;
 
 // 10.5 Invocation Expression
-non terminal Invocation		invocation;
-non terminal Sequence		argument_list_opt, argument_list;
+non terminal Invocation     invocation;
+non terminal Sequence       argument_list_opt, argument_list;
 
 // 10.6 Expressions
-non terminal Expression		postfix_expression;
-non terminal UnaryPostExpr	post_increment_expression, post_decrement_expression;
-non terminal Expression		unary_expression;
-non terminal UnaryPreExpr	pre_increment_expression, pre_decrement_expression;
-non terminal Expression		unary_expression_not_plus_minus;
-non terminal CastExpr		cast_expression;
-non terminal Expression		multiplicative_expression, additive_expression, shift_expression;
-non terminal Expression		relational_expression, equality_expression, and_expression;
-non terminal Expression		exclusive_or_expression, inclusive_or_expression, conditional_and_expression;
-non terminal Expression		conditional_or_expression, conditional_expression, assignment_expression;
-non terminal Assignment		assignment;
-non terminal Integer		assignment_operator;
-non terminal Expression		left_hand_side, expression_opt, expression, constant_expression;
+non terminal Expression     postfix_expression;
+non terminal UnaryPostExpr  post_increment_expression, post_decrement_expression;
+non terminal Expression     unary_expression;
+non terminal UnaryPreExpr   pre_increment_expression, pre_decrement_expression;
+non terminal Expression     unary_expression_not_plus_minus;
+non terminal CastExpr       cast_expression;
+non terminal Expression     multiplicative_expression, additive_expression, shift_expression;
+non terminal Expression     relational_expression, equality_expression, and_expression;
+non terminal Expression     exclusive_or_expression, inclusive_or_expression, conditional_and_expression;
+non terminal Expression     conditional_or_expression, conditional_expression, assignment_expression;
+non terminal Assignment     assignment;
+non terminal Integer        assignment_operator;
+non terminal Expression     left_hand_side, expression_opt, expression, constant_expression;
 
 // 11.0 Literals (See 8.0 for Array Literals) 
-non terminal Literal 		literal;
-non terminal RecordLiteral	record_literal;
+non terminal Literal        literal;
+non terminal RecordLiteral  record_literal;
 non terminal Sequence           record_literal_argument_list_opt;
 non terminal Sequence           record_literal_argument_list;
-non terminal ProtocolLiteral	protocol_literal;
+non terminal ProtocolLiteral    protocol_literal;
 
 // ********************************************************************************
 // ********************************************************************************
@@ -408,8 +408,8 @@ start with source;
 
 //- Compilation :> AST
 source ::= 
-	  compilation_unit:c {: RESULT = c; :}
-	;
+      compilation_unit:c {: RESULT = c; :}
+    ;
 
 // **************************************************
 // 2.0 Type Declarations
@@ -421,7 +421,7 @@ source ::=
 type_declarations_opt ::=
           type_declarations:ts {: RESULT = ts; :}
         | /* epsilon */        {: RESULT = new Sequence<Type>(); :}
-	;
+    ;
 
 //- Sequence[Type :> AST] :> AST
 type_declarations ::=
@@ -432,11 +432,11 @@ type_declarations ::=
 //- Sequence[Type :> AST] :> AST // Error.packageName
 type_declaration ::= 
           procedure_type_declaration:p     {: p.myPackage = CompilerMessageManager.INSTANCE.packageName; RESULT = new Sequence<Type>(p); :}
-      	| record_type_declaration:r        {: r.myPackage = CompilerMessageManager.INSTANCE.packageName; RESULT = new Sequence<Type>(r); :}
-      	| protocol_type_declaration:p      {: p.myPackage = CompilerMessageManager.INSTANCE.packageName; RESULT = new Sequence<Type>(p); :}
-      	| constant_declaration:c           {: c.myPackage = CompilerMessageManager.INSTANCE.packageName; RESULT = c; :}       
-	| EXTERN extern_type:e IDENTIFIER:n  {: e.myPackage = CompilerMessageManager.INSTANCE.packageName; RESULT = new Sequence<Type>(new NamedType(new Name(n), new ExternType(e))); :}
-      	;
+        | record_type_declaration:r        {: r.myPackage = CompilerMessageManager.INSTANCE.packageName; RESULT = new Sequence<Type>(r); :}
+        | protocol_type_declaration:p      {: p.myPackage = CompilerMessageManager.INSTANCE.packageName; RESULT = new Sequence<Type>(p); :}
+        | constant_declaration:c           {: c.myPackage = CompilerMessageManager.INSTANCE.packageName; RESULT = c; :}       
+    | EXTERN extern_type:e IDENTIFIER:n  {: e.myPackage = CompilerMessageManager.INSTANCE.packageName; RESULT = new Sequence<Type>(new NamedType(new Name(n), new ExternType(e))); :}
+        ;
 
 // Name :> AST
 extern_type ::= 
@@ -454,11 +454,11 @@ procedure_type_declaration ::=
           //modifiers_opt:m PROC type:t IDENTIFIER:id 
           modifiers_opt:m type:t IDENTIFIER:id 
           LPAREN formal_parameter_list_opt:f RPAREN annotations_opt:a implements_opt:i body_opt:b 
-	                                                    {: RESULT = new ProcTypeDecl(m, t, new Name(id), f, i, a, b); :} 
+                                                        {: RESULT = new ProcTypeDecl(m, t, new Name(id), f, i, a, b); :} 
         //| modifiers_opt:m PROC VOID:t IDENTIFIER:id
         | modifiers_opt:m VOID:t IDENTIFIER:id  
           LPAREN formal_parameter_list_opt:f RPAREN annotations_opt:a implements_opt:i body_opt:b 
-	         {: RESULT = new ProcTypeDecl(m, new PrimitiveType(t, PrimitiveType.VoidKind), new Name(id), f, i, a, b); :}
+             {: RESULT = new ProcTypeDecl(m, new PrimitiveType(t, PrimitiveType.VoidKind), new Name(id), f, i, a, b); :}
         ;
 
 // Annotations :> AST
@@ -476,8 +476,8 @@ annotations ::=
 // Annotation :> AST
 range ::=
           IDENTIFIER:i EQ IDENTIFIER:v          {: RESULT = new Annotation(i.lexeme, v.lexeme); :}
- 	| IDENTIFIER:i EQ BOOLEAN_LITERAL:v     {: RESULT = new Annotation(i.lexeme, v.lexeme); :}
-	| IDENTIFIER:i EQ INTEGER_LITERAL:v     {: RESULT = new Annotation(i.lexeme, v.lexeme); :}
+    | IDENTIFIER:i EQ BOOLEAN_LITERAL:v     {: RESULT = new Annotation(i.lexeme, v.lexeme); :}
+    | IDENTIFIER:i EQ INTEGER_LITERAL:v     {: RESULT = new Annotation(i.lexeme, v.lexeme); :}
         | IDENTIFIER:i EQ LONG_LITERAL:v        {: RESULT = new Annotation(i.lexeme, v.lexeme); :}
         | IDENTIFIER:i EQ FLOAT_LITERAL:v       {: RESULT = new Annotation(i.lexeme, v.lexeme); :}
         | IDENTIFIER:i EQ DOUBLE_LITERAL:v      {: RESULT = new Annotation(i.lexeme, v.lexeme); :}
@@ -485,8 +485,8 @@ range ::=
 
 // Block :> Statement :> AST
 body_opt ::=
-          block:b											{: RESULT = b; :}
-        | SEMICOLON     									     {: RESULT = null; :} 
+          block:b                                           {: RESULT = b; :}
+        | SEMICOLON                                              {: RESULT = null; :} 
         ;
 
 // Sequence[Name :> AST] :> AST
@@ -503,13 +503,13 @@ type_list ::=
 
 // Name
 type_name ::=
-	  IDENTIFIER:id				      {: RESULT = new Name(id); :}
-	| package_access:pa COLONCOLON IDENTIFIER:id  {: RESULT = new Name(id, pa); :}
-	;
+      IDENTIFIER:id                   {: RESULT = new Name(id); :}
+    | package_access:pa COLONCOLON IDENTIFIER:id  {: RESULT = new Name(id, pa); :}
+    ;
 
 // Sequence[Name :> AST] :> AST
 package_access ::=
-	   IDENTIFIER:id                       {: RESULT = new Sequence<Name>(new Name(id)); :}
+       IDENTIFIER:id                       {: RESULT = new Sequence<Name>(new Name(id)); :}
         |  package_access:pa DOT IDENTIFIER:id {: RESULT = pa.append(new Name(id)); :}
         ;
 
@@ -540,9 +540,9 @@ formal_parameter ::=
 //- ProtocolTypeDecl :> Type :> AST
 protocol_type_declaration ::= 
           modifiers_opt:m PROTOCOL IDENTIFIER:id extends_opt:e annotations_opt:a protocol_body:b 
-	    {: RESULT = new ProtocolTypeDecl(m, new Name(id), e, a, b); :} 
+        {: RESULT = new ProtocolTypeDecl(m, new Name(id), e, a, b); :} 
         | modifiers_opt:m PROTOCOL IDENTIFIER:id extends_opt:e annotations_opt:a SEMICOLON       
-	    {: RESULT = new ProtocolTypeDecl(m, new Name(id), e, a, null); :}
+        {: RESULT = new ProtocolTypeDecl(m, new Name(id), e, a, null); :}
         ;
 
 //- Sequencs[Name :> AST] :> AST
@@ -565,19 +565,19 @@ protocol_cases ::=
 //- ProtocolCase :> AST
 protocol_case ::= 
         IDENTIFIER:id COLON record_body_opt:r 
-	  {: RESULT = new ProtocolCase(new Name(id), r); :}
+      {: RESULT = new ProtocolCase(new Name(id), r); :}
         ;
 
 //- Sequence[RecordMember :> AST] :> AST
 record_body_opt ::=
           record_body:r {: RESULT = r; :}
-	| LBRACE /* empty */ RBRACE   {: RESULT = new Sequence<RecordMember>(); :}
+    | LBRACE /* empty */ RBRACE   {: RESULT = new Sequence<RecordMember>(); :}
         ;
 
 //- Sequence[ProtocolCaseDecl :> AST] :> AST // ProtocolCaseDecl is a Type and a Name
 //protocol_case_declarations ::=
 //        protocol_case_declarations:lst SEMICOLON type:t variable_declarator_identifier:v 
-//	  {: RESULT = lst.append(new ProtocolM); :}
+//    {: RESULT = lst.append(new ProtocolM); :}
 //       | type variable_declarator_identifier                                      {: RESULT = new Sequence<RecordMember>(new ProtocolCaseDecl($1, $2)); :} 
 //       ;
 
@@ -588,7 +588,7 @@ record_body_opt ::=
 //- RecordTypeDecl :> Type :> AST
 record_type_declaration ::= 
           modifiers_opt:m RECORD IDENTIFIER:id extends_opt:e annotations_opt:a record_body:r 
-	    {: RESULT = new RecordTypeDecl(m, new Name(id), e, a, r); :}
+        {: RESULT = new RecordTypeDecl(m, new Name(id), e, a, r); :}
         ;
 
 //- Sequence[RecordMember :> AST] :> AST
@@ -605,7 +605,7 @@ record_member_declarations ::=
 // RecordMember :> AST
 record_member_declaration ::= 
           type:t record_member_declarators:r SEMICOLON   {: Sequence s = new Sequence<RecordMember>();
-	                                                   for (Name n : (Sequence<Name>)r)
+                                                       for (Name n : (Sequence<Name>)r)
                                                              s.append(new RecordMember(t, n));
                                                            RESULT = s;
                                                          :}
@@ -653,8 +653,8 @@ primitive_type ::=
 named_type ::= 
          IDENTIFIER:id {: RESULT = new NamedType(new Name(id)); :}
         //| primary:p COLONCOLON IDENTIFIER:id {: RESULT = new NamedType(new Name(id, primary2PackageAccess(p))); :}
-	//| IDENTIFIER:p COLONCOLON IDENTIFIER:id {: RESULT = new NamedType(new Name(id, primary2PackageAccess(new NameExpr(new Name(p))))); :}
-	;
+    //| IDENTIFIER:p COLONCOLON IDENTIFIER:id {: RESULT = new NamedType(new Name(id, primary2PackageAccess(new NameExpr(new Name(p))))); :}
+    ;
 
 // ArrayType :> Type :> AST
 array_type ::=
@@ -662,15 +662,15 @@ array_type ::=
         | channel_type:t dims:d   {: RESULT = new ArrayType(t, d.size()); :}              
         | IDENTIFIER:id dims:d    {: RESULT = new ArrayType(new NamedType(new Name(id)), d.size()); :}              
         | primary:p COLONCOLON IDENTIFIER:id dims:d {: RESULT = new ArrayType(new NamedType(new Name(id, primary2PackageAccess(p))), d.size()); :}
-	;
- 	
+    ;
+    
 // Type :> AST // (which is a super class of ChannelEndType)
 channel_type ::= 
-	  SHARED READ CHAN LT type:t GT      {: RESULT = new ChannelType(t, ChannelType.SHARED_READ); :}
+      SHARED READ CHAN LT type:t GT      {: RESULT = new ChannelType(t, ChannelType.SHARED_READ); :}
         | SHARED WRITE CHAN LT type:t GT     {: RESULT = new ChannelType(t, ChannelType.SHARED_WRITE); :}
         | SHARED CHAN LT type:t GT           {: RESULT = new ChannelType(t, ChannelType.SHARED_READ_WRITE); :}
-        | CHAN LT type:t GT	    	     {: RESULT = new ChannelType(t, ChannelType.NOT_SHARED); :}
-	| CHAN LT type:t GT DOT READ         {: RESULT = new ChannelEndType(ChannelEndType.NOT_SHARED, t, ChannelEndType.READ_END); :}
+        | CHAN LT type:t GT              {: RESULT = new ChannelType(t, ChannelType.NOT_SHARED); :}
+    | CHAN LT type:t GT DOT READ         {: RESULT = new ChannelEndType(ChannelEndType.NOT_SHARED, t, ChannelEndType.READ_END); :}
         | CHAN LT type:t GT DOT WRITE        {: RESULT = new ChannelEndType(ChannelEndType.NOT_SHARED, t, ChannelEndType.WRITE_END); :}
         | SHARED CHAN LT type:t GT DOT READ  {: RESULT = new ChannelEndType(ChannelEndType.SHARED, t, ChannelEndType.READ_END); :}
         | SHARED CHAN LT type:t GT DOT WRITE {: RESULT = new ChannelEndType(ChannelEndType.SHARED, t, ChannelEndType.WRITE_END); :}
@@ -732,7 +732,7 @@ import_declarations ::=
 import_declaration ::= 
           IMPORT package_access:p SEMICOLON             {: RESULT = new Import(p); :}
         | IMPORT package_access:p DOT MULT:m SEMICOLON  {: RESULT = new Import(p.append(new Name(m)));  :}
-	;
+    ;
 
 
 // **************************************************
@@ -768,7 +768,7 @@ modifier ::=
 // Sequence[ConstantDecl :> AST] :> AST
 constant_declaration ::= 
           modifiers_opt:m type:t constant_declarators:c SEMICOLON {: Sequence s = new Sequence<ConstantDecl>();
-	                                                             for (Var v : (Sequence<Var>)c) 
+                                                                 for (Var v : (Sequence<Var>)c) 
                                                                         s.append(new ConstantDecl(m, t, v));
                                                                     RESULT = s; 
                                                                   :}       
@@ -784,7 +784,7 @@ constant_declarators ::=
 constant_declarator ::=
            variable_declarator_identifier:v EQ variable_initializer:i {: RESULT = new Var(v, i); :}
         |  variable_declarator_identifier:v  {: RESULT = new Var(v, null); :}
-	;
+    ;
 
 //- Sequence[Var :> AST] :> AST
 variable_declarators ::= 
@@ -936,7 +936,7 @@ statement_without_trailing_substatement ::=
         | skip_statement:s                {: RESULT = s; :}
         | stop_statement:s                {: RESULT = s; :}
         | IDENTIFIER:id DOT WRITE LPAREN expression:e RPAREN SEMICOLON 
-	    {: RESULT = new ChannelWriteStat(new NameExpr(new Name(id)), e); :} 
+        {: RESULT = new ChannelWriteStat(new NameExpr(new Name(id)), e); :} 
         | primary:p DOT WRITE LPAREN expression:e RPAREN SEMICOLON    
             {: RESULT = new ChannelWriteStat(p, e); :} 
         | alt_statement:s                 {: RESULT = s; :}
@@ -974,7 +974,7 @@ while_statement ::=
         ;
 
 // WhileStat :> Statement :> AST 
-while_statement_no_short_if ::=  	  WHILE LPAREN expression:e RPAREN statement_no_short_if:s  {: RESULT = new WhileStat(e, s); :}
+while_statement_no_short_if ::=       WHILE LPAREN expression:e RPAREN statement_no_short_if:s  {: RESULT = new WhileStat(e, s); :}
         ;      
 
 // ForStat :> Statement :> AST
@@ -982,9 +982,9 @@ for_statement ::=
         FOR:t LPAREN for_init_opt:i SEMICOLON expression_opt:e SEMICOLON for_update_opt:u RPAREN statement:s     
           {: RESULT = new ForStat(t, i, e, u, new Sequence<Expression>(), s, false); :}
       | PAR FOR:t LPAREN for_init_opt:i SEMICOLON expression_opt:e SEMICOLON for_update_opt:u RPAREN ENROLL LPAREN argument_list:b RPAREN statement:s
-	  {: RESULT = new ForStat(t, i, e, u, b, s, true); :}
+      {: RESULT = new ForStat(t, i, e, u, b, s, true); :}
       | PAR FOR:t LPAREN for_init_opt:i SEMICOLON expression_opt:e SEMICOLON for_update_opt:u RPAREN statement:s
-	  {: RESULT = new ForStat(t, i, e, u, new Sequence<Expression>(), s, true); :}
+      {: RESULT = new ForStat(t, i, e, u, new Sequence<Expression>(), s, true); :}
       ;
 
 // ForStat :> Statement :> AST
@@ -1208,14 +1208,14 @@ skip_statement ::=
 //- AltStat :> AST
 alt_statement ::=
           PRI ALT LBRACE alt_body:b RBRACE 
-	    {: RESULT = new AltStat(b, true /* PRI ALT */); :}
+        {: RESULT = new AltStat(b, true /* PRI ALT */); :}
         | PRI ALT LPAREN for_init_opt:i SEMICOLON expression_opt:e SEMICOLON for_update_opt:u RPAREN LBRACE alt_body:b RBRACE
-	    {: RESULT = new AltStat(i, e, u, b, true /* PRI ALT */); :}
+        {: RESULT = new AltStat(i, e, u, b, true /* PRI ALT */); :}
         | ALT LBRACE alt_body:b RBRACE     
-	    {: RESULT = new AltStat(b, false /* ALT */); :}
+        {: RESULT = new AltStat(b, false /* ALT */); :}
         | ALT LPAREN for_init_opt:i SEMICOLON expression_opt:e SEMICOLON for_update_opt:u RPAREN LBRACE alt_body:b RBRACE
-	    {: RESULT = new AltStat(i, e, u, b, false /* ALT */); :}
-	;
+        {: RESULT = new AltStat(i, e, u, b, false /* ALT */); :}
+    ;
 
 //- Sequence[AltCase :> AST] :> AST
 alt_body ::= 
@@ -1249,8 +1249,8 @@ primary ::=
         | mobile_creation:e                {: RESULT = e; :}
         | chan_read_expression:e           {: RESULT = e; :}
         | chan_expression:e                {: RESULT = e; :}
-	| primary:e COLONCOLON IDENTIFIER:id       {: RESULT = new NameExpr(new Name(id, primary2PackageAccess(e))); :}
-	| IDENTIFIER:id1 COLONCOLON IDENTIFIER:id2 {: RESULT = new NameExpr(new Name(id2, new Sequence(new Name(id1)))); :}
+    | primary:e COLONCOLON IDENTIFIER:id       {: RESULT = new NameExpr(new Name(id, primary2PackageAccess(e))); :}
+    | IDENTIFIER:id1 COLONCOLON IDENTIFIER:id2 {: RESULT = new NameExpr(new Name(id2, new Sequence(new Name(id1)))); :}
         ;
 
 // Expression :> AST
@@ -1269,17 +1269,17 @@ primary_no_new_array_or_mobile ::=
 // NewArray :> Expression :> AST
 array_creation_expression ::=
           NEW primitive_type:t dim_exprs:d1 dims_opt:d2     
-	    {: RESULT = new NewArray(t, d1, d2, null); :}
+        {: RESULT = new NewArray(t, d1, d2, null); :}
         | NEW primitive_type:t dims:d array_initializer:i  
-	    {: RESULT = new NewArray(t, new Sequence<Expression>(), d, i); :}
+        {: RESULT = new NewArray(t, new Sequence<Expression>(), d, i); :}
         | NEW IDENTIFIER:id dim_exprs:d1 dims_opt:d2        
-	    {: RESULT = new NewArray(new NamedType(new Name(id)), d1, d2, null); :}
+        {: RESULT = new NewArray(new NamedType(new Name(id)), d1, d2, null); :}
         | NEW IDENTIFIER:id dims:d array_initializer:i      
-	    {: RESULT = new NewArray(new NamedType(new Name(id)), new Sequence<Expression>(), d, i); :}
-	| NEW channel_type:ct dim_exprs:d1 dims_opt:d2
-	    {: RESULT = new NewArray(ct, d1, d2, null); :}
-	| NEW channel_type:ct dims:d array_initializer:i
-	    {: RESULT = new NewArray(ct, new Sequence<Expression>(), d, i); :}
+        {: RESULT = new NewArray(new NamedType(new Name(id)), new Sequence<Expression>(), d, i); :}
+    | NEW channel_type:ct dim_exprs:d1 dims_opt:d2
+        {: RESULT = new NewArray(ct, d1, d2, null); :}
+    | NEW channel_type:ct dims:d array_initializer:i
+        {: RESULT = new NewArray(ct, new Sequence<Expression>(), d, i); :}
         ;
 
 // Sequence[Expression :> AST] :> AST
@@ -1354,10 +1354,10 @@ array_access ::=
 
 // Invocation :> Expression :> AST
 invocation ::=
-          IDENTIFIER:id LPAREN argument_list_opt:l RPAREN   {: RESULT = new Invocation(null, new Name(id), l); :}	
+          IDENTIFIER:id LPAREN argument_list_opt:l RPAREN   {: RESULT = new Invocation(null, new Name(id), l); :}   
         | primary:p DOT IDENTIFIER:id LPAREN argument_list_opt:l RPAREN   {: RESULT = new Invocation(p, new Name(id), l); :}
-	| primary:p COLONCOLON IDENTIFIER:id LPAREN argument_list_opt:l RPAREN  {: RESULT = new Invocation(null, new Name(id, primary2PackageAccess(p)), l); :}	
-        | IDENTIFIER:p COLONCOLON IDENTIFIER:id LPAREN argument_list_opt:l RPAREN  {: RESULT = new Invocation(null, new Name(id, primary2PackageAccess(new NameExpr(new Name(p)))), l); :}	
+    | primary:p COLONCOLON IDENTIFIER:id LPAREN argument_list_opt:l RPAREN  {: RESULT = new Invocation(null, new Name(id, primary2PackageAccess(p)), l); :} 
+        | IDENTIFIER:p COLONCOLON IDENTIFIER:id LPAREN argument_list_opt:l RPAREN  {: RESULT = new Invocation(null, new Name(id, primary2PackageAccess(new NameExpr(new Name(p)))), l); :}  
         | IDENTIFIER:p DOT IDENTIFIER:id LPAREN argument_list_opt:l RPAREN {: RESULT = new Invocation(new NameExpr(new Name(p)), new Name(id), l); :}
 ;
 
@@ -1425,11 +1425,11 @@ unary_expression_not_plus_minus ::=
 // CastExpr :> Expression :> AST
 cast_expression ::=
           LPAREN expression:e RPAREN unary_expression_not_plus_minus:ex {: if (e instanceof NameExpr) 
-									    RESULT = new CastExpr(new NamedType(((NameExpr)e).name()), ex);
-									  else
-									    Error.error(e,"Illegal Expression in cast - Type names only"); 	
-									  RESULT = null;
-								        :}	 
+                                        RESULT = new CastExpr(new NamedType(((NameExpr)e).name()), ex);
+                                      else
+                                        Error.error(e,"Illegal Expression in cast - Type names only");  
+                                      RESULT = null;
+                                        :}   
         | LPAREN primitive_type:t RPAREN unary_expression:e      {: RESULT = new CastExpr(t, e); :}
         ;
 
@@ -1576,7 +1576,7 @@ literal ::=
         | CHARACTER_LITERAL:l      {: RESULT = new PrimitiveLiteral(l, PrimitiveLiteral.CharKind); :}
         | record_literal:l         {: RESULT = l; :}
         | protocol_literal:l       {: RESULT = l; :}
-	| NULL_LITERAL:l           {: RESULT = new PrimitiveLiteral(l, PrimitiveLiteral.NullKind); :}
+    | NULL_LITERAL:l           {: RESULT = new PrimitiveLiteral(l, PrimitiveLiteral.NullKind); :}
         ;
 
 // RecordLiteral :> Literal :> Expression :> AST
@@ -1600,8 +1600,8 @@ record_literal_argument_list ::=
 protocol_literal ::=
 //        NEW type_name:tn LBRACE IDENTIFIER:id2 COLON argument_list_opt:l RBRACE 
         NEW type_name:tn LBRACE IDENTIFIER:id2 COLON record_literal_argument_list_opt:l RBRACE 
-	  {: RESULT = new ProtocolLiteral(tn, new Name(id2), l); :}
-	  //      | NEW type_name:tn LBRACE IDENTIFIER:id2 COLON RBRACE
+      {: RESULT = new ProtocolLiteral(tn, new Name(id2), l); :}
+      //      | NEW type_name:tn LBRACE IDENTIFIER:id2 COLON RBRACE
       ;
 
 // -----------------------------------------------------------------------------

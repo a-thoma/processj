@@ -231,10 +231,8 @@ public void santa(const long seed,
 
                     //println(">>>>>>>>>>>>> i = " + i + " ... G_REINDEER = " + G_REINDEER);
                 }
-                //println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! about to sync");
-                santa_reindeer.sync();
-                //println("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!! done sync'ing");
                 report.write(new Santa_msg{ mush_mush: });
+                santa_reindeer.sync();
                 t = tim.read();
                 tim.timeout(100);
                 //random_wait(DELIVERY_TIME, my_seed);

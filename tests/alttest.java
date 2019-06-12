@@ -88,14 +88,12 @@ public class alttest {
                 case 1: resume(1); break;
                 case 2: resume(2); break;
                 case 3: resume(3); break;
-                case 4: resume(4); break;
-                case 5: resume(5); break;
                 default: break;
             }
 
-            _ld$alt3 = new PJAlt(3, this);
-            boolean[] booleanGuards = { true, true, true };
-            Object[] objectGuards = { _pd$in11, _pd$in22, PJAlt.SKIP };
+            _ld$alt3 = new PJAlt(2, this);
+            boolean[] booleanGuards = { true, true };
+            Object[] objectGuards = { _pd$in11, PJAlt.SKIP };
             boolean ready = _ld$alt3.setGuards(booleanGuards, objectGuards);
 
             if (!ready) {
@@ -105,10 +103,10 @@ public class alttest {
 
             this.setNotReady();
             _ld$index2 = _ld$alt3.enable();
-            this.runLabel = 5;
+            this.runLabel = 3;
             yield();
 
-            label(5);
+            label(3);
             int selected = _ld$alt3.disable(_ld$index2);
 
             switch(selected) {
@@ -127,20 +125,6 @@ public class alttest {
                     io.println("Got " + _ld$v1 + " from writer 1.");
                     break;
                 case 1:
-                    if (!_pd$in22.isReadyToRead(this)) {
-                        this.runLabel = 3;
-                        yield();
-                    }
-
-                    label(3);
-                    _ld$v1 = _pd$in22.read(this);
-                    this.runLabel = 4;
-                    yield();
-
-                    label(4);
-                    io.println("Got " + _ld$v1 + " from writer 2.");
-                    break;
-                case 2:
                     io.println("in skip");
                     break;
                 default:
@@ -170,16 +154,9 @@ public class alttest {
 
             _ld$c11 = new PJOne2OneChannel<Integer>();
             _ld$c22 = new PJOne2OneChannel<Integer>();
-            final PJPar _ld$par1 = new PJPar(3, this);
+            final PJPar _ld$par1 = new PJPar(2, this);
 
             (new alttest._proc$writer1$cwI(_ld$c11) {
-                @Override
-                public void finalize() {
-                    _ld$par1.decrement();
-                }
-            }).schedule();
-
-            (new alttest._proc$writer2$cwI(_ld$c22) {
                 @Override
                 public void finalize() {
                     _ld$par1.decrement();

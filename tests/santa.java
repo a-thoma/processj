@@ -957,6 +957,10 @@ public class santa {
                 case 35: resume(35); break;
                 case 36: resume(36); break;
                 case 37: resume(37); break;
+                case 38: resume(38); break;
+                case 39: resume(39); break;
+                case 40: resume(40); break;
+                case 41: resume(41); break;
                 default: break;
             }
 
@@ -977,25 +981,25 @@ public class santa {
 
                 this.setNotReady();
                 _ld$index11 = _ld$alt12.enable();
-                this.runLabel = 37;
+                this.runLabel = 41;
                 yield();
 
-                label(37);
+                label(41);
                 int selected = _ld$alt12.disable(_ld$index11);
 
                 switch(selected) {
                     case 0:
                         if (!_pd$from_reindeer3.isReadyToRead(this)) {
-                            this.runLabel = 18;
+                            this.runLabel = 20;
                             yield();
                         }
 
-                        label(18);
+                        label(20);
                         _ld$id5 = _pd$from_reindeer3.read(this);
-                        this.runLabel = 19;
+                        this.runLabel = 21;
                         yield();
 
-                        label(19);
+                        label(21);
                         if (!_pd$report8.claimWrite(this)) {
                             this.runLabel = 1;
                             yield();
@@ -1054,24 +1058,24 @@ public class santa {
                              _pd$report8.unclaimWrite();
 
                         }
-                        _pd$santa_reindeer5.sync(this);
-                        this.runLabel = 9;
-                        yield();
-                        label(9);
                         if (!_pd$report8.claimWrite(this)) {
-                            this.runLabel = 10;
+                            this.runLabel = 9;
                             yield();
                         }
-                        label(10);
+                        label(9);
 
                         _pd$report8.write(this, ((PJProtocolCase) (new Santa_msg.mush_mush())));
-                        this.runLabel = 11;
+                        this.runLabel = 10;
 
                         yield();
-                        label(11);
+                        label(10);
 
                         _pd$report8.unclaimWrite();
 
+                        _pd$santa_reindeer5.sync(this);
+                        this.runLabel = 11;
+                        yield();
+                        label(11);
                         _ld$t3 = PJTimer.read();
                         _ld$tim2 = new PJTimer(this, 100);
                         try {
@@ -1106,41 +1110,57 @@ public class santa {
                              _ld$i8++) {
 
                              if (!_pd$from_reindeer3.isReadyToRead(this)) {
-                                 this.runLabel = 16;
+                                 this.runLabel = 18;
                                  yield();
                              }
 
+                             label(18);
+                              // Do we have a rendezvous?
+                             _ld$id5 = _pd$from_reindeer3.preReadRendezvous(this);
+                             if (!_pd$report8.claimWrite(this)) {
+                                 this.runLabel = 16;
+                                 yield();
+                             }
                              label(16);
-                             _ld$id5 = _pd$from_reindeer3.read(this);
+
+                             _pd$report8.write(this, ((PJProtocolCase) (new Santa_msg.unharness(_ld$id5))));
                              this.runLabel = 17;
+
+                             yield();
+                             label(17);
+
+                             _pd$report8.unclaimWrite();
+
+                             _pd$from_reindeer3.postReadRendezvous(this);
+                             this.runLabel = 19;
                              yield();
 
-                             label(17);
+                             label(19);
                         }
                         break;
                     case 1:
                         if (!_pd$knock2.isReadyToRead(this)) {
-                            this.runLabel = 35;
+                            this.runLabel = 39;
                             yield();
                         }
 
-                        label(35);
+                        label(39);
                         _ld$answer6 = _pd$knock2.read(this);
-                        this.runLabel = 36;
+                        this.runLabel = 40;
                         yield();
 
-                        label(36);
+                        label(40);
                         if (!_pd$report8.claimWrite(this)) {
-                            this.runLabel = 20;
+                            this.runLabel = 22;
                             yield();
                         }
-                        label(20);
+                        label(22);
 
                         _pd$report8.write(this, ((PJProtocolCase) (new Santa_msg.elves_ready())));
-                        this.runLabel = 21;
+                        this.runLabel = 23;
 
                         yield();
-                        label(21);
+                        label(23);
 
                         _pd$report8.unclaimWrite();
 
@@ -1149,27 +1169,27 @@ public class santa {
                              _ld$i9++) {
 
                              if (!_pd$from_elf4.isReadyToRead(this)) {
-                                 this.runLabel = 22;
-                                 yield();
-                             }
-
-                             label(22);
-                             _ld$id5 = _pd$from_elf4.read(this);
-                             this.runLabel = 23;
-                             yield();
-
-                             label(23);
-                             if (!_pd$report8.claimWrite(this)) {
                                  this.runLabel = 24;
                                  yield();
                              }
+
                              label(24);
+                             _ld$id5 = _pd$from_elf4.read(this);
+                             this.runLabel = 25;
+                             yield();
+
+                             label(25);
+                             if (!_pd$report8.claimWrite(this)) {
+                                 this.runLabel = 26;
+                                 yield();
+                             }
+                             label(26);
 
                              _pd$report8.write(this, ((PJProtocolCase) (new Santa_msg.greet(_ld$id5))));
-                             this.runLabel = 25;
+                             this.runLabel = 27;
 
                              yield();
-                             label(25);
+                             label(27);
 
                              _pd$report8.unclaimWrite();
 
@@ -1184,22 +1204,22 @@ public class santa {
                         }).schedule();
 
                         if (_ld$par1.shouldYield()) {
-                            this.runLabel = 26;
+                            this.runLabel = 28;
                             yield();
-                            label(26);
+                            label(28);
                         }
 
                         if (!_pd$report8.claimWrite(this)) {
-                            this.runLabel = 27;
+                            this.runLabel = 29;
                             yield();
                         }
-                        label(27);
+                        label(29);
 
                         _pd$report8.write(this, ((PJProtocolCase) (new Santa_msg.consulting())));
-                        this.runLabel = 28;
+                        this.runLabel = 30;
 
                         yield();
-                        label(28);
+                        label(30);
 
                         _pd$report8.unclaimWrite();
 
@@ -1208,23 +1228,23 @@ public class santa {
                         try {
                             _ld$tim2.start();
                             setNotReady();
-                            this.runLabel = 29;
+                            this.runLabel = 31;
                             yield();
                         } catch (InterruptedException e) {
                             System.out.println("An Interrupted exception occurred for a timer!");
                         }
-                        label(29);
+                        label(31);
                         if (!_pd$report8.claimWrite(this)) {
-                            this.runLabel = 30;
+                            this.runLabel = 32;
                             yield();
                         }
-                        label(30);
+                        label(32);
 
                         _pd$report8.write(this, ((PJProtocolCase) (new Santa_msg.santa_done())));
-                        this.runLabel = 31;
+                        this.runLabel = 33;
 
                         yield();
-                        label(31);
+                        label(33);
 
                         _pd$report8.unclaimWrite();
 
@@ -1238,9 +1258,9 @@ public class santa {
                         }).schedule();
 
                         if (_ld$par2.shouldYield()) {
-                            this.runLabel = 32;
+                            this.runLabel = 34;
                             yield();
-                            label(32);
+                            label(34);
                         }
 
                         for (_ld$i10 = 0;
@@ -1248,16 +1268,32 @@ public class santa {
                              _ld$i10++) {
 
                              if (!_pd$from_elf4.isReadyToRead(this)) {
-                                 this.runLabel = 33;
+                                 this.runLabel = 37;
                                  yield();
                              }
 
-                             label(33);
-                             _ld$id5 = _pd$from_elf4.read(this);
-                             this.runLabel = 34;
+                             label(37);
+                              // Do we have a rendezvous?
+                             _ld$id5 = _pd$from_elf4.preReadRendezvous(this);
+                             if (!_pd$report8.claimWrite(this)) {
+                                 this.runLabel = 35;
+                                 yield();
+                             }
+                             label(35);
+
+                             _pd$report8.write(this, ((PJProtocolCase) (new Santa_msg.goodbye(_ld$id5))));
+                             this.runLabel = 36;
+
+                             yield();
+                             label(36);
+
+                             _pd$report8.unclaimWrite();
+
+                             _pd$from_elf4.postReadRendezvous(this);
+                             this.runLabel = 38;
                              yield();
 
-                             label(34);
+                             label(38);
                         }
                         break;
                     default:

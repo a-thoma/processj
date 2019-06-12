@@ -1,6 +1,6 @@
 import std.*;
 
-public proc void foo(barrier b, chan<int>.read r, timer t) {
+public void foo(barrier b, chan<int>.read r, timer t) {
     b.sync();
     par {
         int d = r.read();
@@ -10,15 +10,15 @@ public proc void foo(barrier b, chan<int>.read r, timer t) {
     }
 }
 
-public proc void bar(barrier b, chan<int>.write w) {
+public void bar(barrier b, chan<int>.write w) {
     b.sync();
     w.write(5);
 }
 
-public proc void f(int i) [yield=true] { println("f(" + i + ")"); }
-public proc void b(int i) [yield=true] { println("b(" + i + ")"); }
+public void f(int i) [yield=true] { println("f(" + i + ")"); }
+public void b(int i) [yield=true] { println("b(" + i + ")"); }
 
-public proc void main(string args[]) {
+public void main(string args[]) {
     timer t;
     barrier b;
     chan<int> c;

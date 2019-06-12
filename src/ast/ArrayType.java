@@ -15,7 +15,7 @@ public class ArrayType extends Type {
         nchildren = 1;
         this.depth = depth;
         if (!baseType.isArrayType()) {
-            actualBaseType = baseType;    // we keep the `real' base type because the ArrayTypeConstructor changes the basetype of multi-dimentional arrays to be on array type with one dimension removed.
+            actualBaseType = baseType;    // we keep the 'real' base type because the ArrayTypeConstructor changes the basetype of multi-dimentional arrays to be on array type with one dimension removed.
             actualDepth = 1;
         } else {
             actualBaseType = ((ArrayType)baseType).getActualBaseType();
@@ -89,19 +89,25 @@ public class ArrayType extends Type {
     // α =T β ⇔ Array?(α) ∧ Array?(β) ∧ (t1 =T t2) ∧ ((I1 =I2) ∨ (I1 =⊥) ∨ (I2 =⊥))
     @Override
     public boolean typeEqual(Type t) {
-        // TODO
-        return false;
+        if (!t.isArrayType())
+            return false;
+        ArrayType at = (ArrayType) t;
+        // Check based type for 2D array and beyond!
+        int baseDepth = depth;
+        if (!actualBaseType.isArrayType())
+            baseDepth = actualDepth;
+        return typeName().equals(at.typeName()) && baseDepth == at.depth;
     }
 
     @Override
     public boolean typeEquivalent(Type t) {
-        // TODO
-        return false;
+        return typeEqual(t);
     }
 
     @Override
     public boolean typeAssignmentCompatible(Type t) {
-	// TODO
-        return false;
+        if (!t.isArrayType())
+            return false;
+        return typeEqual(t);
     }
 }

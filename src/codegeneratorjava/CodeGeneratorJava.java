@@ -2,6 +2,7 @@ package codegeneratorjava;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
@@ -187,6 +188,11 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * This is used to avoid name collisions.
      */
     private boolean _fieldName = true;
+    
+    /**
+     * TODO
+     */
+    private boolean _isArrayLiteral = false;
     
     /**
      * This is used for uninitialized variables.
@@ -526,8 +532,6 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         
         List<String> init = new ArrayList<>();  // Initialization part
         List<String> incr = new ArrayList<>();  // Increment part
-        // Sequence of statements enclosed in a 'block' statement
-        String[] stats = null;
         
         if (!fs.isPar()) { // Is it a regular for loop?
             if (fs.init() != null) {
@@ -544,15 +548,11 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
                 String expr = ((String) fs.expr().visit(this)).replace(";", "");
                 stForStat.add("expr", expr);
             }
-            
+
+            // Sequence of statements enclosed in a 'block' statement
             if (fs.stats() != null) {
-                //stats = (String[]) fs.stats().visit(this);
                 Object o = fs.stats().visit(this);
-                if (o instanceof String[])
-                    stats = (String[]) o;
-                else
-                    stats = new String[] { (String) o };
-                stForStat.add("stats", stats);
+                stForStat.add("stats", o);
             }
         } else // No! then this is a 'par for'
             ;
@@ -619,7 +619,9 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         String lhs = (String) as.left().visit(this);
         String rhs = null;
         
-        if (as.right() instanceof ChannelReadExpr)
+        if (as.right() instanceof NewArray)
+            return (T) createNewArray(lhs, ((NewArray) as.right()));
+        else if (as.right() instanceof ChannelReadExpr)
             return (T) createChannelReadExpr(lhs, op, ((ChannelReadExpr) as.right()));
         else
             rhs = (String) as.right().visit(this);
@@ -697,6 +699,8 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
                 val = (String) expr.visit(this);
             else if (ld.type() instanceof NamedType) // Must be a record or protocol
                 val = (String) expr.visit(this);
+            else if (ld.type() instanceof ArrayType)
+                val = (String) expr.visit(this);
         }
         
         // Is it a barrier declaration? If so, we must generate
@@ -718,7 +722,8 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         // if this local variable is not initialized
         if (expr == null) {
             if (!ld.type().isBarrierType() && (ld.type().isPrimitiveType() ||
-                ld.type().isNamedType()))  // Could be records or protocols
+                ld.type().isArrayType() ||  // Could an uninitialized array declaration
+                ld.type().isNamedType()))   // Could be records or protocols
                 return (T) EMPTY_STRING;
         }
         
@@ -749,6 +754,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         Log.log(na.line + ": Visiting a Name (" + na.getname() + ")");
         
         String name = null;
+        
         if (_fieldName && !_paramDeclNameMap.isEmpty()) {
             if (_paramDeclNameMap.containsKey(na.getname()))
                 name = _paramDeclNameMap.get(na.getname());
@@ -789,10 +795,21 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         
         String type = (String) nt.name().getname();
         
-        if (nt.type().isProtocolType()) // This is for protocol 'inheritance'
+        // This is for protocol 'inheritance'
+        if (nt.type().isProtocolType())
             type = PJProtocolCase.class.getSimpleName();
 
         return (T) type;
+    }
+    
+    /**
+     * -----------------------------------------------------------------------------
+     * VISIT NEW_ARRAY
+     */
+    public T visitNewArray(NewArray ne) {
+        Log.log(ne.line + ": Visiting a NewArray");
+        
+        return (T) createNewArray(null, ne);
     }
     
     /**
@@ -884,14 +901,14 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         // Channel class type
         String chanType = PJOne2OneChannel.class.getSimpleName();
         if (ct.isShared()) {  // Is it a shared channel?
-            if (ct.isRead())  // one-2-many
+            if (ct.isRead())  // one-2-many channel
                 chanType = PJOne2ManyChannel.class.getSimpleName();
-            else if (ct.isWrite()) // many-2-one
+            else if (ct.isWrite()) // many-2-one channel
                 chanType = PJMany2OneChannel.class.getSimpleName();
-            else // many-2-many
+            else // many-2-many channel
                 chanType = PJMany2ManyChannel.class.getSimpleName();
         }
-        // Resolve parameterized type for channel, e.g., chan<T>
+        // Resolve parameterized type for channels, e.g., chan<T>
         // where 'T' is the type to be resolved
         String type = getChannelType(ct.baseType());
         
@@ -988,6 +1005,42 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         stVar.add("name", name);
 
         return (T) stVar.render();
+    }
+    
+    /**
+     * -----------------------------------------------------------------------------
+     * VISIT ARRAY_ACCESS_EXPR
+     */
+    public T visitArrayAccessExpr(ArrayAccessExpr ae) {
+        Log.log(ae.line + ": Visiting an ArrayAccessExpr");
+        
+        // Generated template after evaluating this visitor
+        ST stArrayAccessExpr = _stGroup.getInstanceOf("ArrayAccessExpr");
+        String name = (String) ae.target().visit(this);
+        String index = (String) ae.index().visit(this);
+        
+        stArrayAccessExpr.add("name", name);
+        stArrayAccessExpr.add("index", index);
+        
+        return (T) stArrayAccessExpr.render();
+    }
+    
+    /**
+     * -----------------------------------------------------------------------------
+     * VISIT ARRAY_LITERAL
+     */
+    public T visitArrayLiteral(ArrayLiteral al) {
+        Log.log(al.line + ": Visiting an ArrayLiteral");
+        
+        if (al.elements().size() > 1 || _isArrayLiteral) {
+            String[] vals = (String[]) al.elements().visit(this);
+            return (T) Arrays.asList(vals)
+                    .toString()
+                    .replace("[", " { ")
+                    .replace("]", " } ");
+        }
+        
+        return (T) al.elements().visit(this);
     }
     
     /**
@@ -1095,7 +1148,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         if (_isProtocolCase) {
             // Silly way to keep track of a protocol 'tag', however, this
             // should (in theory) _always_ work. The type checker should
-            // catch any invalid 'tag' in a switch label for a protocol
+            // catch any invalid 'tag' in a switch label for a given protocol
             _currProtocolTag = label;
             label = "\"" + label + "\"";
         }
@@ -1298,16 +1351,15 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         // Generated template after evaluating this visitor
         ST stProtocolCase = _stGroup.getInstanceOf("ProtocolCase");
         
-        // Since we are keeping the name of a tag as it is, this
+        // Since we are keeping the name of a tag as it is, this (in theory)
         // shouldn't cause any name collision
         String protocName = (String) pc.name().visit(this);
-        // This may create name collision problems because we use 'RecordAccess'
-        // for protocols and records
+        // This may create name collision problems because we use the same
+        // visitor for protocols and records
         _recordFieldMap.clear();
-        
-        //////////////
+        // This is used to choose the tag of the 'current' protocol in a single
+        // switch section from a list of possible candidates
         _protocMemberMap.put(protocName, _currProcotolName);
-        //////////////
         
         // The scope in which all members of this tag appeared
         for (RecordMember rm : pc.body())
@@ -1430,9 +1482,9 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         _recordFieldMap.put(name, type);
         _recordMemberMap.put(name, name);
         
-        // Ignored the value returned by this visitor. The reason for this
-        // is that the template for records take a list of types and variable
-        // names.
+        // Ignored the value returned by this visitor. The reason for
+        // this is that the template for records takes a list of types
+        // and variable names.
         return null;
     }
     
@@ -1882,6 +1934,40 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
                 new Block(new Sequence(st))); // body
     }
     
+    private T createNewArray(String lhs, NewArray na) {
+        Log.log(na.line + ": Creating a New Array");
+        
+        // Generated template after evaluating this visitor
+        ST stNewArray = _stGroup.getInstanceOf("NewArray");
+        String[] dims = (String[]) na.dimsExpr().visit(this);
+        String type = (String) na.baseType().visit(this);
+
+        ST stNewArrayLiteral = _stGroup.getInstanceOf("NewArrayLiteral");
+        if (na.init() != null) {
+            List<String> inits = new ArrayList<>();
+            Sequence<Expression> seq = na.init().elements();
+            for (Expression e : seq) {
+                _isArrayLiteral = e instanceof ArrayLiteral ? true : false;
+                inits.add((String) e.visit(this));
+            }
+            
+            stNewArrayLiteral.add("dim", String.join("",
+                    Collections.nCopies(((ArrayType) na.type).getDepth(), "[]")));
+            stNewArrayLiteral.add("vals", inits);
+        }
+        else
+            stNewArrayLiteral.add("dims", dims);
+        
+        stNewArray.add("name", lhs);
+        stNewArray.add("type", type);
+        stNewArray.add("init", stNewArrayLiteral.render());
+        
+        // Reset value for array literal expressions
+        _isArrayLiteral = false;
+        
+        return (T) stNewArray.render();
+    }
+    
     private T createChannelReadExpr(String lhs, String op, ChannelReadExpr cr) {
         Log.log(cr.line + ": Creating Channel Read Expression");
         
@@ -1905,6 +1991,12 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         if (chanExpr.type.isChannelEndType() && ((ChannelEndType) chanExpr.type).isShared()) {
             stChannelReadExpr = _stGroup.getInstanceOf("ChannelOne2Many");
             ++countLabel;
+        }
+        
+        // Do we have an extended rendezvous?
+        if (cr.extRV() != null) {
+            Object o = cr.extRV().visit(this);
+            stChannelReadExpr.add("extendRv", o);
         }
         
         stChannelReadExpr.add("chanName", chanEndName);        
