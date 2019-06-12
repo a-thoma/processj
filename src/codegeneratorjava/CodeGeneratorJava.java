@@ -1561,6 +1561,14 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
             stRecordAccess.add("tag", _currProtocolTag);
             stRecordAccess.add("var", name);
             stRecordAccess.add("member", field);
+        } else { // This is for arrays and strings
+            stRecordAccess = _stGroup.getInstanceOf("RecordAccess");
+            String name = (String) ra.record().visit(this);
+            stRecordAccess.add("name", name);
+            if (ra.isArraySize)
+                stRecordAccess.add("member", "length");
+            else if (ra.isStringLength)
+                stRecordAccess.add("member", "length()");
         }
         
         return (T) stRecordAccess.render();

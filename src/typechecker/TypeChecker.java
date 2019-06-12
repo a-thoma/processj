@@ -1028,7 +1028,7 @@ public class TypeChecker extends Visitor<Type> {
         }
 
 	if (tType.isStringType() && ra.field().getname().equals("length")) {
-            ra.type = new PrimitiveType(PrimitiveType.IntKind); // TODO: should this be long ???
+            ra.type = new PrimitiveType(PrimitiveType.LongKind); // TODO: should this be long ???
             ra.isStringLength = true;
             Log.log(ra.line + ": string length expression has type: " + ra.type);
             return ra.type;
