@@ -1539,10 +1539,9 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         Log.log(ra.line + ": Visiting a RecordAccess (" + ra + ")");
 
         // Generated template after evaluating this visitor
-        ST stRecordAccess = null;
+        ST stRecordAccess = _stGroup.getInstanceOf("RecordAccess");
         
         if (ra.record().type.isRecordType()) {
-            stRecordAccess = _stGroup.getInstanceOf("RecordAccess");
             String name = (String) ra.record().visit(this);
             String field = (String) ra.field().visit(this);
             
@@ -1562,7 +1561,6 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
             stRecordAccess.add("var", name);
             stRecordAccess.add("member", field);
         } else { // This is for arrays and strings
-            stRecordAccess = _stGroup.getInstanceOf("RecordAccess");
             String name = (String) ra.record().visit(this);
             stRecordAccess.add("name", name);
             if (ra.isArraySize)
@@ -2069,6 +2067,8 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
             } else
                 s = s.replace(";", "");
         }
-        return s;
+        
+        s = s.hashCode() + "";
+        return s.replace("-", "$");
     }
 }

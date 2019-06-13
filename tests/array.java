@@ -18,7 +18,7 @@ public class array {
     // Temporary dirty fix for unreachable code due to infinite loop
     public static boolean isTrue() { return true; }
 
-    public static class _proc$main$arT extends PJProcess {
+    public static class _proc$main1169311 extends PJProcess {
         protected String[] _pd$args1;
 
         protected String _ld$str1;
@@ -27,7 +27,7 @@ public class array {
         protected int[][][] _ld$array4;
         protected int[][][] _ld$test5;
 
-        public _proc$main$arT(String[] _pd$args1) {
+        public _proc$main1169311(String[] _pd$args1) {
             this._pd$args1 = _pd$args1;
         }
 
@@ -51,7 +51,7 @@ public class array {
     public static void main(String[] _pd$args1) {
     	Scheduler scheduler = new Scheduler();
         PJProcess.scheduler = scheduler;
-        (new array._proc$main$arT(_pd$args1)).schedule();
+        (new array._proc$main1169311(_pd$args1)).schedule();
         PJProcess.scheduler.start();
     }
 }
