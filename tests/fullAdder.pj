@@ -1,6 +1,7 @@
 import std.*;
 
 public void main(string args[]) {
+
     chan<boolean> a0, a1, a2, a3, a4, a5, a6, a7;
     chan<boolean> b0, b1, b2, b3, b4, b5, b6, b7;
     chan<boolean> r0, r1, r2, r3, r4, r5, r6, r7;
@@ -57,12 +58,12 @@ public void main(string args[]) {
         inCarry.write(inC);
 
         eightBitAdder(a0.read, a1.read, a2.read, a3.read,
-                  a4.read, a5.read, a6.read, a7.read,
-                  b0.read, b1.read, b2.read, b3.read,
-                  b4.read, b5.read, b6.read, b7.read,
-                  inCarry.read, r0.write, r1.write,
-                  r2.write, r3.write, r4.write, r5.write,
-                  r6.write, r7.write, outCarry.write);
+                      a4.read, a5.read, a6.read, a7.read,
+                      b0.read, b1.read, b2.read, b3.read,
+                      b4.read, b5.read, b6.read, b7.read,
+                      inCarry.read, r0.write, r1.write,
+                      r2.write, r3.write, r4.write, r5.write,
+                      r6.write, r7.write, outCarry.write);
 
         f0 = r0.read();
         f1 = r1.read();
@@ -89,7 +90,7 @@ public void notGate(chan<boolean>.read in, chan<boolean>.write out) {
     out.write(!x);
 }
 
-public void orGate(chan<boolean>.read in1, chan<boolean>.read in2, chan<boolean>.write out){
+public void orGate(chan<boolean>.read in1, chan<boolean>.read in2, chan<boolean>.write out) {
     boolean x = false, y = false;
     par{
         x = in1.read();
@@ -98,7 +99,7 @@ public void orGate(chan<boolean>.read in1, chan<boolean>.read in2, chan<boolean>
     out.write(x || y);
 }
 
-public void andGate(chan<boolean>.read in1, chan<boolean>.read in2, chan<boolean>.write out) {
+public void andGate(chan<boolean>.read in1, chan<boolean>.read in2,chan<boolean>.write out) {
     boolean x = false, y = false;
     par {
         x = in1.read();
@@ -107,7 +108,8 @@ public void andGate(chan<boolean>.read in1, chan<boolean>.read in2, chan<boolean
     out.write(x && y);
 }
 
-public void nandGate(chan<boolean>.read in1, chan<boolean>.read in2, chan<boolean>.write out) {
+public void nandGate(chan<boolean>.read in1, chan<boolean>.read in2,
+                     chan<boolean>.write out) {
     chan<boolean> a;
     par {
         andGate(in1, in2, a.write);
@@ -116,7 +118,8 @@ public void nandGate(chan<boolean>.read in1, chan<boolean>.read in2, chan<boolea
     return;
 }
 
-public void muxGate(chan<boolean>.read in, chan<boolean>.read out1, chan<boolean>.write out2) {
+public void muxGate(chan<boolean>.read in, chan<boolean>.read out1,
+                    chan<boolean>.write out2) {
     boolean x = false; x = in.read();
     par {
         out1.write(x);
@@ -125,7 +128,8 @@ public void muxGate(chan<boolean>.read in, chan<boolean>.read out1, chan<boolean
     return;
 }
 
-public void xorGate(chan<boolean>.read in1, chan<boolean>.read in2, chan<boolean>.write out){
+public void xorGate(chan<boolean>.read in1, chan<boolean>.read in2,
+                    chan<boolean>.write out) {
     chan<boolean> a, b, c, d , e, f, g, h, i;
     par {
         muxGate(in1, a.read, b.write);
@@ -138,7 +142,9 @@ public void xorGate(chan<boolean>.read in1, chan<boolean>.read in2, chan<boolean
     }
 }
 
-public void oneBitAdder(chan<boolean>.read in1, chan<boolean>.read in2, chan<boolean>.read in3, chan<boolean>.write result, chan<boolean>.write carry) {
+public void oneBitAdder(chan<boolean>.read in1, chan<boolean>.read in2,
+                        chan<boolean>.read in3, chan<boolean>.write result,
+                        chan<boolean>.write carry) {
     chan<boolean> a, b, c, d, e, f, g, h, i, j, k;
         par{
             muxGate(in1, a.read, b.write);
@@ -153,7 +159,13 @@ public void oneBitAdder(chan<boolean>.read in1, chan<boolean>.read in2, chan<boo
         }
 }
 
-public void fourBitAdder(chan<boolean>.read inA0, chan<boolean>.read inA1, chan<boolean>.read inA2, chan<boolean>.read inA3, chan<boolean>.read inB0, chan<boolean>.read inB1, chan<boolean>.read inB2, chan<boolean>.read inB3, chan<boolean>.read inCarry, chan<boolean>.write result0, chan<boolean>.write result1, chan<boolean>.write result2, chan<boolean>.write result3, chan<boolean>.write carry) {
+public void fourBitAdder(chan<boolean>.read inA0, chan<boolean>.read inA1,
+                         chan<boolean>.read inA2, chan<boolean>.read inA3,
+                         chan<boolean>.read inB0, chan<boolean>.read inB1,
+                         chan<boolean>.read inB2, chan<boolean>.read inB3,
+                         chan<boolean>.read inCarry, chan<boolean>.write result0,
+                         chan<boolean>.write result1, chan<boolean>.write result2,
+                         chan<boolean>.write result3, chan<boolean>.write carry) {
     chan<boolean> a, b, c;
     par {
         oneBitAdder(inA0, inB0, inCarry, result0, a.write);
@@ -163,7 +175,19 @@ public void fourBitAdder(chan<boolean>.read inA0, chan<boolean>.read inA1, chan<
     }
 }
 
-public void eightBitAdder(chan<boolean>.read inA0, chan<boolean>.read inA1, chan<boolean>.read inA2, chan<boolean>.read inA3, chan<boolean>.read inA4, chan<boolean>.read inA5, chan<boolean>.read inA6, chan<boolean>.read inA7, chan<boolean>.read inB0, chan<boolean>.read inB1, chan<boolean>.read inB2, chan<boolean>.read inB3, chan<boolean>.read inB4, chan<boolean>.read inB5, chan<boolean>.read inB6, chan<boolean>.read inB7, chan<boolean>.read inCarry, chan<boolean>.write result0, chan<boolean>.write result1, chan<boolean>.write result2, chan<boolean>.write result3, chan<boolean>.write result4, chan<boolean>.write result5, chan<boolean>.write result6, chan<boolean>.write result7, chan<boolean>.write outCarry) {
+public void eightBitAdder(chan<boolean>.read inA0, chan<boolean>.read inA1,
+                          chan<boolean>.read inA2, chan<boolean>.read inA3,
+                          chan<boolean>.read inA4, chan<boolean>.read inA5,
+                          chan<boolean>.read inA6, chan<boolean>.read inA7,
+                          chan<boolean>.read inB0, chan<boolean>.read inB1,
+                          chan<boolean>.read inB2, chan<boolean>.read inB3,
+                          chan<boolean>.read inB4, chan<boolean>.read inB5,
+                          chan<boolean>.read inB6, chan<boolean>.read inB7,
+                          chan<boolean>.read inCarry, chan<boolean>.write result0,
+                          chan<boolean>.write result1, chan<boolean>.write result2,
+                          chan<boolean>.write result3, chan<boolean>.write result4,
+                          chan<boolean>.write result5, chan<boolean>.write result6,
+                          chan<boolean>.write result7, chan<boolean>.write outCarry) {
     chan<boolean> a;
     par {
         fourBitAdder(inA0, inA1, inA2, inA3,

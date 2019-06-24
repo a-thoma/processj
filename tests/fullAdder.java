@@ -112,32 +112,6 @@ public class fullAdder {
             _ld$r724 = new PJOne2OneChannel<Boolean>();
             _ld$inCarry25 = new PJOne2OneChannel<Boolean>();
             _ld$outCarry26 = new PJOne2OneChannel<Boolean>();
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
             _ld$p027 = false;
             _ld$p128 = false;
             _ld$p229 = true;

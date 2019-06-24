@@ -103,8 +103,8 @@ public static class <name> extends PJProcess {
 
 //========================================================================================
 // An simple (or normal) invocation consists of associating the caller
-// with the parameters that are used to invoked it. This will apply only
-// to procedures that act and behave like any Java method (such methods
+// with the parameters that are used to invoked it with. This will apply
+// only to procedures that act and behave like any Java method (such methods
 // are referred to by names and can be invoked at any point during the
 // execution of the program) and ones that do not extend the class
 // PJProcess.
@@ -223,12 +223,13 @@ if (<name>.shouldYield()) {
 >>
 
 //========================================================================================
-// Defines an expression for an anonymous process which consist of a
-// switch block that contains jump labels, a synchronized body that
-// runs all, and a 'par' block defined in a procedure. Note that the
-// process's schedule() method is excluded iff it is created inside
-// a 'par-for'. If this is case, then we generated code similar to
-// that of a ProcessClass (e.g., with member fields).
+// Defines an anonymous process which consist of a switch block that
+// contains jump labels for resumption and yield, a synchronized body
+// that runs all the statements declared inside the procedure, and a
+// 'par' block defined in a procedure. Note that the process's schedule()
+// method is excluded iff it is created inside a 'par-for'. If this is
+// case, then we generated code similar to that of a ProcessClass
+// (e.g., with member fields).
 // 1) switchBlock: switch statement to jump through blocks to resume points.
 // 2) syncBody: the body (content) of synchronized method that runs/starts a process.
 // 3) parBlock:
@@ -616,14 +617,37 @@ do {
 // 3) incr:
 // 4) stats:
 ForStat(init, expr, incr, stats) ::= <<
-for (<if(init)><init; separator=", "><else>/* empty */<endif>;
-     <if(expr)><expr><else>/* emtpy */<endif>;
-     <if(incr)><incr; separator=", "><else>/* empty */<endif>) {
-     
+for (<if(init)><init; separator=", "><else>/* empty */<endif>; <!--!><if(expr)><expr><else>/* emtpy */<endif>; <!--!><if(incr)><incr; separator=", "><else>/* empty */<endif>) {
      <stats; separator="\n">
 }
 >>
 
+//========================================================================================
+//
+// 1) init:
+// 2) expr:
+// 3) incr:
+// 4) stats:
+ParForStat(init, expr, incr, stats, parName, count, jump) ::= <<
+final PJPar <parName> = new PJPar(0, this);
+List\<PJProcess> processes = new ArrayList<>();
+int count = 0;
+
+for (<init; separator=", ">; <!--!><expr>; <!--!><incr; separator=", ">) {
+    process.add(<stats; separator="\n">);
+    ++count;
+}
+
+<paraName>.setProcessCount(count);
+
+for (PJProcess p : processes)
+    p.schedule();
+
+setNotReady();
+this.runLabel = <jump>;
+yield();
+label(<jump>);
+>>
 
 //========================================================================================
 //
@@ -695,3 +719,8 @@ ObjectGuards(guards) ::= <<
 // 1) type:
 // 2) var:
 ConstantDecl(type, var) ::= "public static final <type> <var>"
+
+//========================================================================================
+//
+// 1) expr:
+ReturnStat(expr) ::= "<if(expr)>return <expr>;<endif>"

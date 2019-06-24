@@ -20,10 +20,10 @@ public class alttest {
 
     public static final int NUMBER = 9;
 
-    public static class _proc$writer1$cwI extends PJProcess {
+    public static class _proc$writer11171377 extends PJProcess {
         protected PJChannel<Integer> _pd$out1;
 
-        public _proc$writer1$cwI(PJChannel<Integer> _pd$out1) {
+        public _proc$writer11171377(PJChannel<Integer> _pd$out1) {
             this._pd$out1 = _pd$out1;
         }
 
@@ -44,10 +44,10 @@ public class alttest {
         }
     }
 
-    public static class _proc$writer2$cwI extends PJProcess {
+    public static class _proc$writer21171377 extends PJProcess {
         protected PJChannel<Integer> _pd$out1;
 
-        public _proc$writer2$cwI(PJChannel<Integer> _pd$out1) {
+        public _proc$writer21171377(PJChannel<Integer> _pd$out1) {
             this._pd$out1 = _pd$out1;
         }
 
@@ -68,7 +68,7 @@ public class alttest {
         }
     }
 
-    public static class _proc$reader$crI$crI extends PJProcess {
+    public static class _proc$reader$682474708 extends PJProcess {
         protected PJChannel<Integer> _pd$in11;
         protected PJChannel<Integer> _pd$in22;
 
@@ -76,7 +76,7 @@ public class alttest {
         protected int _ld$index2;
         protected PJAlt _ld$alt3;
 
-        public _proc$reader$crI$crI(PJChannel<Integer> _pd$in11, PJChannel<Integer> _pd$in22) {
+        public _proc$reader$682474708(PJChannel<Integer> _pd$in11, PJChannel<Integer> _pd$in22) {
             this._pd$in11 = _pd$in11;
             this._pd$in22 = _pd$in22;
         }
@@ -134,13 +134,13 @@ public class alttest {
         }
     }
 
-    public static class _proc$main$arT extends PJProcess {
+    public static class _proc$main1169311 extends PJProcess {
         protected String[] _pd$args1;
 
         protected PJChannel<Integer> _ld$c11;
         protected PJChannel<Integer> _ld$c22;
 
-        public _proc$main$arT(String[] _pd$args1) {
+        public _proc$main1169311(String[] _pd$args1) {
             this._pd$args1 = _pd$args1;
         }
 
@@ -156,14 +156,14 @@ public class alttest {
             _ld$c22 = new PJOne2OneChannel<Integer>();
             final PJPar _ld$par1 = new PJPar(2, this);
 
-            (new alttest._proc$writer1$cwI(_ld$c11) {
+            (new alttest._proc$writer11171377(_ld$c11) {
                 @Override
                 public void finalize() {
                     _ld$par1.decrement();
                 }
             }).schedule();
 
-            (new alttest._proc$reader$crI$crI(_ld$c11, _ld$c22) {
+            (new alttest._proc$reader$682474708(_ld$c11, _ld$c22) {
                 @Override
                 public void finalize() {
                     _ld$par1.decrement();
@@ -183,7 +183,7 @@ public class alttest {
     public static void main(String[] _pd$args1) {
     	Scheduler scheduler = new Scheduler();
         PJProcess.scheduler = scheduler;
-        (new alttest._proc$main$arT(_pd$args1)).schedule();
+        (new alttest._proc$main1169311(_pd$args1)).schedule();
         PJProcess.scheduler.start();
     }
 }

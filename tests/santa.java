@@ -196,14 +196,14 @@ public class santa {
     protected static class Message {
     }
 
-    public static class _proc$random_wait$J$J extends PJProcess {
+    public static class _proc$random_wait1144780 extends PJProcess {
         protected long _pd$max_wait1;
         protected long _pd$seed2;
 
         protected PJTimer _ld$t1;
         protected long _ld$wait2;
 
-        public _proc$random_wait$J$J(long _pd$max_wait1, long _pd$seed2) {
+        public _proc$random_wait1144780(long _pd$max_wait1, long _pd$seed2) {
             this._pd$max_wait1 = _pd$max_wait1;
             this._pd$seed2 = _pd$seed2;
         }
@@ -233,12 +233,12 @@ public class santa {
         }
     }
 
-    public static class _proc$display$crLMessage extends PJProcess {
+    public static class _proc$display$502908242 extends PJProcess {
         protected PJChannel<PJProtocolCase> _pd$in1;
 
         protected PJProtocolCase _ld$msg1;
 
-        public _proc$display$crLMessage(PJChannel<PJProtocolCase> _pd$in1) {
+        public _proc$display$502908242(PJChannel<PJProtocolCase> _pd$in1) {
             this._pd$in1 = _pd$in1;
         }
 
@@ -327,7 +327,7 @@ public class santa {
         }
     }
 
-    public static class _proc$p_barrier_knock$I$crZ$crZ$cwZ extends PJProcess {
+    public static class _proc$p_barrier_knock822005941 extends PJProcess {
         protected int _pd$n1;
         protected PJChannel<Boolean> _pd$a2;
         protected PJChannel<Boolean> _pd$b3;
@@ -338,7 +338,7 @@ public class santa {
         protected int _ld$i3;
         protected boolean _ld$any4;
 
-        public _proc$p_barrier_knock$I$crZ$crZ$cwZ(int _pd$n1, PJChannel<Boolean> _pd$a2, PJChannel<Boolean> _pd$b3, PJChannel<Boolean> _pd$knock4) {
+        public _proc$p_barrier_knock822005941(int _pd$n1, PJChannel<Boolean> _pd$a2, PJChannel<Boolean> _pd$b3, PJChannel<Boolean> _pd$knock4) {
             this._pd$n1 = _pd$n1;
             this._pd$a2 = _pd$a2;
             this._pd$b3 = _pd$b3;
@@ -400,7 +400,7 @@ public class santa {
         }
     }
 
-    public static class _proc$p_barrier$I$crZ$crZ extends PJProcess {
+    public static class _proc$p_barrier2048483955 extends PJProcess {
         protected int _pd$n1;
         protected PJChannel<Boolean> _pd$a2;
         protected PJChannel<Boolean> _pd$b3;
@@ -410,7 +410,7 @@ public class santa {
         protected int _ld$i3;
         protected boolean _ld$any4;
 
-        public _proc$p_barrier$I$crZ$crZ(int _pd$n1, PJChannel<Boolean> _pd$a2, PJChannel<Boolean> _pd$b3) {
+        public _proc$p_barrier2048483955(int _pd$n1, PJChannel<Boolean> _pd$a2, PJChannel<Boolean> _pd$b3) {
             this._pd$n1 = _pd$n1;
             this._pd$a2 = _pd$a2;
             this._pd$b3 = _pd$b3;
@@ -465,11 +465,11 @@ public class santa {
         }
     }
 
-    public static class _proc$syncronize$cwZ$cwZ extends PJProcess {
+    public static class _proc$syncronize$523628924 extends PJProcess {
         protected PJChannel<Boolean> _pd$a1;
         protected PJChannel<Boolean> _pd$b2;
 
-        public _proc$syncronize$cwZ$cwZ(PJChannel<Boolean> _pd$a1, PJChannel<Boolean> _pd$b2) {
+        public _proc$syncronize$523628924(PJChannel<Boolean> _pd$a1, PJChannel<Boolean> _pd$b2) {
             this._pd$a1 = _pd$a1;
             this._pd$b2 = _pd$b2;
         }
@@ -517,7 +517,7 @@ public class santa {
         }
     }
 
-    public static class _proc$reindeer$I$J$R$R$cwI$cwLReindeer_msg extends PJProcess {
+    public static class _proc$reindeer$646748748 extends PJProcess {
         protected int _pd$id1;
         protected long _pd$seed2;
         protected PJBarrier _pd$just_reindeer3;
@@ -530,7 +530,7 @@ public class santa {
         protected long _ld$t3;
         protected PJTimer _ld$tim4;
 
-        public _proc$reindeer$I$J$R$R$cwI$cwLReindeer_msg(int _pd$id1, long _pd$seed2, PJBarrier _pd$just_reindeer3, PJBarrier _pd$santa_reindeer4, PJChannel<Integer> _pd$to_santa5, PJChannel<PJProtocolCase> _pd$report6) {
+        public _proc$reindeer$646748748(int _pd$id1, long _pd$seed2, PJBarrier _pd$just_reindeer3, PJBarrier _pd$santa_reindeer4, PJChannel<Integer> _pd$to_santa5, PJChannel<PJProtocolCase> _pd$report6) {
             this._pd$id1 = _pd$id1;
             this._pd$seed2 = _pd$seed2;
             this._pd$just_reindeer3 = _pd$just_reindeer3;
@@ -583,7 +583,7 @@ public class santa {
 
                 final PJPar _ld$par1 = new PJPar(1, this);
 
-                (new santa._proc$random_wait$J$J(_ld$wait2, _ld$my_seed1) {
+                (new santa._proc$random_wait1144780(_ld$wait2, _ld$my_seed1) {
                     @Override
                     public void finalize() {
                         _ld$par1.decrement();
@@ -683,7 +683,7 @@ public class santa {
         }
     }
 
-    public static class _proc$elf$I$J$cwZ$cwZ$cwZ$cwZ$cwI$cwLElf_msg extends PJProcess {
+    public static class _proc$elf$1975405111 extends PJProcess {
         protected int _pd$id1;
         protected long _pd$seed2;
         protected PJChannel<Boolean> _pd$elves_a3;
@@ -696,7 +696,7 @@ public class santa {
         protected long _ld$my_seed1;
         protected long _ld$wait2;
 
-        public _proc$elf$I$J$cwZ$cwZ$cwZ$cwZ$cwI$cwLElf_msg(int _pd$id1, long _pd$seed2, PJChannel<Boolean> _pd$elves_a3, PJChannel<Boolean> _pd$elves_b4, PJChannel<Boolean> _pd$santa_elves_a5, PJChannel<Boolean> _pd$santa_elves_b6, PJChannel<Integer> _pd$to_santa7, PJChannel<PJProtocolCase> _pd$report8) {
+        public _proc$elf$1975405111(int _pd$id1, long _pd$seed2, PJChannel<Boolean> _pd$elves_a3, PJChannel<Boolean> _pd$elves_b4, PJChannel<Boolean> _pd$santa_elves_a5, PJChannel<Boolean> _pd$santa_elves_b6, PJChannel<Integer> _pd$to_santa7, PJChannel<PJProtocolCase> _pd$report8) {
             this._pd$id1 = _pd$id1;
             this._pd$seed2 = _pd$seed2;
             this._pd$elves_a3 = _pd$elves_a3;
@@ -749,7 +749,7 @@ public class santa {
 
                 final PJPar _ld$par1 = new PJPar(1, this);
 
-                (new santa._proc$random_wait$J$J(_ld$wait2, _ld$my_seed1) {
+                (new santa._proc$random_wait1144780(_ld$wait2, _ld$my_seed1) {
                     @Override
                     public void finalize() {
                         _ld$par1.decrement();
@@ -778,7 +778,7 @@ public class santa {
 
                 final PJPar _ld$par2 = new PJPar(1, this);
 
-                (new santa._proc$syncronize$cwZ$cwZ(_pd$elves_a3, _pd$elves_b4) {
+                (new santa._proc$syncronize$523628924(_pd$elves_a3, _pd$elves_b4) {
                     @Override
                     public void finalize() {
                         _ld$par2.decrement();
@@ -807,7 +807,7 @@ public class santa {
 
                 final PJPar _ld$par3 = new PJPar(1, this);
 
-                (new santa._proc$syncronize$cwZ$cwZ(_pd$santa_elves_a5, _pd$santa_elves_b6) {
+                (new santa._proc$syncronize$523628924(_pd$santa_elves_a5, _pd$santa_elves_b6) {
                     @Override
                     public void finalize() {
                         _ld$par3.decrement();
@@ -836,7 +836,7 @@ public class santa {
 
                 final PJPar _ld$par4 = new PJPar(1, this);
 
-                (new santa._proc$syncronize$cwZ$cwZ(_pd$santa_elves_a5, _pd$santa_elves_b6) {
+                (new santa._proc$syncronize$523628924(_pd$santa_elves_a5, _pd$santa_elves_b6) {
                     @Override
                     public void finalize() {
                         _ld$par4.decrement();
@@ -882,7 +882,7 @@ public class santa {
         }
     }
 
-    public static class _proc$santa$J$crZ$crI$crI$R$cwZ$cwZ$cwLSanta_msg extends PJProcess {
+    public static class _proc$santa$1316171216 extends PJProcess {
         protected long _pd$seed1;
         protected PJChannel<Boolean> _pd$knock2;
         protected PJChannel<Integer> _pd$from_reindeer3;
@@ -905,7 +905,7 @@ public class santa {
         protected int _ld$index11;
         protected PJAlt _ld$alt12;
 
-        public _proc$santa$J$crZ$crI$crI$R$cwZ$cwZ$cwLSanta_msg(long _pd$seed1, PJChannel<Boolean> _pd$knock2, PJChannel<Integer> _pd$from_reindeer3, PJChannel<Integer> _pd$from_elf4, PJBarrier _pd$santa_reindeer5, PJChannel<Boolean> _pd$santa_elves_a6, PJChannel<Boolean> _pd$santa_elves_b7, PJChannel<PJProtocolCase> _pd$report8) {
+        public _proc$santa$1316171216(long _pd$seed1, PJChannel<Boolean> _pd$knock2, PJChannel<Integer> _pd$from_reindeer3, PJChannel<Integer> _pd$from_elf4, PJBarrier _pd$santa_reindeer5, PJChannel<Boolean> _pd$santa_elves_a6, PJChannel<Boolean> _pd$santa_elves_b7, PJChannel<PJProtocolCase> _pd$report8) {
             this._pd$seed1 = _pd$seed1;
             this._pd$knock2 = _pd$knock2;
             this._pd$from_reindeer3 = _pd$from_reindeer3;
@@ -1196,7 +1196,7 @@ public class santa {
                         }
                         final PJPar _ld$par1 = new PJPar(1, this);
 
-                        (new santa._proc$syncronize$cwZ$cwZ(_pd$santa_elves_a6, _pd$santa_elves_b7) {
+                        (new santa._proc$syncronize$523628924(_pd$santa_elves_a6, _pd$santa_elves_b7) {
                             @Override
                             public void finalize() {
                                 _ld$par1.decrement();
@@ -1250,7 +1250,7 @@ public class santa {
 
                         final PJPar _ld$par2 = new PJPar(1, this);
 
-                        (new santa._proc$syncronize$cwZ$cwZ(_pd$santa_elves_a6, _pd$santa_elves_b7) {
+                        (new santa._proc$syncronize$523628924(_pd$santa_elves_a6, _pd$santa_elves_b7) {
                             @Override
                             public void finalize() {
                                 _ld$par2.decrement();
@@ -1304,7 +1304,7 @@ public class santa {
         }
     }
 
-    public static class _proc$main$arT extends PJProcess {
+    public static class _proc$main1169311 extends PJProcess {
         protected String[] _pd$args1;
 
         protected PJTimer _ld$tim1;
@@ -1320,7 +1320,7 @@ public class santa {
         protected PJChannel<Integer> _ld$elf_santa11;
         protected PJChannel<PJProtocolCase> _ld$report12;
 
-        public _proc$main$arT(String[] _pd$args1) {
+        public _proc$main1169311(String[] _pd$args1) {
             this._pd$args1 = _pd$args1;
         }
 
@@ -1360,7 +1360,7 @@ public class santa {
                     final PJPar _ld$par2 = new PJPar(2, this);
                     _ld$santa_reindeer4.enroll(2);
 
-                    (new santa._proc$santa$J$crZ$crI$crI$R$cwZ$cwZ$cwLSanta_msg(_ld$seed2 + (N_REINDEER + N_ELVES), _ld$knock7, _ld$reindeer_santa10, _ld$elf_santa11, _ld$santa_reindeer4, _ld$santa_elves_a8, _ld$santa_elves_b9, _ld$report12) {
+                    (new santa._proc$santa$1316171216(_ld$seed2 + (N_REINDEER + N_ELVES), _ld$knock7, _ld$reindeer_santa10, _ld$elf_santa11, _ld$santa_reindeer4, _ld$santa_elves_a8, _ld$santa_elves_b9, _ld$report12) {
                         @Override
                         public void finalize() {
                             _ld$par2.decrement();
@@ -1381,7 +1381,7 @@ public class santa {
                             _ld$just_reindeer3.enroll(3);
                             _ld$santa_reindeer4.enroll(3);
 
-                            (new santa._proc$reindeer$I$J$R$R$cwI$cwLReindeer_msg(0, _ld$seed2, _ld$just_reindeer3, _ld$santa_reindeer4, _ld$reindeer_santa10, _ld$report12) {
+                            (new santa._proc$reindeer$646748748(0, _ld$seed2, _ld$just_reindeer3, _ld$santa_reindeer4, _ld$reindeer_santa10, _ld$report12) {
                                 @Override
                                 public void finalize() {
                                     _ld$par3.decrement();
@@ -1390,7 +1390,7 @@ public class santa {
                                 }
                             }).schedule();
 
-                            (new santa._proc$reindeer$I$J$R$R$cwI$cwLReindeer_msg(1, _ld$seed2 + 1, _ld$just_reindeer3, _ld$santa_reindeer4, _ld$reindeer_santa10, _ld$report12) {
+                            (new santa._proc$reindeer$646748748(1, _ld$seed2 + 1, _ld$just_reindeer3, _ld$santa_reindeer4, _ld$reindeer_santa10, _ld$report12) {
                                 @Override
                                 public void finalize() {
                                     _ld$par3.decrement();
@@ -1399,7 +1399,7 @@ public class santa {
                                 }
                             }).schedule();
 
-                            (new santa._proc$reindeer$I$J$R$R$cwI$cwLReindeer_msg(2, _ld$seed2 + 2, _ld$just_reindeer3, _ld$santa_reindeer4, _ld$reindeer_santa10, _ld$report12) {
+                            (new santa._proc$reindeer$646748748(2, _ld$seed2 + 2, _ld$just_reindeer3, _ld$santa_reindeer4, _ld$reindeer_santa10, _ld$report12) {
                                 @Override
                                 public void finalize() {
                                     _ld$par3.decrement();
@@ -1451,28 +1451,28 @@ public class santa {
 
                     final PJPar _ld$par4 = new PJPar(4, this);
 
-                    (new santa._proc$elf$I$J$cwZ$cwZ$cwZ$cwZ$cwI$cwLElf_msg(0, N_REINDEER + _ld$seed2, _ld$elves_a5, _ld$elves_b6, _ld$santa_elves_a8, _ld$santa_elves_b9, _ld$elf_santa11, _ld$report12) {
+                    (new santa._proc$elf$1975405111(0, N_REINDEER + _ld$seed2, _ld$elves_a5, _ld$elves_b6, _ld$santa_elves_a8, _ld$santa_elves_b9, _ld$elf_santa11, _ld$report12) {
                         @Override
                         public void finalize() {
                             _ld$par4.decrement();
                         }
                     }).schedule();
 
-                    (new santa._proc$elf$I$J$cwZ$cwZ$cwZ$cwZ$cwI$cwLElf_msg(1, N_REINDEER + (_ld$seed2 + 1), _ld$elves_a5, _ld$elves_b6, _ld$santa_elves_a8, _ld$santa_elves_b9, _ld$elf_santa11, _ld$report12) {
+                    (new santa._proc$elf$1975405111(1, N_REINDEER + (_ld$seed2 + 1), _ld$elves_a5, _ld$elves_b6, _ld$santa_elves_a8, _ld$santa_elves_b9, _ld$elf_santa11, _ld$report12) {
                         @Override
                         public void finalize() {
                             _ld$par4.decrement();
                         }
                     }).schedule();
 
-                    (new santa._proc$elf$I$J$cwZ$cwZ$cwZ$cwZ$cwI$cwLElf_msg(2, N_REINDEER + (_ld$seed2 + 2), _ld$elves_a5, _ld$elves_b6, _ld$santa_elves_a8, _ld$santa_elves_b9, _ld$elf_santa11, _ld$report12) {
+                    (new santa._proc$elf$1975405111(2, N_REINDEER + (_ld$seed2 + 2), _ld$elves_a5, _ld$elves_b6, _ld$santa_elves_a8, _ld$santa_elves_b9, _ld$elf_santa11, _ld$report12) {
                         @Override
                         public void finalize() {
                             _ld$par4.decrement();
                         }
                     }).schedule();
 
-                    (new santa._proc$elf$I$J$cwZ$cwZ$cwZ$cwZ$cwI$cwLElf_msg(3, N_REINDEER + (_ld$seed2 + 3), _ld$elves_a5, _ld$elves_b6, _ld$santa_elves_a8, _ld$santa_elves_b9, _ld$elf_santa11, _ld$report12) {
+                    (new santa._proc$elf$1975405111(3, N_REINDEER + (_ld$seed2 + 3), _ld$elves_a5, _ld$elves_b6, _ld$santa_elves_a8, _ld$santa_elves_b9, _ld$elf_santa11, _ld$report12) {
                         @Override
                         public void finalize() {
                             _ld$par4.decrement();
@@ -1495,7 +1495,7 @@ public class santa {
                 } 
             }.schedule();
 
-            (new santa._proc$display$crLMessage(_ld$report12) {
+            (new santa._proc$display$502908242(_ld$report12) {
                 @Override
                 public void finalize() {
                     _ld$par1.decrement();
@@ -1503,7 +1503,7 @@ public class santa {
                 }
             }).schedule();
 
-            (new santa._proc$p_barrier_knock$I$crZ$crZ$cwZ(G_ELVES, _ld$elves_a5, _ld$elves_b6, _ld$knock7) {
+            (new santa._proc$p_barrier_knock822005941(G_ELVES, _ld$elves_a5, _ld$elves_b6, _ld$knock7) {
                 @Override
                 public void finalize() {
                     _ld$par1.decrement();
@@ -1511,7 +1511,7 @@ public class santa {
                 }
             }).schedule();
 
-            (new santa._proc$p_barrier$I$crZ$crZ(G_ELVES + 1, _ld$santa_elves_a8, _ld$santa_elves_b9) {
+            (new santa._proc$p_barrier2048483955(G_ELVES + 1, _ld$santa_elves_a8, _ld$santa_elves_b9) {
                 @Override
                 public void finalize() {
                     _ld$par1.decrement();
@@ -1532,7 +1532,7 @@ public class santa {
     public static void main(String[] _pd$args1) {
     	Scheduler scheduler = new Scheduler();
         PJProcess.scheduler = scheduler;
-        (new santa._proc$main$arT(_pd$args1)).schedule();
+        (new santa._proc$main1169311(_pd$args1)).schedule();
         PJProcess.scheduler.start();
     }
 }

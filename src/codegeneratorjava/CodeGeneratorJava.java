@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.LinkedHashSet;
 import java.util.List;
@@ -160,19 +161,9 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
     private int _localDecId = 0;
     
     /**
-     * Identifier for an 'alt' block declaration.
-     */
-    private int _altDecId = 0;
-    
-    /**
      * Jump label.
      */
     private int _jumLabel = 0;
-    
-    /**
-     * Channel-end type (e.g. 'read' or 'write')
-     */
-    private boolean _isChanRead = false;
     
     /**
      * Access to protocol case.
@@ -185,12 +176,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
     private String _currProtocolTag = null;
     
     /**
-     * This is used to avoid name collisions.
-     */
-    private boolean _fieldName = true;
-    
-    /**
-     * TODO
+     * This is used for arrays of N-dimensions.
      */
     private boolean _isArrayLiteral = false;
     
@@ -755,7 +741,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         
         String name = null;
         
-        if (_fieldName && !_paramDeclNameMap.isEmpty()) {
+        if (!_paramDeclNameMap.isEmpty()) {
             if (_paramDeclNameMap.containsKey(na.getname()))
                 name = _paramDeclNameMap.get(na.getname());
         }
@@ -886,7 +872,6 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         Log.log(ce.line + ": Visiting a ChannelEndExpr (" + (ce.isRead() ? "read" : "write") + ")");
         
         String channel = (String) ce.channel().visit(this);
-        _isChanRead = ce.isRead() ? true : false;
         
         return (T) channel;
     }
@@ -1090,7 +1075,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         Log.log(se.line + ": Visiting a Sequence");
         
         // Sequence of statements enclosed in a 'block' statement
-        List<String> seqstr = new ArrayList<>();
+        List<String> seqs = new ArrayList<>();
         // Iterate through every statement
         for (int i = 0; i < se.size(); ++i) {
             if (se.child(i) != null) {
@@ -1104,14 +1089,23 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
                 // variable declarations, invocations, etc.
                 if (stats instanceof String[]) {
                     String[] statsStr = (String[]) stats;
-                    seqstr.addAll(Arrays.asList(statsStr));
+                    seqs.addAll(Arrays.asList(statsStr));
                 } else {
-                    seqstr.add((String) stats);
+                    seqs.add((String) stats);
                 }
             }
         }
         
-        return (T) seqstr.toArray(new String[0]);
+        // Remove the *empty string* for any uninitialized
+        // variable (e.g., locals, parameters, etc.)
+        Iterator<String> it = seqs.iterator();
+        while (it.hasNext()) {
+            String str = it.next();
+            if (str.isEmpty() || str == EMPTY_STRING)
+                it.remove();
+        }
+        
+        return (T) seqs.toArray(new String[0]);
     }
     
     /**
@@ -1869,6 +1863,24 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         _switchLabelList.add(renderSwitchLabel(_jumLabel));
         
         return (T) stAltStat.render();
+    }
+    
+    /**
+     * -----------------------------------------------------------------------------
+     * VISIT_RETURN_STAT
+     */
+    public T visitReturnStat(ReturnStat rs) {
+        Log.log(rs.line + ": Visiting a ReturnStat");
+        
+        ST stReturnStat = _stGroup.getInstanceOf("ReturnStat");
+        String expr = null;
+        
+        if (rs.expr() != null)
+            expr = (String) rs.expr().visit(this);
+        
+        stReturnStat.add("expr", expr);
+        
+        return (T) stReturnStat.render();
     }
     
     //
