@@ -197,7 +197,7 @@ public class ProcessJc {
             c.visit(new rewriters.RecordRewrite<>(globalTypeTable));
             
 	    System.out.println("-- Checking native Top Level Declarations.");
-            c.visit(new namechecker.ResolveImportTopTypeDecl<AST>());
+            c.visit(new namechecker.ResolveImportTopLevelDecls<AST>());
 
 
 //            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
@@ -271,6 +271,7 @@ public class ProcessJc {
             // ========================================
 	    System.out.println("-- Computing reachability.");
             c.visit(new reachability.Reachability());
+            c.visit(new rewriters.LoopRewrite());
             
 //            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
 //                CompilerMessageManager.INSTANCE.printTrace("reachability");

@@ -18,19 +18,19 @@ public class fortest {
     // Temporary dirty fix for unreachable code due to infinite loop
     public static boolean isTrue() { return true; }
 
-    public static void _method$fooI$I(int _pd$i1) {
+    public static void _method$fooI1189(int _pd$i1) {
         io.println("i = " + _pd$i1);
     }
 
-    public static void _method$fooJ$I(int _pd$j1) {
+    public static void _method$fooJ1189(int _pd$j1) {
         io.println("j = " + _pd$j1);
     }
 
-    public static void _method$fooK$I(int _pd$k1) {
+    public static void _method$fooK1189(int _pd$k1) {
         io.println("k = " + _pd$k1);
     }
 
-    public static class _proc$main$arT extends PJProcess {
+    public static class _proc$main1169311 extends PJProcess {
         protected String[] _pd$args1;
 
         protected int _ld$i1;
@@ -38,7 +38,7 @@ public class fortest {
         protected int _ld$k3;
         protected int _ld$i4;
 
-        public _proc$main$arT(String[] _pd$args1) {
+        public _proc$main1169311(String[] _pd$args1) {
             this._pd$args1 = _pd$args1;
         }
 
@@ -51,16 +51,13 @@ public class fortest {
             }
 
             io.println("Hi from main!");
-            for (_ld$i1 = 0, _ld$j2 = 0, _ld$k3 = 1;
-                 (_ld$i1 < 4) && (_ld$j2 < 10);
-                 _ld$i1++, _ld$j2 = _ld$j2 + 3 + _ld$i1, _ld$k3 = _ld$k3 + 2) {
-
+            for (_ld$i1 = 0, _ld$j2 = 0, _ld$k3 = 1; (_ld$i1 < 4) && (_ld$j2 < 10); _ld$i1++, _ld$j2 = _ld$j2 + 3 + _ld$i1, _ld$k3 = _ld$k3 + 2) {
                  final PJPar _ld$par1 = new PJPar(3, this);
 
                  new PJProcess() {
                      @Override
                      public synchronized void run() {
-                         fortest._method$fooI$I(_ld$i1);
+                         fortest._method$fooI1189(_ld$i1);
                          terminate();
                      }
 
@@ -73,7 +70,7 @@ public class fortest {
                  new PJProcess() {
                      @Override
                      public synchronized void run() {
-                         fortest._method$fooJ$I(_ld$j2);
+                         fortest._method$fooJ1189(_ld$j2);
                          terminate();
                      }
 
@@ -86,7 +83,7 @@ public class fortest {
                  new PJProcess() {
                      @Override
                      public synchronized void run() {
-                         fortest._method$fooK$I(_ld$k3);
+                         fortest._method$fooK1189(_ld$k3);
                          terminate();
                      }
 
@@ -104,10 +101,7 @@ public class fortest {
 
             }
             _ld$i4 = 0;
-            for (/* empty */;
-                 /* emtpy */;
-                 /* empty */) {
-
+            for (/* empty */; /* emtpy */; /* empty */) {
                  if (_ld$i4 < 5) {
                      io.println("i = " + _ld$i4 + " less that 5");
                  }
@@ -117,10 +111,7 @@ public class fortest {
                  _ld$i4++;
             }
             _ld$i4 = 0;
-            for (/* empty */;
-                 _ld$i4++ < 5;
-                 /* empty */) {
-
+            for (/* empty */; _ld$i4++ < 5; /* empty */) {
                  io.println("i = " + _ld$i4 + " less that 5");
             }
             _ld$i4 = 0;
@@ -142,7 +133,7 @@ public class fortest {
     public static void main(String[] _pd$args1) {
     	Scheduler scheduler = new Scheduler();
         PJProcess.scheduler = scheduler;
-        (new fortest._proc$main$arT(_pd$args1)).schedule();
+        (new fortest._proc$main1169311(_pd$args1)).schedule();
         PJProcess.scheduler.start();
     }
 }

@@ -11,13 +11,13 @@ import utilities.Visitor;
 /**
  * Visitor used for rewriting the body of records that inherit fields
  * from one or more than one record. Since multiple inheritance is
- * not supported in Java, the visitor adds _shallow_ copies of fields
- * that a record inherits from other records.
+ * not supported in Java, this visitor adds _shallow_ copies of fields
+ * into a record that inherits from one or more records.
  * 
  * @author Ben
  */
 public class RecordRewrite<T extends Object> extends Visitor<T> {
-    
+    // The actual entries in the table
     public SymbolTable sym;
     
     public RecordRewrite(SymbolTable sym) {
@@ -40,7 +40,6 @@ public class RecordRewrite<T extends Object> extends Visitor<T> {
             for (Name parent : rt.extend()) {
                 if (sym.get(parent.getname()) != null) {
                     RecordTypeDecl rte = (RecordTypeDecl) sym.get(parent.getname());
-                    //se.addAll(findExtendedRecords(rte));
                     Set<RecordMember> seqr = findExtendedRecords(rte);
                     for (RecordMember rm : seqr)
                         if (!se.add(rm))
@@ -51,6 +50,7 @@ public class RecordRewrite<T extends Object> extends Visitor<T> {
         return se;
     }
     
+    @Override
     public T visitRecordTypeDecl(RecordTypeDecl rt) {
         Log.log(rt.line + ": Visiting a RecordTypeDecl (" + rt.name().getname() + ")");
         

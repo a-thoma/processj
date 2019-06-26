@@ -96,7 +96,7 @@ public enum ParserFactory {
     public OptionParser<?> getParserTypeForClassType(Class<?> classType, String optionName, Class<? extends OptionParser> handler) {
         if (parserMap.get(classType) == null)
             return null;
-        // First check if we are dealing with a user-defined class
+        // First check if we are dealing with an user-defined class
         else {
             Class<?> clazz = findUserDefinedClass(handler);
             if (clazz == null) {

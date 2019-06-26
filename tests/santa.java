@@ -15,8 +15,6 @@ import std.*;
  *
  */
 public class santa {
-    // Temporary dirty fix for unreachable code due to infinite loop
-    public static boolean isTrue() { return true; }
 
     public static final int N_REINDEER = 3;
 
@@ -236,7 +234,8 @@ public class santa {
     public static class _proc$display$502908242 extends PJProcess {
         protected PJChannel<PJProtocolCase> _pd$in1;
 
-        protected PJProtocolCase _ld$msg1;
+        protected boolean _ld$tempLoop01;
+        protected PJProtocolCase _ld$msg2;
 
         public _proc$display$502908242(PJChannel<PJProtocolCase> _pd$in1) {
             this._pd$in1 = _pd$in1;
@@ -251,51 +250,52 @@ public class santa {
                 default: break;
             }
 
-            while (isTrue()) {
+            _ld$tempLoop01 = true;
+            while (_ld$tempLoop01) {
                 if (!_pd$in1.isReadyToRead(this)) {
                     this.runLabel = 1;
                     yield();
                 }
 
                 label(1);
-                _ld$msg1 = _pd$in1.read(this);
+                _ld$msg2 = _pd$in1.read(this);
                 this.runLabel = 2;
                 yield();
 
                 label(2);
-                switch(_ld$msg1.tag) {
+                switch(_ld$msg2.tag) {
                 case "holiday":
-                    io.println("                                   Reindeer-" + (((Reindeer_msg.holiday) _ld$msg1).id) + ": on holiday ... wish you were here");
+                    io.println("                                   Reindeer-" + (((Reindeer_msg.holiday) _ld$msg2).id) + ": on holiday ... wish you were here");
                     break;
                 case "deer_ready":
-                    io.println("                                   Reindeer-" + (((Reindeer_msg.deer_ready) _ld$msg1).id) + ": back from holiday ... ready for work");
+                    io.println("                                   Reindeer-" + (((Reindeer_msg.deer_ready) _ld$msg2).id) + ": back from holiday ... ready for work");
                     break;
                 case "deliver":
-                    io.println("                                   Reindeer-" + (((Reindeer_msg.deliver) _ld$msg1).id) + ": delivering toys ... la-di-da-di-da-di-da");
+                    io.println("                                   Reindeer-" + (((Reindeer_msg.deliver) _ld$msg2).id) + ": delivering toys ... la-di-da-di-da-di-da");
                     break;
                 case "deer_done":
-                    io.println("                                   Reindeer-" + (((Reindeer_msg.deer_done) _ld$msg1).id) + ": all toys delivered ... want a holiday");
+                    io.println("                                   Reindeer-" + (((Reindeer_msg.deer_done) _ld$msg2).id) + ": all toys delivered ... want a holiday");
                     break;
                 case "working":
-                    io.println("                   Elf-" + (((Elf_msg.working) _ld$msg1).id) + ": working");
+                    io.println("                   Elf-" + (((Elf_msg.working) _ld$msg2).id) + ": working");
                     break;
                 case "elf_ready":
-                    io.println("                   Elf-" + (((Elf_msg.elf_ready) _ld$msg1).id) + ": need to consult Santa");
+                    io.println("                   Elf-" + (((Elf_msg.elf_ready) _ld$msg2).id) + ": need to consult Santa");
                     break;
                 case "waiting":
-                    io.println("                   Elf-" + (((Elf_msg.waiting) _ld$msg1).id) + ": in the waiting room...");
+                    io.println("                   Elf-" + (((Elf_msg.waiting) _ld$msg2).id) + ": in the waiting room...");
                     break;
                 case "consult":
-                    io.println("                   Elf-" + (((Elf_msg.consult) _ld$msg1).id) + ": about these toys...??");
+                    io.println("                   Elf-" + (((Elf_msg.consult) _ld$msg2).id) + ": about these toys...??");
                     break;
                 case "elf_done":
-                    io.println("                   Elf-" + (((Elf_msg.elf_done) _ld$msg1).id) + ": OK ... we'll built it, bye...");
+                    io.println("                   Elf-" + (((Elf_msg.elf_done) _ld$msg2).id) + ": OK ... we'll built it, bye...");
                     break;
                 case "reindeer_ready":
                     io.println("Santa: Ho-ho-ho ... the reindeer are back!");
                     break;
                 case "harness":
-                    io.println("Santa: harnessing reindeer: " + (((Santa_msg.harness) _ld$msg1).id));
+                    io.println("Santa: harnessing reindeer: " + (((Santa_msg.harness) _ld$msg2).id));
                     break;
                 case "mush_mush":
                     io.println("Santa: mush mush...");
@@ -304,13 +304,13 @@ public class santa {
                     io.println("Santa: woah... we're back home!");
                     break;
                 case "unharness":
-                    io.println("Santa: un-harnessing reindeer: " + (((Santa_msg.unharness) _ld$msg1).id));
+                    io.println("Santa: un-harnessing reindeer: " + (((Santa_msg.unharness) _ld$msg2).id));
                     break;
                 case "elves_ready":
                     io.println("Santa: Ho-ho-ho... some elves are here!");
                     break;
                 case "greet":
-                    io.println("Santa: hello elf: " + (((Santa_msg.greet) _ld$msg1).id));
+                    io.println("Santa: hello elf: " + (((Santa_msg.greet) _ld$msg2).id));
                     break;
                 case "consulting":
                     io.println("Santa: consulting with elves...");
@@ -319,7 +319,7 @@ public class santa {
                     io.println("Santa: OK, all done -- thanks!");
                     break;
                 case "goodbye":
-                    io.println("Santa: goodbye elf: " + (((Santa_msg.goodbye) _ld$msg1).id));
+                    io.println("Santa: goodbye elf: " + (((Santa_msg.goodbye) _ld$msg2).id));
                     break;
                 }
             }
@@ -333,10 +333,11 @@ public class santa {
         protected PJChannel<Boolean> _pd$b3;
         protected PJChannel<Boolean> _pd$knock4;
 
-        protected int _ld$i1;
-        protected boolean _ld$any2;
-        protected int _ld$i3;
-        protected boolean _ld$any4;
+        protected boolean _ld$tempLoop11;
+        protected int _ld$i2;
+        protected boolean _ld$any3;
+        protected int _ld$i4;
+        protected boolean _ld$any5;
 
         public _proc$p_barrier_knock822005941(int _pd$n1, PJChannel<Boolean> _pd$a2, PJChannel<Boolean> _pd$b3, PJChannel<Boolean> _pd$knock4) {
             this._pd$n1 = _pd$n1;
@@ -357,18 +358,16 @@ public class santa {
                 default: break;
             }
 
-            while (isTrue()) {
-                for (_ld$i1 = 0;
-                     _ld$i1 < _pd$n1;
-                     _ld$i1++) {
-
+            _ld$tempLoop11 = true;
+            while (_ld$tempLoop11) {
+                for (_ld$i2 = 0; _ld$i2 < _pd$n1; _ld$i2++) {
                      if (!_pd$a2.isReadyToRead(this)) {
                          this.runLabel = 1;
                          yield();
                      }
 
                      label(1);
-                     _ld$any2 = _pd$a2.read(this);
+                     _ld$any3 = _pd$a2.read(this);
                      this.runLabel = 2;
                      yield();
 
@@ -379,17 +378,14 @@ public class santa {
                 yield();
                 label(3);
 
-                for (_ld$i3 = 0;
-                     _ld$i3 < _pd$n1;
-                     _ld$i3++) {
-
+                for (_ld$i4 = 0; _ld$i4 < _pd$n1; _ld$i4++) {
                      if (!_pd$b3.isReadyToRead(this)) {
                          this.runLabel = 4;
                          yield();
                      }
 
                      label(4);
-                     _ld$any4 = _pd$b3.read(this);
+                     _ld$any5 = _pd$b3.read(this);
                      this.runLabel = 5;
                      yield();
 
@@ -405,10 +401,11 @@ public class santa {
         protected PJChannel<Boolean> _pd$a2;
         protected PJChannel<Boolean> _pd$b3;
 
-        protected int _ld$i1;
-        protected boolean _ld$any2;
-        protected int _ld$i3;
-        protected boolean _ld$any4;
+        protected boolean _ld$tempLoop21;
+        protected int _ld$i2;
+        protected boolean _ld$any3;
+        protected int _ld$i4;
+        protected boolean _ld$any5;
 
         public _proc$p_barrier2048483955(int _pd$n1, PJChannel<Boolean> _pd$a2, PJChannel<Boolean> _pd$b3) {
             this._pd$n1 = _pd$n1;
@@ -427,34 +424,29 @@ public class santa {
                 default: break;
             }
 
-            while (isTrue()) {
-                for (_ld$i1 = 0;
-                     _ld$i1 < _pd$n1;
-                     _ld$i1++) {
-
+            _ld$tempLoop21 = true;
+            while (_ld$tempLoop21) {
+                for (_ld$i2 = 0; _ld$i2 < _pd$n1; _ld$i2++) {
                      if (!_pd$a2.isReadyToRead(this)) {
                          this.runLabel = 1;
                          yield();
                      }
 
                      label(1);
-                     _ld$any2 = _pd$a2.read(this);
+                     _ld$any3 = _pd$a2.read(this);
                      this.runLabel = 2;
                      yield();
 
                      label(2);
                 }
-                for (_ld$i3 = 0;
-                     _ld$i3 < _pd$n1;
-                     _ld$i3++) {
-
+                for (_ld$i4 = 0; _ld$i4 < _pd$n1; _ld$i4++) {
                      if (!_pd$b3.isReadyToRead(this)) {
                          this.runLabel = 3;
                          yield();
                      }
 
                      label(3);
-                     _ld$any4 = _pd$b3.read(this);
+                     _ld$any5 = _pd$b3.read(this);
                      this.runLabel = 4;
                      yield();
 
@@ -525,10 +517,11 @@ public class santa {
         protected PJChannel<Integer> _pd$to_santa5;
         protected PJChannel<PJProtocolCase> _pd$report6;
 
-        protected long _ld$my_seed1;
-        protected long _ld$wait2;
-        protected long _ld$t3;
-        protected PJTimer _ld$tim4;
+        protected boolean _ld$tempLoop31;
+        protected long _ld$my_seed2;
+        protected long _ld$wait3;
+        protected long _ld$t4;
+        protected PJTimer _ld$tim5;
 
         public _proc$reindeer$646748748(int _pd$id1, long _pd$seed2, PJBarrier _pd$just_reindeer3, PJBarrier _pd$santa_reindeer4, PJChannel<Integer> _pd$to_santa5, PJChannel<PJProtocolCase> _pd$report6) {
             this._pd$id1 = _pd$id1;
@@ -562,11 +555,10 @@ public class santa {
                 default: break;
             }
 
-            _ld$my_seed1 = _pd$seed2;
-            _ld$wait2 = HOLIDAY_TIME;
-
-
-            while (isTrue()) {
+            _ld$tempLoop31 = true;
+            _ld$my_seed2 = _pd$seed2;
+            _ld$wait3 = HOLIDAY_TIME;
+            while (_ld$tempLoop31) {
                 if (!_pd$report6.claimWrite(this)) {
                     this.runLabel = 1;
                     yield();
@@ -583,7 +575,7 @@ public class santa {
 
                 final PJPar _ld$par1 = new PJPar(1, this);
 
-                (new santa._proc$random_wait1144780(_ld$wait2, _ld$my_seed1) {
+                (new santa._proc$random_wait1144780(_ld$wait3, _ld$my_seed2) {
                     @Override
                     public void finalize() {
                         _ld$par1.decrement();
@@ -693,8 +685,9 @@ public class santa {
         protected PJChannel<Integer> _pd$to_santa7;
         protected PJChannel<PJProtocolCase> _pd$report8;
 
-        protected long _ld$my_seed1;
-        protected long _ld$wait2;
+        protected boolean _ld$tempLoop41;
+        protected long _ld$my_seed2;
+        protected long _ld$wait3;
 
         public _proc$elf$1975405111(int _pd$id1, long _pd$seed2, PJChannel<Boolean> _pd$elves_a3, PJChannel<Boolean> _pd$elves_b4, PJChannel<Boolean> _pd$santa_elves_a5, PJChannel<Boolean> _pd$santa_elves_b6, PJChannel<Integer> _pd$to_santa7, PJChannel<PJProtocolCase> _pd$report8) {
             this._pd$id1 = _pd$id1;
@@ -730,9 +723,10 @@ public class santa {
                 default: break;
             }
 
-            _ld$my_seed1 = _pd$seed2;
-            _ld$wait2 = WORKING_TIME;
-            while (isTrue()) {
+            _ld$tempLoop41 = true;
+            _ld$my_seed2 = _pd$seed2;
+            _ld$wait3 = WORKING_TIME;
+            while (_ld$tempLoop41) {
                 if (!_pd$report8.claimWrite(this)) {
                     this.runLabel = 1;
                     yield();
@@ -749,7 +743,7 @@ public class santa {
 
                 final PJPar _ld$par1 = new PJPar(1, this);
 
-                (new santa._proc$random_wait1144780(_ld$wait2, _ld$my_seed1) {
+                (new santa._proc$random_wait1144780(_ld$wait3, _ld$my_seed2) {
                     @Override
                     public void finalize() {
                         _ld$par1.decrement();
@@ -892,18 +886,19 @@ public class santa {
         protected PJChannel<Boolean> _pd$santa_elves_b7;
         protected PJChannel<PJProtocolCase> _pd$report8;
 
-        protected long _ld$my_seed1;
-        protected PJTimer _ld$tim2;
-        protected long _ld$t3;
-        protected long _ld$wait4;
-        protected int _ld$id5;
-        protected boolean _ld$answer6;
-        protected int _ld$i7;
+        protected boolean _ld$tempLoop51;
+        protected long _ld$my_seed2;
+        protected PJTimer _ld$tim3;
+        protected long _ld$t4;
+        protected long _ld$wait5;
+        protected int _ld$id6;
+        protected boolean _ld$answer7;
         protected int _ld$i8;
         protected int _ld$i9;
         protected int _ld$i10;
-        protected int _ld$index11;
-        protected PJAlt _ld$alt12;
+        protected int _ld$i11;
+        protected int _ld$index12;
+        protected PJAlt _ld$alt13;
 
         public _proc$santa$1316171216(long _pd$seed1, PJChannel<Boolean> _pd$knock2, PJChannel<Integer> _pd$from_reindeer3, PJChannel<Integer> _pd$from_elf4, PJBarrier _pd$santa_reindeer5, PJChannel<Boolean> _pd$santa_elves_a6, PJChannel<Boolean> _pd$santa_elves_b7, PJChannel<PJProtocolCase> _pd$report8) {
             this._pd$seed1 = _pd$seed1;
@@ -964,15 +959,13 @@ public class santa {
                 default: break;
             }
 
-            _ld$my_seed1 = _pd$seed1;
-
-
-
-            while (isTrue()) {
-                _ld$alt12 = new PJAlt(2, this);
+            _ld$tempLoop51 = true;
+            _ld$my_seed2 = _pd$seed1;
+            while (_ld$tempLoop51) {
+                _ld$alt13 = new PJAlt(2, this);
                 boolean[] booleanGuards = { true, true };
                 Object[] objectGuards = { _pd$from_reindeer3, _pd$knock2 };
-                boolean ready = _ld$alt12.setGuards(booleanGuards, objectGuards);
+                boolean ready = _ld$alt13.setGuards(booleanGuards, objectGuards);
 
                 if (!ready) {
                     System.out.println("RuntimeError: One of the boolean pre-guards must be true!");
@@ -980,12 +973,12 @@ public class santa {
                 }
 
                 this.setNotReady();
-                _ld$index11 = _ld$alt12.enable();
+                _ld$index12 = _ld$alt13.enable();
                 this.runLabel = 41;
                 yield();
 
                 label(41);
-                int selected = _ld$alt12.disable(_ld$index11);
+                int selected = _ld$alt13.disable(_ld$index12);
 
                 switch(selected) {
                     case 0:
@@ -995,7 +988,7 @@ public class santa {
                         }
 
                         label(20);
-                        _ld$id5 = _pd$from_reindeer3.read(this);
+                        _ld$id6 = _pd$from_reindeer3.read(this);
                         this.runLabel = 21;
                         yield();
 
@@ -1020,7 +1013,7 @@ public class santa {
                         }
                         label(3);
 
-                        _pd$report8.write(this, ((PJProtocolCase) (new Santa_msg.harness(_ld$id5))));
+                        _pd$report8.write(this, ((PJProtocolCase) (new Santa_msg.harness(_ld$id6))));
                         this.runLabel = 4;
 
                         yield();
@@ -1028,17 +1021,14 @@ public class santa {
 
                         _pd$report8.unclaimWrite();
 
-                        for (_ld$i7 = 0;
-                             _ld$i7 < G_REINDEER - 1;
-                             _ld$i7++) {
-
+                        for (_ld$i8 = 0; _ld$i8 < G_REINDEER - 1; _ld$i8++) {
                              if (!_pd$from_reindeer3.isReadyToRead(this)) {
                                  this.runLabel = 5;
                                  yield();
                              }
 
                              label(5);
-                             _ld$id5 = _pd$from_reindeer3.read(this);
+                             _ld$id6 = _pd$from_reindeer3.read(this);
                              this.runLabel = 6;
                              yield();
 
@@ -1049,7 +1039,7 @@ public class santa {
                              }
                              label(7);
 
-                             _pd$report8.write(this, ((PJProtocolCase) (new Santa_msg.harness(_ld$id5))));
+                             _pd$report8.write(this, ((PJProtocolCase) (new Santa_msg.harness(_ld$id6))));
                              this.runLabel = 8;
 
                              yield();
@@ -1076,10 +1066,10 @@ public class santa {
                         this.runLabel = 11;
                         yield();
                         label(11);
-                        _ld$t3 = PJTimer.read();
-                        _ld$tim2 = new PJTimer(this, 100);
+                        _ld$t4 = PJTimer.read();
+                        _ld$tim3 = new PJTimer(this, 100);
                         try {
-                            _ld$tim2.start();
+                            _ld$tim3.start();
                             setNotReady();
                             this.runLabel = 12;
                             yield();
@@ -1105,10 +1095,7 @@ public class santa {
                         this.runLabel = 15;
                         yield();
                         label(15);
-                        for (_ld$i8 = 0;
-                             _ld$i8 < G_REINDEER;
-                             _ld$i8++) {
-
+                        for (_ld$i9 = 0; _ld$i9 < G_REINDEER; _ld$i9++) {
                              if (!_pd$from_reindeer3.isReadyToRead(this)) {
                                  this.runLabel = 18;
                                  yield();
@@ -1116,14 +1103,14 @@ public class santa {
 
                              label(18);
                               // Do we have a rendezvous?
-                             _ld$id5 = _pd$from_reindeer3.preReadRendezvous(this);
+                             _ld$id6 = _pd$from_reindeer3.preReadRendezvous(this);
                              if (!_pd$report8.claimWrite(this)) {
                                  this.runLabel = 16;
                                  yield();
                              }
                              label(16);
 
-                             _pd$report8.write(this, ((PJProtocolCase) (new Santa_msg.unharness(_ld$id5))));
+                             _pd$report8.write(this, ((PJProtocolCase) (new Santa_msg.unharness(_ld$id6))));
                              this.runLabel = 17;
 
                              yield();
@@ -1145,7 +1132,7 @@ public class santa {
                         }
 
                         label(39);
-                        _ld$answer6 = _pd$knock2.read(this);
+                        _ld$answer7 = _pd$knock2.read(this);
                         this.runLabel = 40;
                         yield();
 
@@ -1164,17 +1151,14 @@ public class santa {
 
                         _pd$report8.unclaimWrite();
 
-                        for (_ld$i9 = 0;
-                             _ld$i9 < G_ELVES;
-                             _ld$i9++) {
-
+                        for (_ld$i10 = 0; _ld$i10 < G_ELVES; _ld$i10++) {
                              if (!_pd$from_elf4.isReadyToRead(this)) {
                                  this.runLabel = 24;
                                  yield();
                              }
 
                              label(24);
-                             _ld$id5 = _pd$from_elf4.read(this);
+                             _ld$id6 = _pd$from_elf4.read(this);
                              this.runLabel = 25;
                              yield();
 
@@ -1185,7 +1169,7 @@ public class santa {
                              }
                              label(26);
 
-                             _pd$report8.write(this, ((PJProtocolCase) (new Santa_msg.greet(_ld$id5))));
+                             _pd$report8.write(this, ((PJProtocolCase) (new Santa_msg.greet(_ld$id6))));
                              this.runLabel = 27;
 
                              yield();
@@ -1223,10 +1207,10 @@ public class santa {
 
                         _pd$report8.unclaimWrite();
 
-                        _ld$t3 = PJTimer.read();
-                        _ld$tim2 = new PJTimer(this, 100);
+                        _ld$t4 = PJTimer.read();
+                        _ld$tim3 = new PJTimer(this, 100);
                         try {
-                            _ld$tim2.start();
+                            _ld$tim3.start();
                             setNotReady();
                             this.runLabel = 31;
                             yield();
@@ -1263,10 +1247,7 @@ public class santa {
                             label(34);
                         }
 
-                        for (_ld$i10 = 0;
-                             _ld$i10 < G_ELVES;
-                             _ld$i10++) {
-
+                        for (_ld$i11 = 0; _ld$i11 < G_ELVES; _ld$i11++) {
                              if (!_pd$from_elf4.isReadyToRead(this)) {
                                  this.runLabel = 37;
                                  yield();
@@ -1274,14 +1255,14 @@ public class santa {
 
                              label(37);
                               // Do we have a rendezvous?
-                             _ld$id5 = _pd$from_elf4.preReadRendezvous(this);
+                             _ld$id6 = _pd$from_elf4.preReadRendezvous(this);
                              if (!_pd$report8.claimWrite(this)) {
                                  this.runLabel = 35;
                                  yield();
                              }
                              label(35);
 
-                             _pd$report8.write(this, ((PJProtocolCase) (new Santa_msg.goodbye(_ld$id5))));
+                             _pd$report8.write(this, ((PJProtocolCase) (new Santa_msg.goodbye(_ld$id6))));
                              this.runLabel = 36;
 
                              yield();

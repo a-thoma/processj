@@ -12,6 +12,7 @@ public class CastRewrite extends Visitor<Object> {
         Log.logHeader("****************************************");
     }
     
+    @Override
     public Object visitChannelWriteStat(ChannelWriteStat cs) {
         Type chanBaseType;
         if (cs.channel().type instanceof ChannelEndType)
@@ -22,7 +23,7 @@ public class CastRewrite extends Visitor<Object> {
         if (!exprType.typeEqual(chanBaseType)) {
             // replace the expression in the channel writer by a new cast expression.
             // that is:    write ( expr ) becomes
-            //             write ( (....) expr )
+            //             write ( (...) expr )
             CastExpr ce = new CastExpr(chanBaseType, cs.expr());
             cs.children[1] = ce;
         }

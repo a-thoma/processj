@@ -35,8 +35,6 @@ import processj.runtime.*;
  *
  */
 public class <name> {
-    // Temporary dirty fix for unreachable code due to infinite loop
-    public static boolean isTrue() { return true; }
     
     <if(body)><body; separator="\n\n"><endif>
 }
@@ -469,13 +467,15 @@ switch(<expr><if(tag)>.tag<endif>) {
 //
 // 1) operand:
 // 2) op:
-UnaryPostExpr(operand, op) ::= "<if(operand)><operand><op>;<endif>"
+// 3) delim:
+UnaryPostExpr(operand, op, delim) ::= "<if(operand)><operand><op><if(!delim)>;<endif><endif>"
 
 //========================================================================================
 //
 // 1) operand:
 // 2) op:
-UnaryPreExpr(operand, op) ::= "<if(operand)><op><operand>;<endif>"
+// 3) delim:
+UnaryPreExpr(operand, op, delim) ::= "<if(operand)><op><operand><if(!delim)>;<endif><endif>"
 
 //========================================================================================
 //
@@ -628,22 +628,27 @@ for (<if(init)><init; separator=", "><else>/* empty */<endif>; <!--!><if(expr)><
 // 2) expr:
 // 3) incr:
 // 4) stats:
-ParForStat(init, expr, incr, stats, parName, count, jump) ::= <<
-final PJPar <parName> = new PJPar(0, this);
-List\<PJProcess> processes = new ArrayList<>();
+// 5) name:
+// 6) count:
+// 7) jump:
+ParForStat(init, expr, incr, stats, name, count, jump) ::= <<
+final PJPar <name> = new PJPar(0, this);
+List\<PJProcess> processes = new ArrayList\<>();
 int count = 0;
 
 for (<init; separator=", ">; <!--!><expr>; <!--!><incr; separator=", ">) {
-    process.add(<stats; separator="\n">);
     ++count;
+    processes.add(
+        <stats; separator="\n">
+    );
 }
 
-<paraName>.setProcessCount(count);
+<name>.setProcessCount(count);
 
 for (PJProcess p : processes)
     p.schedule();
 
-setNotReady();
+this.setNotReady();
 this.runLabel = <jump>;
 yield();
 label(<jump>);
