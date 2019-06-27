@@ -278,6 +278,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         stCompilation.add("body", body);
         stCompilation.add("version", _currentJVM);
         
+        // Add the import statements to the file
         if (_importList.size() > 0)
             stCompilation.add("imports", _importList);
 
@@ -412,7 +413,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
                 stProcTypeDecl.add("types", _formalParamFieldMap.values());
                 stProcTypeDecl.add("vars", _formalParamFieldMap.keySet());
             }
-            // The list of local variables defined in the body of a procedure become
+            // The list of local variables defined in the body of a procedure becomes
             // the member variables of the procedure class
             if (!_localParamFieldMap.isEmpty()) {
                 stProcTypeDecl.add("ltypes", _localParamFieldMap.values());
@@ -673,13 +674,13 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         Log.log(ld, "Visting a LocalDecl (" + ld.type().typeName() + " " + ld.var().name().getname() + ")");
 
         // We could have the following targets:
-        //      type x;                              , a declaration
-        //      type x = 4;                          , a simple declaration
-        //      type x = in.read();                  , a single channel read
-        //      type x = b.read() + c.read() + ...;  , multiple channel reads
-        //      type x = read();                     , a Java method that returns a value
-        //      type x = a + b;                      , a binary expression
-        //      type x = a = b ...;                  , a complex assignment
+        //      T x;                              , a declaration
+        //      T x = 4;                          , a simple declaration
+        //      T x = in.read();                  , a single channel read
+        //      T x = b.read() + c.read() + ...;  , multiple channel reads
+        //      T x = read();                     , a Java method that returns a value
+        //      T x = a + b;                      , a binary expression
+        //      T x = a = b ...;                  , a complex assignment
 
         // Returning values for a local declaration
         String name = (String) ld.var().name().getname();
@@ -730,7 +731,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
             if (!ld.type().isBarrierType() && (ld.type().isPrimitiveType() ||
                 ld.type().isArrayType() ||  // Could be an uninitialized array declaration
                 ld.type().isNamedType()))   // Could be records or protocols
-                return (T) EMPTY_STRING;
+                return (T) EMPTY_STRING;    // This is removed from the sequence of statements
         }
         
         // If we reach this section, then we have a variable declaration
@@ -1051,7 +1052,13 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
     public T visitArrayLiteral(ArrayLiteral al) {
         Log.log(al, "Visiting an ArrayLiteral");
         
+        // Is the array initialize at compile time? If so, create
+        // a list of values separated by commas and enclosed between
+        // braces (note, syntax for array literals is different)
         if (al.elements().size() > 1 || _isArrayLiteral) {
+            // The following extends naturally to two-dimensional, and
+            // even higher-dimensional arrays -- but they are not used
+            // very often in practice
             String[] vals = (String[]) al.elements().visit(this);
             return (T) Arrays.asList(vals)
                     .toString()
@@ -1134,8 +1141,8 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
             }
         }
         
-        // Remove the *empty string* that belongs to any uninitialized
-        // variable (e.g., locals, parameters, etc.)
+        // Remove the 'empty' string that belongs to any uninitialized
+        // variable (e.g., locals, parameters, etc.) returned by a visitor
         Iterator<String> it = seqs.iterator();
         while (it.hasNext()) {
             String str = it.next();
@@ -1180,9 +1187,9 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         if (!sl.isDefault())
             label = (String) sl.expr().visit(this);
         if (_isProtocolCase) {
-            // Silly way to keep track of a protocol 'tag', however, this
+            // Silly way to keep track of a protocol tag, however, this
             // should (in theory) _always_ work. The type checker should
-            // catch any invalid 'tag' in a switch label for a given protocol
+            // catch any invalid tag in a switch label for a given protocol
             _currProtocolTag = label;
             label = "\"" + label + "\"";
         }
@@ -1230,7 +1237,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         
         // Generated template after evaluating this visitor
         ST stSwitchStat = _stGroup.getInstanceOf("SwitchStat");
-        // Is this a protocol 'tag'?
+        // Is this a protocol tag?
         if (st.expr().type.isProtocolType())
             _isProtocolCase = true;
         
@@ -1244,7 +1251,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         stSwitchStat.add("expr", expr);
         stSwitchStat.add("block", switchGroup);
         
-        // Reset value
+        // Reset value for future protocol tag
         _isProtocolCase = false;
         
         return (T) stSwitchStat.render();
@@ -2125,7 +2132,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * procedure         | (parameter list signature) t
      * named type        | Lname;
      * channel type      | {t;
-     * channeld end type | {t;! or {t;?
+     * channel end type | {t;! or {t;?
      */
     private String signature(ProcTypeDecl pd) {
         String s = "";

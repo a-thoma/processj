@@ -46,12 +46,12 @@ public class ResolveImportTopLevelDecls<T extends AST> extends Visitor<T> {
     
     @Override
     public T visitPragma(Pragma pr) {
-        String name = pr.value() != null ? pr.value() : "";
-        Log.log(pr, "Visiting an pragma " + pr.pname().getname() + " " + name);
-        if (name.isEmpty())
+        String val = pr.value() != null ? pr.value() : "";
+        Log.log(pr, "Visiting an pragma " + pr.pname().getname() + " " + val);
+        if (val.isEmpty())
             pragmatable.put(pr.pname().getname(), pr.pname().getname());
         else
-            pragmatable.put(pr.pname().getname(), name.replace("\"", ""));
+            pragmatable.put(pr.pname().getname(), val.replace("\"", ""));
         return null;
     }
     
@@ -60,10 +60,9 @@ public class ResolveImportTopLevelDecls<T extends AST> extends Visitor<T> {
         Log.log(im, "Visiting an import (of file: " + im + ")");
         Import prevImport = currentImport;
         currentImport = im;
-        Sequence<Compilation> compilations = im.getCompilations();
         // For every top-level declaration in a file, determine if this
         // declaration is part of a ProcessJ native library
-        for (Compilation c : compilations) {
+        for (Compilation c : im.getCompilations()) {
             if (c == null)
                 continue;
             // Visit the fields associated with pragma values to check
@@ -74,8 +73,10 @@ public class ResolveImportTopLevelDecls<T extends AST> extends Visitor<T> {
             // a ProcessJ native library
             for (Type t : c.typeDecls())
                 t.visit(this);
+            // TODO: the 'pragmatable' may need to be updated here due to
+            // compilations that this import perform 
         }
-        // TODO: 'pragmatable' may need to be updated here
+        // For now, resolve any updates here
         pragmatable.clear();
         currentImport = prevImport;
         return null;
@@ -93,7 +94,8 @@ public class ResolveImportTopLevelDecls<T extends AST> extends Visitor<T> {
                 pd.library = currentImport.toString();
                 pd.filename = pragmatable.get("FILE");
                 pd.nativeFunction = pd.name().getname();
-            }
+            } else
+                ; // Non-native procedure found
         }
         return null;
     }

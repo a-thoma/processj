@@ -69,7 +69,7 @@ public class ProcessJc {
         List<File> files = pjMain.files;
         // Turn on/off colour mode
         if (pjMain.ansiColour == null) {
-            // Only set the colour mode if the default value in 
+            // Set the colour mode if the default value in the
             // properties file is 'yes'
             if (config.getProperty("colour").equalsIgnoreCase("yes"))
                 Settings.isAnsiColour = true;
@@ -78,7 +78,7 @@ public class ProcessJc {
             String ansiColorvalue = "no";
             if (Settings.isAnsiColour)
                 ansiColorvalue = "yes";
-            // Update 'colour' code value in properties file
+            // Update colour code value in properties file
             config.setProperty("colour", ansiColorvalue);
             ConfigFileReader.closeConfiguration(config);
 //            System.exit(0);
@@ -102,7 +102,7 @@ public class ProcessJc {
         }
         else if (files == null || files.isEmpty()) { // Check for input file(s)
             // At least one file must be provided. Otherwise, throw an error if
-            // no file is given, or if a file does not exists
+            // no file is given, or if the file does not exists
             System.out.println(new PJMessage.Builder()
                                    .addError(VisitorMessageNumber.RESOLVE_IMPORTS_100)
                                    .build().getST().render());
@@ -365,7 +365,7 @@ public class ProcessJc {
         //generator.setWorkingDirectory(configFile.getProperty("workingdir"));
 
         // Visit this compilation unit and recursively build the program
-        // by returning strings rendered by the string template
+        // after returning strings rendered by the string template
         String templateResult = (String) compilation.visit(generator);
 
         // Write the output to a file

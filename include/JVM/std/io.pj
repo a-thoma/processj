@@ -4,6 +4,7 @@
 #pragma LANGUAGE "JVM";
 package std;
 
+public native void println();
 public native void println(string s);
 public native void println(byte b);
 public native void println(short s);

@@ -6,6 +6,10 @@ public class io {
     // With line-feed
     //
     
+    public static void println() {
+        System.out.println();
+    }
+    
     public static void println(byte b) {
         System.out.println(b);
     }

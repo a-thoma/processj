@@ -207,7 +207,7 @@ public class Helper {
     
     public static String getPackage(String packageName, String sourceFile) {
         // An invocation comes from a external file (an import) if the
-        // source file from which an invocation is made is different to
+        // source file from which the invocation is made is different to
         // the package
         if (!packageName.contains(sourceFile)) {
             String includePath = Settings.includeDir + File.separator + Settings.targetLanguage + File.separator;

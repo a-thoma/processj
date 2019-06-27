@@ -52,7 +52,7 @@ public class LoopRewrite extends Visitor<Object> {
             LocalDecl ld = new LocalDecl(
                     new PrimitiveType(PrimitiveType.BooleanKind),
                     new Var(new Name(temp), null),
-                    false /* not constant */);
+                    true /* constant */);
             // Replace the literal in the while
             NameExpr ne = new NameExpr(new Name(temp));
             ExprStat es = new ExprStat(new Assignment(ne, ws.expr(), Assignment.EQ));
