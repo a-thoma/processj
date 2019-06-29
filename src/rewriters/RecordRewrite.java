@@ -16,7 +16,7 @@ import utilities.Visitor;
  * 
  * @author Ben
  */
-public class RecordRewrite<T extends Object> extends Visitor<T> {
+public class RecordRewrite extends Visitor<AST> {
     // The actual entries in the table
     public SymbolTable sym;
     
@@ -51,7 +51,7 @@ public class RecordRewrite<T extends Object> extends Visitor<T> {
     }
     
     @Override
-    public T visitRecordTypeDecl(RecordTypeDecl rt) {
+    public AST visitRecordTypeDecl(RecordTypeDecl rt) {
         Log.log(rt.line + ": Visiting a RecordTypeDecl (" + rt.name().getname() + ")");
         
         Set<RecordMember> se = new LinkedHashSet<>();        

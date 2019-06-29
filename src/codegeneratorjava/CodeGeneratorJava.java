@@ -35,160 +35,100 @@ import utilities.Visitor;
  * @since 1.2
  */
 @SuppressWarnings("unchecked")
-public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
+public class CodeGeneratorJava extends Visitor<Object> {
 
-    /**
-     * String template file locator.
-     */
+    // String template file locator.
     private final String _stGammarFile = "resources/stringtemplates/java/grammarTemplatesJava.stg";
     
-    /**
-     * Current java version.
-     */
+    // Current java version.
     private final String _currentJVM = System.getProperty("java.version");
 
-    /**
-     * Collection of templates, imported templates, and/or groups that
-     * contain formal template definitions.
-     */
+    // Collection of templates, imported templates, and/or groups that
+    // contain formal template definitions.
     private STGroup _stGroup;
     
-    /**
-     * Current compilation unit.
-     */
+    // Current compilation unit.
     private Compilation _currCompilation = null;
 
-    /**
-     * The user working directory.
-     */
+    // The user working directory.
     private String _workingDir = null;
 
-    /**
-     * Current procedure call.
-     */
+    // Current procedure call.
     private String _currProcName = null;
     
-    /**
-     * Current 'par' block.
-     */
+    // Current par-block.
     private String _currParBlock = null;
     
-    /**
-     * Current 'protocol'.
-     */
+    // Current protocol.
     private String _currProcotolName = null;
     
-    /**
-     * List of imports.
-     */
+    // List of imports.
     private Set<String> _importList = new LinkedHashSet<>();
     
-    /**
-     * Top level declarations.
-     */
+    // Top level declarations.
     private SymbolTable _topLevelDecls = null;
 
-    /**
-     * Map of formal parameters transformed to fields.
-     */
+    // Map of formal parameters transformed to fields.
     private HashMap<String, String> _formalParamFieldMap = new LinkedHashMap<>();
     
-    /**
-     * Map of formal parameter names to name tags.
-     */
+    // Map of formal parameter names to name tags.
     private HashMap<String, String> _paramDeclNameMap = new LinkedHashMap<>();
     
-    /**
-     * Map of local parameters transformed to fields.
-     */
+    // Map of local parameters transformed to fields.
     private HashMap<String, String> _localParamFieldMap = new LinkedHashMap<>();
     
-    /**
-     * Map of 'par' blocks declared in a process. This map associates the
-     * name of a 'par' block with the number of processes invoked within
-     * its block.
-     */
+    // Map of par-blocks declared in a process. This map associates the
+    // name of a par-block with the number of processes invoked within
+    // its block.
     private HashMap<String, Integer> _parMap = new LinkedHashMap<>();
     
-    /**
-     * Map of record names to name tags.
-     */
+    // Map of record names to name tags.
     private HashMap<String, String> _recordMap = new LinkedHashMap<>();
     
-    /**
-     * Map of records member transformed to fields.
-     */
+    // Map of records member transformed to fields.
     private HashMap<String, String> _recordFieldMap = new LinkedHashMap<>();
     
-    /**
-     * Map of records members transformed to fields for records that
-     * inherit members from other records.
-     */
+    // Map of records members transformed to fields for records that
+    // inherit members from other records.
     private HashMap<String, String> _recordMemberMap = new LinkedHashMap<>();
     
-    /**
-     * Map of protocol names to name tags.
-     */
+    // Map of protocol names to name tags.
     private HashMap<String, String> _protocMap = new LinkedHashMap<>();
     
-    /**
-     * Map of name tags to protocol names.
-     */
+    // Map of name tags to protocol names.
     private HashMap<String, String> _protocMemberMap = new LinkedHashMap<>();
     
-    /**
-     * List of switch labels.
-     */
+    // List of switch labels.
     private List<String> _switchLabelList = new ArrayList<>();
     
-    /**
-     * List of barrier expressions.
-     */
+    // List of barrier expressions.
     private List<String> _barrierList = new ArrayList<>();
 
-    /**
-     * Identifier for a parameter declaration.
-     */
+    // Identifier for a parameter declaration.
     private int _varDecId = 0;
     
-    /**
-     * Identifier for a 'par' block declaration.
-     */
+    // Identifier for a par-block declaration.
     private int _parDecId = 0;
 
-    /**
-     * Identifier for a local variable declaration.
-     */
+    // Identifier for a local variable declaration.
     private int _localDecId = 0;
     
-    /**
-     * Jump label.
-     */
+    // Jump label.
     private int _jumLabel = 0;
     
-    /**
-     * Access to protocol case.
-     */
+    // Access to protocol case.
     private boolean _isProtocolCase = false;
     
-    /**
-     * Access to protocol tag.
-     */
+    // Access to protocol tag.
     private String _currProtocolTag = null;
     
-    /**
-     * This is used for arrays of N-dimensions.
-     */
+    // This is used for arrays of N-dimensions.
     private boolean _isArrayLiteral = false;
     
-    /**
-     * This is used for uninitialized variables.
-     */
+    // This is used for uninitialized variables.
     private static final String EMPTY_STRING = "";
     
-    /**
-     * A table used to hold the state of a tree-node traversal.
-     */
+    // A table used to hold the state of a tree-node traversal.
     private StateTable _stateTable = new StateTable();
 
     /**
@@ -217,14 +157,14 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * @param workingDir
      * 			A working directory.
      */
-    public void setWorkingDirectory(String workingDir) {
+    public void setWorkingDir(String workingDir) {
         this._workingDir = workingDir;
     }
     
     /**
      * @return
      */
-    public String getWorkingDirectory() {
+    public String getWorkingDir() {
         return _workingDir;
     }
     
@@ -241,7 +181,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * @return A text generated after evaluating this compilation unit.
      */
     @Override
-    public T visitCompilation(Compilation compilation) {
+    public Object visitCompilation(Compilation compilation) {
         Log.log(compilation, "Visiting a Compilation");
         
         _currCompilation = compilation;
@@ -291,7 +231,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         Log.log("****************************************");
         Log.log("\n" + templateResult);
         
-        return (T) templateResult;
+        return templateResult;
     }
     
     /**
@@ -299,7 +239,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT PROC_TYPE_DECL
      */
     @Override
-    public T visitProcTypeDecl(ProcTypeDecl pd) {
+    public Object visitProcTypeDecl(ProcTypeDecl pd) {
         Log.log(pd, "Visiting a ProcTypeDecl (" + pd.name().getname() + ")");
         
         // Generated template after evaluating this visitor
@@ -316,9 +256,9 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         // having classes with the same name, we generate a new name for this procedure
         String procName = null;
         // For non-invocations, that is, for anything other than a procedure that
-        // 'yields', we need to extends the PJProcess class 'anonymously'
+        // yields, we need to extends the PJProcess class anonymously
         if (_currProcName.equals("Anonymous")) {
-            // Preserve current 'jump' label
+            // Preserve current jump label
             int prevJumLabel = _jumLabel;
             _jumLabel = 0;
             // Grab the instance for an anonymous procedure
@@ -328,16 +268,16 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
             
             stProcTypeDecl.add("parBlock", _currParBlock);
             stProcTypeDecl.add("syncBody", body);
-            // Add the 'barrier' this procedure should resign from
+            // Add the barrier this procedure should resign from
             if (!_barrierList.isEmpty())
                 stProcTypeDecl.add("barrier", _barrierList);
-            // Add the 'switch' block
+            // Add the switch block
             if (!_switchLabelList.isEmpty()) {
                 ST stSwitchBlock = _stGroup.getInstanceOf("SwitchBlock");
                 stSwitchBlock.add("jumps", _switchLabelList);
                 stProcTypeDecl.add("switchBlock", stSwitchBlock.render());
             }
-            // Restore 'jump' label
+            // Restore jump label
             _jumLabel = prevJumLabel;
         } else {
             // Restore global variables for a new PJProcess class
@@ -419,7 +359,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
                 stProcTypeDecl.add("ltypes", _localParamFieldMap.values());
                 stProcTypeDecl.add("lvars", _localParamFieldMap.keySet());
             }
-            // Add the 'switch' block for resumption
+            // Add the switch block for resumption
             if (!_switchLabelList.isEmpty()) {
                 ST stSwitchBlock = _stGroup.getInstanceOf("SwitchBlock");
                 stSwitchBlock.add("jumps", _switchLabelList);
@@ -432,7 +372,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         // Restore previous jump labels
         _switchLabelList = prevLabels;
 
-        return (T) stProcTypeDecl.render();
+        return stProcTypeDecl.render();
     }
     
     /**
@@ -440,7 +380,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT BINARY_EXPR
      */
     @Override
-    public T visitBinaryExpr(BinaryExpr be) {
+    public Object visitBinaryExpr(BinaryExpr be) {
         Log.log(be, "Visiting a BinaryExpr");
 
         // Generated template after evaluating this visitor
@@ -456,7 +396,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         stBinaryExpr.add("rhs", rhs);
         stBinaryExpr.add("op", op);
 
-        return (T) stBinaryExpr.render();
+        return stBinaryExpr.render();
     }
     
     /**
@@ -464,12 +404,12 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT_WHILE_STAT
      */
     @Override
-    public T visitWhileStat(WhileStat ws) {
+    public Object visitWhileStat(WhileStat ws) {
         Log.log(ws, "Visiting a WhileStat");
         
         // Generated template after evaluating this visitor
         ST stWhileStat = _stGroup.getInstanceOf("WhileStat");
-        // Sequence of statements enclosed in a 'block' statement
+        // Sequence of statements enclosed in a block statement
         String[] stats = null;
         String condExpr = null;
         
@@ -478,13 +418,13 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         
         if (ws.stat() != null)
             stats = (String[]) ws.stat().visit(this);
-        else // The body of a 'while' could be empty
+        else // The body of a while-loop could be empty
             stats = new String[] { ";" };
         
         stWhileStat.add("expr", condExpr);
         stWhileStat.add("body", stats);
         
-        return (T) stWhileStat.render();
+        return stWhileStat.render();
     }
     
     /**
@@ -492,12 +432,12 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT DO_STAT
      */
     @Override
-    public T visitDoStat(DoStat ds) {
+    public Object visitDoStat(DoStat ds) {
         Log.log(ds, "Visiting a DoStat");
         
         // Generated template after evaluating this visitor
         ST stDoStat = _stGroup.getInstanceOf("DoStat");
-        // Sequence of statements enclosed in a 'block' statement
+        // Sequence of statements enclosed in a block statement
         String[] stats = null;
         String condExpr = null;
         
@@ -510,7 +450,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         stDoStat.add("expr", condExpr);
         stDoStat.add("body", stats);
         
-        return (T) stDoStat.render();
+        return stDoStat.render();
     }
     
     /**
@@ -518,7 +458,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT FOR_STAT
      */
     @Override
-    public T visitForStat(ForStat fs) {
+    public Object visitForStat(ForStat fs) {
         Log.log(fs, "Visiting a ForStat");
         
         // Generated template after evaluating this visitor
@@ -547,12 +487,12 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
                 stForStat.add("expr", expr);
             }
 
-            // Sequence of statements enclosed in a 'block' statement
+            // Sequence of statements enclosed in a block statement
             if (fs.stats() != null) {
                 Object o = fs.stats().visit(this);
                 stForStat.add("stats", o);
             }
-        } else // No! then this is a 'par for'
+        } else // No! then this is a par-for
             ;
         
         // Restore previous value
@@ -563,7 +503,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         if (!incr.isEmpty())
             stForStat.add("incr", incr);
         
-        return (T) stForStat.render();
+        return stForStat.render();
     }
     
     /**
@@ -571,12 +511,12 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT_IF_STAT
      */
     @Override
-    public T visitIfStat(IfStat is) {
+    public Object visitIfStat(IfStat is) {
         Log.log(is, "Visiting a IfStat");
 
         // Generated template after evaluating this visitor
         ST stIfStat = _stGroup.getInstanceOf("IfStat");
-        // Sequence of statements enclosed in a 'block' statement
+        // Sequence of statements enclosed in a block statement
         String[] thenStats = null;
         String[] thenParts = null;
         String condExpr = null;
@@ -604,7 +544,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         stIfStat.add("thenPart", thenStats);
         stIfStat.add("elsePart", thenParts);
         
-        return (T) stIfStat.render();
+        return stIfStat.render();
     }
     
     /**
@@ -612,7 +552,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT ASSIGNMENT
      */
     @Override
-    public T visitAssignment(Assignment as) {
+    public Object visitAssignment(Assignment as) {
         Log.log(as, "Visiting an Assignment");
         
         // Generated template after evaluating this visitor
@@ -623,9 +563,9 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         String rhs = null;
         
         if (as.right() instanceof NewArray)
-            return (T) createNewArray(lhs, ((NewArray) as.right()));
+            return createNewArray(lhs, ((NewArray) as.right()));
         else if (as.right() instanceof ChannelReadExpr)
-            return (T) createChannelReadExpr(lhs, op, ((ChannelReadExpr) as.right()));
+            return createChannelReadExpr(lhs, op, ((ChannelReadExpr) as.right()));
         else
             rhs = (String) as.right().visit(this);
         
@@ -633,7 +573,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         stVar.add("val", rhs);
         stVar.add("op", op);
         
-        return (T) stVar.render();
+        return stVar.render();
     }
     
     /**
@@ -641,7 +581,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT PARAM_DECL
      */
     @Override
-    public T visitParamDecl(ParamDecl pd) {
+    public Object visitParamDecl(ParamDecl pd) {
         Log.log(pd, "Visiting a ParamDecl (" + pd.type().typeName() + " " + pd.paramName().getname() + ")");
         
         // Grab the type and name of a declared variable
@@ -670,7 +610,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT LOCAL_DECL
      */
     @Override
-    public T visitLocalDecl(LocalDecl ld) {
+    public Object visitLocalDecl(LocalDecl ld) {
         Log.log(ld, "Visting a LocalDecl (" + ld.type().typeName() + " " + ld.var().name().getname() + ")");
 
         // We could have the following targets:
@@ -687,10 +627,10 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         String type = (String) ld.type().visit(this);
         String val = null;
         
-        String chantype = type; // the channel type (e.g., one-2-one, one-2-many, many-2-one, many-to-many)
-        if (ld.type().isChannelType() || ld.type().isChannelEndType()) {
+        String chantype = type;
+        // The channel type (e.g., one-2-one, one-2-many, many-2-one, many-to-many)
+        if (ld.type().isChannelType() || ld.type().isChannelEndType())
             type = PJChannel.class.getSimpleName() + type.substring(type.indexOf("<"), type.length());
-        }
 
         // Create a tag for this local channel expr parameter
         String newName = Helper.makeVariableName(name, ++_localDecId, Tag.LOCAL_NAME);
@@ -731,7 +671,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
             if (!ld.type().isBarrierType() && (ld.type().isPrimitiveType() ||
                 ld.type().isArrayType() ||  // Could be an uninitialized array declaration
                 ld.type().isNamedType()))   // Could be records or protocols
-                return (T) EMPTY_STRING;    // This is removed from the sequence of statements
+                return EMPTY_STRING;        // This is removed from the sequence of statements
         }
         
         // If we reach this section, then we have a variable declaration
@@ -740,7 +680,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         stVar.add("name", newName);
         stVar.add("val", val);
         
-        return (T) stVar.render();
+        return stVar.render();
     }
     
     /**
@@ -748,10 +688,10 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT EXPR_STAT
      */
     @Override
-    public T visitExprStat(ExprStat es) {
+    public Object visitExprStat(ExprStat es) {
         Log.log(es, "Visiting an ExprStat");
 
-        return (T) es.expr().visit(this);
+        return es.expr().visit(this);
     }
     
     /**
@@ -759,7 +699,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT NAME
      */
     @Override
-    public T visitName(Name na) {
+    public Object visitName(Name na) {
         Log.log(na, "Visiting a Name (" + na.getname() + ")");
         
         String name = null;
@@ -781,7 +721,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         if (name == null)
             name = na.getname();
         
-        return (T) name;
+        return name;
     }
     
     /**
@@ -789,11 +729,11 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT NAME_EXPR
      */
     @Override
-    public T visitNameExpr(NameExpr ne) {
+    public Object visitNameExpr(NameExpr ne) {
         Log.log(ne, "Visiting NameExpr (" + ne.name().getname() + ")");
         
         // NameExpr always points to 'myDecl'
-        return (T) ne.name().visit(this);
+        return ne.name().visit(this);
     }
     
     /**
@@ -801,16 +741,16 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT NAMED_TYPE
      */
     @Override
-    public T visitNamedType(NamedType nt) {
+    public Object visitNamedType(NamedType nt) {
         Log.log(nt, "Visiting a NamedType (" + nt.name().getname() + ")");
         
         String type = (String) nt.name().getname();
         
-        // This is for protocol 'inheritance'
+        // This is for protocol inheritance
         if (nt.type().isProtocolType())
             type = PJProtocolCase.class.getSimpleName();
 
-        return (T) type;
+        return type;
     }
     
     /**
@@ -818,10 +758,10 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT NEW_ARRAY
      */
     @Override
-    public T visitNewArray(NewArray ne) {
+    public Object visitNewArray(NewArray ne) {
         Log.log(ne, "Visiting a NewArray");
         
-        return (T) createNewArray(null, ne);
+        return createNewArray(null, ne);
     }
     
     /**
@@ -829,7 +769,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT PRIMITIVE_TYPE
      */
     @Override
-    public T visitPrimitiveType(PrimitiveType py) {
+    public Object visitPrimitiveType(PrimitiveType py) {
         Log.log(py, "Visiting a Primitive Type (" + py.typeName() + ")");
         
         // ProcessJ primitive types that do not translate
@@ -842,7 +782,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         else if (py.isBarrierType())
             typeStr = PJBarrier.class.getSimpleName();
 
-        return (T) typeStr;
+        return typeStr;
     }
     
     /**
@@ -850,7 +790,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT PRIMITIVE_LITERAL
      */
     @Override
-    public T visitPrimitiveLiteral(PrimitiveLiteral li) {
+    public Object visitPrimitiveLiteral(PrimitiveLiteral li) {
         Log.log(li, "Visiting a Primitive Literal (" + li.getText() + ")");
         
         ST stPrimitiveLiteral = _stGroup.getInstanceOf("PrimitiveLiteral");
@@ -858,7 +798,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
             stPrimitiveLiteral.add("type", li.suffix());
         stPrimitiveLiteral.add("value", li.getText());
         
-        return (T) stPrimitiveLiteral.render();
+        return stPrimitiveLiteral.render();
     }
     
     /**
@@ -866,7 +806,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT CHANNEL_TYPE
      */
     @Override
-    public T visitChannelType(ChannelType ct) {
+    public Object visitChannelType(ChannelType ct) {
         Log.log(ct, "Visiting a ChannelType (" + ct + ")");
         
         // Channel class type
@@ -889,7 +829,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         // where 'T' is the type to be resolved
         String type = getChannelType(ct.baseType());
         
-        return (T) (chantype + "<" + type + ">");
+        return chantype + "<" + type + ">";
     }
     
     /**
@@ -897,12 +837,12 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT CHANNEL_END_EXPR
      */
     @Override
-    public T visitChannelEndExpr(ChannelEndExpr ce) {
+    public Object visitChannelEndExpr(ChannelEndExpr ce) {
         Log.log(ce, "Visiting a ChannelEndExpr (" + (ce.isRead() ? "read" : "write") + ")");
         
         String channel = (String) ce.channel().visit(this);
         
-        return (T) channel;
+        return channel;
     }
     
     /**
@@ -910,7 +850,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT CHANNEL_END_TYPE
      */
     @Override
-    public T visitChannelEndType(ChannelEndType ct) {
+    public Object visitChannelEndType(ChannelEndType ct) {
         Log.log(ct, "Visiting a ChannelEndType (" + ct.typeName() + ")");
         
         // Channel class type
@@ -927,7 +867,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         // where 'T' is the type to be resolved
         String type = getChannelType(ct.baseType());
         
-        return (T) (chanType + "<" + type + ">");
+        return chanType + "<" + type + ">";
     }
     
     /**
@@ -935,7 +875,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT CHANNEL_WRITE_STAT
      */
     @Override
-    public T visitChannelWriteStat(ChannelWriteStat cw) {
+    public Object visitChannelWriteStat(ChannelWriteStat cw) {
         Log.log(cw, "Visiting a ChannelWriteStat");
         
         // Generated template after evaluating this visitor
@@ -959,15 +899,15 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         stChanWriteStat.add("chanName", chanWriteName);
         stChanWriteStat.add("writeExpr", expr);
         
-        // Add the 'switch' block for resumption
+        // Add the switch block for resumption
         for (int label = 0; label < countLabel; ++label) {
             // Increment jump label
             stChanWriteStat.add("resume" + label, ++_jumLabel);
-            // Add jump label to the 'switch' list
+            // Add jump label to the switch list
             _switchLabelList.add(renderSwitchLabel(_jumLabel));
         }
         
-        return (T) stChanWriteStat.render();
+        return stChanWriteStat.render();
     }
     
     /**
@@ -975,7 +915,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT CHANNEL_READ_EXPR
      */
     @Override
-    public T visitChannelReadExpr(ChannelReadExpr cr) {
+    public Object visitChannelReadExpr(ChannelReadExpr cr) {
         Log.log(cr, "Visiting a ChannelReadExpr");
         
         // Generated template after evaluating this visitor
@@ -990,11 +930,11 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         for (int label = 0; label < 2; ++label) {
             // Increment jump label
             stChannelReadExpr.add("resume" + label, ++_jumLabel);
-            // Add jump label to the 'switch' list
+            // Add jump label to the switch list
             _switchLabelList.add(renderSwitchLabel(_jumLabel));
         }
         
-        return (T) stChannelReadExpr.render();
+        return stChannelReadExpr.render();
     }
     
     /**
@@ -1002,7 +942,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT VAR
      */
     @Override
-    public T visitVar(Var va) {
+    public Object visitVar(Var va) {
         Log.log(va, "Visiting a Var (" + va.name().getname() + ")");
 
         // Generated template after evaluating this visitor
@@ -1010,7 +950,8 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         // Returned values for name and expression (if any)
         String name = (String) va.name().visit(this);
         String exprStr = null;
-        // This variable could be initialized, e.g., through an assignment operator
+        // This variable could be initialized, e.g., through an assignment
+        // operator
         Expression expr = va.init();
         // Visit the expressions associated with this variable
         if (expr != null) {
@@ -1022,7 +963,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
 
         stVar.add("name", name);
 
-        return (T) stVar.render();
+        return stVar.render();
     }
     
     /**
@@ -1030,7 +971,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT ARRAY_ACCESS_EXPR
      */
     @Override
-    public T visitArrayAccessExpr(ArrayAccessExpr ae) {
+    public Object visitArrayAccessExpr(ArrayAccessExpr ae) {
         Log.log(ae, "Visiting an ArrayAccessExpr");
         
         // Generated template after evaluating this visitor
@@ -1041,7 +982,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         stArrayAccessExpr.add("name", name);
         stArrayAccessExpr.add("index", index);
         
-        return (T) stArrayAccessExpr.render();
+        return stArrayAccessExpr.render();
     }
     
     /**
@@ -1049,7 +990,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT ARRAY_LITERAL
      */
     @Override
-    public T visitArrayLiteral(ArrayLiteral al) {
+    public Object visitArrayLiteral(ArrayLiteral al) {
         Log.log(al, "Visiting an ArrayLiteral");
         
         // Is the array initialize at compile time? If so, create
@@ -1060,13 +1001,13 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
             // even higher-dimensional arrays -- but they are not used
             // very often in practice
             String[] vals = (String[]) al.elements().visit(this);
-            return (T) Arrays.asList(vals)
+            return Arrays.asList(vals)
                     .toString()
                     .replace("[", " { ")
                     .replace("]", " } ");
         }
         
-        return (T) al.elements().visit(this);
+        return al.elements().visit(this);
     }
     
     /**
@@ -1074,12 +1015,12 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT ARRAY_TYPE
      */
     @Override
-    public T visitArrayType(ArrayType at) {
+    public Object visitArrayType(ArrayType at) {
         Log.log(at, "Visiting an ArrayType (" + at.typeName() + ")");
 
         String stArrayType = (String) at.baseType().visit(this) + "[]";
 
-        return (T) stArrayType;
+        return stArrayType;
     }
     
     /**
@@ -1087,11 +1028,11 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT MODIFIER
      */
     @Override
-    public T visitModifier(Modifier mo) {
+    public Object visitModifier(Modifier mo) {
         Log.log(mo, "Visiting a Modifier (" + mo + ")");
         
         // Type of modifiers: public, protected, private, etc.
-        return (T) mo.toString();
+        return mo.toString();
     }
     
     /**
@@ -1099,7 +1040,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT BLOCK
      */
     @Override
-    public T visitBlock(Block bl) {
+    public Object visitBlock(Block bl) {
         Log.log(bl, "Visiting a Block");
         
         // The scope in which declarations appear, starting with their
@@ -1107,7 +1048,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         // invocations or sequence of statements
         String[] stats = (String[]) bl.stats().visit(this);
 
-        return (T) stats;
+        return stats;
     }
     
     /**
@@ -1116,21 +1057,21 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      */
     @Override
     @SuppressWarnings("rawtypes")
-    public T visitSequence(Sequence se) {
+    public Object visitSequence(Sequence se) {
         Log.log(se, "Visiting a Sequence");
         
-        // Sequence of statements enclosed in a 'block' statement
+        // Sequence of statements enclosed in a block statement
         List<String> seqs = new ArrayList<>();
         // Iterate through every statement
         for (int i = 0; i < se.size(); ++i) {
             if (se.child(i) != null) {
-                T stats = se.child(i).visit(this);
+                Object stats = se.child(i).visit(this);
                 if (stats == null)
                     continue;
                 // These are either
                 //      1) a sequence of statements, or
                 //      2) a single statement
-                // found in a 'block' statement, e.g. local declarations,
+                // found in a block statement, e.g. local declarations,
                 // variable declarations, invocations, etc.
                 if (stats instanceof String[]) {
                     String[] statsStr = (String[]) stats;
@@ -1150,7 +1091,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
                 it.remove();
         }
         
-        return (T) seqs.toArray(new String[0]);
+        return seqs.toArray(new String[0]);
     }
     
     /**
@@ -1158,7 +1099,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT BREAK_STAT
      */
     @Override
-    public T visitBreakStat(BreakStat bs) {
+    public Object visitBreakStat(BreakStat bs) {
         Log.log(bs, "Visiting a BreakStat");
         
         // Generated template after evaluating this visitor
@@ -1167,7 +1108,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         if (bs.target() != null) // No parse tree for 'break'
             stBreakStat.add("name", bs.target().visit(this));
         
-        return (T) stBreakStat.render();
+        return stBreakStat.render();
     }
     
     /**
@@ -1175,13 +1116,13 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT SWITCH_LABEL
      */
     @Override
-    public T visitSwitchLabel(SwitchLabel sl) {
+    public Object visitSwitchLabel(SwitchLabel sl) {
         Log.log(sl, "Visiting a SwitchLabel");
         
         // Generated template after evaluating this visitor
         ST stSwitchLabel = _stGroup.getInstanceOf("SwitchLabel");
         
-        // This could be a 'default' label, in this case, expr()
+        // This could be a default label, in this case, expr()
         // is 'null'
         String label = null;
         if (!sl.isDefault())
@@ -1196,7 +1137,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         
         stSwitchLabel.add("label", label);
         
-        return (T) stSwitchLabel.render();
+        return stSwitchLabel.render();
     }
     
     /**
@@ -1204,7 +1145,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT SWITCH_GROUP
      */
     @Override
-    public T visitSwitchGroup(SwitchGroup sg) {
+    public Object visitSwitchGroup(SwitchGroup sg) {
         Log.log(sg, "Visit a SwitchGroup");
         
         // Generated template after evaluating this visitor
@@ -1224,7 +1165,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         stSwitchGroup.add("labels", labels);
         stSwitchGroup.add("stats", stats);
         
-        return (T) stSwitchGroup.render();
+        return stSwitchGroup.render();
     }
     
     /**
@@ -1232,7 +1173,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT SWITCH_STAT
      */
     @Override
-    public T visitSwitchStat(SwitchStat st) {
+    public Object visitSwitchStat(SwitchStat st) {
         Log.log(st, "Visiting a SwitchStat");
         
         // Generated template after evaluating this visitor
@@ -1254,7 +1195,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         // Reset value for future protocol tag
         _isProtocolCase = false;
         
-        return (T) stSwitchStat.render();
+        return stSwitchStat.render();
     }
     
     /**
@@ -1262,12 +1203,12 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT CAST_EXPR
      */
     @Override
-    public T visitCastExpr(CastExpr ce) {
+    public Object visitCastExpr(CastExpr ce) {
         Log.log(ce, "Visiting a CastExpr");
         
         // Generated template after evaluating this invocation
         ST stCastExpr = _stGroup.getInstanceOf("CastExpr");
-        // This result in
+        // This result in:
         //      ((type) (expr))
         String type = (String) ce.type().visit(this);
         String expr = (String) ce.expr().visit(this);
@@ -1275,7 +1216,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         stCastExpr.add("type", type);
         stCastExpr.add("expr", expr);
         
-        return (T) stCastExpr.render();
+        return stCastExpr.render();
     }
     
     /**
@@ -1284,7 +1225,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      */
     @Override
     @SuppressWarnings("rawtypes")
-    public T visitInvocation(Invocation in) {
+    public Object visitInvocation(Invocation in) {
         Log.log(in, "Visiting Invocation (" + in.targetProc.name().getname() + ")");
         
         // Generated template after evaluating this invocation
@@ -1306,9 +1247,9 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
                         0, Tag.METHOD_NAME);
             invokedProcName = invokedProc.myCompilation.fileNoExtension() + "." + name;
         } else if (invokedProc.isNative) {
-            // Make the package visible on import by using the qualified name of the
-            // class the procedure belongs to and the name of the folder the procedure's
-            // class belongs to, e.g., std.io.println(), where
+            // Make the package visible on import by using the qualified name of
+            // the class the procedure belongs to and the name of the directory
+            // the procedure's class belongs to, e.g., std.io.println(), where
             //      'std' is the name of the package,
             //      'io' is the name of the class/file,
             //      'println' is the method declared in the class
@@ -1324,20 +1265,20 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         Sequence<Expression> parameters = in.params();
         String[] paramsList = (String[]) parameters.visit(this);
         
-        // For an invocation of a procedure that 'yields' and one which
-        // is not inside par block, we wrap the procedure in a 'par' block
+        // For an invocation of a procedure that yields and one which
+        // is not inside par block, we wrap the procedure in a par-block
         if (Helper.doesProcedureYield(invokedProc) && _currParBlock == null) {
             return (new ParBlock(
-                    new Sequence(new ExprStat(in)), // statements
-                    new Sequence()))                // barriers
-                    .visit(this);                   // return a procedure wrapped in a 'par' block
+                    new Sequence(new ExprStat(in)), // Statements
+                    new Sequence()))                // Barriers
+                    .visit(this);                   // Return a procedure wrapped in a par-block
         }
         
         // Does this procedure yield?
         if (Helper.doesProcedureYield(invokedProc)) {
             stInvocation = _stGroup.getInstanceOf("InvocationProcType");
             stInvocation.add("parBlock", _currParBlock);
-            // Add the 'barrier' this procedure should resign from
+            // Add the barrier this procedure should resign from
             if (!_barrierList.isEmpty())
                 stInvocation.add("barrier", _barrierList);
         } else
@@ -1347,7 +1288,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         stInvocation.add("name", invokedProcName);
         stInvocation.add("vars", paramsList);
         
-        return (T) stInvocation.render();
+        return stInvocation.render();
     }
     
     /**
@@ -1355,7 +1296,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT PROTOCOL_TYPE_DECL
      */
     @Override
-    public T visitProtocolTypeDecl(ProtocolTypeDecl pd) {
+    public Object visitProtocolTypeDecl(ProtocolTypeDecl pd) {
         Log.log(pd, "Visiting a ProtocolTypeDecl (" + pd.name().getname() + ")");
         
         // Generated template after evaluating this visitor
@@ -1384,7 +1325,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         stProtocolClass.add("modifiers", modifiers);
         stProtocolClass.add("body", body);
         
-        return (T) stProtocolClass.render();
+        return stProtocolClass.render();
     }
     
     /**
@@ -1392,7 +1333,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT PROTOCOL_CASE
      */
     @Override
-    public T visitProtocolCase(ProtocolCase pc) {
+    public Object visitProtocolCase(ProtocolCase pc) {
         Log.log(pc, "Visiting a ProtocolCase (" + pc.name().getname() + ")");
         
         // Generated template after evaluating this visitor
@@ -1404,7 +1345,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         // This may create name collision problems because we use the same
         // visitor for protocols and records
         _recordFieldMap.clear();
-        // This is used to choose the tag of the 'current' protocol in a single
+        // This is used to choose the tag of the current protocol in a single
         // switch section from a list of possible candidates
         _protocMemberMap.put(protocName, _currProcotolName);
         
@@ -1421,7 +1362,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         
         stProtocolCase.add("name", protocName);
         
-        return (T) stProtocolCase.render();
+        return stProtocolCase.render();
     }
     
     /**
@@ -1429,7 +1370,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT PROTOCOL_LITERAL
      */
     @Override
-    public T visitProtocolLiteral(ProtocolLiteral pl) {
+    public Object visitProtocolLiteral(ProtocolLiteral pl) {
         Log.log(pl, "Visiting a ProtocolLiteral (" + pl.name().getname() + ")");
         
         // Generated template after evaluating this visitor
@@ -1439,9 +1380,9 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         
         // This map is used to determine the order in which values are
         // used with the constructor of the class associated with this
-        // protocol's 'type'
+        // protocol's type
         HashMap<String, String> members = new LinkedHashMap<>();
-        // We only need the members of the 'tag' being used
+        // We only need the members of the tag being used
         ProtocolCase target = null;
         ProtocolTypeDecl pt = (ProtocolTypeDecl) _topLevelDecls.get(type);
         if (pt != null) { // This should never be 'null'
@@ -1451,7 +1392,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
                     break;
                 }
             }
-            // Now that we have the target 'tag', iterate over all
+            // Now that we have the target tag, iterate over all
             // of its members
             for (RecordMember rm : target.body()) {
                 String name = (String) rm.name().visit(this);
@@ -1459,9 +1400,10 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
             }
         }
         
-        // Similar to a 'RecordLiteral', a visit to a 'RecordMemberLiteral'
-        // would return a string "z = 3", where 'z' is the member of a protocol
-        // and '3' is the literal value used to initialized 'z' with. 
+        // Similar to a RecordLiteral, a visit to a RecordMemberLiteral
+        // would return a string "z = 3", where 'z' is the member of a
+        // protocol and '3' is the literal value used to initialized
+        // 'z' with. 
         for (RecordMemberLiteral rm : pl.expressions()) {
             String lhs = (String) rm.name().visit(this);
             String expr = (String) rm.expr().visit(this);
@@ -1475,7 +1417,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         stProtocolLiteral.add("tag", tag);
         stProtocolLiteral.add("vals", members.values());
         
-        return (T) stProtocolLiteral.render();
+        return stProtocolLiteral.render();
     }
     
     /**
@@ -1483,7 +1425,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT RECORD_TYPE_DECL
      */
     @Override
-    public T visitRecordTypeDecl(RecordTypeDecl rt) {
+    public Object visitRecordTypeDecl(RecordTypeDecl rt) {
         Log.log(rt, "Visiting a RecordTypeDecl (" + rt.name().getname() + ")");
         
         // Generated template after evaluating this visitor
@@ -1513,7 +1455,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         stRecordClass.add("name", recName);
         stRecordClass.add("modifiers", modifiers);
         
-        return (T) stRecordClass.render();
+        return stRecordClass.render();
     }
     
     /**
@@ -1521,7 +1463,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT RECORD_MEMBER
      */
     @Override
-    public T visitRecordMember(RecordMember rm) {
+    public Object visitRecordMember(RecordMember rm) {
         Log.log(rm, "Visiting a RecordMember (" + rm.type() + " " + rm.name().getname() + ")");
         
         // Grab the type and name of a declared variable
@@ -1543,7 +1485,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT RECORD_LITERAL
      */
     @Override
-    public T visitRecordLiteral(RecordLiteral rl) {
+    public Object visitRecordLiteral(RecordLiteral rl) {
         Log.log(rl, "Visiting a RecordLiteral (" + rl.name().getname() + ")");
         
         // Generated template after evaluating this visitor
@@ -1563,7 +1505,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
             }
         }
         
-        // This can get hairy! A visit to a 'RecordMemberLiteral' would
+        // This can get hairy! A visit to a RecordMemberLiteral would
         // return a string "z = 3", where 'z' is the member of a record
         // and '3' is the literal value used to initialized 'z' with. This
         // is something we don't want to do. Instead, we need to return
@@ -1580,7 +1522,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         stRecordListeral.add("type", type);
         stRecordListeral.add("vals", members.values());
         
-        return (T) stRecordListeral.render();
+        return stRecordListeral.render();
     }
     
     /**
@@ -1588,7 +1530,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT RECORD_ACCESS
      */
     @Override
-    public T visitRecordAccess(RecordAccess ra) {
+    public Object visitRecordAccess(RecordAccess ra) {
         Log.log(ra, "Visiting a RecordAccess (" + ra + ")");
 
         // Generated template after evaluating this visitor
@@ -1603,10 +1545,12 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         } else if (ra.record().type.isProtocolType()) {
             stRecordAccess = _stGroup.getInstanceOf("ProtocolAccess");
             ProtocolTypeDecl pt = (ProtocolTypeDecl) ra.record().type;
-            String protocName = (String) pt.name().visit(this); // wrapper class
-            String name = (String) ra.record().visit(this);     // reference to inner class type
-            String field = (String) ra.field().visit(this);     // field in inner class
+            String protocName = (String) pt.name().visit(this); // Wrapper class
+            String name = (String) ra.record().visit(this);     // Reference to inner class type
+            String field = (String) ra.field().visit(this);     // Field in inner class
             
+            // Grab the name of the wrapper class enclosing the
+            // protocol tag
             protocName = _protocMemberMap.get(_currProtocolTag);
             
             stRecordAccess.add("protocName", protocName);
@@ -1616,13 +1560,16 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         } else { // This is for arrays and strings
             String name = (String) ra.record().visit(this);
             stRecordAccess.add("name", name);
+            // Call the appropriate method to retrieve the number
+            // of characters in a string or the number of elements
+            // in an n-dimensional array
             if (ra.isArraySize)
                 stRecordAccess.add("member", "length");
             else if (ra.isStringLength)
                 stRecordAccess.add("member", "length()");
         }
         
-        return (T) stRecordAccess.render();
+        return stRecordAccess.render();
     }
     
     /**
@@ -1630,28 +1577,29 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT PAR_BLOCK
      */
     @Override
-    public T visitParBlock(ParBlock pb) {
+    public Object visitParBlock(ParBlock pb) {
         Log.log(pb, "Visiting a ParBlock with " + pb.stats().size() + " statements.");
         
-        // Report a warning message for having an empty 'par' block?
+        // Report a warning message for having an empty par-block?
+        // TODO: should this be done in 'reachability'?
         if (pb.stats().size() == 0)
             return null;
         // Generated template after evaluating this visitor
         ST stParBlock = _stGroup.getInstanceOf("ParBlock");
-        // Save previous 'par' block
+        // Save previous par-block
         String prevParBlock = _currParBlock;
-        // Save previous 'barrier' expressions
+        // Save previous barrier expressions
         List<String> prevBarrier = _barrierList;
         if (!_barrierList.isEmpty())
             _barrierList = new ArrayList<>();
-        // Create a name for this new 'par' block
+        // Create a name for this new par-block
         _currParBlock = Helper.makeVariableName(Tag.PAR_BLOCK_NAME.getTag(), ++_parDecId, Tag.LOCAL_NAME);
-        // Is this 'par' block new?
+        // Is this par-block new?
         if (_parMap.get(_currParBlock) == null) {
             // Yes! register this block.
             _parMap.put(_currProcName, pb.stats().size());
-            // Since this is a new 'par' block, we need to create a
-            // variable inside the process in which this 'par' block
+            // Since this is a new par-block, we need to create a
+            // variable inside the process in which this par-block
             // was declared
             if (_currProcName != null) { // This should never be 'null'
                 stParBlock.add("name", _currParBlock);
@@ -1663,16 +1611,16 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         
         // Increment jump label
         stParBlock.add("jump", ++_jumLabel);
-        // Add jump label to the 'switch' list
+        // Add jump label to the switch list
         _switchLabelList.add(renderSwitchLabel(_jumLabel));
-        // Add the 'barrier' this par block enrolls in
+        // Add the barrier this par block enrolls in
         Sequence<Expression> barriers = pb.barriers();
         if (barriers.size() > 0) {
             for (Expression ex : barriers)
                 _barrierList.add((String) ex.visit(this));
         }
         
-        // Visit the sequence of statements in the 'par' block
+        // Visit the sequence of statements in the par-block
         Sequence<Statement> statements = pb.stats();
         if (statements.size() > 0) {
             // Rendered value of each statement
@@ -1680,9 +1628,9 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
             for (Statement st : statements) {
                 if (st == null)
                     continue;
-                // An 'expression' is any valid unit of code that resolves to a value,
+                // An expression is any valid unit of code that resolves to a value,
                 // that is, it can be a combination of variables, operations and values
-                // that yield a result. An 'statement' is a line of code that performs
+                // that yield a result. An statement is a line of code that performs
                 // some action, e.g., print statements, an assignment statement, etc.
                 if (st instanceof ExprStat && ((ExprStat) st).expr() instanceof Invocation) {
                     ExprStat es = (ExprStat) st;
@@ -1703,16 +1651,16 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
             }
             stParBlock.add("body", stmts);
         }
-        // Add 'barrier' to par block
+        // Add barrier to par block
         if (!_barrierList.isEmpty() && pb.barriers().size() > 0)
             stParBlock.add("barrier", _barrierList);
         
-        // Restore 'par' block
+        // Restore par-block
         _currParBlock = prevParBlock;
-        // Restore 'barrier' expressions
+        // Restore barrier expressions
         _barrierList = prevBarrier;
         
-        return (T) stParBlock.render();
+        return stParBlock.render();
     }
     
     /**
@@ -1720,7 +1668,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT TIMEOUT_STAT
      */
     @Override
-    public T visitTimeoutStat(TimeoutStat ts) {
+    public Object visitTimeoutStat(TimeoutStat ts) {
         Log.log(ts, "Visiting a TimeoutStat");
         
         // Generated template after evaluating this visitor
@@ -1733,10 +1681,10 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         
         // Increment jump label
         stTimeoutStat.add("resume0", ++_jumLabel);
-        // Add jump label to the 'switch' list
+        // Add jump label to the switch list
         _switchLabelList.add(renderSwitchLabel(_jumLabel));
         
-        return (T) stTimeoutStat.render();
+        return stTimeoutStat.render();
     }
     
     /**
@@ -1744,7 +1692,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT SYNC_STAT
      */
     @Override
-    public T visitSyncStat(SyncStat st) {
+    public Object visitSyncStat(SyncStat st) {
         Log.log(st, "Visiting a SyncStat");
         
         // Generated template after evaluating this visitor
@@ -1754,10 +1702,10 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         
         // Increment jump label
         stSyncStat.add("resume0", ++_jumLabel);
-        // Add jump label to the 'switch' list
+        // Add jump label to the switch list
         _switchLabelList.add(renderSwitchLabel(_jumLabel));
         
-        return (T) stSyncStat.render();
+        return stSyncStat.render();
     }
     
     /**
@@ -1765,7 +1713,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT UNARY_POST_EXPR
      */
     @Override
-    public T visitUnaryPostExpr(UnaryPostExpr ue) {
+    public Object visitUnaryPostExpr(UnaryPostExpr ue) {
         Log.log(ue, "Visiting a UnaryPostExpr (" + ue.opString() + ")");
         
         // Generated template after evaluating this visitor
@@ -1780,7 +1728,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         stUnaryPostExpr.add("operand", operand);
         stUnaryPostExpr.add("op", op);
         
-        return (T) stUnaryPostExpr.render();
+        return stUnaryPostExpr.render();
     }
     
     /**
@@ -1788,7 +1736,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT UNARY_PRE_EXPR
      */
     @Override
-    public T visitUnaryPreExpr(UnaryPreExpr ue) {
+    public Object visitUnaryPreExpr(UnaryPreExpr ue) {
         Log.log(ue, "Visiting a UnaryPreExpr (" + ue.opString() + ")");
         
         // Generated template after evaluating this visitor
@@ -1803,7 +1751,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         stUnaryPreExpr.add("operand", operand);
         stUnaryPreExpr.add("op", op);
         
-        return (T) stUnaryPreExpr.render();
+        return stUnaryPreExpr.render();
     }
     
     /**
@@ -1811,7 +1759,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT_ALT_CASE
      */
     @Override
-    public T visitAltCase(AltCase ac) {
+    public Object visitAltCase(AltCase ac) {
         Log.log(ac, "Visiting an AltCase");
         
         // Generated template after evaluating this visitor
@@ -1827,7 +1775,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         stAltCase.add("guardExpr", guard);
         stAltCase.add("stats", stats);
         
-        return (T) stAltCase.render();
+        return stAltCase.render();
     }
     
     /**
@@ -1835,7 +1783,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT_CONSTANT_DECL
      */
     @Override
-    public T visitConstantDecl(ConstantDecl cd) {
+    public Object visitConstantDecl(ConstantDecl cd) {
         Log.log(cd, "Visting ConstantDecl (" + cd.type().typeName() + " " + cd.var().name().getname() + ")");
         
         // Generated template after evaluating this visitor
@@ -1843,7 +1791,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         stConstantDecl.add("type", cd.type().visit(this));
         stConstantDecl.add("var", cd.var().visit(this));
         
-        return (T) stConstantDecl.render();
+        return stConstantDecl.render();
     }
     
     /**
@@ -1851,7 +1799,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT_ALT_STAT
      */
     @Override
-    public T visitAltStat(AltStat as) {
+    public Object visitAltStat(AltStat as) {
         Log.log(as, "Visiting an AltStat");
         
         // Generated template after evaluating this visitor
@@ -1912,14 +1860,14 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         
         // ==
         // This is needed because of the 'StackMapTable' for the
-        // generated bytecode
-        Name n1 = new Name("index");
+        // generated Java bytecode
+        Name n = new Name("index");
         new LocalDecl(
                 new PrimitiveType(PrimitiveType.IntKind),
-                new Var(n1, null),
+                new Var(n, null),
                 false /* not constant */).visit(this);
         
-        // Create a tag for this local 'alt' declaration
+        // Create a tag for this local alt declaration
         String newName = Helper.makeVariableName("alt", ++_localDecId, Tag.LOCAL_NAME);
         _localParamFieldMap.put(newName, "PJAlt");
         _paramDeclNameMap.put(newName, newName);
@@ -1933,12 +1881,12 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         stAltStat.add("guards", "objectGuards");
         stAltStat.add("jump", ++_jumLabel);
         stAltStat.add("cases", altCases);
-        stAltStat.add("index", n1.visit(this));
+        stAltStat.add("index", n.visit(this));
         
-        // Add jump label to the 'switch' list
+        // Add jump label to the switch list
         _switchLabelList.add(renderSwitchLabel(_jumLabel));
         
-        return (T) stAltStat.render();
+        return stAltStat.render();
     }
     
     /**
@@ -1946,7 +1894,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
      * VISIT_RETURN_STAT
      */
     @Override
-    public T visitReturnStat(ReturnStat rs) {
+    public Object visitReturnStat(ReturnStat rs) {
         Log.log(rs, "Visiting a ReturnStat");
         
         ST stReturnStat = _stGroup.getInstanceOf("ReturnStat");
@@ -1957,7 +1905,7 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         
         stReturnStat.add("expr", expr);
         
-        return (T) stReturnStat.render();
+        return stReturnStat.render();
     }
     
     //
@@ -2023,16 +1971,16 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
     @SuppressWarnings("rawtypes")
     private ProcTypeDecl createAnonymousProcTypeDecl(Statement st) {
         return new ProcTypeDecl(
-                new Sequence(),               // modifiers
-                null,                         // return type
-                new Name("Anonymous"),        // procedure name
-                new Sequence(),               // formal parameters
-                new Sequence(),               // implement
-                null,                         // annotations
-                new Block(new Sequence(st))); // body
+                new Sequence(),               // Modifiers
+                null,                         // Return type
+                new Name("Anonymous"),        // Procedure name
+                new Sequence(),               // Formal parameters
+                new Sequence(),               // Implement
+                null,                         // Annotations
+                new Block(new Sequence(st))); // Body
     }
     
-    private T createNewArray(String lhs, NewArray na) {
+    private Object createNewArray(String lhs, NewArray na) {
         Log.log(na.line + ": Creating a New Array");
         
         // Generated template after evaluating this visitor
@@ -2063,10 +2011,10 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         // Reset value for array literal expressions
         _isArrayLiteral = false;
         
-        return (T) stNewArray.render();
+        return stNewArray.render();
     }
     
-    private T createChannelReadExpr(String lhs, String op, ChannelReadExpr cr) {
+    private Object createChannelReadExpr(String lhs, String op, ChannelReadExpr cr) {
         Log.log(cr, "Creating Channel Read Expression");
         
         // Generated template after evaluating this visitor
@@ -2077,11 +2025,11 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         // 'c' is the name of the channel
         String chanEndName = (String) chanExpr.visit(this);
         
-        // Is it a 'timer' read expression
+        // Is it a timer read expression
         if (chanExpr.type.isTimerType()) {
             ST stTimerRedExpr = _stGroup.getInstanceOf("TimerRedExpr");
             stTimerRedExpr.add("name", lhs);
-            return (T) stTimerRedExpr.render();
+            return stTimerRedExpr.render();
         }
         
         int countLabel = 2;  // One for the 'runLabel' and one for the 'read' operation
@@ -2098,18 +2046,18 @@ public class CodeGeneratorJava<T extends Object> extends Visitor<T> {
         }
         
         stChannelReadExpr.add("chanName", chanEndName);        
-        // Add the 'switch' block for resumption
+        // Add the switch block for resumption
         for (int label = 0; label < countLabel; ++label) {
             // Increment jump label
             stChannelReadExpr.add("resume" + label, ++_jumLabel);
-            // Add jump label to the 'switch' list
+            // Add jump label to the switch list
             _switchLabelList.add(renderSwitchLabel(_jumLabel));
         }
         
         stChannelReadExpr.add("lhs", lhs);
         stChannelReadExpr.add("op", op);
         
-        return (T) stChannelReadExpr.render();
+        return stChannelReadExpr.render();
     }
     
     /**

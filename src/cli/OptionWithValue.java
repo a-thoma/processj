@@ -98,17 +98,17 @@ public abstract class OptionWithValue implements Comparable<OptionWithValue> {
         defaultValue = builder.defaultValue;
     }
     
-    // ================
+    // 
     // S E T T E R S
-    // ================
+    // 
     
     public void addValue(Object newValue) {
         value = newValue;
     }
     
-    // ================
+    // 
     // G E T T E R S
-    // ================
+    // 
     
     public final String getSimpleName() {
         return simpleName;
@@ -203,9 +203,9 @@ public abstract class OptionWithValue implements Comparable<OptionWithValue> {
         return stringBuilder.toString();
     }
     
-    // =====================
+    // 
     // B U I L D E R
-    // =====================
+    // 
     
     /**
      * The class {@link Builder} uses descriptive methods to

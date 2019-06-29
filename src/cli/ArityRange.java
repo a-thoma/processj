@@ -152,9 +152,9 @@ public class ArityRange extends AbstractList<Integer> {
         return "[" + from + ".." + to + "]";
     }
     
-    // =================
+    // 
     // H E L P E R S
-    // =================
+    // 
     
     /**
      * A helper iterator class.

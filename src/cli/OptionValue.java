@@ -94,9 +94,9 @@ public final class OptionValue extends OptionWithValue {
                 ")";
     }
     
-    // =====================
+    // 
     // B U I L D E R
-    // =====================
+    // 
 
     /**
      * Builder for this {@link OptionValue}.

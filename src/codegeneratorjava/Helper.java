@@ -162,12 +162,8 @@ public class Helper {
         return getWrapperClass(type).getSimpleName();
     }
     
-    // ==========================================
-    // I N V A L I D   I D E N T I F I E R S
-    // ==========================================
-    
-    // This is to prevent collision of names with special keywords
-    // when generating Java class files
+    // The idea was to used this set of special keyword for name conflicts
+    // TODO: this should be taken care of in 'namechecker'
     private static final Set<String> INVALID_NAMES = new HashSet<>(Arrays.asList(
             new String[] {
                     /* Java keywords */
@@ -218,7 +214,7 @@ public class Helper {
         }
         
         // Otherwise, the invocation must come from the same source
-        // file (and package)
+        // file and package
         return sourceFile;
     }
     

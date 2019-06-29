@@ -44,9 +44,9 @@ public class ProcessJc {
         if (args.length == 0)
             help();
         
-        // ===============================================
-        // C O M M A N D   L I N E   P R O C E S S O R
-        // ===============================================
+        //
+        // Command-line processor
+        // 
         
         // Build options and arguments with user input
         PJMain pjMain = null;
@@ -67,9 +67,10 @@ public class ProcessJc {
         boolean sts = pjMain.symbolTable;
         boolean visitorAll = pjMain.visitorAll;
         List<File> files = pjMain.files;
-        // Turn on/off colour mode
+        
+        // Turn on/off color mode
         if (pjMain.ansiColour == null) {
-            // Set the colour mode if the default value in the
+            // Set the color mode if the default value in the
             // properties file is 'yes'
             if (config.getProperty("colour").equalsIgnoreCase("yes"))
                 Settings.isAnsiColour = true;
@@ -78,7 +79,7 @@ public class ProcessJc {
             String ansiColorvalue = "no";
             if (Settings.isAnsiColour)
                 ansiColorvalue = "yes";
-            // Update colour code value in properties file
+            // Update color code value in properties file
             config.setProperty("colour", ansiColorvalue);
             ConfigFileReader.closeConfiguration(config);
 //            System.exit(0);
@@ -87,7 +88,8 @@ public class ProcessJc {
         // Display usage page
         if (pjMain.help)
             help();
-        else if (pjMain.version) { // Display version
+        // Display version
+        if (pjMain.version) {
             try {
                 String[] list = pjMain.getVersion().getVersionPrinter();
                 System.out.println(StringUtil.join(Arrays.asList(list), "\n"));
@@ -96,11 +98,13 @@ public class ProcessJc {
             }
             System.exit(0);
         }
-        else if (pjMain.errorCode != null) { // TODO: Display error code information
+        // Display error code information
+        if (pjMain.errorCode != null) {
             System.out.println("Not available..");
             System.exit(0);
         }
-        else if (files == null || files.isEmpty()) { // Check for input file(s)
+        // Check for input file(s)
+        if (files == null || files.isEmpty()) {
             // At least one file must be provided. Otherwise, throw an error if
             // no file is given, or if the file does not exists
             System.out.println(new PJMessage.Builder()
@@ -109,9 +113,9 @@ public class ProcessJc {
             System.exit(0);
         }
         
-        // ===============================================
-        // P R O C C E S S I N G   F I L E S
-        // ===============================================
+        // 
+        // Processing ProcessJ source files
+        //
         
         AST root = null;
         
@@ -170,12 +174,12 @@ public class ProcessJc {
             if (visitorAll)
                 Log.startLogging();
             
-            // =====================================================
+            //
             // V I S I T   I M P O R T   D E C L A R A T I O N S
-            // =====================================================
+            //
             
-	    SymbolTable.hook = null;
-	    System.out.println("-- Resolving imports.");
+            SymbolTable.hook = null;
+            System.out.println("-- Resolving imports.");
             c.visit(new namechecker.ResolveImports<AST>(globalTypeTable));
             globalTypeTable.printStructure("");
             
@@ -186,18 +190,18 @@ public class ProcessJc {
 //            }
 //            globalTypeTable.setImportParent(SymbolTable.hook);
             
-            // ===========================================================
+            // 
             // V I S I T   T O P   L E V E L   D E C L A R A T I O N S
-            // ===========================================================
-
-	    System.out.println("-- Declaring Top Level Declarations.");
+            // 
+            
+            System.out.println("-- Declaring Top Level Declarations.");
             c.visit(new namechecker.TopLevelDecls<AST>(globalTypeTable));
             
             System.out.println("-- Reconstructing records.");
-            c.visit(new rewriters.RecordRewrite<>(globalTypeTable));
+            c.visit(new rewriters.RecordRewrite(globalTypeTable));
             
-	    System.out.println("-- Checking native Top Level Declarations.");
-            c.visit(new namechecker.ResolveImportTopLevelDecls<AST>());
+            System.out.println("-- Checking native Top Level Declarations.");
+            c.visit(new namechecker.ResolveImportTopLevelDecls());
 
 
 //            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
@@ -212,118 +216,83 @@ public class ProcessJc {
 //                globalTypeTable.printStructure("");
             
             
-            // ========================================================
+            // 
             // V I S I T R E S O L V E   P A C K A G E   T Y P E S
-            // ========================================================
+            // 
 
             // Resolve types from imported packages.
-	    System.out.println("-- Resolving imported types.");
+            System.out.println("-- Resolving imported types.");
             c.visit(new namechecker.ResolvePackageTypes());
             
-//            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
-//                CompilerMessageManager.INSTANCE.printTrace("package types");
-//                System.exit(1);
-//            }
-            
-            // =======================================
+            // 
             // V I S I T   N A M E   C H E C K E R
-            // =======================================
-	    System.out.println("-- Checking name usage.");
+            // 
+            
+            System.out.println("-- Checking name usage.");
             c.visit(new namechecker.NameChecker<AST>(globalTypeTable));
             
-//            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
-//                CompilerMessageManager.INSTANCE.printTrace("name checker");
-//                System.exit(1);
-//            }
-            
-            // =======================================
+            // 
             // V I S I T   A R R A Y   T Y P E S
-            // =======================================
+            //
 
             // Re-construct Array Types correctly
-	    System.out.println("-- Reconstrucing array types.");
+            System.out.println("-- Reconstrucing array types.");
             root.visit(new namechecker.ArrayTypeConstructor());
             
-//            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
-//                CompilerMessageManager.INSTANCE.printTrace("array types constructor");
-//                System.exit(1);
-//            }
-            
-            // ========================================
+            // 
             // V I S I T   T Y P E   C H E C K E R
-            // ========================================
-	    System.out.println("-- Checking types.");
+            // 
+            
+            System.out.println("-- Checking types.");
             c.visit(new typechecker.TypeChecker(globalTypeTable));
             
-//            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
-//                CompilerMessageManager.INSTANCE.printTrace("type checking");
-//                System.exit(1);
-//            }
-            
-            // ========================================
+            // 
             // V I S I T   R E W R I T E S
-            // ========================================
+            // 
             
             c.visit(new CastRewrite());
             
-            // ========================================
+            // 
             // V I S I T   R E A C H A B I L I T Y
-            // ========================================
-	    System.out.println("-- Computing reachability.");
+            // 
+            
+            System.out.println("-- Computing reachability.");
             c.visit(new reachability.Reachability());
             c.visit(new rewriters.LoopRewrite());
             
-//            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
-//                CompilerMessageManager.INSTANCE.printTrace("reachability");
-//                System.exit(1);
-//            }
-            
-            // ===========================================
+            // 
             // V I S I T   P A R A L L E L   U S A G E
-            // ===========================================
-	    System.out.println("-- Performing parallel usage check.");
-            c.visit(new parallel_usage_check.ParallelUsageCheck());
+            // 
             
-//            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
-//                CompilerMessageManager.INSTANCE.printTrace("parallel usage checking");
-//                System.exit(1);
-//            }
+            System.out.println("-- Performing parallel usage check.");
+            c.visit(new parallel_usage_check.ParallelUsageCheck());
             
             // ==========================
             // V I S I T   Y I E L D
             // ==========================
             
             c.visit(new yield.Yield());
-	    System.out.println("-- Marking yielding statements and expressions.");
+            System.out.println("-- Marking yielding statements and expressions.");
             c.visit(new rewriters.Yield());
-	    //c.visit(new rewriters.Expr());
-	    
-	    System.out.println("-- Checking literal inits are free of channel communication.");
-	    c.visit(new semanticcheck.LiteralInits());
-
-
-	    System.out.println("-- Rewriting yielding expressions.");
-            new rewriters.ChannelReadRewrite().go(c, null);
-	    //System.out.println("Lets reprint it all");
-	    //c.visit(new printers.ParseTreePrinter());
-	    //c.visit(new printers.PrettyPrinter());
-	    System.out.println("-- Checking break and continue labels.");
-	    new semanticcheck.LabeledBreakContinueCheck().go(c);
-
-	    System.out.println("-- Collecting left-hand sides for par for code generation");
-	    c.visit(new rewriters.ParFor());
-
-
-
-
-//            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
-//                CompilerMessageManager.INSTANCE.printTrace("yield");
-//                System.exit(1);
-//            }
+            //c.visit(new rewriters.Expr());
             
-            // ===============================
+            System.out.println("-- Checking literal inits are free of channel communication.");
+            c.visit(new semanticcheck.LiteralInits());
+            
+            System.out.println("-- Rewriting yielding expressions.");
+            new rewriters.ChannelReadRewrite().go(c, null);
+            //System.out.println("Lets reprint it all");
+            //c.visit(new printers.ParseTreePrinter());
+            //c.visit(new printers.PrettyPrinter());
+            System.out.println("-- Checking break and continue labels.");
+            new semanticcheck.LabeledBreakContinueCheck().go(c);
+            
+            System.out.println("-- Collecting left-hand sides for par for code generation");
+            c.visit(new rewriters.ParFor());
+            
+            // 
             // C O D E   G E N E R A T O R
-            // ===============================
+            // 
             
             if (Settings.targetLanguage == Language.JVM) {
                 generateCodeJava(c, inFile, globalTypeTable);
@@ -359,10 +328,10 @@ public class ProcessJc {
 
         // Run the code generator to decode pragmas, generate libraries, resolve
         // types, and set the symbol table for top level declarations
-        CodeGeneratorJava<Object> generator = new CodeGeneratorJava<>(topLevelDecls);
+        CodeGeneratorJava generator = new CodeGeneratorJava(topLevelDecls);
 
         // Set the user working directory
-        //generator.setWorkingDirectory(configFile.getProperty("workingdir"));
+        //generator.setWorkingDir(configFile.getProperty("workingdir"));
 
         // Visit this compilation unit and recursively build the program
         // after returning strings rendered by the string template

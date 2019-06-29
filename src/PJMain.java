@@ -77,10 +77,9 @@ public class PJMain extends Command {
     @Option(names = {"-t", "-target"},
             defaultValue = "JVM",
             metavar = "<language>",
-            help = "Specify the target language. C: C source code is written, compiled, "
-                    + "and linked with the CSSP runtime; C++: C++ source code is generated "
+            help = "Specify the target language. C++: C++ source code is generated "
                     + "and compiled into an executable; JVM: JVM class files are written "
-                    + "and compiled; JS: JavaScript is written")
+                    + "and compiled")
     public Language target;
     
     @Option(names = {"-v", "-version"},

@@ -91,7 +91,6 @@ public enum ParserFactory {
      *            The name of the option.
      * @return An {@link OptionParser} instance or {@code null} if none is found.
      */
-//    public OptionParser<?> getParserTypeForClassType(Class<?> classType, String optionName) {
     @SuppressWarnings("rawtypes")
     public OptionParser<?> getParserTypeForClassType(Class<?> classType, String optionName, Class<? extends OptionParser> handler) {
         if (parserMap.get(classType) == null)

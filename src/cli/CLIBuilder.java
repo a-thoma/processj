@@ -491,9 +491,9 @@ public class CLIBuilder {
         return setClass;
     }
     
-    // =====================
+    // 
     // O P T I O N S
-    // =====================
+    // 
     
     /**
      * Collections of shared-options between command types.

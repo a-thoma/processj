@@ -557,8 +557,8 @@ public final class OptionGroup {
     
     protected static Constructor<? extends Command> findConstructor(Class<? extends Command> type) {
         try {
-            // This will fail if the extended class has no default no-argument constructor.
-            // One must NEVER be provided!
+            // This will fail if the extended class has no default no-argument
+            // constructor. One must be _never_ provided!
             return type.getConstructor(new Class[0]);
         } catch (NoSuchMethodException | SecurityException e) {
             throw new IllegalArgumentException(String.format("Missing default constructor in class '%s'.",
@@ -606,7 +606,7 @@ public final class OptionGroup {
     
     /**
      * Compares {@link Argument @Argument} fields by their index or,
-     * id their indices have the same values, by {@link Argument#order()}.
+     * if their indices have the same values, by {@link Argument#order()}.
      * 
      * @author Ben
      * @version 08/16/2018

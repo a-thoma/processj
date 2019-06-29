@@ -2,12 +2,10 @@ package namechecker;
 
 import java.util.Hashtable;
 
-import ast.AST;
 import ast.Compilation;
 import ast.Import;
 import ast.Pragma;
 import ast.ProcTypeDecl;
-import ast.Sequence;
 import ast.Type;
 import utilities.Log;
 import utilities.Visitor;
@@ -23,7 +21,7 @@ import utilities.Visitor;
  * @version 01/31/2019
  * @since 1.2
  */
-public class ResolveImportTopLevelDecls<T extends AST> extends Visitor<T> {
+public class ResolveImportTopLevelDecls extends Visitor<Object> {
     
     // The import currently being resolved.
     public Import currentImport = null;
@@ -37,7 +35,7 @@ public class ResolveImportTopLevelDecls<T extends AST> extends Visitor<T> {
     }
     
     @Override
-    public T visitCompilation(Compilation co) {
+    public Object visitCompilation(Compilation co) {
         Log.log("Finding native top type declarations");
         Log.log("Visiting type declarations");
         co.imports().visit(this);
@@ -45,7 +43,7 @@ public class ResolveImportTopLevelDecls<T extends AST> extends Visitor<T> {
     }
     
     @Override
-    public T visitPragma(Pragma pr) {
+    public Object visitPragma(Pragma pr) {
         String val = pr.value() != null ? pr.value() : "";
         Log.log(pr, "Visiting an pragma " + pr.pname().getname() + " " + val);
         if (val.isEmpty())
@@ -56,7 +54,7 @@ public class ResolveImportTopLevelDecls<T extends AST> extends Visitor<T> {
     }
     
     @Override
-    public T visitImport(Import im) {
+    public Object visitImport(Import im) {
         Log.log(im, "Visiting an import (of file: " + im + ")");
         Import prevImport = currentImport;
         currentImport = im;
@@ -83,7 +81,7 @@ public class ResolveImportTopLevelDecls<T extends AST> extends Visitor<T> {
     }
     
     @Override
-    public T visitProcTypeDecl(ProcTypeDecl pd) {
+    public Object visitProcTypeDecl(ProcTypeDecl pd) {
         Log.log(pd, "Visiting a ProcTypeDecl (" + pd.name().getname() + " " + pd.signature() + ")");
         if (!pragmatable.isEmpty() && currentImport != null) {
             String path = ResolveImports.makeImportPath(currentImport);
