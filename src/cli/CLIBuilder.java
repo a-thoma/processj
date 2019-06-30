@@ -492,7 +492,7 @@ public class CLIBuilder {
     }
     
     // 
-    // O P T I O N S
+    // OPTIONS
     // 
     
     /**

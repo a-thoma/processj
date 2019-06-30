@@ -25,7 +25,8 @@ public class ResolveImportTopLevelDecls extends Visitor<Object> {
     
     // The import currently being resolved.
     public Import currentImport = null;
-    public static Hashtable<String, String> pragmatable = new Hashtable<>();
+    
+    public static Hashtable<String, String> pragmaTable = new Hashtable<>();
     
     public ResolveImportTopLevelDecls() {
         Log.logHeader("****************************************");
@@ -47,9 +48,9 @@ public class ResolveImportTopLevelDecls extends Visitor<Object> {
         String val = pr.value() != null ? pr.value() : "";
         Log.log(pr, "Visiting an pragma " + pr.pname().getname() + " " + val);
         if (val.isEmpty())
-            pragmatable.put(pr.pname().getname(), pr.pname().getname());
+            pragmaTable.put(pr.pname().getname(), pr.pname().getname());
         else
-            pragmatable.put(pr.pname().getname(), val.replace("\"", ""));
+            pragmaTable.put(pr.pname().getname(), val.replace("\"", ""));
         return null;
     }
     
@@ -71,11 +72,11 @@ public class ResolveImportTopLevelDecls extends Visitor<Object> {
             // a ProcessJ native library
             for (Type t : c.typeDecls())
                 t.visit(this);
-            // TODO: the 'pragmatable' may need to be updated here due to
+            // TODO: the 'pragmaTable' may need to be updated here due to
             // compilations that this import perform 
         }
         // For now, resolve any updates here
-        pragmatable.clear();
+        pragmaTable.clear();
         currentImport = prevImport;
         return null;
     }
@@ -83,14 +84,14 @@ public class ResolveImportTopLevelDecls extends Visitor<Object> {
     @Override
     public Object visitProcTypeDecl(ProcTypeDecl pd) {
         Log.log(pd, "Visiting a ProcTypeDecl (" + pd.name().getname() + " " + pd.signature() + ")");
-        if (!pragmatable.isEmpty() && currentImport != null) {
+        if (!pragmaTable.isEmpty() && currentImport != null) {
             String path = ResolveImports.makeImportPath(currentImport);
             Log.log(pd, "Package path: " + path);
-            if (pragmatable.contains("LIBRARY") && pragmatable.contains("NATIVE")) {
+            if (pragmaTable.contains("LIBRARY") && pragmaTable.contains("NATIVE")) {
                 Log.log(pd, "Package file name: " + currentImport.file().getname());
                 pd.isNative = true;
                 pd.library = currentImport.toString();
-                pd.filename = pragmatable.get("FILE");
+                pd.filename = pragmaTable.get("FILE");
                 pd.nativeFunction = pd.name().getname();
             } else
                 ; // Non-native procedure found

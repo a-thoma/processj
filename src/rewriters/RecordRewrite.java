@@ -10,9 +10,9 @@ import utilities.Visitor;
 
 /**
  * Visitor used for rewriting the body of records that inherit fields
- * from one or more than one record. Since multiple inheritance is
- * not supported in Java, this visitor adds _shallow_ copies of fields
- * into a record that inherits from one or more records.
+ * from one or more than one record. Since multiple inheritance is not
+ * supported in Java, this visitor adds _shallow_ copies of fields
+ * into a record that extends other records.
  * 
  * @author Ben
  */
@@ -27,23 +27,24 @@ public class RecordRewrite extends Visitor<AST> {
         Log.logHeader("****************************************");
     }
     
-    public Set<RecordMember> findExtendedRecords(AST ast) {
+    public Set<RecordMember> addExtendedRecords(AST ast) {
         RecordTypeDecl rt = (RecordTypeDecl) ast;
-        Log.log(rt.line + ": extends a RecordTypeDecl (" + rt.name().getname() + ")");
+        Log.log(rt, "extends a RecordTypeDecl (" + rt.name().getname() + ")");
         
         Set<RecordMember> se = new LinkedHashSet<>();
         for (RecordMember rm : rt.body()) {
-            Log.log(rt.line + ": adding member " + rm.type() + " " + rm.name().getname());
+            Log.log(rt, "adding member " + rm.type() + " " + rm.name().getname());
             se.add(rm);
         }
-        if (rt.extend().size() > 0) { // Append members
+        // Add new members if and only if a record extends other records
+        if (rt.extend().size() > 0) {
             for (Name parent : rt.extend()) {
                 if (sym.get(parent.getname()) != null) {
-                    RecordTypeDecl rte = (RecordTypeDecl) sym.get(parent.getname());
-                    Set<RecordMember> seqr = findExtendedRecords(rte);
+                    RecordTypeDecl rtd = (RecordTypeDecl) sym.get(parent.getname());
+                    Set<RecordMember> seqr = addExtendedRecords(rtd);
                     for (RecordMember rm : seqr)
                         if (!se.add(rm))
-                            Log.log(rt.line + ": already in (" + rt.name().getname() + ")");
+                            Log.log(rt, "already in (" + rt.name().getname() + ")");
                 }
             }
         }        
@@ -52,7 +53,7 @@ public class RecordRewrite extends Visitor<AST> {
     
     @Override
     public AST visitRecordTypeDecl(RecordTypeDecl rt) {
-        Log.log(rt.line + ": Visiting a RecordTypeDecl (" + rt.name().getname() + ")");
+        Log.log(rt, "Visiting a RecordTypeDecl (" + rt.name().getname() + ")");
         
         Set<RecordMember> se = new LinkedHashSet<>();        
         if (rt.extend().size() > 0) {
@@ -60,18 +61,18 @@ public class RecordRewrite extends Visitor<AST> {
             for (Name name : rt.extend()) {
                 if (sym.get(name.getname()) != null) {
                     RecordTypeDecl rte = (RecordTypeDecl) sym.get(name.getname());
-                    se.addAll(findExtendedRecords(rte));
+                    se.addAll(addExtendedRecords(rte));
                 }
             }
         }
-        // Add this 'record' members to the set
+        // Add this record's members to the set
         for (RecordMember rm : rt.body())
             se.add(rm);
-        // Combine all into one
+        // Rewrite the record's body and add the new set of members
         rt.body().clear();
         for (RecordMember rm : se)
             rt.body().append(rm);
-        Log.log(rt.line + ": record " + rt.name().getname() + " with " + rt.body().size() + " member(s)");
+        Log.log(rt, "record " + rt.name().getname() + " with " + rt.body().size() + " member(s)");
         for (RecordMember rm : rt.body())
             Log.log("  > member " + rm.type() + " " + rm.name());
         return null;

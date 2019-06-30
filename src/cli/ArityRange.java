@@ -153,7 +153,7 @@ public class ArityRange extends AbstractList<Integer> {
     }
     
     // 
-    // H E L P E R S
+    // HELPER METHODS
     // 
     
     /**

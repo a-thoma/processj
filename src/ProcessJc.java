@@ -11,10 +11,8 @@ import library.Library;
 import namechecker.ResolveImports;
 import parser.parser;
 import rewriters.CastRewrite;
-import rewriters.ParFor;
 import scanner.Scanner;
 import utilities.ConfigFileReader;
-import utilities.Error;
 import utilities.PJMessage;
 import utilities.VisitorMessageNumber;
 import utilities.Language;
@@ -45,7 +43,7 @@ public class ProcessJc {
             help();
         
         //
-        // Command-line processor
+        // COMMAND-LINE PROCESSOR
         // 
         
         // Build options and arguments with user input
@@ -82,7 +80,6 @@ public class ProcessJc {
             // Update color code value in properties file
             config.setProperty("colour", ansiColorvalue);
             ConfigFileReader.closeConfiguration(config);
-//            System.exit(0);
         }
         
         // Display usage page
@@ -114,7 +111,7 @@ public class ProcessJc {
         }
         
         // 
-        // Processing ProcessJ source files
+        // PROCESS SOURCE FILES
         //
         
         AST root = null;
@@ -151,18 +148,18 @@ public class ProcessJc {
                 System.exit(1);
             }
 
-            // Cast the result from the parse to a Compilation - this is the root of the tree
+            // Cast the result from the parse to a Compilation -- this is the root of the tree
             Compilation c = (Compilation) root;
             // Set absolute path, file and package name from where this Compilation is created
             System.out.println("-- Setting absolute path, file and package name for '" + inFile.getName() + "'.");
             c.sourceFile = inFile.getName();
-            String parentPath = inFile.getAbsolutePath(); // This line grabs parent path of source file
+            String parentPath = inFile.getAbsolutePath(); // Grab the parent's path of source file
             parentPath = parentPath.substring(0, parentPath.lastIndexOf(File.separator));
-            c.path = parentPath; // get file's parent absolute path
+            c.path = parentPath; // Get file's parent absolute path
             if (c.packageName() != null)  // A package declaration is optional, so this can be 'null'
                 c.packageName = ResolveImports.packageNameToString(c.packageName());
 
-            // Decode pragmas - these are used for generating stubs from libraries.
+            // Decode pragmas -- these are used for generating stubs from libraries.
             // No regular program would have them.
             Library.decodePragmas(c);
             Library.generateLibraries(c);
@@ -175,7 +172,7 @@ public class ProcessJc {
                 Log.startLogging();
             
             //
-            // V I S I T   I M P O R T   D E C L A R A T I O N S
+            // VISIT IMPORT DECLARATIONS
             //
             
             SymbolTable.hook = null;
@@ -191,7 +188,7 @@ public class ProcessJc {
 //            globalTypeTable.setImportParent(SymbolTable.hook);
             
             // 
-            // V I S I T   T O P   L E V E L   D E C L A R A T I O N S
+            // VISIT TOP LEVEL DECLARATIONS
             // 
             
             System.out.println("-- Declaring Top Level Declarations.");
@@ -202,22 +199,9 @@ public class ProcessJc {
             
             System.out.println("-- Checking native Top Level Declarations.");
             c.visit(new namechecker.ResolveImportTopLevelDecls());
-
-
-//            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
-//                CompilerMessageManager.INSTANCE.printTrace("top level declarations");
-//                System.exit(1);
-//            }
-            
-//            globalTypeTable = SymbolTable.hook;
-
-            // Dump the symbol table structure
-//            if (symbolTable)
-//                globalTypeTable.printStructure("");
-            
             
             // 
-            // V I S I T R E S O L V E   P A C K A G E   T Y P E S
+            // VISIT RESOLVE PACKAGE TYPES
             // 
 
             // Resolve types from imported packages.
@@ -225,14 +209,14 @@ public class ProcessJc {
             c.visit(new namechecker.ResolvePackageTypes());
             
             // 
-            // V I S I T   N A M E   C H E C K E R
+            // VISIT NAME CHECKER
             // 
             
             System.out.println("-- Checking name usage.");
             c.visit(new namechecker.NameChecker<AST>(globalTypeTable));
             
             // 
-            // V I S I T   A R R A Y   T Y P E S
+            // VISIT ARRAY TYPES
             //
 
             // Re-construct Array Types correctly
@@ -240,20 +224,20 @@ public class ProcessJc {
             root.visit(new namechecker.ArrayTypeConstructor());
             
             // 
-            // V I S I T   T Y P E   C H E C K E R
+            // VISIT TYPE CHECKER
             // 
             
             System.out.println("-- Checking types.");
             c.visit(new typechecker.TypeChecker(globalTypeTable));
             
             // 
-            // V I S I T   R E W R I T E S
+            // VISIT REWRITERS
             // 
             
             c.visit(new CastRewrite());
             
             // 
-            // V I S I T   R E A C H A B I L I T Y
+            // VISIT REACHABILITY
             // 
             
             System.out.println("-- Computing reachability.");
@@ -261,15 +245,15 @@ public class ProcessJc {
             c.visit(new rewriters.LoopRewrite());
             
             // 
-            // V I S I T   P A R A L L E L   U S A G E
+            // VISIT PARALLEL USAGE
             // 
             
             System.out.println("-- Performing parallel usage check.");
             c.visit(new parallel_usage_check.ParallelUsageCheck());
             
-            // ==========================
-            // V I S I T   Y I E L D
-            // ==========================
+            // 
+            // VISIT YIELD
+            // 
             
             c.visit(new yield.Yield());
             System.out.println("-- Marking yielding statements and expressions.");
@@ -291,7 +275,7 @@ public class ProcessJc {
             c.visit(new rewriters.ParFor());
             
             // 
-            // C O D E   G E N E R A T O R
+            // CODE GENERATOR
             // 
             
             if (Settings.targetLanguage == Language.JVM) {
@@ -307,15 +291,13 @@ public class ProcessJc {
     }
     
     /**
-     * Given a ProcessJ {@link Compilation} unit, e.g. an abstract
-     * syntax tree object, we will generate the code for the JVM.
-     * The source range for this type of tree is the entire source
-     * file, not including leading and trailing whitespace characters
-     * and comments.
+     * Given a ProcessJ {@link Compilation} unit, e.g. an abstract syntax
+     * tree object, we will generate the code for the JVM. The source range
+     * for this type of tree is the entire source file, not including leading
+     * and trailing whitespace characters and comments.
      *
      * @param compilation
-     *              A {@link Compilation} unit consisting of a single
-     *              file.
+     *              A {@link Compilation} unit consisting of a single file.
      * @param inFile
      *              The compiled file.
      * @param topLevelDecls

@@ -1069,8 +1069,8 @@ public class CodeGeneratorJava extends Visitor<Object> {
                 if (stats == null)
                     continue;
                 // These are either
-                //      1) a sequence of statements, or
-                //      2) a single statement
+                //      1.) a sequence of statements, or
+                //      2.) a single statement
                 // found in a block statement, e.g. local declarations,
                 // variable declarations, invocations, etc.
                 if (stats instanceof String[]) {
@@ -1250,9 +1250,9 @@ public class CodeGeneratorJava extends Visitor<Object> {
             // Make the package visible on import by using the qualified name of
             // the class the procedure belongs to and the name of the directory
             // the procedure's class belongs to, e.g., std.io.println(), where
-            //      'std' is the name of the package,
-            //      'io' is the name of the class/file,
-            //      'println' is the method declared in the class
+            //      1.) 'std' is the name of the package,
+            //      2.) 'io' is the name of the class/file,
+            //      3.) 'println' is the method declared in the class
             invokedProcName = invokedProc.filename + "." + invokedProcName;
             stImport = _stGroup.getInstanceOf("Import");
             stImport.add("package", invokedProc.library);

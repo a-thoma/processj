@@ -102,7 +102,7 @@ public class Helper {
 
     /**
      * Returns {@code true} if a procedure is capable of yielding or {@code false}
-     * otherwise. Note that {@code "yieldability"} is determined by checking the
+     * otherwise. Note that {@code 'yieldability'} is determined by checking the
      * procedure's annotation through {@link ProcTypeDecl#annotations()}.
      *
      * @see ProcTypeDecl#annotations()

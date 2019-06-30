@@ -204,7 +204,7 @@ public abstract class OptionWithValue implements Comparable<OptionWithValue> {
     }
     
     // 
-    // B U I L D E R
+    // BUILDER
     // 
     
     /**

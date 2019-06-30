@@ -1,5 +1,6 @@
 package rewriters;
 
+import ast.AST;
 import ast.Assignment;
 import ast.Block;
 import ast.ExprStat;
@@ -10,7 +11,6 @@ import ast.PrimitiveType;
 import ast.ProcTypeDecl;
 import ast.Sequence;
 import ast.Statement;
-import ast.Type;
 import ast.Var;
 import ast.WhileStat;
 import utilities.Log;
@@ -19,12 +19,16 @@ import utilities.Visitor;
 /**
  * Temporary dirty fix for unreachable code due to infinite loop.
  * 
+ * For example:
+ *                              boolean tempLoopX = true;
+ *                              ...
+ *      while(true) {           while (tempLoopX) {
+ *          ...                     ...
+ *      }                       }
+ * 
  * @author Ben
  */
-public class LoopRewrite extends Visitor<Object> {
-    
-    // The procedure currently being checked.
-    private ProcTypeDecl currentProcedure = null;
+public class LoopRewrite extends Visitor<AST> {
     
     private int tempCounter = 0;
 
@@ -39,45 +43,62 @@ public class LoopRewrite extends Visitor<Object> {
     }
     
     @Override
-    public Object visitWhileStat(WhileStat ws) {
-        Log.log(ws, "Visiting a while statement");
+    public AST visitBlock(Block bl) {
+        Log.log(bl, "Visiting a Block");
         
-        // Is this an infinite loop?
-        if (ws.foreverLoop) {
-            // Rewrite the procedure's body
-            // Turn while (true) { ... }:
-            // boolean temp = true;
-            // while (temp) { ... }
-            String temp = nextTemp();
-            LocalDecl ld = new LocalDecl(
-                    new PrimitiveType(PrimitiveType.BooleanKind),
-                    new Var(new Name(temp), null),
-                    true /* constant */);
-            // Replace the literal in the while
-            NameExpr ne = new NameExpr(new Name(temp));
-            ExprStat es = new ExprStat(new Assignment(ne, ws.expr(), Assignment.EQ));
-            // This a quick dirty access!
-            ws.children[0] = ne;
-            // Append the new localDecl
-            Sequence<Statement> stats = new Sequence<Statement>();
-            stats.append(ld);
-            stats.append(es);
-            // Append remaining statements
-            for (Statement st : currentProcedure.body().stats())
-                stats.append(st);
-            // Create a new block for the current procedure
-            Block b = new Block(stats);
-            // I'm ashamed of myself -- another quick dirty access
-            currentProcedure.children[6] = b;
+        // TODO: Rewrite inner infinite loops??
+        
+        Sequence<Statement> stats = bl.stats();
+        // LocalDecls of the while-loop currently being visited.
+        Sequence<Statement> localStmts = new Sequence<>();
+        for (int i = 0; i < stats.size(); ++i) {
+            AST st = stats.child(i);
+            // Is this an infinite loop?
+            if (st instanceof WhileStat && ((WhileStat) st).foreverLoop) {
+                WhileStat ws = (WhileStat) st.visit(this);
+                // Create a local variable for the boolean literal in
+                // the while-loop
+                LocalDecl ld = new LocalDecl(
+                        new PrimitiveType(PrimitiveType.BooleanKind),
+                        new Var(new Name(((NameExpr) ws.expr()).name().getname()), null),
+                        true /* constant */);
+                localStmts.append(ld);
+            }
         }
         
-        return null;
+        if (localStmts.size() > 0) {
+            // Combine the original statements of the current procedure
+            // with the new one(s)
+            Sequence<Statement> newStmts = new Sequence<>();
+            newStmts.merge(localStmts);
+            newStmts.merge(bl.stats());
+            // Rewrite the procedure's body
+            bl.children[0] = newStmts;
+        }       
+        return bl;
     }
     
     @Override
-    public Object visitProcTypeDecl(ProcTypeDecl pd) {
+    public AST visitWhileStat(WhileStat ws) {
+        Log.log(ws, "Rewriting the boolean literal in while-loop");
+        
+        // Rewrite the boolean literal
+        String temp = nextTemp();
+        // Replace the literal value in the while-loop with the
+        // new local variable
+        NameExpr ne = new NameExpr(new Name(temp));
+        ExprStat es = new ExprStat(new Assignment(ne, ws.expr(), Assignment.EQ));
+        // Rewrite the expression for the while-loop
+        ws.children[0] = ne;
+        ws.assignments = new Sequence<Statement>();
+        ws.assignments.append(es);
+        
+        return ws;
+    }
+    
+    @Override
+    public AST visitProcTypeDecl(ProcTypeDecl pd) {
         Log.log(pd, "Visiting a procedure type declaration (" + pd.name().getname() + ").");
-        currentProcedure = pd;
         super.visitProcTypeDecl(pd);
         return null;
     }
