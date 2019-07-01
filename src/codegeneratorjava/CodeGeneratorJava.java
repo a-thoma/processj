@@ -90,7 +90,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
     
     // Map of records members transformed to fields for records that
     // inherit members from other records.
-    private HashMap<String, String> _recordMemberMap = new LinkedHashMap<>();
+//    private HashMap<String, String> _recordMemberMap = new LinkedHashMap<>();
     
     // Map of protocol names to name tags.
     private HashMap<String, String> _protocMap = new LinkedHashMap<>();
@@ -709,7 +709,8 @@ public class CodeGeneratorJava extends Visitor<Object> {
                 name = _paramDeclNameMap.get(na.getname());
         }
         
-        if (name == null && _recordMemberMap.containsKey(name))
+//        if (name == null && _recordMemberMap.containsKey(name))
+        if (name == null && _recordFieldMap.containsKey(name))
             name = _recordFieldMap.get(name);
         
         if (name == null && _recordMap.containsKey(name))
@@ -1472,7 +1473,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         
         // Add this field to the collection of record members for reference
         _recordFieldMap.put(name, type);
-        _recordMemberMap.put(name, name);
+//        _recordMemberMap.put(name, name);
         
         // Ignored the value returned by this visitor. The reason for
         // this is that the template for records takes a list of types
@@ -1514,9 +1515,9 @@ public class CodeGeneratorJava extends Visitor<Object> {
             String lhs = (String) rm.name().visit(this);
             String expr = (String) rm.expr().visit(this);
             if (members.put(lhs, expr) == null)
-                Log.log(rl.line + ":    Settings '" + lhs + "' with '" + expr + "'");
+                Log.log(rl, "    Settings '" + lhs + "' with '" + expr + "'");
             else
-                Log.log(rl.line + ":    Updating '" + lhs + "' with '" + expr + "'");
+                Log.log(rl, "    Updating '" + lhs + "' with '" + expr + "'");
         }
         
         stRecordListeral.add("type", type);

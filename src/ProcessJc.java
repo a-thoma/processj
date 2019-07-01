@@ -242,7 +242,6 @@ public class ProcessJc {
             
             System.out.println("-- Computing reachability.");
             c.visit(new reachability.Reachability());
-            c.visit(new rewriters.LoopRewrite());
             
             // 
             // VISIT PARALLEL USAGE
@@ -270,6 +269,9 @@ public class ProcessJc {
             //c.visit(new printers.PrettyPrinter());
             System.out.println("-- Checking break and continue labels.");
             new semanticcheck.LabeledBreakContinueCheck().go(c);
+            
+            System.out.println("-- Rewriting infinite loops");
+            new rewriters.ForeverLoopRewrite().go(c);
             
             System.out.println("-- Collecting left-hand sides for par for code generation");
             c.visit(new rewriters.ParFor());

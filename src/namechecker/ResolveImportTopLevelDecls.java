@@ -15,7 +15,7 @@ import utilities.Visitor;
  *
  * @param <T>
  *          The visitor interface used to traverse and resolve the
- *          type in an 'import' statement.
+ *          type in an import statement.
  * 
  * @author Ben
  * @version 01/31/2019
@@ -26,7 +26,7 @@ public class ResolveImportTopLevelDecls extends Visitor<Object> {
     // The import currently being resolved.
     public Import currentImport = null;
     
-    public static Hashtable<String, String> pragmaTable = new Hashtable<>();
+    public static Hashtable<String, String> pt = new Hashtable<>();
     
     public ResolveImportTopLevelDecls() {
         Log.logHeader("****************************************");
@@ -48,9 +48,9 @@ public class ResolveImportTopLevelDecls extends Visitor<Object> {
         String val = pr.value() != null ? pr.value() : "";
         Log.log(pr, "Visiting an pragma " + pr.pname().getname() + " " + val);
         if (val.isEmpty())
-            pragmaTable.put(pr.pname().getname(), pr.pname().getname());
+            pt.put(pr.pname().getname(), pr.pname().getname());
         else
-            pragmaTable.put(pr.pname().getname(), val.replace("\"", ""));
+            pt.put(pr.pname().getname(), val.replace("\"", ""));
         return null;
     }
     
@@ -59,24 +59,23 @@ public class ResolveImportTopLevelDecls extends Visitor<Object> {
         Log.log(im, "Visiting an import (of file: " + im + ")");
         Import prevImport = currentImport;
         currentImport = im;
-        // For every top-level declaration in a file, determine if this
+        // For every top-level declaration in the given file, determine if this
         // declaration is part of a ProcessJ native library
         for (Compilation c : im.getCompilations()) {
-            if (c == null)
-                continue;
-            // Visit the fields associated with pragma values to check
-            // if they are part of a native library function
+            if (c == null) continue;
+            // Visit the fields associated with pragma values to check if they
+            // are part of a native library function
             for (Pragma p : c.pragmas())
                 p.visit(this);
-            // Mark all top-level decls _native_ if they are part of
-            // a ProcessJ native library
+            // Mark all top-level decls _native_ if they are part of a ProcessJ
+            // native library
             for (Type t : c.typeDecls())
                 t.visit(this);
-            // TODO: the 'pragmaTable' may need to be updated here due to
-            // compilations that this import perform 
+            // TODO: 'pt' may need to be updated here due to compilations that
+            // this import perform
         }
         // For now, resolve any updates here
-        pragmaTable.clear();
+        pt.clear();
         currentImport = prevImport;
         return null;
     }
@@ -84,14 +83,14 @@ public class ResolveImportTopLevelDecls extends Visitor<Object> {
     @Override
     public Object visitProcTypeDecl(ProcTypeDecl pd) {
         Log.log(pd, "Visiting a ProcTypeDecl (" + pd.name().getname() + " " + pd.signature() + ")");
-        if (!pragmaTable.isEmpty() && currentImport != null) {
+        if (!pt.isEmpty() && currentImport != null) {
             String path = ResolveImports.makeImportPath(currentImport);
             Log.log(pd, "Package path: " + path);
-            if (pragmaTable.contains("LIBRARY") && pragmaTable.contains("NATIVE")) {
+            if (pt.contains("LIBRARY") && pt.contains("NATIVE")) {
                 Log.log(pd, "Package file name: " + currentImport.file().getname());
                 pd.isNative = true;
                 pd.library = currentImport.toString();
-                pd.filename = pragmaTable.get("FILE");
+                pd.filename = pt.get("FILE");
                 pd.nativeFunction = pd.name().getname();
             } else
                 ; // Non-native procedure found
