@@ -13,7 +13,6 @@ import ast.Sequence;
 import ast.Statement;
 import ast.Var;
 import ast.WhileStat;
-import utilities.Visitor;
 
 /**
  * Temporary dirty fix for unreachable code due to infinite loop.
@@ -61,30 +60,35 @@ public class ForeverLoopRewrite {
                     if (stat instanceof Block) {
                         // Visit the statements in the block.
                         go(stat);
-                    } else if (stat instanceof WhileStat && ((WhileStat) stat).foreverLoop) {
+                    } else if (stat instanceof WhileStat) {
                         WhileStat ws = (WhileStat) stat;
-                        // Rewrite the boolean literal.
-                        String temp = nextTemp();
-                        // Create a local variable for the boolean literal value in
-                        // the while-loop.
-                        LocalDecl ld = new LocalDecl(
-                                new PrimitiveType(PrimitiveType.BooleanKind),
-                                new Var(new Name(temp), null),
-                                true /* constant */);
-                        // Replace the boolean literal value in the while-loop with the
-                        // new local variable.
-                        NameExpr ne = new NameExpr(new Name(temp));
-                        ExprStat es = new ExprStat(new Assignment(ne, ws.expr(), Assignment.EQ));
-                        // Rewrite the expression for the while-loop.
-                        ws.children[0] = ne;
-                        // Rewrite the i'th sequence of statements.
-                        Sequence<Statement> stmts = new Sequence<Statement>();
-                        stmts.append(ld);
-                        stmts.append(es);
-                        stmts.append(stat);
-                        s.set(i, stmts);
-                        // Visit the while-loop's block.
-                        go(ws.stat());
+                        // Visit the while-loop's block to find possible infinite loops 
+                        if (!ws.foreverLoop)
+                            go(ws.stat());
+                        else {
+                            // Rewrite the boolean literal.
+                            String temp = nextTemp();
+                            // Create a local variable for the boolean literal value in
+                            // the while-loop.
+                            LocalDecl ld = new LocalDecl(
+                                    new PrimitiveType(PrimitiveType.BooleanKind),
+                                    new Var(new Name(temp), null),
+                                    true /* constant */);
+                            // Replace the boolean literal value in the while-loop with the
+                            // new local variable.
+                            NameExpr ne = new NameExpr(new Name(temp));
+                            ExprStat es = new ExprStat(new Assignment(ne, ws.expr(), Assignment.EQ));
+                            // Rewrite the expression for the while-loop.
+                            ws.children[0] = ne;
+                            // Rewrite the i'th sequence of statements.
+                            Sequence<Statement> stmts = new Sequence<Statement>();
+                            stmts.append(ld);
+                            stmts.append(es);
+                            stmts.append(stat);
+                            s.set(i, new Block(stmts));
+                            // Visit the while-loop's block.
+                            go(ws.stat());
+                        }
                     }
                 } else if (s.child(i) != null)
                     go(s.child(i));

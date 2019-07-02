@@ -33,7 +33,7 @@ public class LoopReadRewrite extends Visitor<AST> {
     }
     
     @SuppressWarnings("unchecked")
-    public void go(AST a, Sequence<Statement> stmts) {
+    public void go(AST a, Statement stmts) {
         if (a instanceof ProcTypeDecl) {
             // Rewrite the body if needed.
             ProcTypeDecl pd = (ProcTypeDecl) a;
@@ -46,50 +46,57 @@ public class LoopReadRewrite extends Visitor<AST> {
                     Statement stat = (Statement) s.child(i);
                     if (stat instanceof Block) {
                         // Visit the statements in the block.
-                        go(stat, stmts);
+                        Block b = (Block) stat;
+                        b.assignments = new Sequence<Statement>();
+                        go(b, b);
                     } else if (stat instanceof WhileStat) {
                         WhileStat ws = (WhileStat) stat;
-                        Sequence<Statement> newStmts = new Sequence<Statement>();
-                        // Do we have a read expression?
-                        if (ws.expr().doesYield())
-                            go(ws.expr(), newStmts);
-                        // Rewrite the expression in the while-loop
-                        if (newStmts.size() > 0) {
-                            LocalDecl ld = (LocalDecl) newStmts.child(0);
-                            ws.children[0] = new NameExpr(new Name(ld.name()));
-                            newStmts.append(stat);
-                            // Rewrite the block in the while-loop
-                            Block b = (Block) ws.stat();
-                            b.stats().append(newStmts.child(1));
-                            s.set(i, newStmts);
-                        }
+                        ws.assignments = new Sequence<Statement>();
                         // Visit the while-loop's block.
-                        go(ws.stat(), stmts);
+                        go(ws, ws);
+                        // Do we have a read expression?
+                        if (ws.expr().doesYield()) {
+                            System.out.println("Yields!!!");
+                            // Rewrite the block in the while-loop.
+                            ws.assignments.append(stat);
+                            Block b = (Block) ws.stat();
+                            for (AST expr : ws.assignments) {
+                                if (expr instanceof ExprStat)
+                                    b.stats().append((ExprStat) expr);
+                            }
+                            s.set(i, new Block(ws.assignments));
+                        }
                     } else if (stat instanceof ForStat) {
-                        // TODO: 'ExprStat' in for-loop
+                        // TODO: 'ExprStat' in for-loop.
                     }
                 } else if (s.child(i) != null)
                     go(s.child(i), stmts);
             }
-        } else if (a instanceof ChannelReadExpr) {
-            if (stmts != null) {
-                ChannelReadExpr cre = (ChannelReadExpr) a;
-                // Rewrite the boolean literal.
-                String temp = nextTemp();
-                // Create a local variable for the boolean literal value in
-                // the while-loop.
-                LocalDecl ld = new LocalDecl(cre.type,
-                        new Var(new Name(temp), null),
-                        true /* constant */);
-                ExprStat es = new ExprStat(new Assignment(new NameExpr(new Name(temp)),
-                        (ChannelReadExpr) a, Assignment.EQ));
-                stmts.append(ld);
-                stmts.append(es);
-            }
         } else {
+//            System.out.println("Maybe");
             // Iterate through it's 'children' array.
             for (int i = 0; i < a.nchildren; ++i) {
-                if (a.children[i] != null)
+//                System.out.println("Ok");
+                if (a.children[i] != null && a.children[i] instanceof ChannelReadExpr) {
+//                    System.out.println("Maybe");
+                    if (stmts != null) {
+                        ChannelReadExpr cre = (ChannelReadExpr) a.children[i];
+                        // Rewrite the boolean literal.
+                        String temp = nextTemp();
+                        // Create a local variable for the boolean literal value in
+                        // the while-loop.
+                        LocalDecl ld = new LocalDecl(cre.type, new Var(new Name(temp), null), true /* constant */);
+                        ExprStat es = new ExprStat(new Assignment(new NameExpr(new Name(temp)), cre, Assignment.EQ));
+                        // Add the rewrites to the statement.
+                        stmts.assignments.append(ld);
+                        stmts.assignments.append(es);
+                        // Mark the name expression as a 'yield expression'.
+                        NameExpr ne = new NameExpr(new Name(temp));
+                        ne.setYield();
+                        // Rewrite the channel read expression.
+                        a.children[i] = ne;
+                    }
+                } else if (a.children[i] != null)
                     go(a.children[i], stmts);
             }
         }
