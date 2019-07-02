@@ -5,6 +5,7 @@ import ast.Assignment;
 import ast.BinaryExpr;
 import ast.Block;
 import ast.ChannelReadExpr;
+import ast.DoStat;
 import ast.ExprStat;
 import ast.Expression;
 import ast.ForStat;
@@ -56,7 +57,7 @@ public class LoopReadRewrite extends Visitor<AST> {
                         go(ws, ws);
                         // Do we have a read expression?
                         if (ws.expr().doesYield()) {
-                            System.out.println("Yields!!!");
+//                            System.out.println("Yields!!!");
                             // Rewrite the block in the while-loop.
                             ws.assignments.append(stat);
                             Block b = (Block) ws.stat();
@@ -65,6 +66,29 @@ public class LoopReadRewrite extends Visitor<AST> {
                                     b.stats().append((ExprStat) expr);
                             }
                             s.set(i, new Block(ws.assignments));
+                        }
+                    } else if (stat instanceof DoStat) {
+                        DoStat ds = (DoStat) stat;
+                        ds.assignments = new Sequence<Statement>();
+                        // Visit the do-while's block.
+                        go(ds, ds);
+                        // Do we have a read expression?
+                        if (ds.expr().doesYield()) {
+                            // Only the expression in the do-while should be handle.
+                            // Add locals for each channel read expression.
+                            Sequence<Statement> newStmts = new Sequence<Statement>();
+                            for (AST expr : ds.assignments) {
+                                if (expr instanceof LocalDecl)
+                                    newStmts.append((LocalDecl) expr);
+                            }
+                            // Rewrite the block in the do-while.
+                            newStmts.append(stat);
+                            Block b = (Block) ds.stat();
+                            for (AST expr : ds.assignments) {
+                                if (expr instanceof ExprStat)
+                                    b.stats().append((ExprStat) expr);
+                            }
+                            s.set(i, new Block(newStmts));
                         }
                     } else if (stat instanceof ForStat) {
                         // TODO: 'ExprStat' in for-loop.
