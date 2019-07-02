@@ -69,40 +69,40 @@ public class CodeGeneratorJava extends Visitor<Object> {
     private SymbolTable _topLevelDecls = null;
 
     // Map of formal parameters transformed to fields.
-    private HashMap<String, String> _formalParamFieldMap = new LinkedHashMap<>();
+    private HashMap<String, String> _formalParamFieldMap = new LinkedHashMap<String, String>();
     
     // Map of formal parameter names to name tags.
-    private HashMap<String, String> _paramDeclNameMap = new LinkedHashMap<>();
+    private HashMap<String, String> _paramDeclNameMap = new LinkedHashMap<String, String>();
     
     // Map of local parameters transformed to fields.
-    private HashMap<String, String> _localParamFieldMap = new LinkedHashMap<>();
+    private HashMap<String, String> _localParamFieldMap = new LinkedHashMap<String, String>();
     
     // Map of par-blocks declared in a process. This map associates the
     // name of a par-block with the number of processes invoked within
     // its block.
-    private HashMap<String, Integer> _parMap = new LinkedHashMap<>();
+    private HashMap<String, Integer> _parMap = new LinkedHashMap<String, Integer>();
     
     // Map of record names to name tags.
-    private HashMap<String, String> _recordMap = new LinkedHashMap<>();
+    private HashMap<String, String> _recordMap = new LinkedHashMap<String, String>();
     
     // Map of records member transformed to fields.
-    private HashMap<String, String> _recordFieldMap = new LinkedHashMap<>();
+    private HashMap<String, String> _recordFieldMap = new LinkedHashMap<String, String>();
     
     // Map of records members transformed to fields for records that
     // inherit members from other records.
 //    private HashMap<String, String> _recordMemberMap = new LinkedHashMap<>();
     
     // Map of protocol names to name tags.
-    private HashMap<String, String> _protocMap = new LinkedHashMap<>();
+    private HashMap<String, String> _protocMap = new LinkedHashMap<String, String>();
     
     // Map of name tags to protocol names.
-    private HashMap<String, String> _protocMemberMap = new LinkedHashMap<>();
+    private HashMap<String, String> _protocMemberMap = new LinkedHashMap<String, String>();
     
     // List of switch labels.
-    private List<String> _switchLabelList = new ArrayList<>();
+    private List<String> _switchLabelList = new ArrayList<String>();
     
     // List of barrier expressions.
-    private List<String> _barrierList = new ArrayList<>();
+    private List<String> _barrierList = new ArrayList<String>();
 
     // Identifier for a parameter declaration.
     private int _varDecId = 0;
@@ -504,6 +504,26 @@ public class CodeGeneratorJava extends Visitor<Object> {
             stForStat.add("incr", incr);
         
         return stForStat.render();
+    }
+    
+    /**
+     * -----------------------------------------------------------------------------
+     * VISIT_CONTINUE
+     */
+    @Override
+    public Object visitContinueStat(ContinueStat cs) {
+        Log.log(cs, "Visiting a ContinueStat");
+        
+        // Generated template after evaluating this visitor.
+        ST stContinueStat = _stGroup.getInstanceOf("ContinueStat");
+        String name = null;
+        // If target is not 'null' then we have a label to jump to.
+        if (cs.target() != null) {
+            name = (String) cs.target().visit(this);
+            stContinueStat.add("name", name);
+        }
+        
+        return stContinueStat.render();
     }
     
     /**

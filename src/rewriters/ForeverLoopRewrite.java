@@ -37,9 +37,8 @@ import utilities.Visitor;
  * 
  * 
  * @author Ben
- *
  */
-public class ForeverLoopRewrite extends Visitor<AST> {
+public class ForeverLoopRewrite {
     
     private int tempCounter = 0;
 
@@ -55,35 +54,36 @@ public class ForeverLoopRewrite extends Visitor<AST> {
             go(pd.body());
         } else if (a instanceof Sequence) {
             Sequence<AST> s = (Sequence<AST>) a;
+            // Iterate through all the nodes in the sequence.
             for (int i = 0; i < s.size(); ++i) {
                 if (s.child(i) != null && s.child(i) instanceof Statement) {
                     Statement stat = (Statement) s.child(i);
-                    if (stat instanceof Block)
-                        // Visit the statements in the block
+                    if (stat instanceof Block) {
+                        // Visit the statements in the block.
                         go(stat);
-                    else if (stat instanceof WhileStat && ((WhileStat) stat).foreverLoop) {
+                    } else if (stat instanceof WhileStat && ((WhileStat) stat).foreverLoop) {
                         WhileStat ws = (WhileStat) stat;
-                        // Rewrite the boolean literal
+                        // Rewrite the boolean literal.
                         String temp = nextTemp();
                         // Create a local variable for the boolean literal value in
-                        // the while-loop
+                        // the while-loop.
                         LocalDecl ld = new LocalDecl(
                                 new PrimitiveType(PrimitiveType.BooleanKind),
                                 new Var(new Name(temp), null),
                                 true /* constant */);
                         // Replace the boolean literal value in the while-loop with the
-                        // new local variable
+                        // new local variable.
                         NameExpr ne = new NameExpr(new Name(temp));
                         ExprStat es = new ExprStat(new Assignment(ne, ws.expr(), Assignment.EQ));
-                        // Rewrite the expression for the while-loop
+                        // Rewrite the expression for the while-loop.
                         ws.children[0] = ne;
-                        // Rewrite the i'th sequence of statements
+                        // Rewrite the i'th sequence of statements.
                         Sequence<Statement> stmts = new Sequence<Statement>();
                         stmts.append(ld);
                         stmts.append(es);
                         stmts.append(stat);
                         s.set(i, stmts);
-                        // Visit the while-loop's block
+                        // Visit the while-loop's block.
                         go(ws.stat());
                     }
                 } else if (s.child(i) != null)

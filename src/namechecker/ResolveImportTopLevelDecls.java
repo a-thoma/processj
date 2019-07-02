@@ -26,7 +26,7 @@ public class ResolveImportTopLevelDecls extends Visitor<Object> {
     // The import currently being resolved.
     public Import currentImport = null;
     
-    public static Hashtable<String, String> pt = new Hashtable<>();
+    public static Hashtable<String, String> pt = new Hashtable<String, String>();
     
     public ResolveImportTopLevelDecls() {
         Log.logHeader("****************************************");
@@ -60,21 +60,19 @@ public class ResolveImportTopLevelDecls extends Visitor<Object> {
         Import prevImport = currentImport;
         currentImport = im;
         // For every top-level declaration in the given file, determine if this
-        // declaration is part of a ProcessJ native library
+        // declaration is part of a ProcessJ native library.
         for (Compilation c : im.getCompilations()) {
             if (c == null) continue;
-            // Visit the fields associated with pragma values to check if they
-            // are part of a native library function
+            // Visit each pragma and check if they are part of a native
+            // library function.
             for (Pragma p : c.pragmas())
                 p.visit(this);
             // Mark all top-level decls _native_ if they are part of a ProcessJ
-            // native library
+            // native library.
             for (Type t : c.typeDecls())
                 t.visit(this);
-            // TODO: 'pt' may need to be updated here due to compilations that
-            // this import perform
         }
-        // For now, resolve any updates here
+        // For now, resolve any updates here.
         pt.clear();
         currentImport = prevImport;
         return null;
@@ -93,7 +91,7 @@ public class ResolveImportTopLevelDecls extends Visitor<Object> {
                 pd.filename = pt.get("FILE");
                 pd.nativeFunction = pd.name().getname();
             } else
-                ; // Non-native procedure found
+                ; // Non-native procedure found.
         }
         return null;
     }
