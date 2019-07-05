@@ -17,23 +17,26 @@ import ast.WhileStat;
 /**
  * Temporary dirty fix for unreachable code due to infinite loop.
  * 
- * For example:
- *                                  boolean foreverLoopX = true;
+ * For example:                     Becomes:
+ *                                  boolean foreverLoop_0 = true;
  *                                  ...
- *      while (true) {              while (foreverLoopX) {
+ *      while (true) {              while (foreverLoop_0) {
  *          ...                         ...
  *      }                           }
  *
- * or
- *                                  boolean foreverLoopX = true;
- *                                  boolean foreverLoopY = true;
+ * For example:                     Becomes:
+ *                                  boolean foreverLoop_0 = true;
+ *                                  boolean foreverLoop_1 = true;
  *                                  ...
- *      while (true) {              while (foreverLoopX) {
- *          while (true) {              while (foreverLoopY) {
+ *                                  boolean foreverLoop_n = true;
+ *      while (true) {              while (foreverLoop_0) {
+ *          while (true) {              while (foreverLoop_1) {
  *              ...                         ...
+ *              while (true) {              while (foreverLoop_n) {
+ *                  ...                         ...
+ *              }                           }
  *          }                           }
  *      }                           }
- * 
  * 
  * @author Ben
  */
@@ -42,7 +45,7 @@ public class ForeverLoopRewrite {
     private int tempCounter = 0;
 
     private String nextTemp() {
-        return "foreverLoop" + tempCounter++ + "_";
+        return "foreverLoop" + tempCounter++ + "$";
     }
     
     @SuppressWarnings("unchecked")
@@ -62,7 +65,7 @@ public class ForeverLoopRewrite {
                         go(stat);
                     } else if (stat instanceof WhileStat) {
                         WhileStat ws = (WhileStat) stat;
-                        // Visit the while-loop's block to find possible infinite loops 
+                        // Check for infinite loops (if any). 
                         if (!ws.foreverLoop)
                             go(ws.stat());
                         else {
@@ -70,10 +73,8 @@ public class ForeverLoopRewrite {
                             String temp = nextTemp();
                             // Create a local variable for the boolean literal value in
                             // the while-loop.
-                            LocalDecl ld = new LocalDecl(
-                                    new PrimitiveType(PrimitiveType.BooleanKind),
-                                    new Var(new Name(temp), null),
-                                    true /* constant */);
+                            LocalDecl ld = new LocalDecl(new PrimitiveType(PrimitiveType.BooleanKind),
+                                    new Var(new Name(temp), null), true /* constant */);
                             // Replace the boolean literal value in the while-loop with the
                             // new local variable.
                             NameExpr ne = new NameExpr(new Name(temp));
@@ -94,7 +95,7 @@ public class ForeverLoopRewrite {
                     go(s.child(i));
             }
         } else {
-            // Iterate through it's 'children' array.
+            // Iterate through it's children array.
             for (int i = 0; i < a.nchildren; ++i) {
                 if (a.children[i] != null)
                     go(a.children[i]);

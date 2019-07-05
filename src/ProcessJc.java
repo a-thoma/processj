@@ -271,11 +271,11 @@ public class ProcessJc {
             new semanticcheck.LabeledBreakContinueCheck().go(c);
             
             System.out.println("-- Rewriting infinite loops.");
-            new rewriters.ForeverLoopRewrite().go(c);
+            //new rewriters.ForeverLoopRewrite().go(c);
             
             ////
             System.out.println("-- Rewriting yielding expressions in loops.");
-            new rewriters.LoopReadRewrite().go(c, null);
+            //new rewriters.LoopReadRewrite().go(c, null);
             ////
             
             System.out.println("-- Collecting left-hand sides for par for code generation");
