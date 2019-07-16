@@ -7,7 +7,6 @@ import java.io.OutputStreamWriter;
 import java.io.Writer;
 import java.util.Arrays;
 import java.util.HashSet;
-import java.util.Set;
 
 import ast.ProcTypeDecl;
 import ast.Type;
@@ -15,8 +14,7 @@ import utilities.Assert;
 import utilities.Settings;
 
 /**
- * The class {@link Helper} contains helper methods for
- * the {@link CodeGeneratorJava}.
+ * This class contains helper methods for the CodeGenerator.
  *
  * @author Ben
  * @version 06/21/2018
@@ -25,55 +23,33 @@ import utilities.Settings;
 public class Helper {
 
     /**
-     * Changes the name of a procedure, method, protocol, record, channel or local
-     * variable so that the JVM can separate common names which belong to the same
-     * compiled class.
-     * 
-     * <p>
-     * The ProcessJ naming convention is as follows:
-     * </p>
-     * 
-     * <ul>
-     * <li>
-     * For a procedure, the procedure is encoded as '{@code _proc$nameX}' where
-     * {@code name} is the procedure's unique identifier.
-     * </li>
-     *
-     * <li>
-     * For a Java method, the method is encoded as '{@code _method$nameX}' where
-     * {@code name} is the method's unique identifier.
-     * </li>
-     *
-     * <li>
-     * For parameters, the parameter is encoded as '{@code _pd$nameX}' where
-     * {@code name} is the name of the argument and '{@code X}' represents the
-     * position of the parameter in the argument list.
-     * <ul>
-     * <li>For example: foo(_pd$bar0, _pd$foo1, ..., _pd@nameX)</li>
-     * </ul>
-     * </li>
-     *
-     * <li>
-     * For locals, the local is encoded as '{@code _ld$nameX}' where {@code name}
-     * is the name of the local variable and '{@code X}' is the local's unique
+     * Changes the name of a procedure, method, protocol, record, channel
+     * or local variable so that the JVM can separate common names which
+     * belong to the same compiled class. The ProcessJ naming convention
+     * is as follows:
+     * 1.) For a procedure, the procedure is encoded as '_proc$name' where
+     * name is the procedure's unique identifier.
+     * 2.) For a Java method, the method is encoded as '_method$name' where
+     * name is the method's unique identifier.
+     * 3.) For parameters, the parameter is encoded as '_pd$nameX' where
+     * name is the name of the argument and 'X' represents the position of
+     * the parameter in the argument list; e.g.,
+     *              foo(_pd$bar0, _pd$foo1, ..., _pd@nameN)
+     * 4.) For locals, the local is encoded as '_ld$nameX' where name is
+     * the name of the local variable and 'X' is the local's unique
      * identifier.
-     * </li>
-     *
-     * <li>
-     * For protocols, the protocol is encoded as '{@code _prot$nameX}' where
-     * {@code name} is a protocol tag and '{@code X}' is the protocol's unique
-     * identifier.
-     * </li>
-     * </ul>
-     *
+     * 5.) For protocols, the protocol is encoded as '_prot$name' where
+     * name is a protocol tag and 'X' is the protocol's unique identifier.
+     * 
      * @param name
      *            The name or tag of a procedure, method, protocol, record,
      *            parameter, or local variable.
      * @param X
-     *            A unique identifier or position in a procedure's argument list.
+     *            A unique identifier or position in a procedure's argument
+     *            list.
      * @param type
-     *            A tag to encode in a procedure, method, parameter, local variable,
-     *            protocol, record, or channel.
+     *            A tag to encode in a procedure, method, parameter, local
+     *            variable, protocol, record, or channel.
      * @return A symbolic encoded name that represents an identifier/variable.
      */
     public static String makeVariableName(final String name, int X, Tag type) {
@@ -81,8 +57,7 @@ public class Helper {
 
         switch (type) {
         case MAIN_NAME:
-            // Ignore
-            break;
+            break; // Do nothing for now.
         case PROCEDURE_NAME:
             varName = Tag.PROCEDURE_NAME.getTag() + name; break;
         case METHOD_NAME:
@@ -101,14 +76,13 @@ public class Helper {
     }
 
     /**
-     * Returns {@code true} if a procedure is capable of yielding or {@code false}
-     * otherwise. Note that {@code 'yieldability'} is determined by checking the
-     * procedure's annotation through {@link ProcTypeDecl#annotations()}.
+     * Returns true if a procedure is capable of yielding or false
+     * otherwise. Note that 'yieldability' is determined by checking
+     * the procedure's annotation through annotations().
      *
-     * @see ProcTypeDecl#annotations()
      * @param pd
      *            The procure whose annotation is to be checked.
-     * @return {@code true} if the procedure can yield or {@code false} otherwise.
+     * @return true if the procedure can yield or false otherwise.
      */
     public static boolean doesProcedureYield(final ProcTypeDecl pd) {
         if (pd == null)
@@ -120,7 +94,7 @@ public class Helper {
     }
     
     /**
-     * Returns the wrapper class for the given class {@code type}.
+     * Returns the wrapper class for the given class type.
      * 
      * @param type
      *          A primitive class type or the class itself.
@@ -156,31 +130,36 @@ public class Helper {
      * 
      * @param type
      *          A primitive class type or the class itself.
-     * @return A {@code String} representation of class {@code type}.
+     * @return A String representation of class type.
      */
     public static String getWrapperType(Type type) {
         return getWrapperClass(type).getSimpleName();
     }
     
-    // The idea was to used this set of special keyword for name conflicts
-    // TODO: this should be taken care of in 'namechecker'
-    private static final Set<String> INVALID_NAMES = new HashSet<>(Arrays.asList(
+    // The idea was to used this set of special keyword for
+    // name conflicts. Note, this should be taken care of in
+    // namechecker
+    private static final HashSet<String> INVALID_NAMES = new HashSet<String>(Arrays.asList(
             new String[] {
                     /* Java keywords */
-                    "abstract", "assert", "class", "catch", "enum", "extends", "final",
-                    "goto", "instanceof", "interface", "static", "super", "synchronized",
-                    "this", "throw", "throws", "try", "null",
+                    "abstract", "assert", "class",
+                    "catch", "enum", "extends", "final",
+                    "goto", "instanceof", "interface",
+                    "static", "super", "synchronized",
+                    "this", "throw", "throws", "try",
+                    "null",
                     /* ProcessJ keywords */
                     "label", "jump", "terminate", "yield"
             }));
     
     /**
-     * Returns {@code true} if the name of a variable, method, class, etc. represents
-     * an invalid Java identifier or {@code false} otherwise.
+     * Returns true if the name of a variable, method, class,
+     * etc. represents an invalid Java identifier or false
+     * otherwise.
      * 
      * @param identifier
      *              The name of a variable, method, class, etc.
-     * @return {@code true} if an {@code identifier} contains valid Java characters.
+     * @return true if an identifier contains valid Java characters.
      */
     public static boolean isInvalidJavaIdentifier(String identifier) {
         if (identifier.length() != 0 && !INVALID_NAMES.contains(identifier)) {
@@ -202,9 +181,9 @@ public class Helper {
     }
     
     public static String getPackage(String packageName, String sourceFile) {
-        // An invocation comes from a external file (an import) if the
-        // source file from which the invocation is made is different to
-        // the package
+        // An invocation comes from a external file (an import)
+        // if the source file from which the invocation is made
+        // is different to the package
         if (!packageName.contains(sourceFile)) {
             String includePath = Settings.includeDir + File.separator + Settings.targetLanguage + File.separator;
             // The following replaces all '/' with '.'
@@ -213,8 +192,8 @@ public class Helper {
             return packageName;
         }
         
-        // Otherwise, the invocation must come from the same source
-        // file and package
+        // Otherwise, the invocation must come from the same
+        // source file and package
         return sourceFile;
     }
     

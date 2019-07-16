@@ -3,9 +3,9 @@ package utilities;
 import java.util.Collection;
 
 /**
- * The interface {@link IMultiMap} serves as the base for
- * all types of maps that hold a collection of values
- * associated with different keys.
+ * The interface IMultiMap serves as the base for all types of
+ * maps that hold a collection of values associated with different
+ * keys.
  * 
  * @param <K>
  *          The key type.
@@ -19,99 +19,95 @@ import java.util.Collection;
 public interface IMultiMap<K, V> {
     
     /**
-     * Adds the {@code value} to the collection that {@code key} maps to in a
-     * {@link IMultiMap}.
+     * Adds the value to the collection that key maps to in a IMultiMap.
      *
      * @param key
      *            The key that maps to the collection.
      * @param value
-     *            The value to add to the collection associated with {@code key}.
+     *            The value to add to the collection associated with key.
      */
     void put(K key, V value);
     
     /**
-     * Adds a new collection of values to the list of values that {@code key} maps
-     * to in a {@link IMultiMap}.
+     * Adds a new collection of values to the list of values that key maps
+     * to in a IMultiMap.
      *
      * @param key
      *            The key that maps to a collection.
      * @param values
-     *            The collection to be added the list of values associated with
-     *            {@code key}.
+     *            The collection to be added the list of values associated
+     *            with key.
      */
     void putAll(K key, Collection<V> values);
     
     /**
-     * Adds the values stored in array {@code values} to the collection the
-     * {@code key} maps to in a {@link IMultiMap}.
+     * Adds the values stored in array values to the collection the key maps
+     * to in a IMultiMap.
      *
      * @param key
      *            The key that maps to a collection.
      * @param values
-     *            The array to be added the list of values associated with
-     *            {@code key}.
+     *            The array to be added the list of values associated with key.
      */
     void putAll(K key, V[] values);
     
     /**
-     * Removes the specified value from the collection associated with the given
-     * {@code key} and then returns {@code true} if the mapping was successfully
-     * removed from a {@link IMultiMap} or {@code false} otherwise.
+     * Removes the specified value from the collection associated with the
+     * given key and then returns true if the mapping was successfully
+     * removed from a IMultiMap or false otherwise.
      *
      * @param key
      *            The key to remove from.
      * @param value
      *            The value to be removed.
-     * @return {@code true} if the mapping was removed or {@code false} otherwise.
+     * @return true if the mapping was removed or false otherwise.
      */
     boolean removeMapping(K key, V value);
     
     /**
-     * Gets the collection that {@code key} maps to in a {@link IMultiMap}.
+     * Gets the collection that key maps to in a IMultiMap.
      *
      * @param key
-     *            The key that maps to a collection of values of type {@code V}.
-     * @return The {@link Collection} of values that {@code key} maps to.
+     *            The key that maps to a collection of values of type V.
+     * @return The Collection of values that key maps to.
      */
     Collection<V> get(Object key);
     
     /**
-     * Returns {@code true} if a {@link IMultiMap} is empty or {@code false}
-     * otherwise.
+     * Returns true if a IMultiMap is empty or false otherwise.
      *
-     * @return {@code true} if a {@link IMultiMap} is empty or {@code false}
-     *         otherwise.
+     * @return true if a IMultiMap is empty or false otherwise.
      */
     boolean isEmpty();
     
     /**
-     * Returns a collection of keys stored in a {@link IMultiMap}.
+     * Returns a collection of keys stored in a IMultiMap.
      *
-     * @return A {@link Collection} of keys stored in a {@link IMultiMap}.
+     * @return A Collection of keys stored in a IMultiMap.
      */
     Collection<K> keys();
     
     /**
-     * Returns a collection of values stored in a {@link IMultiMap}.
+     * Returns a collection of values stored in a IMultiMap.
      *
-     * @return A {@link Collection} of values stored in a {@link IMultiMap}.
+     * @return A Collection of values stored in a IMultiMap.
      */
     Collection<V> values();
     
     /**
-     * Returns the number of keys in a {@link IMultiMap}.
+     * Returns the number of keys in a IMultiMap.
      *
-     * @return The number of key stored in a {@link IMultiMap}.
+     * @return The number of key stored in a IMultiMap.
      */
     int size();
     
     /**
-     * Removes all keys and values from a {@link IMultiMap}.
+     * Removes all keys and values from a IMultiMap.
      */
     void clear();
     
     /**
-     * Removes all values associated with {@code key} in a {@link IMultiMap}.
+     * Removes all values associated with key in a IMultiMap.
      *
      * @param key
      *            The key whose collection is to be removed.
@@ -119,12 +115,12 @@ public interface IMultiMap<K, V> {
     void remove(Object key);
     
     /**
-     * Adds the keys and collection of values of an{@code other} map to this
-     * {@link IMultiMap}.
+     * Adds the keys and collection of values of another map to this
+     * IMultiMap.
      *
      * @param other
-     *            The {@link IMultiMap} whose keys and collection of values are to
-     *            be added.
+     *            The IMultiMap whose keys and collection of values are
+     *            to be added.
      */
     void merge(IMultiMap<K, V> other);
 }

@@ -153,12 +153,11 @@ Method(modifier, type, name, types, vars, ltypes, lvars, body) ::= <<
 
 //========================================================================================
 // A declaration for a member variable that is defined outside of
-// any methods but inside the class to which it belongs.
+// any method but inside the class to which it belongs.
 // 1) modifier: a keyword that defines the access of a field.
 // 2) type: a data type that determines the value a variable can contain.
 // 3) name: a qualified name for the member variable.
-// 4) val: the value to be assigned to the member variable.
-Field(modifier, type, name, val) ::= "<if(modifier)><modifier> <endif><Var(type, name, val)>;"
+Field(modifier, type, name) ::= "<if(modifier)><modifier><else>public<endif> <type> <name>"
 
 //========================================================================================
 // Initializes a declaration for a variable given a type and a value.
@@ -225,9 +224,9 @@ if (<name>.shouldYield()) {
 // contains jump labels for resumption and yield, a synchronized body
 // that runs all the statements declared inside the procedure, and a
 // 'par' block defined in a procedure. Note that the process's schedule()
-// method is excluded iff it is created inside a 'par-for'. If this is
-// case, then we generated code similar to that of a ProcessClass
-// (e.g., with member fields).
+// method is excluded iff it is created inside a par-for. If this is
+// case, then we generated code similar to that of a ProcessClass; e.g.,
+// with member fields.
 // 1) switchBlock: switch statement to jump through blocks to resume points.
 // 2) syncBody: the body (content) of synchronized method that runs/starts a process.
 // 3) parBlock:
@@ -237,7 +236,12 @@ if (<name>.shouldYield()) {
 AnonymousProcess(switchBlock, syncBody, parBlock, barrier, ltypes, lvars) ::= <<
 new PJProcess() {
     <! -------- Instance variables for local parameters -------- !>
-    <if(lvars)><ltypes,lvars:{t,v | protected <t> <v>}; separator=";\n">;<\n><endif>
+    <if(lvars)><ltypes,lvars:{t,v | protected <t> <v>}; separator=";\n">;<\n>
+    PJProcess set(<ltypes,lvars:{t,v | <t> <v>}; separator=", ">) {
+        <lvars:{v | this.<v> = <v>}; separator=";\n">;
+        return this;
+    }<\n>
+    <endif>
     <! Synchronized run method !>
     @Override
     public synchronized void run() {
@@ -251,11 +255,11 @@ new PJProcess() {
     public void finalize() {
         <if(parBlock)><parBlock>.decrement();<endif>
         <if(barrier)><barrier:{b | <b>.resign()}; separator=";\n">;<endif>
-    } <!-- The setter should be called inside the generated code for a 'par-for'.
+    } <!-- The setter should be called inside the generated code for a par-for.
            Such an invocation means that the 'anonymous' process will be scheduled
-           later in a separate for loop. Otherwise, the process should be schedule
+           later in a separate for-loop. Otherwise, the process should be schedule
            right away. --!>
-}<if(lvars)>.set(<lvars; separator=", ">)<else>.schedule()<endif>;
+}<if(lvars)>.set(<lvars; separator=", ">)<else>.schedule();<endif>
 >>
 
 //========================================================================================
@@ -467,15 +471,13 @@ switch(<expr><if(tag)>.tag<endif>) {
 //
 // 1) operand:
 // 2) op:
-// 3) delim:
-UnaryPostExpr(operand, op, delim) ::= "<if(operand)><operand><op><if(!delim)>;<endif><endif>"
+UnaryPostExpr(operand, op) ::= "<if(operand)><operand><op><endif>;"
 
 //========================================================================================
 //
 // 1) operand:
 // 2) op:
-// 3) delim:
-UnaryPreExpr(operand, op, delim) ::= "<if(operand)><op><operand><if(!delim)>;<endif><endif>"
+UnaryPreExpr(operand, op) ::= "<if(operand)><op><operand><endif>;"
 
 //========================================================================================
 //
@@ -617,7 +619,7 @@ do {
 // 3) incr:
 // 4) stats:
 ForStat(init, expr, incr, stats) ::= <<
-for (<if(init)><init; separator=", "><else>/* empty */<endif>; <!--!><if(expr)><expr><else>/* emtpy */<endif>; <!--!><if(incr)><incr; separator=", "><else>/* empty */<endif>) {
+for (<if(init)><init; separator=", "><else>/* ... */<endif>; <!--!><if(expr)><expr><else>/* ... */<endif>; <!--!><if(incr)><incr; separator=", "><else>/* ... */<endif>) {
      <stats; separator="\n">
 }
 >>
@@ -633,7 +635,7 @@ for (<if(init)><init; separator=", "><else>/* empty */<endif>; <!--!><if(expr)><
 // 7) jump:
 ParForStat(init, expr, incr, stats, name, count, jump) ::= <<
 final PJPar <name> = new PJPar(0, this);
-List\<PJProcess> processes = new ArrayList\<>();
+ArrayList\<PJProcess> processes = new ArrayList\<PJProcess>();
 int count = 0;
 
 for (<init; separator=", ">; <!--!><expr>; <!--!><incr; separator=", ">) {

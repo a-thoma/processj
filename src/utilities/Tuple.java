@@ -7,8 +7,7 @@ import java.util.List;
 import cli.Util;
 
 /**
- * The class {@link Tuple} represents a sequences of
- * immutable objects.
+ * The class Tuple represents a sequences of immutable objects.
  *
  * @param <T>
  *          The type of value.

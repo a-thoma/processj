@@ -5,26 +5,24 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * The enum {@link Tag} represents and identifies
- * various types such as procedures, methods, parameters,
- * local variables, protocols, records, channels, etc.
+ * The enum Tag represents and identifies various types such as
+ * procedures, methods, parameters, local variables, protocols,
+ * records, channels, etc.
  *
  * @author Ben
  * @version 06/15/2018
  * @since 1.2
  */
 public enum Tag {
-
-    /**
-     * Signatures and types.
-     * NOTE: labels can be used for debugging.
-     */
+    
+    // Signatures and types. These labels can be used
+    // for debugging.
     MAIN_NAME           ("([T;)V"   , "mainProcedureType"),
     PROCEDURE_NAME      ("_proc$"   , "procedureType"),
     METHOD_NAME         ("_method$" , "methodType"),
     PARAM_NAME          ("_pd$"     , "parameterType"),
     LOCAL_NAME          ("_ld$"     , "localVariableType"),
-    PAR_BLOCK_NAME      ("par"    , "parBlockType"),
+    PAR_BLOCK_NAME      ("par"      , "parBlockType"),
     PROTOCOL_NAME       ("_prot$"   , "protocolType")
     ;
 
@@ -51,24 +49,20 @@ public enum Tag {
     public static Tag findValueOf(final String name) {
         try {
             return Tag.valueOf(name);
-        } catch (IllegalArgumentException e) {
-            // Try one more time
+        } catch (IllegalArgumentException e) { // Try one more time.
             Tag result = null;
-            for (Tag tagType : values()) {
-                if (tagType.tag.startsWith(name)) {
+            for (Tag t : values()) {
+                if (t.tag.startsWith(name)) {
                     if (result == null)
-                        result = tagType;
+                        result = t;
                     else
-                        throw new IllegalArgumentException(
-                                String.format("Unable to find ambiguous tag \"%s\" "
-                                        + "in %s.", name, getTags()));
+                        throw new IllegalArgumentException("Unable to find ambiguous tag '" +
+                                name + "' in " + getTags());
                 }
             }
-
             if (result == null)
-                throw new IllegalArgumentException(String.format("Unable to find tag \"%s\" in %s.",
-                            name, getTags()));
-
+                throw new IllegalArgumentException("Unable to find ambiguous tag '" +
+                            name + "' in " + getTags());
             return result;
         }
     }

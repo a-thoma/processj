@@ -175,7 +175,7 @@ public class ChannelReadRewrite {
                         Block b = new Block(st.assignments);
                         b.canBeMerged = true;
                         s.set(i, b);
-                        s.child(i).visit(new printers.PrettyPrinter());
+                        s.child(i).visit(new printers.PrettyPrinter<AST>());
                     }
                 } else {
                     if (s.child(i) instanceof ChannelReadExpr) {

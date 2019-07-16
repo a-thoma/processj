@@ -1,25 +1,15 @@
 package utilities;
 
 /**
- * The class {@code ColorCodes} is used for ANSI colour
- * manipulation on a terminal console that supports ANSI
- * colour codes.
+ * This class is used for ANSI color manipulation on a terminal console that
+ * supports ANSI color codes.
  * 
- * <p>
  * Usage:
- * <ul>
- * <li> ANSI_PREFIX + (Attribute | Attribute + ANSI_COMMA +
- * (AnsiForeground | AnsiBackground)) + ANSI_POSTFIX</li>
- * </ul>
- * </p>
+ * - ANSI_PREFIX + (Attribute | Attribute + ANSI_COMMA + (AnsiForeground | AnsiBackground)) + ANSI_POSTFIX
  * 
- * <p>
  * Example:
- * <ul>
- * <li>\033[ + 0 + m = \033[0m (Ansi Reset) </li>
- * <li> \033[ + 1 + ";" + 31 + "m" = \033[1;31m (Ansi RED) </li>
- * </ul>
- * </p>
+ * 1.) \033[ + 0 + m = \033[0m (Ansi Reset)
+ * 2.) \033[ + 1 + ";" + 31 + "m" = \033[1;31m (Ansi RED)
  * 
  * @author Ben
  * @version 10/06/2018
@@ -33,8 +23,7 @@ public class ColorCodes {
     public static final String ANSI_RESET = "\033[0m";
     
     /**
-     * The enum {@link AnsiForeground} represents each ANSI
-     * foreground colour code.
+     * The enum AnsiForeground represents each ANSI foreground color code.
      * 
      * @author Ben
      * @version 10/06/2018
@@ -66,8 +55,7 @@ public class ColorCodes {
     }
     
     /**
-     * The enum {@link AnsiForeground} represents each ANSI
-     * background colour code.
+     * The enum AnsiForeground represents each ANSI background color code.
      * 
      * @author Ben
      * @version 10/06/2018
@@ -99,8 +87,7 @@ public class ColorCodes {
     }
     
     /**
-     * The enum {@link Attribute} represents each ANSI
-     * attribute colour code.
+     * The enum Attribute represents each ANSI attribute color code.
      * 
      * @author Ben
      * @version 10/06/2018

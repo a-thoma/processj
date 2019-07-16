@@ -5,8 +5,8 @@ import java.util.Collection;
 import cli.StringUtil;
 
 /**
- * The class {@link Assert} provides a convenient way for
- * checking {@code null} objects.
+ * The class Assert provides a convenient way for checking 'null'
+ * objects.
  * 
  * @author Ben
  * @version 08/06/2018
@@ -15,7 +15,7 @@ import cli.StringUtil;
 public class Assert {
     
     /**
-     * Throws a {@link NullPointerException} if a given object is null.
+     * Throws a NullPointerException if a given object is null.
      * 
      * @param obj
      *          The object to be cheked.
@@ -26,7 +26,7 @@ public class Assert {
     }
 
     /**
-     * Throws a {@link NullPointerException} if a given object is null.
+     * Throws a NullPointerException if a given object is null.
      * 
      * @param obj
      *          The object to be checked.
@@ -41,7 +41,7 @@ public class Assert {
     }
     
     /**
-     * Throws a {@link NullPointerException} if a given object is null.
+     * Throws a NullPointerException if a given object is null.
      * 
      * @param obj
      *          The object to be checked.

@@ -10,8 +10,8 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The class {@link MultiValueMap} represents a collection
- * of values associated with a key.
+ * The class MultiValueMap represents a collection of values
+ * associated with a key.
  * 
  * @author Ben
  * @version 09/04/2018
@@ -174,30 +174,30 @@ public class MultiValueMap<K, V> implements IMultiMap<K, V> {
     }
 
     /**
-     * Creates an empty {@link MultiValueMap}.
+     * Creates an empty MultiValueMap.
      *
      * @param <K>
      *            The key type.
      * @param <V>
      *            The value type.
-     * @return An empty {@link MultiValueMap}.
+     * @return An empty MultiValueMap.
      */
     public static <K, V> MultiValueMap<K, V> create() {
         return new MultiValueMap<>();
     }
 
     /**
-     * Creates and initializes a new {@link MultiValueMap} with the keys and values
-     * from another {@code multiMap}.
+     * Creates and initializes a new MultiValueMap with the keys and values
+     * from another multiMap.
      *
      * @param multiMap
      *            The map whose keys and values are used to initialize a new
-     *            {@link MultiValueMap} with.
+     *            MultiValueMap with.
      * @param <K>
      *            The key type.
      * @param <V>
      *            The value type.
-     * @return An new {@link MultiValueMap} initialized with {@code multiMap}.
+     * @return An new MultiValueMap initialized with multiMap.
      */
     public static <K, V> MultiValueMap<K, V> create(IMultiMap<K, V> multiMap) {
         MultiValueMap<K, V> multiHashMap = new MultiValueMap<>();

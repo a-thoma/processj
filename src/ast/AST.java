@@ -11,6 +11,10 @@ public abstract class AST {
     public int line, charBegin;
     public int nchildren = 0;
     public AST[] children;
+    
+    // This variable is used in the rewriting phase to indicate that
+    // an expression has already been rewritten.
+    public boolean rewrite = false;
 
     public AST() {
         // this constructor must ONLY be used in ErrorType

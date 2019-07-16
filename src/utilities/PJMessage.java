@@ -3,8 +3,7 @@ package utilities;
 import org.stringtemplate.v4.ST;
 
 /**
- * This class is used to create generic messages
- * in ProcessJ.
+ * This class is used to create generic messages in ProcessJ.
  * 
  * @author Ben
  * @since 1.2
@@ -39,7 +38,7 @@ public class PJMessage extends CompilerMessage {
             stStackInfo.add("stack", throwable.getStackTrace());
         }
         
-        // Apply colour code mode if allowed on terminal
+        // Apply color code mode if allowed on terminal
         String tag = stTag.render();
         if (Settings.isAnsiColour)
             tag = ColorCodes.colorTag(stTag.render(), error.getErrorSeverity());
@@ -63,9 +62,9 @@ public class PJMessage extends CompilerMessage {
         return doStackTrace;
     }
     
-    // =====================
-    // B U I L D E R
-    // =====================
+    //
+    // BUILDER
+    //
     
     /**
      * Builder for this basic error message type.

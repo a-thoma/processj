@@ -116,8 +116,8 @@ public class Reachability extends Visitor<Boolean> {
         boolean b = ds.stat().visit(this);
 
         if (ds.expr().isConstant() && ((Boolean) ds.expr().constantValue())
-                && b && // the statement can run to completion
-                !ds.hasBreak && !ds.hasReturn) { // but has no breaks, so it will loop forever
+                && (b && // the statement can run to completion
+                !ds.hasBreak && !ds.hasReturn) || !b) { // but has no breaks, so it will loop forever
             loopConstruct = oldLoopConstruct;
             ds.foreverLoop = true;
             CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
@@ -184,8 +184,8 @@ public class Reachability extends Visitor<Boolean> {
 
         // for (... ; true; ...) S1
         if ((fs.expr() == null || (fs.expr().isConstant() && ((Boolean) fs
-                .expr().constantValue()))) && b && // the statement can run to completion
-                !fs.hasBreak && !fs.hasReturn) // but has no breaks, so it will loop forever
+                .expr().constantValue()))) && (b && // the statement can run to completion
+                !fs.hasBreak && !fs.hasReturn) || !b) // but has no breaks, so it will loop forever
         {
             CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
                                   .addAST(fs)

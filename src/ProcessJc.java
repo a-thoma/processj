@@ -22,7 +22,7 @@ import utilities.Settings;
 import utilities.SymbolTable;
 
 /**
- * ProcessJ JVM Compiler.
+ * ProcessJ-JVM Compiler.
  * 
  * @author Ben
  * @version 07/01/2018
@@ -155,7 +155,7 @@ public class ProcessJc {
             c.sourceFile = inFile.getName();
             String parentPath = inFile.getAbsolutePath(); // Grab the parent's path of source file
             parentPath = parentPath.substring(0, parentPath.lastIndexOf(File.separator));
-            c.path = parentPath; // Get file's parent absolute path
+            c.path = parentPath; // Get the file's parent absolute path
             if (c.packageName() != null)  // A package declaration is optional, so this can be 'null'
                 c.packageName = ResolveImports.packageNameToString(c.packageName());
 
@@ -197,6 +197,11 @@ public class ProcessJc {
             System.out.println("-- Reconstructing records.");
             c.visit(new rewriters.RecordRewrite(globalTypeTable));
             
+            ///
+            System.out.println("-- Reconstructing protocols.");
+            c.visit(new rewriters.ProtocolRewrite(globalTypeTable));
+            ///
+            
             System.out.println("-- Checking native Top Level Declarations.");
             c.visit(new namechecker.ResolveImportTopLevelDecls());
             
@@ -231,7 +236,7 @@ public class ProcessJc {
             c.visit(new typechecker.TypeChecker(globalTypeTable));
             
             // 
-            // VISIT REWRITERS
+            // VISIT CASTREWRITE
             // 
             
             c.visit(new CastRewrite());
@@ -271,14 +276,9 @@ public class ProcessJc {
             new semanticcheck.LabeledBreakContinueCheck().go(c);
             
             System.out.println("-- Rewriting infinite loops.");
-            //new rewriters.ForeverLoopRewrite().go(c);
+            new rewriters.ForeverLoopRewrite().go(c);
             
-            ////
-            System.out.println("-- Rewriting yielding expressions in loops.");
-            //new rewriters.LoopReadRewrite().go(c, null);
-            ////
-            
-            System.out.println("-- Collecting left-hand sides for par for code generation");
+            System.out.println("-- Collecting left-hand sides for par for code generation.");
             c.visit(new rewriters.ParFor());
             
             // 
@@ -298,13 +298,13 @@ public class ProcessJc {
     }
     
     /**
-     * Given a ProcessJ {@link Compilation} unit, e.g. an abstract syntax
-     * tree object, we will generate the code for the JVM. The source range
-     * for this type of tree is the entire source file, not including leading
-     * and trailing whitespace characters and comments.
+     * Given a ProcessJ Compilation unit, e.g. an abstract syntax tree object,
+     * we will generate the code for the JVM. The source range for this type of
+     * tree is the entire source file, not including leading and trailing whitespace
+     * characters and comments.
      *
      * @param compilation
-     *              A {@link Compilation} unit consisting of a single file.
+     *              A Compilation unit consisting of a single file.
      * @param inFile
      *              The compiled file.
      * @param topLevelDecls

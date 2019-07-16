@@ -1,7 +1,7 @@
 package rewriters;
 
+import java.util.HashSet;
 import java.util.LinkedHashSet;
-import java.util.Set;
 
 import ast.*;
 import utilities.Log;
@@ -16,8 +16,8 @@ import utilities.Visitor;
  * 
  * @author Ben
  */
-public class RecordRewrite extends Visitor<AST> {
-    // The actual entries in the table
+public class RecordRewrite extends Visitor<Object> {
+    // The top level symbol table.
     public SymbolTable sym;
     
     public RecordRewrite(SymbolTable sym) {
@@ -27,20 +27,20 @@ public class RecordRewrite extends Visitor<AST> {
         Log.logHeader("****************************************");
     }
     
-    public Set<RecordMember> addExtendedRecords(AST a) {
+    public HashSet<RecordMember> addExtendedRecords(AST a) {
         Log.log(a, "extends a RecordTypeDecl (" + ((RecordTypeDecl) a).name().getname() + ")");
 
         RecordTypeDecl rt = (RecordTypeDecl) a;
-        Set<RecordMember> se = new LinkedHashSet<RecordMember>();
+        HashSet<RecordMember> se = new LinkedHashSet<RecordMember>();
         for (RecordMember rm : rt.body()) {
             Log.log(rt, "adding member " + rm.type() + " " + rm.name().getname());
             se.add(rm);
         }
-        // Add new members if and only if a record extends other records
+        // Add new members iff the record extends other records.
         if (rt.extend().size() > 0) {
             for (Name parent : rt.extend()) {
                 if (sym.get(parent.getname()) != null) {
-                    Set<RecordMember> seqr = addExtendedRecords((RecordTypeDecl) sym.get(parent.getname()));
+                    HashSet<RecordMember> seqr = addExtendedRecords((RecordTypeDecl) sym.get(parent.getname()));
                     for (RecordMember rm : seqr) {
                         if (!se.add(rm))
                             Log.log(rt, "already in (" + rt.name().getname() + ")");
@@ -52,21 +52,20 @@ public class RecordRewrite extends Visitor<AST> {
     }
     
     @Override
-    public AST visitRecordTypeDecl(RecordTypeDecl rt) {
+    public Object visitRecordTypeDecl(RecordTypeDecl rt) {
         Log.log(rt, "Visiting a RecordTypeDecl (" + rt.name().getname() + ")");
         
-        Set<RecordMember> se = new LinkedHashSet<RecordMember>();
+        HashSet<RecordMember> se = new LinkedHashSet<RecordMember>();
         if (rt.extend().size() > 0) {
-            // Merge sequence of members
+            // Merge the sequence of members of all extend records.
             for (Name name : rt.extend()) {
                 if (sym.get(name.getname()) != null)
                     se.addAll(addExtendedRecords((RecordTypeDecl) sym.get(name.getname())));
             }
         }
-        // Add this record's members to the set
         for (RecordMember rm : rt.body())
             se.add(rm);
-        // Rewrite the record's body and add the new set of members
+        // Rewrite the sequence of members.
         rt.body().clear();
         for (RecordMember rm : se)
             rt.body().append(rm);

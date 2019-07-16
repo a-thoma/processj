@@ -63,31 +63,10 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
     public T visitCompilation(Compilation co) {
         Log.log(" Defining forward referencable names (" + CompilerMessageManager.INSTANCE.fileName
                 + ").");
-	currentCompilation = co;
-        // 'symtab' is either passed in here from the driver (ProcessJ.java) or from
-        // the visitImport() method in this file. Save it cause we need to put all
-        // the types and constants for this compilation into it after we handle
-        // the imports.
-//        SymbolTable myGlobals = symtab;
-
-        // reset the symbol table to null so we get a fresh chain for these imports.
-//        symtab = null;
-//        Log.log(" Visit Imports in " + CompilerMessageManager.INSTANCE.fileName + ":");
-//        co.imports().visit(this);
-//        Log.log(" Visit Imports in " + CompilerMessageManager.INSTANCE.fileName + " - done!");
-        // symtab now contains a chain through the parent link of all the imports for this compilation.
-        // set the 'importParent' of this compilation's symbol table to point to the
-        // import chain of symbol tables.
-//        myGlobals.setImportParent(symtab);
-        // re-establish this compilation's table
-//        symtab = myGlobals;
-        // now visit all the type declarations and the constants in this compilation
+        currentCompilation = co;
+        // now visit all the type declarations and the constants in this compilation.
         Log.log(" Visiting type declarations for " + CompilerMessageManager.INSTANCE.fileName);
         co.typeDecls().visit(this);
-        // hook the symbol table so it can be grabbed from who ever called us.
-//        SymbolTable.hook = symtab;
-//        System.out.println("From visitCompilation: *******");
-//        symtab.printStructure("");
         
         Log.logHeader("");
         Log.logHeader("*                  T O P   L E V E L   D E C L S             *");

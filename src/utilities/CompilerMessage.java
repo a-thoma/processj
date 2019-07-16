@@ -10,12 +10,11 @@ import org.stringtemplate.v4.STGroupFile;
 import ast.AST;
 
 /**
- * The class {@link CompilerMessage} is used to create messages
- * for the visitor pattern when processing the contents in a
- * ProcessJ file, when processing the syntax and/or semantics
- * errors when compiling or generating Java source code from a
- * ProcessJ file, or when processing command line options and/or
- * arguments.
+ * The class CompilerMessage is used to create messages during a
+ * tree-traversal node when processing the contents in a ProcessJ
+ * file, when processing the syntax and/or semantics errors when
+ * compiling or generating Java source code from a ProcessJ file,
+ * or when processing command line options and/or arguments.
  * 
  * @author Ben
  * @version 10/07/2018
@@ -87,9 +86,9 @@ public abstract class CompilerMessage {
         columnNum = builder.myColumn;
     }
     
-    // ================
-    // G E T T E R S
-    // ================
+    // 
+    // GETTERS
+    // 
     
     public AST getAST() {
         return ast;
@@ -198,14 +197,14 @@ public abstract class CompilerMessage {
         return true;
     }
     
-    // =====================
-    // B U I L D E R
-    // =====================
+    // 
+    // BUILDER
+    // 
     
     /**
      * 
-     * The class {@link Builder} uses descriptive methods to
-     * create error messages with default or initial values.
+     * The class Builder uses descriptive methods to create error
+     * messages with default or initial values.
      * 
      * @author Ben
      * @version 10/20/2018
