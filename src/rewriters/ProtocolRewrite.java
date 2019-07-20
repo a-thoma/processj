@@ -10,6 +10,12 @@ import utilities.Log;
 import utilities.SymbolTable;
 import utilities.Visitor;
 
+/**
+ * Visitor used for rewriting the body of protocols that inherit tags
+ * from one or more than one protocol.
+ * 
+ * @author Ben
+ */
 public class ProtocolRewrite extends Visitor<Object> {
     // The top level symbol table.
     public SymbolTable sym;

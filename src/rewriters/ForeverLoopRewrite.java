@@ -35,13 +35,13 @@ public class ForeverLoopRewrite {
     /**
      * This tree-traversal method rewrites 'WhileStat', 'DoStat', and 'ForStat'
      * parse-tree nodes when the code represented by each of these nodes cannot
-     * run to completion due to infinite loop.
+     * or may not run to completion due to infinite loop.
      * 
      * 1.) While-loop rewrite:
      *                                                  boolean foreverLoop0 = true;
      *      while (true) {                              while (foreverLoop0) {
-     *          while (true) {          becomes             boolean foreverLoop1 = true;
-     *              ...                                     while (foreverLoop1) {
+     *          while (true) {                              boolean foreverLoop1 = true;
+     *              ...                 becomes             while (foreverLoop1) {
      *          }                                               ...
      *      }                                               }
      *                                                  }
@@ -50,7 +50,7 @@ public class ForeverLoopRewrite {
      *                                                  boolean foreverLoop0 = true;
      *      do {                                        do {
      *          do {                                        boolean foreverLoop1 = true;
-     *          ...                                         do {
+     *          ...                     becomes             do {
      *          } while (true)                                  ...
      *      } while (true);                                 } while (foreverLoop1);
      *                                                  } while (foreverLoop0);
@@ -59,7 +59,7 @@ public class ForeverLoopRewrite {
      *                                                  boolean foreverLoop0 = true;
      *      for (...; ...; ...;) {                      for (...; foreverLoop0; ...) {
      *          for (...; ...; ...;) {                      boolean foreverLoop1 = true;
-     *              ...                                     for (...; foreverLoop1; ...) {
+     *              ...                 becomes             for (...; foreverLoop1; ...) {
      *          }                                               ...
      *      }                                               }
      *                                                  }

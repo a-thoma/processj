@@ -558,9 +558,8 @@ public class CodeGeneratorJava extends Visitor<Object> {
         _formalParamFields.put(newName, type);
         _paramDeclNames.put(name, newName);
         
-        // Ignored the value returned by this visitor. The reason for this
-        // is that templates for methods and classes take a list of types
-        // and variable names.
+        // Ignored the value returned by this visitor. The types
+        // and variables are resolved elsewhere.
         return null;
     }
     
@@ -879,9 +878,10 @@ public class CodeGeneratorJava extends Visitor<Object> {
     public Object visitArrayLiteral(ArrayLiteral al) {
         Log.log(al, "Visiting an ArrayLiteral");
         
-        // Is the array initialize at compile time? If so, create
-        // a list of values separated by commas and enclosed between
-        // braces (note, syntax for array literals is different).
+        // Is the array initialize at compile time? If so, create a
+        // list of values separated by commas and enclosed between
+        // braces (note, the syntax for array literals in ProcessJ
+        // is different to Java's).
         if (al.elements().size() > 1 || _isArrayLiteral) {
             // The following extends naturally to two-dimensional, and
             // even higher-dimensional arrays -- but they are not used
@@ -975,14 +975,14 @@ public class CodeGeneratorJava extends Visitor<Object> {
         // Generated template after evaluating this visitor.
         ST stSwitchLabel = _stGroup.getInstanceOf("SwitchLabel");
         
-        // This could be a default label, in this case, expr() is 'null'.
+        // This could be a default label, in which case, expr()
+        // would be 'null'.
         String label = null;
         if (!sl.isDefault())
             label = (String) sl.expr().visit(this);
         if (_isProtocolCase) {
             // Silly way to keep track of a protocol tag, however, this
-            // should (in theory) _always_ work. The type checker should
-            // catch any invalid tag in a switch label for a given protocol.
+            // should (in theory) _always_ work.
             _currProtocolTag = label;
             label = "\"" + label + "\"";
         }
@@ -1207,20 +1207,14 @@ public class CodeGeneratorJava extends Visitor<Object> {
         
         // This map is used to determine the order in which values are
         // used with the constructor of the class associated with this
-        // protocol's type.
+        // kind of protocol.
         HashMap<String, String> members = new LinkedHashMap<String, String>();
-        // We only need the members of the tag being used.
+        // We need the members of the tag currently being used.
         ProtocolCase target = null;
         ProtocolTypeDecl pt = (ProtocolTypeDecl) _topLevelDecls.get(type);
         if (pt != null) { // This should never be 'null'.
-            for (ProtocolCase pc : pt.body()) {
-                if (pc.name().getname().equals(tag)) {
-                    target = pc;
-                    break;
-                }
-            }
-            // Now that we have the target tag, iterate over all
-            // of its members.
+            target = pt.getCase(tag);
+            // Now that we have the target tag, iterate over all of its members.
             for (RecordMember rm : target.body()) {
                 String name = (String) rm.name().visit(this);
                 members.put(name, null);
@@ -1234,7 +1228,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
             String lhs = (String) rm.name().getname();
             String expr = (String) rm.expr().visit(this);
             if (members.put(lhs, expr) == null)
-                Log.log(pl, " > Setting '" + lhs + "' with '" + expr + "'");
+                Log.log(pl, "> Initializing '" + lhs + "' with '" + expr + "'");
             else
                 ; // We should never get here.
         }
@@ -1289,9 +1283,8 @@ public class CodeGeneratorJava extends Visitor<Object> {
         // Add this field to the collection of record members for reference.
         _recordFields.put(name, type);
         
-        // Ignored the value returned by this visitor. The reason for
-        // this is that the template for records takes a list of types
-        // and variable names.
+        // Ignored the value returned by this visitor. The types
+        // and variables are resolved elsewhere.
         return null;
     }
     
@@ -1324,7 +1317,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
             String lhs = (String) rm.name().getname();
             String expr = (String) rm.expr().visit(this);
             if (members.put(lhs, expr) == null)
-                Log.log(rl, " > Setting '" + lhs + "' with '" + expr + "'");
+                Log.log(rl, "> Initializing '" + lhs + "' with '" + expr + "'");
             else
                 ; // We should never get here.
         }

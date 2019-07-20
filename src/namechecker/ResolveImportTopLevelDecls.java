@@ -11,7 +11,7 @@ import utilities.Log;
 import utilities.Visitor;
 
 /**
- * Visitors used for marking top-level decls as 'native'.
+ * Visitors used for marking top-level declarations as 'native'.
  *
  * @param <T>
  *          The visitor interface used to traverse and resolve the
@@ -67,8 +67,8 @@ public class ResolveImportTopLevelDecls extends Visitor<Object> {
             // library function.
             for (Pragma p : c.pragmas())
                 p.visit(this);
-            // Mark all top-level decls _native_ if they are part of a ProcessJ
-            // native library.
+            // Mark all top-level declarations 'native' if they are part of
+            // a native library function.
             for (Type t : c.typeDecls())
                 t.visit(this);
         }
