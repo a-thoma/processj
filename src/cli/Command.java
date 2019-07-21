@@ -1,11 +1,8 @@
 package cli;
 
 /**
- * The class {@link Command} serves as the base class
- * for all extended commands in ProcessJ.
- * <p>
- * See {@link Parameters @Parameters}.
- * </p>
+ * The class Command serves as the base class for all extended
+ * commands in ProcessJ.
  * 
  * @author Ben
  * @version 08/11/2018

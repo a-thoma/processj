@@ -6,8 +6,8 @@ import java.util.Comparator;
 import java.util.List;
 
 /**
- * The class {@link StringUtil} contains helper methods for
- * classes within the {@code cli} package.
+ * The class StringUtil contains helper methods for classes
+ * within the cli-package.
  *
  * @author Ben
  * @version 06/21/2018
@@ -20,29 +20,28 @@ public final class StringUtil {
     }
 
     /**
-     * Returns {@code true} if the parameter {@code str} is null or if 
-     * it represents an empty string.
+     * Returns true if the parameter is null or if it represents an
+     * empty string.
      *
      * @param str
      *            The string to be checked for nullability or emptiness.
-     * @return {@code true} if the parameter {@code str} represents an empty 
-     *         string otherwise {@code false}.
+     * @return true if the parameter represents an empty string otherwise
+     *         false.
      */
     public static boolean isStringEmpty(String str) {
         return str == null || "".equals(str);
     }
 
     /**
-     * Returns a {@code String} initialized with the list of string sequence
-     * that this {@code object} represents if the runtime class of {@code obj} 
-     * represents an {@link java.lang.Iterable} class or an array class,
-     * otherwise a single string containing the sequence of characters
-     * that this {@code obj} represents is created and returned.
+     * Returns a string initialized with the list of string sequence
+     * that this object represents if the runtime class of the object
+     * represents an Iterable class or an array class, otherwise a
+     * single string containing the sequence of characters that this
+     * object represents is created and returned.
      *
      * @param obj
      *            A joint sequence of elements or a single object.
-     * @return A {@code String} containing a string representation of this
-     *           {@code object}.
+     * @return A string containing a string representation of this object.
      */
     public static String joinStringList(Object obj) {
         final StringBuilder stringBuilder = new StringBuilder();
@@ -63,15 +62,15 @@ public final class StringUtil {
     }
 
     /**
-     * Returns an array initialized with the list of string values that
-     * both {@code str1} and {@code str2} contain.
+     * Returns an array initialized with the list of string values
+     * that both 'str1' and 'str2' contain.
      *
      * @param str1
      *            An array of strings.
      * @param str2
-     *            An array of strings to be combined with {@code str1}.
-     * @return An array containing the values of both list {@code str1}
-     *         and {@code str2}
+     *            An array of strings to be combined with 'str1'.
+     * @return An array containing the values of both list 'str1'
+     *         and 'str2'.
      */
     public static String[] joinStringArrays(String[] str1, String[] str2) {
         String[] strResult = new String[str1.length + str2.length];
@@ -96,12 +95,12 @@ public final class StringUtil {
     }
 
     /**
-     * Removes the leading and trailing quotes form {@code str}.
+     * Removes the leading and trailing quotes form the given string.
      *
      * @param str
      *            The string from which leading and trailing quotes are
      *            to be removed.
-     * @return A {@code String} without leading and trailing quotes.
+     * @return A string without leading and trailing quotes.
      */
     public static String stripLeadingAndTrailingQuotes(String str) {
         if (str.length() > 1 && str.startsWith("\"") && str.endsWith("\""))
@@ -111,9 +110,9 @@ public final class StringUtil {
     }
 
     /**
-     * Splits a {@code word} into a character array whose length is the length
-     * of the {@code word} and whose contents are initialized with the character
-     * sequence represented by this {@code word}.
+     * Splits a word into a character array whose length is the length
+     * of the word and whose contents are initialized with the character
+     * sequence represented by this word.
      *
      * @throws IllegalArgumentException
      *             When {@code word} is an empty string.
@@ -130,11 +129,12 @@ public final class StringUtil {
     }
 
     /**
-     * Splits a sequence of contiguous words separated by a {@code delimiter}
+     * Splits a sequence of contiguous words separated by a delimiter
      * and then returns a list containing each of these words.
      *
      * @param delimiter
-     *            The character that indicates the beginning and end of a word.
+     *            The character that indicates the beginning and end
+     *            of a word.
      * @param words
      *            The sequence of words to be split.
      * @return A list containing each word.
@@ -152,13 +152,13 @@ public final class StringUtil {
     }
 
     /**
-     * Gets a {@code count} number of whitespace characters.
+     * Gets a count number of whitespace characters.
      *
      * @throws IllegalArgumentException
-     *             When {@code count} is equal to or less than zero.
+     *             When the count is equal to or less than zero.
      * @param count
      *            The number of whitespace characters.
-     * @return A {@code String} containing a sequence of whitespace characters.
+     * @return A a string containing a sequence of whitespace characters.
      */
     public static String addSpaces(int count) {
         if (count < 1)

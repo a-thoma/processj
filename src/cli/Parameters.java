@@ -3,26 +3,9 @@ package cli;
 import java.lang.annotation.*;
 
 /**
- * The annotation {@link Parameters @Parameters} is used to specify
- * default settings for commands. This {@link Parameters @Parameters}
- * can be place only on types that can be either {@code class}s, an
- * {@code interface}s, or an {@code enum}s.
- *
- * <p>
- * The elements below are used to validate the elements of a
- * {@link Parameters @Parameters} and to make up the help information.
- * </p>
- *
- * <ul>
- * <li>{@link Parameters#name()}</li>
- * <li>{@link Parameters#hidden()}</li>
- * <li>{@link Parameters#header()}</li>
- * <li>{@link Parameters#help()}</li>
- * <li>{@link Parameters#notes()}</li>
- * <li>{@link Parameters#footer()}</li>
- * <li>{@link Parameters#version()}</li>
- * <li>{@link Parameters#order()}</li>
- * </ul>
+ * The annotation Parameters is used to specify default settings
+ * for commands. This Parameters can be place only on types that
+ * can be either classes, an interfaces, or an enums.
  *
  * @author Ben
  * @version 06/14/2018
@@ -70,9 +53,9 @@ public @interface Parameters {
     String[] version() default {};
 
     /**
-     * A custom version information that gets instantiated when provided.
-     * If none is provided then the default specified version information
-     * in ProcessJ is used.
+     * A custom version information that gets instantiated when
+     * provided. If none is provided then the default specified
+     * version information in ProcessJ is used.
      */
     Class<? extends IVersionPrinter> versionPrinter() default IVersionPrinter.class;
 }

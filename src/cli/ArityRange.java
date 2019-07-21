@@ -7,9 +7,8 @@ import java.util.Iterator;
 import utilities.Assert;
 
 /**
- * The class {@link ArityRange} represents a list of indexes
- * from some starting position to some ending position on the
- * command line.
+ * The class ArityRange represents a list of indexes from some
+ * starting position to some ending position on the command line.
  * 
  * @author Ben
  * @version 08/23/2018

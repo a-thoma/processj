@@ -7,10 +7,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * The class {@link OptionValue} is a wrapper class that encapsulates
- * operations on an {@link Option @Option} annotation. Information
- * about an the annotation and each of its elements can be accessed
- * dynamically through this wrapper class.
+ * The class OptionValue is a wrapper class that encapsulates
+ * operations on an Option annotation. Information about an the
+ * annotation and each of its elements can be accessed dynamically
+ * through this wrapper class.
  * 
  * @author Ben
  * @version 08/05/2018
@@ -99,7 +99,7 @@ public final class OptionValue extends OptionWithValue {
     // 
 
     /**
-     * Builder for this {@link OptionValue}.
+     * Builder for this OptionValue.
      * 
      * @author Ben
      * @version 08/05/2018

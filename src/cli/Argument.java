@@ -6,25 +6,10 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * The annotation {@link Argument @Argument} is similar to an
- * {@link Option @Option} except that an {@link Argument @Argument}
- * has an index which represents its exact position on the command
- * line. This annotation should be placed only on member fields.
- * <p>
- * The elements below are used to initialize and validate the elements
- * of a {@link Argument @Argument} and to make up the help information.
- * </p>
- * 
- * <ul>
- * <li>{@link Argument#help()}</li>
- * <li>{@link Argument#defaultValue()}</li>
- * <li>{@link Argument#order()}</li>
- * <li>{@link Argument#metavar()}</li>
- * <li>{@link Argument#required()}</li>
- * <li>{@link Argument#hidden()}</li>
- * <li>{@link Argument#split()}</li>
- * <li>{@link Argument#handler()}</li>
- * </ul>
+ * The annotation Argument is similar to an Option except that
+ * an Argument has an index which represents its exact position
+ * on the command line. This annotation should be placed only on
+ * member fields.
  * 
  * @author Ben
  * @version 07/11/2018

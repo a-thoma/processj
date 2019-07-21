@@ -70,7 +70,7 @@ public class ProcessJc {
         if (pjMain.ansiColour == null) {
             // Set the color mode if the default value in the
             // properties file is 'yes'
-            if (config.getProperty("colour").equalsIgnoreCase("yes"))
+            if (config.getProperty("color").equalsIgnoreCase("yes"))
                 Settings.isAnsiColour = true;
         } else {
             Settings.isAnsiColour = pjMain.ansiColour;

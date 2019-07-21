@@ -1,17 +1,9 @@
 package cli;
 
 /**
- * The interface {@link IVersionPrinter} represents a program's
- * custom version information which gets instantiated when provided.
- * 
- * <p>
- * The element below is used for retrieving a string containing
- * the version information of the program.
- * </p>
- * 
- * <ul>
- * <li>{@link #getVersionPrinter()}</li>
- * </ul>
+ * The interface IVersionPrinter represents a program's
+ * custom version information which gets instantiated
+ * when provided.
  * 
  * @author Ben
  * @version 07/11/2018

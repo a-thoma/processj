@@ -22,8 +22,8 @@ import utilities.Assert;
 import utilities.MultiValueMap;
 
 /**
- * Responsible for building {@link OptionValue} and
- * {@link PositionalValue}.
+ * Responsible for building options and parameters for a
+ * given command.
  * 
  * @author Ben
  * @version 07/21/2018

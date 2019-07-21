@@ -20,14 +20,14 @@ import utilities.SymbolTable;
 import utilities.Visitor;
 
 /**
- * A tree walker that collects data from an AST object and then pushes
- * this data into a grammarTemplatesJava to translate a ProcessJ source
+ * A tree walker that collects data from an AST object and then
+ * pushes this data into a template to translate a ProcessJ source
  * code to Java.
  *
  * @param <T>
  *          A visitor interface used to perform operations across a
  *          collection of different objects.
- *
+ * 
  * @author Ben
  * @version 06/10/2018
  * @since 1.2
@@ -575,8 +575,6 @@ public class CodeGeneratorJava extends Visitor<Object> {
         //      T x = read();                     -> a Java method that returns a value
         //      T x = a + b;                      -> a binary expression
         //      T x = a = b ...;                  -> a complex assignment
-
-        // Returning values for a local declaration.
         String name = (String) ld.var().name().getname();
         String type = (String) ld.type().visit(this);
         String val = null;

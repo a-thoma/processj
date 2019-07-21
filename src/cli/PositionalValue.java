@@ -5,10 +5,10 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * The class {@link PositionalValue} is a wrapper class that encapsulates
- * operations on a {@link Argument @Argument} annotation. Information
- * about a the annotation and each of its elements can be accessed
- * dynamically through this wrapper class.
+ * The class PositionalValue is a wrapper class that encapsulates
+ * operations on an Argument annotation. Information about a the
+ * annotation and each of its elements can be accessed dynamically
+ * through this wrapper class.
  * 
  * @author Ben
  * @version 08/05/2018

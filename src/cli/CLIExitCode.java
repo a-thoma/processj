@@ -1,8 +1,8 @@
 package cli;
 
 /**
- * The enum {@link CLIExitCode} is used to determine the
- * exit status of the command line parser.
+ * The enum CLIExitCode is used to determine the exit
+ * status of the command line parser.
  * 
  * @author Ben
  * @version 08/14/2018

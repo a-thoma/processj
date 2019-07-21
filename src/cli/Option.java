@@ -6,25 +6,11 @@ import java.lang.annotation.RetentionPolicy;
 import java.lang.annotation.Target;
 
 /**
- * The annotation {@link Option @Option} is used to specified default
- * settings for command line options. This annotation should be placed
- * only on fields.
- * <p>
- * The elements below are used to initialize and validate the elements
- * of an {@link Option @Option} and to make up the help information.
- * </p>
- *
- * <ul>
- * <li>{@link Option#names()}</li>
- * <li>{@link Option#help()}</li>
- * <li>{@link Option#defaultValue()}</li>
- * <li>{@link Option#arity()}</li>
- * <li>{@link Option#metavar()}</li>
- * <li>{@link Option#hidden()}</li>
- * <li>{@link Option#required()}</li>
- * <li>{@link Option#split()}</li>
- * <li>{@link Option#handler()}</li>
- * </ul>
+ * The annotation Option is used to specified default settings
+ * for command line options. This annotation should be placed
+ * only on fields. The elements below are used to initialize
+ * and validate the elements of an Option and to make up the
+ * help information.
  *
  * @author Ben
  * @version 06/21/2018

@@ -11,17 +11,9 @@ import java.util.Map;
 import cli.parsers.*;
 
 /**
- * The enum {@link ParserFactory} contains a factory of converters
- * and handlers types that are used for parsing values that belong
+ * The enum ParserFactory contains a factory of converters and
+ * handlers types that are used for parsing values that belong
  * to various command line options.
- * <p>
- * This factory provides the following methods:
- * </p>
- *
- * <ul>
- * <li>{@link #getParserTypeForClassType(Class, String)}</li>
- * <li>{@link #addParserTypeForClassType(Class, Class)}</li>
- * </ul>
  *
  * @author Ben
  * @version 06/21/2018
@@ -33,7 +25,7 @@ public enum ParserFactory {
     ;
 
     /**
-     * Maps all types of {@link OptionParser}.
+     * Maps all types of OptionParser.
      */
     private final Map<Class<?>, ParameterConverter> parserMap;
 
@@ -66,12 +58,12 @@ public enum ParserFactory {
     }
     
     /**
-     * Returns the class associated with class {@code type}, or {@code null}
-     * if the given {@code type} does not map to any hander type.
+     * Returns the class associated with class type, or null
+     * if the given type does not map to any hander type.
      * 
      * @param type
-     *          A class type that maps to a {@link OptionParser}.
-     * @return An {@OptionParser} or {@code null} if none was found.
+     *          A class type that maps to a OptionParser.
+     * @return An OptionParser or null if none was found.
      */
     @SuppressWarnings("rawtypes")
     public Class<? extends OptionParser> inferHandlerType(Class<?> type) {
@@ -82,24 +74,24 @@ public enum ParserFactory {
     }
 
     /**
-     * Gets the {@link OptionParser} instance associated with the {@code classType}
-     * that belongs to option {@code optionName}.
+     * Gets the OptionParser instance associated with the given
+     * class that belongs to option option.
      *
      * @param classType
-     *            The value type which maps to an {@link OptionParser}.
+     *            The value type which maps to an OptionParser.
      * @param optionName
      *            The name of the option.
-     * @return An {@link OptionParser} instance or {@code null} if none is found.
+     * @return An OptionParser instance or null if none is found.
      */
     @SuppressWarnings("rawtypes")
     public OptionParser<?> getParserTypeForClassType(Class<?> classType, String optionName, Class<? extends OptionParser> handler) {
         if (parserMap.get(classType) == null)
             return null;
-        // First check if we are dealing with an user-defined class
         else {
+            // First check if we are dealing with an user-defined class.
             Class<?> clazz = findUserDefinedClass(handler);
             if (clazz == null) {
-                // Add it to the factory
+                // No, then add it to the factory.
                 addParserTypeForClassType(handler, handler);
                 classType = handler;
             }
@@ -109,12 +101,12 @@ public enum ParserFactory {
     }
     
     /**
-     * Gets the handler corresponding to the actual type specified by the user.
-     * Return {@code null} if the actual type is not found.
+     * Gets the handler corresponding to the actual type specified by
+     * the user. Return null if the actual type is not found.
      * 
      * @param handler
      *          Some user-defined type.
-     * @return The corresponding actual type, or {@code null} if not found.
+     * @return The corresponding actual type, or null if not found.
      */
     @SuppressWarnings("rawtypes")
     public Class<?> findUserDefinedClass(Class<? extends OptionParser> handler) {
@@ -126,15 +118,15 @@ public enum ParserFactory {
     }
 
     /**
-     * Registers an instance of type {@link OptionParser} associated with
-     * {@code classType.}
+     * Registers an instance of type OptionParser associated with
+     * the given class type.
      *
      * @throws IllegalArgumentException
-     *             When the {@code converter} is not a subtype of {@link OptionParser}.
+     *             When the converter is not a subtype of OptionParser.
      * @param classType
-     *            The value type which maps to an {@link OptionParser} instance.
+     *            The value type which maps to an OptionParser instance.
      * @param converter
-     *            The instance used to parse a value of type {@code classType}.
+     *            The instance used to parse a value of class type.
      */
     public void addParserTypeForClassType(Class<?> classType,
             @SuppressWarnings("rawtypes") Class<? extends OptionParser> converter) {
@@ -148,14 +140,13 @@ public enum ParserFactory {
     }
 
     /**
-     * The class {@link ParameterConverter} is used to search for and
-     * invoke a constructor defined in a class that implements
-     * {@link IOptionParser} and extends {@link OptionParser}. After
-     * the constructor is found, it is invoked to create and return
-     * an instance of {@link OptionParser}. An {@link Exception} is
+     * The class ParameterConverter is used to search for and invoke a
+     * constructor defined in a class that implements IOptionParser and
+     * extends OptionParser. After the constructor is found, it is invoked
+     * to create and return an instance of OptionParser. An Exception is
      * thrown when no default constructor is found.
      *
-     * @author Ben Cisneros
+     * @author Ben
      * @version 06/21/2018
      * @since 1.2
      */
@@ -173,14 +164,13 @@ public enum ParserFactory {
         }
 
         /**
-         * Gets the constructor of the class that implements {@link OptionParser}.
+         * Gets the constructor of the class that implements OptionParser.
          *
          * @throws IllegalArgumentException
-         *             When a constructor with a parameter {@code String} is not
-         *             defined.
+         *             When a constructor with a parameter is not defined.
          * @param handlerType
          *            The class type that the constructor belongs to.
-         * @return A constructor that belong to class {@code converter}.
+         * @return A constructor that belong to converter class.
          */
         @SuppressWarnings("rawtypes")
         private Constructor<? extends OptionParser> findConstructor(Class<? extends OptionParser> handlerType) {
@@ -193,11 +183,11 @@ public enum ParserFactory {
         }
 
         /**
-         * Creates and returns an instance of {@link OptionParser}.
+         * Creates and returns an instance of OptionParser.
          *
          * @param optionName
          *            The name of a command line option.
-         * @return An instances of {@link OptionParser}.
+         * @return An instances of OptionParser.
          */
         public OptionParser<?> getOptionParser(String optionName) {
             try {

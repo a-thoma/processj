@@ -6,8 +6,8 @@ import java.util.Collection;
 import java.util.List;
 
 /**
- * The class {@link Util} contains helper methods for classes
- * within the command line processor package.
+ * This class contains helper methods for classes within
+ * the command line processor package.
  *
  * @author Ben
  * @version 06/21/2018
@@ -20,17 +20,17 @@ public final class Util {
     }
 
     /**
-     * Returns {@code true} if the parameter {@code obj} is null, or
-     * if the runtime class of {@code obj} does not represent an array
-     * class, or if the length of the array (after casting) is zero, or
-     * if all elements in the array are {@code null}.
+     * Returns 'true' if the parameter is null, or if if the runtime class
+     * of parameter does not represent an array class, or if the length of
+     * the array (after casting) is zero, or if all elements in the array
+     * are null.
      *
      * @throws IllegalArgumentException
-     *             When the class type of {@code obj} is not an array class.
+     *             When the class type of parameter is not an array class.
      * @param obj
      *            The array to be checked for nullability or emptiness.
-     * @return {@code true} if the parameter {@code obj} represents an empty
-     *         array or {@code false} otherwise.
+     * @return true if the parameter parameter represents an empty
+     *         array or false otherwise.
      */
     public static boolean isArrayEmpty(Object obj) {
         if (obj == null) {
@@ -72,7 +72,7 @@ public final class Util {
      * 
      * @param accessibleObject
      *            The field, method, or constructor.
-     * @return The name of an {@code accessibleObject}.
+     * @return The name of the accessible object.
      */
     public static String getAccessibleObjectTypeName(AccessibleObject accessibleObject) {
         String objectName = String.valueOf(accessibleObject);
@@ -82,9 +82,9 @@ public final class Util {
     }
 
     /**
-     * Returns an instance represented by a type {@link Collection} if {@code type}
-     * represents some type of group of objects. Otherwise, an exception is thrown
-     * if {@code type} is an unknown type.
+     * Returns an instance represented by a Collection type if the parameter
+     * represents some kind of group of objects. Otherwise, an exception is
+     * thrown if the parameter is an unknown type.
      * 
      * @throws RuntimeException
      *            If the class type is unknown.
@@ -101,14 +101,14 @@ public final class Util {
     }
     
     /**
-     * Returns and casts an instance represented by a class {@code type}.
+     * Returns and casts an instance represented by a specified class.
      * 
      * @param objects
-     *          A list of objects containing an instance of type {@code type}.
+     *          A list of objects containing an instance of type.
      * @param type
-     *          The class type used for casting an object in {@code objects}.
-     * @return An instance after casting or null if the list of {@code objects} does
-     *         not contain an instance of type {@code type}.
+     *          The class type used for casting an object in the given list.
+     * @return An instance after casting or null if the list of objects does
+     *         not contain an instance of specified type.
      */
     public static <T> T find(List<?> objects, Class<T> type) {
         for (Object obj : objects) {
@@ -119,41 +119,40 @@ public final class Util {
     }
 
     /**
-     * Returns {@code true} if the string {@code str} represents an integer
-     * or floating-point number.
+     * Returns true if the string represents an integer or
+     * floating-point number.
      * 
      * @param str
-     *            A string representation of an integer or floating-point number.
-     * @return {@code true} if the string is an integer or double number or
-     *         {@code false} otherwise.
+     *            A string representation of an integer or floating-point
+     *            number.
+     * @return true if the string is an integer or double number or
+     *         false otherwise.
      */
     public static boolean isNumber(String str) {
         return str.matches("^[0-9]+\\.?[0-9]+");
     }
     
     /**
-     * Returns {@code true} if {@code lhs} is equal to {@code rhs} or {@code false}
-     * otherwise.
+     * Returns true if 'lhs' is equal to 'rhs' or false otherwise.
      * 
      * @param lhs
      *          The object to be compared for equality.
      * @param rhs
      *          Another object used entirely as the comparing object. 
-     * @return {@code true} if both {@code lhs} and {@code rhs} are equal or {@code false}
-     *         otherwise.
+     * @return true if both 'lhs' and 'rhs' are equal or false otherwise.
      */
     public static boolean objectEquals(Object lhs, Object rhs) {
         return lhs == null && rhs == null || lhs != null && lhs.equals(rhs);
     }
     
     /**
-     * Find the Levenshtein distance between two Strings (Naive approach).
+     * Find the Levenshtein distance between two Strings -- naive approach.
      * 
      * @param src
      *          The source string.
      * @param target
      *          The destination string.
-     * @return The distance between {@code src} and {@code target}.
+     * @return The distance between source and target.
      */
     public static int distance(String src, String target) {
         int dist[][];
@@ -187,7 +186,7 @@ public final class Util {
                 else
                     cost = 1;
                 
-                // Get minimum
+                // Get minimum.
                 int min = dist[i - 1][j] + 1;
                 if (min > dist[i][j - 1] + 1)
                     min = dist[i][j - 1] + 1;
