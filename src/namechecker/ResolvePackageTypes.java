@@ -20,9 +20,9 @@ import utilities.VisitorMessageNumber;
 public class ResolvePackageTypes extends Visitor<AST> {
 
     public ResolvePackageTypes() {
-        Log.logHeader("=========================================================");
-        Log.logHeader("*    P A C K A G E D   T Y P E   R E S O L U T I O N    *");
-        Log.logHeader("=========================================================");
+        Log.logHeader("***************************************************");
+        Log.logHeader("* P A C K A G E D   T Y P E   R E S O L U T I O N *");
+        Log.logHeader("***************************************************");
         Log.logHeader("> File: " + CompilerMessageManager.INSTANCE.fileName);
     }
 

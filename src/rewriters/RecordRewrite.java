@@ -22,9 +22,9 @@ public class RecordRewrite extends Visitor<Object> {
     
     public RecordRewrite(SymbolTable sym) {
         this.sym = sym;
-        Log.logHeader("========================================");
+        Log.logHeader("****************************************");
         Log.logHeader("*     R E C O R D   R E W R I T E      *");
-        Log.logHeader("========================================");
+        Log.logHeader("****************************************");
     }
     
     public HashSet<RecordMember> addExtendedRecords(AST a) {

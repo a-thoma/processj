@@ -29,9 +29,9 @@ public class ResolveImportTopDecls extends Visitor<Object> {
     public static Hashtable<String, String> pt = new Hashtable<String, String>();
     
     public ResolveImportTopDecls() {
-        Log.logHeader("=================================================");
-        Log.logHeader("*    R E S O L V E   N A T I V E   D E C L S    *");
-        Log.logHeader("=================================================");
+        Log.logHeader("*******************************************");
+        Log.logHeader("* R E S O L V E   N A T I V E   D E C L S *");
+        Log.logHeader("*******************************************");
     }
     
     @Override

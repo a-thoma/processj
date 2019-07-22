@@ -7,9 +7,9 @@ import ast.*;
 public class CastRewrite extends Visitor<Object> {
     
     public CastRewrite() {
-        Log.logHeader("========================================");
+        Log.logHeader("****************************************");
         Log.logHeader("*        C A S T   R E W R I T E       *");
-        Log.logHeader("========================================");
+        Log.logHeader("****************************************");
     }
     
     @Override

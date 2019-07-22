@@ -41,9 +41,9 @@ public class NameChecker<T extends Object> extends Visitor<T> {
     public NameChecker(SymbolTable currentScope) {
         this.currentScope = currentScope;
         this.topScope = currentScope;
-        Log.log("======================================");
+        Log.log("**************************************");
         Log.log("*       N A M E   C H E C K E R      *");
-        Log.log("======================================");
+        Log.log("**************************************");
 
     }
 

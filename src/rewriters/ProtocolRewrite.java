@@ -22,9 +22,9 @@ public class ProtocolRewrite extends Visitor<Object> {
     
     public ProtocolRewrite(SymbolTable sym) {
         this.sym = sym;
-        Log.logHeader("========================================");
+        Log.logHeader("****************************************");
         Log.logHeader("*   P R O T O C O L   R E W R I T E    *");
-        Log.logHeader("========================================");
+        Log.logHeader("****************************************");
     }
     
     public boolean addName(HashSet<Name> se, Name name) {

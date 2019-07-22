@@ -40,7 +40,7 @@ public class PJMessage extends CompilerMessage {
         
         // Apply color code mode if allowed on terminal
         String tag = stTag.render();
-        if (Settings.isAnsiColour)
+        if (Settings.isAnsiColor)
             tag = ColorCodes.colorTag(stTag.render(), error.getErrorSeverity());
         
         return stMessage.add("tag", tag)

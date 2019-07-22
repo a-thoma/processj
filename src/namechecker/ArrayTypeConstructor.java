@@ -28,9 +28,9 @@ public class ArrayTypeConstructor extends Visitor<AST> {
 
     public ArrayTypeConstructor() {
         debug = true;
-        Log.log("======================================");
+        Log.log("**************************************");
         Log.log("*  A R R A Y   C O N S T R U C T O R *");
-        Log.log("======================================");
+        Log.log("**************************************");
 
     }
 

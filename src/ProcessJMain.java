@@ -54,8 +54,8 @@ import utilities.Language;
                         },
             name = "pjc",
             help = "The primary command in ProcessJ",
-            versionPrinter = PJMain.VersionPrinter.class)
-public class PJMain extends Command {
+            versionPrinter = ProcessJMain.VersionPrinter.class)
+public class ProcessJMain extends Command {
 
     // TODO: This is for imports (libraries, files, etc), pragmas, etc..
     @Option(names = {"-V", "-verbose"},
@@ -130,7 +130,7 @@ public class PJMain extends Command {
     public String info;
     
     @Option(names = "-console-ansi-code",
-            help = "Try and use color on terminals that support ANSI espace codes",
+            help = "Use color on terminals that support ANSI espace codes",
             metavar = "<flag>",
             split = "=")
     public Boolean ansiColour;
@@ -162,14 +162,14 @@ public class PJMain extends Command {
             Date date = new Date();
             return new String[] { "ProcessJ version 1.2 - compiled on " + dateFormat.format(date) + ".",
                                   "Java version \"" + System.getProperty("java.version") + "\"",
-                                  "Copyright(c) 2018 Matt Pedersen, Ben Cisneros, and others.",
-                                  "This release is maintained by Matt Pedersen.",
+                                  "Copyright(c) 2018-2019",
+                                  "This release is maintained by Ben Cisneros.",
                                   "Please report bugs to <matt.pedersen@unlv.edu>."};
         }
     }
     
     public VersionPrinter getVersion() throws InstantiationException, IllegalAccessException {
-        return (VersionPrinter) PJMain.class.getAnnotation(Parameters.class)
+        return (VersionPrinter) ProcessJMain.class.getAnnotation(Parameters.class)
                                             .versionPrinter().newInstance();
     }
 }

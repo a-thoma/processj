@@ -124,9 +124,9 @@ public class CLIBuilder {
         if (!positionArgs.isEmpty())
             parseArgument(optGroup, positionArgs);
         
-        // Sub-commands are ALWAYS invoked last
+        // Sub-commands are _always_ invoked last
         if (subParameters)
-            handleArgs(args, getCommandByName(args[index]), index + 1, new ArrayList<>());
+            handleArgs(args, getCommandByName(args[index]), index + 1, new ArrayList<String>());
         
         // Validate required command line options
         validateRequiredOptions();
@@ -198,9 +198,9 @@ public class CLIBuilder {
         for (PositionalValue argument : optGroup.getArguments()) {
             ArityRange order = argument.getArity();
             // The minimum number of values to consume
-            int getFrom = order.getFrom();
+            int indexFrom = order.getFrom();
             // The maximum number of values to consume
-            int getTo = order.getTo();
+            int indexTo = order.getTo();
             // Number of consumed values
             int consumedArgs = 0;
             // Indicates when a value could not be parsed
@@ -209,18 +209,18 @@ public class CLIBuilder {
             if (argument.isSingleValue()) {
                 optGroup.addValue(argument, argList.get(index++));
             } else {
-                while (getFrom <= getTo && !consumedValue) {
+                while (indexFrom <= indexTo && !consumedValue) {
                     try {
                         optGroup.addValue(argument, argList.get(index++));
                         ++consumedArgs;
-                        ++getFrom;
+                        ++indexFrom;
                     } catch (Exception e) {
-                        getFrom = getTo != Integer.MAX_VALUE ? getFrom - 1 : getFrom;
+                        indexFrom = indexTo != Integer.MAX_VALUE ? indexFrom - 1 : indexFrom;
                         consumedValue = true;
                     }
                 }
                 // Have we consumed all required values?
-                if (getFrom < index && getTo != Integer.MAX_VALUE)
+                if (indexFrom < index && indexTo != Integer.MAX_VALUE)
                     throw new RuntimeException(String.format("@Argument '%s' requires %s value(s), "
                                 + "only %d value(s) consumed.", argument.getSimpleName(), order, consumedArgs));
             }

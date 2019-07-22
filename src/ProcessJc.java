@@ -30,7 +30,7 @@ import utilities.SymbolTable;
  */
 public class ProcessJc {
     
-    public static CLIBuilder optionBuilder = new CLIBuilder().addCommand(PJMain.class);
+    public static CLIBuilder optionBuilder = new CLIBuilder().addCommand(ProcessJMain.class);
     
     public static void help() {
         Formatter formatHelp = new Formatter(optionBuilder);
@@ -47,10 +47,10 @@ public class ProcessJc {
         // 
         
         // Build options and arguments with user input
-        PJMain pjMain = null;
+        ProcessJMain pjMain = null;
         try {
             optionBuilder.handleArgs(args);
-            pjMain = optionBuilder.getCommand(PJMain.class);
+            pjMain = optionBuilder.getCommand(ProcessJMain.class);
         } catch(Exception e) {
             System.out.println(e.getMessage());
             System.exit(0);
@@ -66,19 +66,19 @@ public class ProcessJc {
         boolean visitorAll = pjMain.visitorAll;
         List<File> files = pjMain.files;
         
-        // Turn on/off color mode
+        // Turn on/off color mode.
         if (pjMain.ansiColour == null) {
             // Turn 'on' the color mode if the value of the color property
             // in the properties file is 'yes'.
             if (config.getProperty("color").equalsIgnoreCase("yes"))
-                Settings.isAnsiColour = true;
+                Settings.isAnsiColor = true;
         } else {
-            Settings.isAnsiColour = pjMain.ansiColour;
+            Settings.isAnsiColor = pjMain.ansiColour;
             String ansiColorvalue = "no";
-            if (Settings.isAnsiColour)
+            if (Settings.isAnsiColor)
                 ansiColorvalue = "yes";
             // Update the value of color code property in the properties file.
-            config.setProperty("colour", ansiColorvalue);
+            config.setProperty("color", ansiColorvalue);
             ConfigFileReader.closeConfiguration(config);
         }
         
