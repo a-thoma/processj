@@ -27,11 +27,10 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
     
     public ResolveImports(SymbolTable importChild) {
         this.importChild = importChild;
-        Log.logHeader("==============================================================");
-        Log.logHeader("*                  R E S O L V E   I M P O R T S             *");
-        Log.logHeader("*       -----------------------------------------------      *");
-        Log.logHeader("*       File: " + CompilerMessageManager.INSTANCE.fileName);
-        Log.logHeader("==============================================================");
+        Log.logHeader("========================================");
+        Log.logHeader("*    R E S O L V E   I M P O R T S     *");
+        Log.logHeader("========================================");
+        Log.logHeader("> File: " + CompilerMessageManager.INSTANCE.fileName);
     }
     
     public static String packageNameToString(Sequence<Name> packageName) {

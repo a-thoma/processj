@@ -45,7 +45,7 @@ public class Compilation extends AST {
         return sourceFile.substring(0, sourceFile.lastIndexOf("."));
     }
     
-    public String packageNoName() {
+    public String pathNoName() {
         if (packageName.isEmpty()) // If packageName is 'null' then it must be a local directory
             return path.substring(path.lastIndexOf(File.separator) + 1, path.length());
         return packageName;

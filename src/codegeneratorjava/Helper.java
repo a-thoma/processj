@@ -59,15 +59,15 @@ public class Helper {
         case MAIN_NAME:
             break; // Do nothing for now.
         case PROCEDURE_NAME:
-            varName = Tag.PROCEDURE_NAME.getTag() + name; break;
+            varName = Tag.PROCEDURE_NAME + name; break;
         case METHOD_NAME:
-            varName = Tag.METHOD_NAME.getTag() + name; break;
+            varName = Tag.METHOD_NAME + name; break;
         case PARAM_NAME:
-            varName = Tag.PARAM_NAME.getTag() + name + X; break;
+            varName = Tag.PARAM_NAME + name + X; break;
         case LOCAL_NAME:
-            varName = Tag.LOCAL_NAME.getTag() + name + X; break;
+            varName = Tag.LOCAL_NAME + name + X; break;
         case PROTOCOL_NAME:
-            varName = Tag.PROTOCOL_NAME.getTag() + name; break;
+            varName = Tag.PROTOCOL_NAME + name; break;
         default:
             break;
         }

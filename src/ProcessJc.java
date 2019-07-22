@@ -68,8 +68,8 @@ public class ProcessJc {
         
         // Turn on/off color mode
         if (pjMain.ansiColour == null) {
-            // Set the color mode if the default value in the
-            // properties file is 'yes'
+            // Turn 'on' the color mode if the value of the color property
+            // in the properties file is 'yes'.
             if (config.getProperty("color").equalsIgnoreCase("yes"))
                 Settings.isAnsiColour = true;
         } else {
@@ -77,7 +77,7 @@ public class ProcessJc {
             String ansiColorvalue = "no";
             if (Settings.isAnsiColour)
                 ansiColorvalue = "yes";
-            // Update color code value in properties file
+            // Update the value of color code property in the properties file.
             config.setProperty("colour", ansiColorvalue);
             ConfigFileReader.closeConfiguration(config);
         }
@@ -148,16 +148,18 @@ public class ProcessJc {
                 System.exit(1);
             }
 
-            // Cast the result from the parse to a Compilation -- this is the root of the tree
+            // Cast the result from the parse to a Compilation -- this is the root of the tree.
             Compilation c = (Compilation) root;
-            // Set absolute path, file and package name from where this Compilation is created
+            // Set the absolute path, file and package name from where this Compilation is created.
             System.out.println("-- Setting absolute path, file and package name for '" + inFile.getName() + "'.");
             c.sourceFile = inFile.getName();
-            String parentPath = inFile.getAbsolutePath(); // Grab the parent's path of source file
+            String parentPath = inFile.getAbsolutePath(); // Grab the parent's path of source file.
             parentPath = parentPath.substring(0, parentPath.lastIndexOf(File.separator));
-            c.path = parentPath; // Get the file's parent absolute path
-            if (c.packageName() != null)  // A package declaration is optional, so this can be 'null'
+            c.path = parentPath; // Get the file's parent absolute path.
+            if (c.packageName() != null) {
+                // A package declaration is optional, so this can be 'null'.
                 c.packageName = ResolveImports.packageNameToString(c.packageName());
+            }
 
             // Decode pragmas -- these are used for generating stubs from libraries.
             // No regular program would have them.
@@ -203,7 +205,7 @@ public class ProcessJc {
             ///
             
             System.out.println("-- Checking native Top Level Declarations.");
-            c.visit(new namechecker.ResolveImportTopLevelDecls());
+            c.visit(new namechecker.ResolveImportTopDecls());
             
             // 
             // VISIT RESOLVE PACKAGE TYPES
@@ -298,10 +300,10 @@ public class ProcessJc {
     }
     
     /**
-     * Given a ProcessJ Compilation unit, e.g. an abstract syntax tree object,
-     * we will generate the code for the JVM. The source range for this type of
-     * tree is the entire source file, not including leading and trailing whitespace
-     * characters and comments.
+     * Given a ProcessJ Compilation unit, e.g. an abstract syntax tree
+     * object, we will generate the code for the JVM. The source range
+     * for this type of tree is the entire source file, not including
+     * leading and trailing whitespace characters and comments.
      *
      * @param compilation
      *              A Compilation unit consisting of a single file.
@@ -311,22 +313,22 @@ public class ProcessJc {
      *              A symbol table consisting of all the top level types.
      */
     private static void generateCodeJava(Compilation compilation, File inFile, SymbolTable topLevelDecls) {
-        // Read in and get the pathname of the input file
+        // Read in and get the pathname of the input file.
         String name = inFile.getName().substring(0, inFile.getName().lastIndexOf("."));
         Properties config = utilities.ConfigFileReader.openConfiguration();
 
-        // Run the code generator to decode pragmas, generate libraries, resolve
-        // types, and set the symbol table for top level declarations
+        // Run the code generator to decode pragmas, generate libraries,
+        // resolve types, and set the symbol table for top level declarations.
         CodeGeneratorJava generator = new CodeGeneratorJava(topLevelDecls);
 
         // Set the user working directory
         //generator.setWorkingDir(configFile.getProperty("workingdir"));
 
         // Visit this compilation unit and recursively build the program
-        // after returning strings rendered by the string template
-        String templateResult = (String) compilation.visit(generator);
+        // after returning strings rendered by the string template.
+        String code = (String) compilation.visit(generator);
 
         // Write the output to a file
-        Helper.writeToFile(templateResult, compilation.fileNoExtension());
+        Helper.writeToFile(code, compilation.fileNoExtension());
     }
 }

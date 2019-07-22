@@ -69,15 +69,16 @@ public enum Tag {
 
     public static List<String> getTags() {
         return Arrays.stream(values())
-                     .map(tag -> tag.getTag())
+                     .map(tag -> tag.toString())
                      .collect(Collectors.toList());
     }
 
     public String getLabel() {
         return label;
     }
-
-    public String getTag() {
+    
+    @Override
+    public String toString() {
         return tag;
     }
 }

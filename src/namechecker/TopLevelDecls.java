@@ -37,10 +37,10 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
 
 
     public TopLevelDecls(SymbolTable symtab) {
-        Log.logHeader("==============================================================");
-        Log.logHeader("*                  T O P   L E V E L   D E C L S             *");
-        Log.logHeader("*       -----------------------------------------------      *");
-        Log.logHeader("*       File: " + CompilerMessageManager.INSTANCE.fileName);
+        Log.logHeader("=======================================");
+        Log.logHeader("*    T O P   L E V E L   D E C L S    *");
+        Log.logHeader("=======================================");
+        Log.logHeader("> File: " + CompilerMessageManager.INSTANCE.fileName);
         Log.logHeader("");
         this.symtab = symtab;
     }
@@ -69,10 +69,11 @@ public class TopLevelDecls<T extends AST> extends Visitor<T> {
         co.typeDecls().visit(this);
         
         Log.logHeader("");
-        Log.logHeader("*                  T O P   L E V E L   D E C L S             *");
-        Log.logHeader("*                           D O N E                          *");
-        Log.logHeader("*       File: " + CompilerMessageManager.INSTANCE.fileName);
-        Log.logHeader("==============================================================");
+        Log.logHeader("> File: " + CompilerMessageManager.INSTANCE.fileName);
+        Log.logHeader("=======================================");
+        Log.logHeader("*    T O P   L E V E L   D E C L S    *");
+        Log.logHeader("*               D O N E               *");
+        Log.logHeader("=======================================");
 
         return null;
     }

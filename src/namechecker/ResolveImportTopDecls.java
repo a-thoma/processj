@@ -21,18 +21,17 @@ import utilities.Visitor;
  * @version 01/31/2019
  * @since 1.2
  */
-public class ResolveImportTopLevelDecls extends Visitor<Object> {
+public class ResolveImportTopDecls extends Visitor<Object> {
     
     // The import currently being resolved.
     public Import currentImport = null;
     
     public static Hashtable<String, String> pt = new Hashtable<String, String>();
     
-    public ResolveImportTopLevelDecls() {
-        Log.logHeader("****************************************");
-        Log.logHeader("*     R E S O L V E   N A T I V E      *");
-        Log.logHeader("*    T O P   L E V E L   D E C L S     *");
-        Log.logHeader("****************************************");
+    public ResolveImportTopDecls() {
+        Log.logHeader("=================================================");
+        Log.logHeader("*    R E S O L V E   N A T I V E   D E C L S    *");
+        Log.logHeader("=================================================");
     }
     
     @Override

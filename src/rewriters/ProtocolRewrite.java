@@ -22,9 +22,9 @@ public class ProtocolRewrite extends Visitor<Object> {
     
     public ProtocolRewrite(SymbolTable sym) {
         this.sym = sym;
-        Log.logHeader("****************************************");
+        Log.logHeader("========================================");
         Log.logHeader("*   P R O T O C O L   R E W R I T E    *");
-        Log.logHeader("****************************************");
+        Log.logHeader("========================================");
     }
     
     public boolean addName(HashSet<Name> se, Name name) {
@@ -78,7 +78,7 @@ public class ProtocolRewrite extends Visitor<Object> {
             pd.extend().append(n);
         Log.log(pd, "protocol " + pd.name().getname() + " with " + pd.extend().size() + " member(s)");
         for (Name n : pd.extend())
-            Log.log(pd, "  > protocol " + n);
+            Log.log(pd, "> protocol " + n);
         return null;
     }
 }
