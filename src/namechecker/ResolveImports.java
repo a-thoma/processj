@@ -12,7 +12,7 @@ import ast.Name;
 import ast.Sequence;
 import parser.parser;
 import scanner.Scanner;
-import utilities.PJMessage;
+import utilities.ProcessJMessage;
 import utilities.Log;
 import utilities.MessageType;
 import utilities.CompilerMessageManager;
@@ -77,13 +77,13 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
                     (Compilation) r.value);
             return (Compilation) r.value;
         } catch (java.io.FileNotFoundException e) {
-            CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+            CompilerMessageManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                         .addAST(a)
                         .addError(VisitorMessageNumber.RESOLVE_IMPORTS_102)
                         .addArguments(fileName)
                         .build());
         } catch (Exception e) {
-            CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+            CompilerMessageManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                         .addAST(a)
                         .addError(VisitorMessageNumber.RESOLVE_IMPORTS_106)
                         .addArguments(fileName)
@@ -103,7 +103,7 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
         public boolean accept(File dir, String name) {
             String[] result = name.split("\\.");
             return result[result.length - 1]
-                    .equals(utilities.Settings.importFileExtension);
+                    .equals(utilities.Settings.IMPORT_FILE_EXTENSSION);
         }
     }
 
@@ -182,7 +182,7 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
             } else {
                 // It was not a local directory, but see if it is a library directory
                 fileName = new File(utilities.Settings.includeDir)
-                        .getAbsolutePath() + "/" + utilities.Settings.targetLanguage + "/" + path;
+                        .getAbsolutePath() + "/" + utilities.Settings.language + "/" + path;
                 Log.log("visitImport(): Not a local, so try a library: " + fileName);
                 if (new File(fileName).isDirectory()) {
                     // Yes, it was, so add it's content to the fileList
@@ -191,7 +191,7 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
                     // Oh no, the directory wasn't found at all!
                     String packageName = path.replaceAll("/", ".");
                     packageName = packageName.substring(0, packageName.length() - 1);
-                    CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                    CompilerMessageManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                                 .addAST(im)
                                 .addError(VisitorMessageNumber.RESOLVE_IMPORTS_103)
                                 .addArguments(packageName)
@@ -211,7 +211,7 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
             } else {
                 // No, so look in the library
                 fileName = new File(utilities.Settings.includeDir)
-                        .getAbsolutePath() + "/" + utilities.Settings.targetLanguage
+                        .getAbsolutePath() + "/" + utilities.Settings.language
                         + "/" + path + (path.equals("") ? "" : "/") + im.file().getname() + ".pj";
                 Log.log("visitImport(): Not a local so try a library: " + fileName);
                 // But only if it isn't of the form 'import f' cause they can only be local!
@@ -220,7 +220,7 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
                 } else {
                     // Nope, nothing found!
                     if (path.equals("")) {
-                        CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                        CompilerMessageManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                                     .addAST(im)
                                     .addError(VisitorMessageNumber.RESOLVE_IMPORTS_102)
                                     .addArguments(im.file().getname())
@@ -228,7 +228,7 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
                     } else {
                         String packageName = path.replaceAll("/", ".");
                         packageName = packageName.substring(0, packageName.length() - 1);
-                        CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                        CompilerMessageManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                                     .addAST(im)
                                     .addError(VisitorMessageNumber.RESOLVE_IMPORTS_105)
                                     .addArguments(im.file().getname(), path)
@@ -250,7 +250,7 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
             Compilation c = ResolveImports.importFile(im, fn);
             
             // Set absolute path, file and package name from where the Import is created
-            c.sourceFile = fn.substring(fn.lastIndexOf(File.separator) + 1, fn.length());
+            c.fileName = fn.substring(fn.lastIndexOf(File.separator) + 1, fn.length());
             c.path = fn.substring(0, fn.lastIndexOf(File.separator));
             c.packageName = path.replaceAll(File.separator, "\\.");
 

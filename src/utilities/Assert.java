@@ -2,8 +2,6 @@ package utilities;
 
 import java.util.Collection;
 
-import cli.StringUtil;
-
 /**
  * The class Assert provides a convenient way for checking 'null'
  * objects.
@@ -50,6 +48,6 @@ public class Assert {
      * @return The same object.
      */
     public static <T> T nonNull(T obj, Collection<String> args) {
-        return nonNull(obj, StringUtil.join(args, ", "));
+        return nonNull(obj, Util.join(args, ", "));
     }
 }

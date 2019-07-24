@@ -117,24 +117,24 @@ public class ColorCodes {
     }
     
     public static String colorTag(String tag, ErrorSeverity severity) {
-        StringBuilder stringBuilder = new StringBuilder();
-        stringBuilder.append(ANSI_PREFIX)
-                     .append(Attribute.BOLD.toString())
-                     .append(ANSI_COMMA);
+        StringBuilder sb = new StringBuilder();
+        sb.append(ANSI_PREFIX);
+        sb.append(Attribute.BOLD.toString());
+        sb.append(ANSI_COMMA);
         
         switch (severity) {
         case WARNING:
-            stringBuilder.append(AnsiForeground.YELLOW.toString());
+            sb.append(AnsiForeground.YELLOW.toString());
             break;
         case ERROR:
-            stringBuilder.append(AnsiForeground.RED.toString());
+            sb.append(AnsiForeground.RED.toString());
             break;
         default:
             break;
         }
-        stringBuilder.append(ANSI_POSTFIX)
-                     .append(tag)
-                     .append(ANSI_RESET);
-        return stringBuilder.toString();
+        sb.append(ANSI_POSTFIX);
+        sb.append(tag);
+        sb.append(ANSI_RESET);
+        return sb.toString();
     }
 }

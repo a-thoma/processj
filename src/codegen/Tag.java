@@ -1,13 +1,13 @@
-package codegeneratorjava;
+package codegen;
 
 import java.util.Arrays;
 import java.util.List;
 import java.util.stream.Collectors;
 
 /**
- * The enum Tag represents and identifies various types such as
- * procedures, methods, parameters, local variables, protocols,
- * records, channels, etc.
+ * This enum represents and identifies various types such as
+ * yielding procedures, non-yielding procedures, parameters,
+ * local variables, protocols, records, channels, etc.
  *
  * @author Ben
  * @version 06/15/2018
@@ -15,14 +15,13 @@ import java.util.stream.Collectors;
  */
 public enum Tag {
     
-    // Signatures and types. These labels can be used
-    // for debugging.
+    // Signatures and types. These labels can be used for debugging.
     MAIN_NAME           ("([T;)V"   , "mainProcedureType"),
     PROCEDURE_NAME      ("_proc$"   , "procedureType"),
     METHOD_NAME         ("_method$" , "methodType"),
     PARAM_NAME          ("_pd$"     , "parameterType"),
     LOCAL_NAME          ("_ld$"     , "localVariableType"),
-    PAR_BLOCK_NAME      ("par"      , "parBlockType"),
+    PAR_BLOCK_NAME      ("_par"      , "parBlockType"),
     PROTOCOL_NAME       ("_prot$"   , "protocolType")
     ;
 
@@ -49,7 +48,8 @@ public enum Tag {
     public static Tag findValueOf(final String name) {
         try {
             return Tag.valueOf(name);
-        } catch (IllegalArgumentException e) { // Try one more time.
+        } catch (IllegalArgumentException e) {
+            // Try one more time.
             Tag result = null;
             for (Tag t : values()) {
                 if (t.tag.startsWith(name)) {
@@ -57,17 +57,17 @@ public enum Tag {
                         result = t;
                     else
                         throw new IllegalArgumentException("Unable to find ambiguous tag '" +
-                                name + "' in " + getTags());
+                                name + "' in " + tags());
                 }
             }
             if (result == null)
                 throw new IllegalArgumentException("Unable to find ambiguous tag '" +
-                            name + "' in " + getTags());
+                            name + "' in " + tags());
             return result;
         }
     }
 
-    public static List<String> getTags() {
+    public static List<String> tags() {
         return Arrays.stream(values())
                      .map(tag -> tag.toString())
                      .collect(Collectors.toList());

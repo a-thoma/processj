@@ -10,7 +10,7 @@ import utilities.Error;
 import utilities.Log;
 import utilities.SymbolTable;
 import utilities.Visitor;
-import utilities.PJMessage;
+import utilities.ProcessJMessage;
 import utilities.CompilerMessageManager;
 import utilities.Log;
 import utilities.MessageType;
@@ -131,7 +131,7 @@ public class TypeChecker extends Visitor<Type> {
             // This error does not create an error type cause the baseType() is
             // still the array expression's type.
             if (!indexType.isIntegerType())
-                CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder().addAST(ae)
+                CompilerMessageManager.INSTANCE.reportMessage(new ProcessJMessage.Builder().addAST(ae)
                         .addError(VisitorMessageNumber.TYPE_CHECKER_655).addArguments(indexType.typeName()).build(),
                         MessageType.PRINT_CONTINUE);
         }
@@ -149,7 +149,7 @@ public class TypeChecker extends Visitor<Type> {
 
         // Array Literals cannot appear without a 'new' keyword.
         CompilerMessageManager.INSTANCE.reportMessage(
-                new PJMessage.Builder().addAST(al).addError(VisitorMessageNumber.TYPE_CHECKER_656).build(),
+                new ProcessJMessage.Builder().addAST(al).addError(VisitorMessageNumber.TYPE_CHECKER_656).build(),
                 MessageType.PRINT_CONTINUE);
         return null;
     }
@@ -207,7 +207,7 @@ public class TypeChecker extends Visitor<Type> {
         // TODO: Check the implementation of Assignable.
         if (!vType.assignable())
             CompilerMessageManager.INSTANCE.reportMessage(
-                    new PJMessage.Builder().addAST(as).addError(VisitorMessageNumber.TYPE_CHECKER_630).build(),
+                    new ProcessJMessage.Builder().addAST(as).addError(VisitorMessageNumber.TYPE_CHECKER_630).build(),
                     MessageType.PRINT_CONTINUE);
 
         // Now switch on the operators
@@ -218,7 +218,7 @@ public class TypeChecker extends Visitor<Type> {
                 as.type = new ErrorType();
                 CompilerMessageManager.INSTANCE
                         .reportMessage(
-                                new PJMessage.Builder().addAST(as).addError(VisitorMessageNumber.TYPE_CHECKER_601)
+                                new ProcessJMessage.Builder().addAST(as).addError(VisitorMessageNumber.TYPE_CHECKER_601)
                                         .addArguments(eType.typeName(), vType.typeName()).build(),
                                 MessageType.PRINT_CONTINUE);
             }
@@ -240,7 +240,7 @@ public class TypeChecker extends Visitor<Type> {
                 as.type = new ErrorType();
                 CompilerMessageManager.INSTANCE
                         .reportMessage(
-                                new PJMessage.Builder().addAST(as).addError(VisitorMessageNumber.TYPE_CHECKER_600)
+                                new ProcessJMessage.Builder().addAST(as).addError(VisitorMessageNumber.TYPE_CHECKER_600)
                                         .addArguments(eType.typeName(), vType.typeName()).build(),
                                 MessageType.PRINT_CONTINUE);
             }
@@ -251,13 +251,13 @@ public class TypeChecker extends Visitor<Type> {
             // <<=, >>=, >>>=
             if (!vType.isIntegralType()) {
                 as.type = new ErrorType();
-                CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder().addAST(as)
+                CompilerMessageManager.INSTANCE.reportMessage(new ProcessJMessage.Builder().addAST(as)
                         .addError(VisitorMessageNumber.TYPE_CHECKER_604).addArguments(as.opString()).build(),
                         MessageType.PRINT_CONTINUE);
             }
             if (!eType.isIntegralType()) {
                 as.type = new ErrorType();
-                CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder().addAST(as)
+                CompilerMessageManager.INSTANCE.reportMessage(new ProcessJMessage.Builder().addAST(as)
                         .addError(VisitorMessageNumber.TYPE_CHECKER_605).addArguments(as.opString()).build(),
                         MessageType.PRINT_CONTINUE);
             }

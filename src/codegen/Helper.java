@@ -1,12 +1,10 @@
-package codegeneratorjava;
+package codegen;
 
 import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.OutputStreamWriter;
 import java.io.Writer;
-import java.util.Arrays;
-import java.util.HashSet;
 
 import ast.ProcTypeDecl;
 import ast.Type;
@@ -97,29 +95,29 @@ public class Helper {
      * Returns the wrapper class for the given class type.
      * 
      * @param type
-     *          A primitive class type or the class itself.
+     *          A wrapper class type or the class itself.
      * @return The type instances represented by a class.
      */
     public static Class<?> getWrapperClass(Type type) {
         type = Assert.nonNull(type, "The parameter type cannot be null.");
         Class<?> typeName = null;
-        if (type.isIntegerType()) {
+        
+        if (type.isIntegerType())
             typeName = Integer.class;
-        } else if (type.isByteType()) {
+        else if (type.isByteType())
             typeName = Byte.class;
-        } else if (type.isLongType()) {
+        else if (type.isLongType())
             typeName = Long.class;
-        } else if (type.isDoubleType()) {
+        else if (type.isDoubleType())
             typeName = Double.class;
-        } else if (type.isFloatType()) {
+        else if (type.isFloatType())
             typeName = Float.class;
-        } else if (type.isBooleanType()) {
+        else if (type.isBooleanType())
             typeName = Boolean.class;
-        } else if (type.isCharType()) {
+        else if (type.isCharType())
             typeName = Character.class;
-        } else if (type.isShortType()) {
+        else if (type.isShortType())
             typeName = Short.class;
-        }
         
         return typeName;
     }
@@ -136,22 +134,6 @@ public class Helper {
         return getWrapperClass(type).getSimpleName();
     }
     
-    // The idea was to used this set of special keyword for
-    // name conflicts. Note, this should be taken care of in
-    // namechecker
-    private static final HashSet<String> INVALID_NAMES = new HashSet<String>(Arrays.asList(
-            new String[] {
-                    /* Java keywords */
-                    "abstract", "assert", "class",
-                    "catch", "enum", "extends", "final",
-                    "goto", "instanceof", "interface",
-                    "static", "super", "synchronized",
-                    "this", "throw", "throws", "try",
-                    "null",
-                    /* ProcessJ keywords */
-                    "label", "jump", "terminate", "yield"
-            }));
-    
     /**
      * Returns true if the name of a variable, method, class,
      * etc. represents an invalid Java identifier or false
@@ -162,16 +144,13 @@ public class Helper {
      * @return true if an identifier contains valid Java characters.
      */
     public static boolean isInvalidJavaIdentifier(String identifier) {
-        if (identifier.length() != 0 && !INVALID_NAMES.contains(identifier)) {
-            if (!Character.isJavaIdentifierStart(identifier.charAt(0))) {
+        if (identifier.length() != 0) {
+            if (!Character.isJavaIdentifierStart(identifier.charAt(0)))
                 return true;
-            }
-            
             char[] letters = identifier.toCharArray();
             for (char ch : letters) {
-                if (!Character.isJavaIdentifierPart(ch)) {
+                if (!Character.isJavaIdentifierPart(ch))
                     return true;
-                }
             }
             
             return false;
@@ -181,19 +160,18 @@ public class Helper {
     }
     
     public static String getPackage(String packageName, String sourceFile) {
-        // An invocation comes from a external file (an import)
-        // if the source file from which the invocation is made
-        // is different to the package
+        // An invocation comes from a external file (an import) if the source
+        // file from which the invocation is made is different to the package.
         if (!packageName.contains(sourceFile)) {
-            String includePath = Settings.includeDir + File.separator + Settings.targetLanguage + File.separator;
-            // The following replaces all '/' with '.'
+            String includePath = Settings.includeDir + File.separator + Settings.language + File.separator;
+            // The following replaces all '/' with '.'.
             includePath = includePath.replaceAll(File.separator, "\\.");
             packageName = packageName.replaceAll(includePath, "");
             return packageName;
         }
         
         // Otherwise, the invocation must come from the same
-        // source file and package
+        // source file and package.
         return sourceFile;
     }
     

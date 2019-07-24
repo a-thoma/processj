@@ -3,16 +3,17 @@ package utilities;
 import org.stringtemplate.v4.ST;
 
 /**
- * This class is used to create generic messages in ProcessJ.
+ * This class is used to create generic messages for the
+ * ProcessJ compiler.
  * 
  * @author Ben
  * @since 1.2
  */
-public class PJMessage extends CompilerMessage {
+public class ProcessJMessage extends CompilerMessage {
     
     private boolean doStackTrace = false;
     
-    public PJMessage(Builder builder) {
+    public ProcessJMessage(Builder builder) {
         super(builder);
         doStackTrace = builder.doStackTrace;
     }
@@ -43,10 +44,12 @@ public class PJMessage extends CompilerMessage {
         if (Settings.isAnsiColor)
             tag = ColorCodes.colorTag(stTag.render(), error.getErrorSeverity());
         
-        return stMessage.add("tag", tag)
-                        .add("message", super.getST().render())
-                        .add("location", stFile.render())
-                        .add("stack", stStackInfo.render());
+        stMessage.add("tag", tag);
+        stMessage.add("message", super.getST().render());
+        stMessage.add("location", stFile.render());
+        stMessage.add("stack", stStackInfo.render());
+        
+        return stMessage;
     }
     
     public String renderMessage() {
@@ -89,7 +92,7 @@ public class PJMessage extends CompilerMessage {
         @Override
         public <E extends CompilerMessage> E build() {
             @SuppressWarnings("unchecked")
-            E error = (E) new PJMessage(this);
+            E error = (E) new ProcessJMessage(this);
             return error;
         }
         

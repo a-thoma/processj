@@ -10,11 +10,11 @@ import org.stringtemplate.v4.STGroupFile;
 import ast.AST;
 
 /**
- * The class CompilerMessage is used to create messages during a
- * tree-traversal node when processing the contents in a ProcessJ
- * file, when processing the syntax and/or semantics errors when
- * compiling or generating Java source code from a ProcessJ file,
- * or when processing command line options and/or arguments.
+ * This class is used to create messages during a tree-traversal node
+ * when processing the contents in a ProcessJ file, when processing
+ * the syntax and/or semantics errors when compiling or generating
+ * Java source code from a ProcessJ file, or when processing command
+ * line options and/or arguments.
  * 
  * @author Ben
  * @version 10/07/2018
@@ -43,7 +43,7 @@ public abstract class CompilerMessage {
     /**
      * Type of error message.
      */
-    protected final IMessageNumber error;
+    protected final MessageNumber error;
     
     /**
      * Attributes used in templates.
@@ -94,7 +94,7 @@ public abstract class CompilerMessage {
         return ast;
     }
     
-    public IMessageNumber getMessageNumber() {
+    public MessageNumber getMessageNumber() {
         return error;
     }
     
@@ -216,7 +216,7 @@ public abstract class CompilerMessage {
     public static abstract class Builder<B> {
         
         protected AST ast;
-        protected IMessageNumber error;
+        protected MessageNumber error;
         protected Object[] arguments;
         protected Throwable throwable;
         protected String fileName;
@@ -242,7 +242,7 @@ public abstract class CompilerMessage {
             return builder();
         }
         
-        public B addError(IMessageNumber error) {
+        public B addError(MessageNumber error) {
             this.error = error;
             return builder();
         }

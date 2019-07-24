@@ -62,7 +62,7 @@ public class ResolveImportTopDecls extends Visitor<Object> {
         // declaration is part of a ProcessJ native library.
         for (Compilation c : im.getCompilations()) {
             if (c == null) continue;
-            // Visit each pragma and check if they are part of a native
+            // Visit each pragma (if any) and check if they are part of a native
             // library function.
             for (Pragma p : c.pragmas())
                 p.visit(this);
@@ -70,9 +70,9 @@ public class ResolveImportTopDecls extends Visitor<Object> {
             // a native library function.
             for (Type t : c.typeDecls())
                 t.visit(this);
+            // Resolve updates here (if any).
+            pt.clear();
         }
-        // For now, resolve any updates here.
-        pt.clear();
         currentImport = prevImport;
         return null;
     }

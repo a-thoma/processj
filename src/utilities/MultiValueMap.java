@@ -10,14 +10,13 @@ import java.util.List;
 import java.util.Map;
 
 /**
- * The class MultiValueMap represents a collection of values
- * associated with a key.
+ * This class represents a collection of values associated with a key.
  * 
  * @author Ben
  * @version 09/04/2018
  * @since 1.2
  */
-public class MultiValueMap<K, V> implements IMultiMap<K, V> {
+public class MultiValueMap<K, V> implements MultiKeyMap<K, V> {
     
     /** The map containing keys and values. */
     private final Map<K, Collection<V>> hashMap;
@@ -43,7 +42,7 @@ public class MultiValueMap<K, V> implements IMultiMap<K, V> {
         Collection<V> collection = hashMap.get(key);
 
         if (collection == null) {
-            collection = new ArrayList<>();
+            collection = new ArrayList<V>();
             hashMap.put(key, collection);
         }
 
@@ -55,7 +54,7 @@ public class MultiValueMap<K, V> implements IMultiMap<K, V> {
         Collection<V> collection = hashMap.get(key);
 
         if (collection == null) {
-            collection = new ArrayList<>();
+            collection = new ArrayList<V>();
             hashMap.put(key, collection);
         }
 
@@ -64,9 +63,8 @@ public class MultiValueMap<K, V> implements IMultiMap<K, V> {
 
     @Override
     public boolean removeMapping(K key, V value) {
-        if (!hashMap.containsKey(key)) {
+        if (!hashMap.containsKey(key))
             return false;
-        }
         Iterator<V> it = hashMap.get(key).iterator();
 
         while (it.hasNext()) {
@@ -125,7 +123,7 @@ public class MultiValueMap<K, V> implements IMultiMap<K, V> {
     }
 
     @Override
-    public void merge(IMultiMap<K, V> other) {
+    public void merge(MultiKeyMap<K, V> other) {
         for (K k : other.keys()) {
             putAll(k, other.get(k));
         }
@@ -143,31 +141,26 @@ public class MultiValueMap<K, V> implements IMultiMap<K, V> {
 
     @Override
     public boolean equals(Object obj) {
-        if (obj == null) {
+        if (obj == null)
             return false;
-        }
 
-        if (this == obj || getClass() != obj.getClass()) {
+        if (this == obj || getClass() != obj.getClass())
             return false;
-        }
 
         @SuppressWarnings("rawtypes")
         MultiValueMap other = (MultiValueMap) obj;
 
-        if (!hashMap.equals(other.hashMap)) {
+        if (!hashMap.equals(other.hashMap))
             return false;
-        }
 
         return true;
     }
 
     public List<Pair<K, V>> getPairs() {
         List<Pair<K, V>> pairs = new ArrayList<>();
-
         for (K key : keys()) {
-            for (V value : get(key)) {
-                pairs.add(new Pair<>(key, value));
-            }
+            for (V value : get(key))
+                pairs.add(new Pair<K, V>(key, value));
         }
 
         return pairs;
@@ -199,10 +192,10 @@ public class MultiValueMap<K, V> implements IMultiMap<K, V> {
      *            The value type.
      * @return An new MultiValueMap initialized with multiMap.
      */
-    public static <K, V> MultiValueMap<K, V> create(IMultiMap<K, V> multiMap) {
-        MultiValueMap<K, V> multiHashMap = new MultiValueMap<>();
-        multiHashMap.merge(multiMap);
+    public static <K, V> MultiValueMap<K, V> create(MultiKeyMap<K, V> multiMap) {
+        MultiValueMap<K, V> ht = new MultiValueMap<K, V>();
+        ht.merge(multiMap);
 
-        return multiHashMap;
+        return ht;
     }
 }

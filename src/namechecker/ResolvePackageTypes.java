@@ -8,7 +8,7 @@ import ast.Name;
 import ast.NamedType;
 import ast.Sequence;
 import ast.DefineTopLevelDecl;
-import utilities.PJMessage;
+import utilities.ProcessJMessage;
 import utilities.CompilerMessageManager;
 import utilities.Log;
 import utilities.MessageType;
@@ -60,14 +60,14 @@ public class ResolvePackageTypes extends Visitor<AST> {
                 fileName = new File(utilities.Settings.includeDir)
                         .getAbsolutePath()
                         + "/"
-                        + utilities.Settings.targetLanguage
+                        + utilities.Settings.language
                         + "/"
                         + makeImportFileName(pa);
                 if (new File(fileName).isFile()) { // Yes it is a library file.
                     // don't do anything just continue after the if.
                 } else {
                     // It was neither a local nor a library file - throw an error...
-                    CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                    CompilerMessageManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                                 .addAST(pa)
                                 .addError(VisitorMessageNumber.RESOLVE_IMPORTS_101)
                                 .addArguments(makeImportFileName(pa))

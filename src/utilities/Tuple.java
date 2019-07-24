@@ -4,10 +4,8 @@ import java.util.AbstractList;
 import java.util.Arrays;
 import java.util.List;
 
-import cli.Util;
-
 /**
- * The class Tuple represents a sequences of immutable objects.
+ * This class represents a sequences of immutable objects.
  *
  * @param <T>
  *          The type of value.
@@ -20,9 +18,8 @@ public class Tuple<T> extends AbstractList<T> {
     private final T[] values;
 
     public Tuple(T[] values) {
-        if (Util.isArrayEmpty(values)) {
+        if (Util.isArrayEmpty(values))
             throw new IllegalArgumentException("The array may not be empty.");
-        }
 
         this.values = values;
     }
@@ -53,29 +50,24 @@ public class Tuple<T> extends AbstractList<T> {
         final int prime = 31;
         int result = 1;
 
-        for (final T v : values) {
+        for (final T v : values)
             result = prime * result + v.hashCode();
-        }
 
         return result;
     }
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj) {
+        if (this == obj) 
             return true;
-        }
 
-        if (obj == null || getClass() != obj.getClass()) {
+        if (obj == null || getClass() != obj.getClass())
             return false;
-        }
 
         @SuppressWarnings("rawtypes")
         final Tuple other = (Tuple) obj;
-
-        if (size() != other.size()) {
+        if (size() != other.size())
             return false;
-        }
 
         return Arrays.equals(values, other.values);
     }

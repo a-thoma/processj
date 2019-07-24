@@ -3,7 +3,7 @@ package rewriters;
 import ast.*;
 import utilities.Visitor;
 import printers.*;
-import utilities.PJMessage;
+import utilities.ProcessJMessage;
 import utilities.CompilerMessageManager;
 import utilities.MessageType;
 import utilities.VisitorMessageNumber;
@@ -108,7 +108,7 @@ public class ChannelReadRewrite {
                         for (int j = 0; j < as.body().size(); j++) {
                             AltCase ac = (AltCase) as.body().child(j);
                             if (ac.precondition() != null && ac.precondition().doesYield())
-                                CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                                CompilerMessageManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                                                                 .addAST(ac.precondition())
                                                                 .addError(VisitorMessageNumber.REWRITE_900).build(),
                                                                 MessageType.PRINT_CONTINUE);
