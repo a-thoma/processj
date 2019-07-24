@@ -22,10 +22,11 @@ import utilities.SymbolTable;
 import utilities.VisitorMessageNumber;
 
 /**
+ * ProcessJ compiler.
  * 
  * @author Ben
  */
-public class startProcessJc {
+public class ProcessJc {
     
     // Kinds of available options for the ProcessJ compiler.
     public static enum OptionType {
@@ -54,7 +55,7 @@ public class startProcessJc {
     
     // List of available options for the ProcessJ compiler.
     public static final Option[] options = {
-            new Option("ansiColor",    "-ansi-color",                          "Use color on terminals that support ANSI espace codes"),
+            new Option("ansiColor",     "-ansi-color",                          "Use color on terminals that support ANSI espace codes"),
             new Option("help",          "-help",                                "Show this help message and exit"),
             new Option("include",       "-include",     OptionType.STRING,      "Override the default include directory"),
             new Option("target",        "-target",      OptionType.STRING,      "Specify the target language: C++, Java, JS"),
@@ -63,11 +64,11 @@ public class startProcessJc {
     };
     
     // <--
-    // Fields used by the compiler.
+    // Fields used by the ProcessJ compiler.
     public boolean ansiColor = false;
     public boolean help = false;
     public String include = null;
-    public Language target = Language.JVM;
+    public Language target = Settings.language;
     public boolean version = false;
     public boolean visitAll = false;
     // -->
@@ -78,12 +79,18 @@ public class startProcessJc {
     
     private Properties config = ConfigFileReader.openConfiguration();
     
+    /**
+     * Program execution begins here.
+     * 
+     * @param args
+     *          A vector of command arguments passed to the compiler.
+     */
     public static void main(String[] args) {
-        startProcessJc processj = new startProcessJc(args);
+        ProcessJc processj = new ProcessJc(args);
         // Do we have any arguments?
-        if (args.length == 0) {
+        if (args.length == 0 || processj.inputFiles.isEmpty()) {
             // At least one file must be provided. Otherwise, throw an error if
-            // no file is given, or if the file does not exists
+            // no file is given, or if the file does not exists.
             System.out.println(new ProcessJMessage.Builder()
                                    .addError(VisitorMessageNumber.RESOLVE_IMPORTS_100)
                                    .build().getST().render());
@@ -91,20 +98,17 @@ public class startProcessJc {
             processj.exit(1);
         }
         
-        processj.parseArgs();
-        
         // 
         // PROCESS SOURCE FILES
         //
         ArrayList<File> files = processj.createFiles();
         AST root = null;
-        
         for (File inFile : files) {
             Scanner s = null;
             parser p = null;
             try {
                 String fileAbsolutePath = inFile.getAbsolutePath();
-                // Set package and filename
+                // Set package and filename.
                 CompilerMessageManager.INSTANCE.setFileName(fileAbsolutePath);
                 CompilerMessageManager.INSTANCE.setPackageName(fileAbsolutePath);
                 
@@ -271,10 +275,10 @@ public class startProcessJc {
             // 
             
             if (Settings.language == processj.target) {
-                generateCodeJava(c, inFile, globalTypeTable);
+                processj.generateCodeJava(c, inFile, globalTypeTable);
             } else {
-                System.err.println(String.format("Unknown target language '%s' selected.", Settings.language));
-                System.exit(1);
+                System.err.println("Unknown target language '" + processj.target + "' selected");
+                processj.exit(1);
             }
             
             System.out.println("============= S = U = C = C = E = S = S =================");
@@ -295,10 +299,10 @@ public class startProcessJc {
      * @param topLevelDecls
      *              A symbol table consisting of all the top level types.
      */
-    private static void generateCodeJava(Compilation compilation, File inFile, SymbolTable topLevelDecls) {
+    private void generateCodeJava(Compilation compilation, File inFile, SymbolTable topLevelDecls) {
         // Read in and get the pathname of the input file.
         String name = inFile.getName().substring(0, inFile.getName().lastIndexOf("."));
-        Properties config = utilities.ConfigFileReader.openConfiguration();
+        config = utilities.ConfigFileReader.openConfiguration();
 
         // Run the code generator to decode pragmas, generate libraries,
         // resolve types, and set the symbol table for top level declarations.
@@ -315,17 +319,30 @@ public class startProcessJc {
         Helper.writeToFile(code, compilation.fileNoExtension());
     }
     
-    public startProcessJc(String[] args) {
+    public ProcessJc(String[] args) {
         this.args = args;
-        this.ansiColor = config.getProperty("color").equals("yes");
+        Settings.ansiColor = Boolean.valueOf(config.getProperty("color"));
+        // Parse command line arguments.
+        parseArgs();
+        // Switch to turn color mode on/off.
+        ansiColor();
+    }
+    
+    public void ansiColor() {        
+        // Check default value before switching on/off.
+        if (!Settings.ansiColor && this.ansiColor) {
+            // Turn ansi-color mode 'on'.
+            config.setProperty("color", String.valueOf(this.ansiColor));
+        } else if (Settings.ansiColor && this.ansiColor) {
+            // Turn ansi-color mode 'off'.
+            config.setProperty("color", String.valueOf(Boolean.FALSE));
+        }
+        Settings.ansiColor = Boolean.valueOf(config.getProperty("color"));
+        ConfigFileReader.closeConfiguration(config);
     }
     
     public void parseArgs() {
-        if (args == null)
-            return;
-        
-        int pos = 0;
-        while (pos < args.length) {
+        for (int pos = 0; pos < args.length;) {
             String arg = args[pos++];
             if (arg.charAt(0) != '-') {
                 // We found an '.pj' file.
@@ -341,7 +358,7 @@ public class startProcessJc {
                         if (o.optionType != OptionType.BOOLEAN)
                             optValue = args[pos++];
                         // Same as before with Java reflection.
-                        Class<? extends startProcessJc> c = this.getClass();
+                        Class<? extends ProcessJc> c = this.getClass();
                         try {
                             Field f = c.getField(o.fieldName);
                             if (optValue != null)
@@ -355,7 +372,7 @@ public class startProcessJc {
                     }
                 }
                 if (!foundOption) {
-                    System.out.println("Invalid option '" + arg + "'");
+                    System.out.println("Invalid option '" + arg + "' found.");
                     exit(1);
                 }
             }

@@ -41,7 +41,7 @@ public class ProcessJMessage extends CompilerMessage {
         
         // Apply color code mode if allowed on terminal
         String tag = stTag.render();
-        if (Settings.isAnsiColor)
+        if (Settings.ansiColor)
             tag = ColorCodes.colorTag(stTag.render(), error.getErrorSeverity());
         
         stMessage.add("tag", tag);
