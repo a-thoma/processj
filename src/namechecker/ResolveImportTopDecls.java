@@ -58,12 +58,12 @@ public class ResolveImportTopDecls extends Visitor<Object> {
         Log.log(im, "Visiting an import (of file: " + im + ")");
         Import prevImport = currentImport;
         currentImport = im;
-        // For every top-level declaration in the given file, determine if this
-        // declaration is part of a ProcessJ native library.
+        // For every top-level declaration in the given file, determine if
+        // this declaration is part of a ProcessJ native library.
         for (Compilation c : im.getCompilations()) {
             if (c == null) continue;
-            // Visit each pragma (if any) and check if they are part of a native
-            // library function.
+            // Visit each pragma (if any) and check if they are part of a
+            // native library function.
             for (Pragma p : c.pragmas())
                 p.visit(this);
             // Mark all top-level declarations 'native' if they are part of

@@ -24,7 +24,7 @@ import utilities.Visitor;
 /**
  * A tree walker that collects data from an AST object and then
  * pushes this data into a template to translate a ProcessJ source
- * code to Java.
+ * file to Java code.
  *
  * @param <T>
  *          A visitor interface used to perform operations across a
@@ -37,74 +37,74 @@ import utilities.Visitor;
 public class CodeGeneratorJava extends Visitor<Object> {
 
     // String template file locator.
-    private final String _stGammarFile = "resources/stringtemplates/java/grammarTemplatesJava.stg";
+    private final String stGammarFile = "resources/stringtemplates/java/grammarTemplatesJava.stg";
     
     // Current java version.
-    private final String _currentJVM = System.getProperty("java.version");
+    private final String currentJVM = System.getProperty("java.version");
 
     // Collection of templates, imported templates, and/or groups that
     // contain formal template definitions.
-    private STGroup _stGroup;
+    private STGroup stGroup;
     
     // Current compilation unit.
-    private Compilation _currCompilation = null;
+    private Compilation currentCompilation = null;
 
     // The user working directory.
-    private String _workingDir = null;
+    private String workingDir = null;
 
     // Current procedure call.
-    private String _currProcName = null;
+    private String currentProcName = null;
     
     // Current par-block.
-    private String _currParBlock = null;
+    private String currentParBlock = null;
     
-    // List of imports.
-    private HashSet<String> _imports = new LinkedHashSet<String>();
+    // All imports are kept in this table.
+    private HashSet<String> importFiles = new LinkedHashSet<String>();
     
     // Top level declarations.
-    private SymbolTable _topLevelDecls = null;
+    private SymbolTable topLevelDecls = null;
 
     // Contains formal parameters transformed to fields.
-    private HashMap<String, String> _formalParamFields = new LinkedHashMap<String, String>();
+    private HashMap<String, String> formalParamFields = new LinkedHashMap<String, String>();
     
     // Contains formal parameter names transformed to name tags.
-    private HashMap<String, String> _paramDeclNames = new LinkedHashMap<String, String>();
+    private HashMap<String, String> paramDeclNames = new LinkedHashMap<String, String>();
     
     // Contains local parameters transformed to fields.
-    private HashMap<String, String> _localParamFields = new LinkedHashMap<String, String>();
+    private HashMap<String, String> localParamFields = new LinkedHashMap<String, String>();
     
     // Contains the record member transformed to field.
-    private HashMap<String, String> _recordFields = new LinkedHashMap<String, String>();
+    private HashMap<String, String> recordFields = new LinkedHashMap<String, String>();
 
     // Contains the protocol name and the corresponding tags currently switched on.
-    private Hashtable<String, String> _protocolTagsSwitchedOn = new Hashtable<String, String>();
+    private Hashtable<String, String> protocolTagsSwitchedOn = new Hashtable<String, String>();
     
     // List of switch labels.
-    private ArrayList<String> _switchLabelList = new ArrayList<String>();
+    private ArrayList<String> switchLabelList = new ArrayList<String>();
     
     // List of barrier expressions.
-    private ArrayList<String> _barrierList = new ArrayList<String>();
+    private ArrayList<String> barrierList = new ArrayList<String>();
 
     // Identifier for a parameter declaration.
-    private int _varDecId = 0;
+    private int varDecId = 0;
     
     // Identifier for a par-block declaration.
-    private int _parDecId = 0;
+    private int parDecId = 0;
 
     // Identifier for a local variable declaration.
-    private int _localDecId = 0;
+    private int localDecId = 0;
     
     // Jump label used when a procedure yields.
-    private int _jumLabel = 0;
+    private int jumpLabel = 0;
     
     // Access to protocol case.
-    private boolean _isProtocolCase = false;
+    private boolean isProtocolCase = false;
     
     // Access to protocol tag.
-    private String _currProtocolTag = null;
+    private String currentProtocolTag = null;
     
     // This is used for arrays of N-dimensions.
-    private boolean _isArrayLiteral = false;
+    private boolean isArrayLiteral = false;
     
     private final static String DELIMITER = ";";
 
@@ -114,17 +114,17 @@ public class CodeGeneratorJava extends Visitor<Object> {
      * definitions. Additionally, the constructor initializes a symbol table
      * with top level types declarations.
      * 
-     * @param topLevelDecls
+     * @param s
      * 			The top level types which can be procedures, records, protocols,
      * 			constants, and/or external types.
      */
-    public CodeGeneratorJava(SymbolTable topLevelDecls) {
+    public CodeGeneratorJava(SymbolTable s) {
         Log.logHeader("*****************************************");
         Log.logHeader("* C O D E - G E N E R A T O R   J A V A *");
         Log.logHeader("*****************************************");
         
-        _topLevelDecls = topLevelDecls;
-        _stGroup = new STGroupFile(_stGammarFile);
+        topLevelDecls = s;
+        stGroup = new STGroupFile(stGammarFile);
     }
     
     /**
@@ -134,14 +134,14 @@ public class CodeGeneratorJava extends Visitor<Object> {
      * 			A working directory.
      */
     public void setWorkingDir(String workingDir) {
-        this._workingDir = workingDir;
+        this.workingDir = workingDir;
     }
     
     /**
      * Return a string representing the current working directory.
      */
     public String getWorkingDir() {
-        return _workingDir;
+        return workingDir;
     }
     
     /**
@@ -157,11 +157,11 @@ public class CodeGeneratorJava extends Visitor<Object> {
     public Object visitCompilation(Compilation co) {
         Log.log(co, "Visiting a Compilation");
         
-        _currCompilation = co;
+        currentCompilation = co;
         // Code generated by the template.
         String code = null;
         // Instance of Compilation template to fill in.
-        ST stCompilation = _stGroup.getInstanceOf("Compilation");
+        ST stCompilation = stGroup.getInstanceOf("Compilation");
         // Reference to all remaining types.
         ArrayList<String> body = new ArrayList<String>();
         // Holds all top level types declarations.
@@ -170,7 +170,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         String packagename = co.packageNoName();
         
         for (Import im : co.imports())
-            _imports.add((String) im.visit(this));
+            importFiles.add((String) im.visit(this));
         
         for (AST decl : typeDecls) {
             if (decl instanceof Type) {
@@ -192,11 +192,11 @@ public class CodeGeneratorJava extends Visitor<Object> {
         stCompilation.add("fileName", co.fileName);
         stCompilation.add("name", co.fileNoExtension());
         stCompilation.add("body", body);
-        stCompilation.add("version", _currentJVM);
+        stCompilation.add("version", currentJVM);
         
         // Add the import statements to the file.
-        if (_imports.size() > 0)
-            stCompilation.add("imports", _imports);
+        if (importFiles.size() > 0)
+            stCompilation.add("imports", importFiles);
 
         // Rendered code for debbuging.
         code = stCompilation.render();
@@ -217,40 +217,40 @@ public class CodeGeneratorJava extends Visitor<Object> {
         // Generated template after evaluating this visitor.
         ST stProcTypeDecl = null;
         // Save previous procedure.
-        String prevProcName = _currProcName;
+        String prevProcName = currentProcName;
         // Save previous jump labels.
-        ArrayList<String> prevLabels = _switchLabelList;
-        if (!_switchLabelList.isEmpty())
-            _switchLabelList = new ArrayList<String>();
+        ArrayList<String> prevLabels = switchLabelList;
+        if (!switchLabelList.isEmpty())
+            switchLabelList = new ArrayList<String>();
         // Name of invoked procedure.
-        _currProcName = (String) pd.name().visit(this);
+        currentProcName = (String) pd.name().visit(this);
         // Procedures are static classes which belong to the same package. To avoid
         // having classes with the same name, we generate a new name for this procedure.
         String procName = null;
         // For non-invocations, that is, for anything other than a procedure
         // that yields, we need to extends the PJProcess class anonymously.
-        if ("Anonymous".equals(_currProcName)) {
+        if ("Anonymous".equals(currentProcName)) {
             // Preserve current jump label.
-            int prevJumLabel = _jumLabel;
-            _jumLabel = 0;
+            int prevJumLabel = jumpLabel;
+            jumpLabel = 0;
             // Grab the instance for an anonymous procedure.
-            stProcTypeDecl = _stGroup.getInstanceOf("AnonymousProcess");
+            stProcTypeDecl = stGroup.getInstanceOf("AnonymousProcess");
             // Statements that appear in the procedure.
             String[] body = (String[]) pd.body().visit(this);
             
-            stProcTypeDecl.add("parBlock", _currParBlock);
+            stProcTypeDecl.add("parBlock", currentParBlock);
             stProcTypeDecl.add("syncBody", body);
             // Add the barrier this procedure should resign from.
-            if (!_barrierList.isEmpty())
-                stProcTypeDecl.add("barrier", _barrierList);
+            if (!barrierList.isEmpty())
+                stProcTypeDecl.add("barrier", barrierList);
             // Add the switch block.
-            if (!_switchLabelList.isEmpty()) {
-                ST stSwitchBlock = _stGroup.getInstanceOf("SwitchBlock");
-                stSwitchBlock.add("jumps", _switchLabelList);
+            if (!switchLabelList.isEmpty()) {
+                ST stSwitchBlock = stGroup.getInstanceOf("SwitchBlock");
+                stSwitchBlock.add("jumps", switchLabelList);
                 stProcTypeDecl.add("switchBlock", stSwitchBlock.render());
             }
             // Restore jump label.
-            _jumLabel = prevJumLabel;
+            jumpLabel = prevJumLabel;
         } else {
             // Restore global variables for a new PJProcess class.
             resetGlobals();
@@ -284,16 +284,16 @@ public class CodeGeneratorJava extends Visitor<Object> {
             if (doYield) {
                 // This procedure yields! Grab the instance of a yielding procedure
                 // from the string template in order to define a new class.
-                procName = Helper.makeVariableName(_currProcName + signature(pd), 0, Tag.PROCEDURE_NAME);
-                stProcTypeDecl = _stGroup.getInstanceOf("ProcClass");
+                procName = Helper.makeVariableName(currentProcName + signature(pd), 0, Tag.PROCEDURE_NAME);
+                stProcTypeDecl = stGroup.getInstanceOf("ProcClass");
                 stProcTypeDecl.add("name", procName);
                 // The statements that appear in the body of the procedure.
                 stProcTypeDecl.add("syncBody", body);
             } else {
                 // Otherwise, grab the instance of a non-yielding procedure instead
                 // to define a new static Java method.
-                procName = Helper.makeVariableName(_currProcName + signature(pd), 0, Tag.METHOD_NAME);
-                stProcTypeDecl = _stGroup.getInstanceOf("Method");
+                procName = Helper.makeVariableName(currentProcName + signature(pd), 0, Tag.METHOD_NAME);
+                stProcTypeDecl = stGroup.getInstanceOf("Method");
                 stProcTypeDecl.add("name", procName);
                 stProcTypeDecl.add("type", procType);
                 // Do we have any modifier?
@@ -304,15 +304,15 @@ public class CodeGeneratorJava extends Visitor<Object> {
             
             // Create an entry point for the ProcessJ program, which is just
             // a Java main method that is called by the JVM.
-            if ("main".equals(_currProcName) && pd.signature().equals(Tag.MAIN_NAME.toString())) {
+            if ("main".equals(currentProcName) && pd.signature().equals(Tag.MAIN_NAME.toString())) {
                 // Create an instance of a Java main method template.
-                ST stMain = _stGroup.getInstanceOf("Main");
-                stMain.add("class", _currCompilation.fileNoExtension());
+                ST stMain = stGroup.getInstanceOf("Main");
+                stMain.add("class", currentCompilation.fileNoExtension());
                 stMain.add("name", procName);
                 // Pass the list of command line arguments to this main method.
-                if (!_formalParamFields.isEmpty()) {
-                    stMain.add("types", _formalParamFields.values());
-                    stMain.add("vars", _formalParamFields.keySet());
+                if (!formalParamFields.isEmpty()) {
+                    stMain.add("types", formalParamFields.values());
+                    stMain.add("vars", formalParamFields.keySet());
                 }
                 // Add entry point of the program.
                 stProcTypeDecl.add("main", stMain.render());
@@ -321,28 +321,28 @@ public class CodeGeneratorJava extends Visitor<Object> {
             // The list of command line arguments should be passed to the constructor
             // of the static class that the main method belongs to (some procedure class)
             // or should be passed to the Java method (some static method).
-            if (!_formalParamFields.isEmpty()) {
-                stProcTypeDecl.add("types", _formalParamFields.values());
-                stProcTypeDecl.add("vars", _formalParamFields.keySet());
+            if (!formalParamFields.isEmpty()) {
+                stProcTypeDecl.add("types", formalParamFields.values());
+                stProcTypeDecl.add("vars", formalParamFields.keySet());
             }
             // The list of local variables defined in the body of a procedure becomes
             // the member variables of the procedure class.
-            if (!_localParamFields.isEmpty()) {
-                stProcTypeDecl.add("ltypes", _localParamFields.values());
-                stProcTypeDecl.add("lvars", _localParamFields.keySet());
+            if (!localParamFields.isEmpty()) {
+                stProcTypeDecl.add("ltypes", localParamFields.values());
+                stProcTypeDecl.add("lvars", localParamFields.keySet());
             }
             // Add the switch block for resumption.
-            if (!_switchLabelList.isEmpty()) {
-                ST stSwitchBlock = _stGroup.getInstanceOf("SwitchBlock");
-                stSwitchBlock.add("jumps", _switchLabelList);
+            if (!switchLabelList.isEmpty()) {
+                ST stSwitchBlock = stGroup.getInstanceOf("SwitchBlock");
+                stSwitchBlock.add("jumps", switchLabelList);
                 stProcTypeDecl.add("switchBlock", stSwitchBlock.render());
             }
         }
         
         // Restore and reset previous values.
-        _currProcName = prevProcName;
+        currentProcName = prevProcName;
         // Restore previous jump labels.
-        _switchLabelList = prevLabels;
+        switchLabelList = prevLabels;
 
         return stProcTypeDecl.render();
     }
@@ -352,7 +352,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(be, "Visiting a BinaryExpr");
 
         // Generated template after evaluating this visitor.
-        ST stBinaryExpr = _stGroup.getInstanceOf("BinaryExpr");
+        ST stBinaryExpr = stGroup.getInstanceOf("BinaryExpr");
         String op = be.opString();
         String lhs = (String) be.left().visit(this);
         lhs = lhs.replace(DELIMITER, "");
@@ -373,7 +373,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(ws, "Visiting a WhileStat");
         
         // Generated template after evaluating this visitor.
-        ST stWhileStat = _stGroup.getInstanceOf("WhileStat");
+        ST stWhileStat = stGroup.getInstanceOf("WhileStat");
         // Sequence of statements enclosed in a block statement.
         String[] stats = null;
         String condExpr = null;
@@ -397,7 +397,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(ds, "Visiting a DoStat");
         
         // Generated template after evaluating this visitor.
-        ST stDoStat = _stGroup.getInstanceOf("DoStat");
+        ST stDoStat = stGroup.getInstanceOf("DoStat");
         // Sequence of statements enclosed in a block statement.
         String[] stats = null;
         String condExpr = null;
@@ -419,7 +419,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(fs, "Visiting a ForStat");
         
         // Generated template after evaluating this visitor.
-        ST stForStat = _stGroup.getInstanceOf("ForStat");
+        ST stForStat = stGroup.getInstanceOf("ForStat");
         ArrayList<String> init = new ArrayList<String>();  // Initialization part.
         ArrayList<String> incr = new ArrayList<String>();  // Increment part.
         
@@ -462,7 +462,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(cs, "Visiting a ContinueStat");
         
         // Generated template after evaluating this visitor.
-        ST stContinueStat = _stGroup.getInstanceOf("ContinueStat");
+        ST stContinueStat = stGroup.getInstanceOf("ContinueStat");
         String name = null;
         // If target is not 'null' then we have a label to jump to.
         if (cs.target() != null) {
@@ -478,7 +478,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(is, "Visiting a IfStat");
 
         // Generated template after evaluating this visitor.
-        ST stIfStat = _stGroup.getInstanceOf("IfStat");
+        ST stIfStat = stGroup.getInstanceOf("IfStat");
         // Sequence of statements enclosed in a block statement.
         String[] thenStats = null;
         String[] thenParts = null;
@@ -515,7 +515,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(as, "Visiting an Assignment");
         
         // Generated template after evaluating this visitor.
-        ST stVar = _stGroup.getInstanceOf("Var");
+        ST stVar = stGroup.getInstanceOf("Var");
         
         String op = (String) as.opString();
         String lhs = null;
@@ -556,9 +556,9 @@ public class CodeGeneratorJava extends Visitor<Object> {
         
         // Create a tag for this parameter and then add it to the collection
         // of parameters for reference.
-        String newName = Helper.makeVariableName(name, ++_varDecId, Tag.PARAM_NAME);
-        _formalParamFields.put(newName, type);
-        _paramDeclNames.put(name, newName);
+        String newName = Helper.makeVariableName(name, ++varDecId, Tag.PARAM_NAME);
+        formalParamFields.put(newName, type);
+        paramDeclNames.put(name, newName);
         
         // Ignored the value returned by this visitor. The types
         // and variables are resolved elsewhere.
@@ -587,9 +587,9 @@ public class CodeGeneratorJava extends Visitor<Object> {
             type = PJChannel.class.getSimpleName() + type.substring(type.indexOf("<"), type.length());
 
         // Create a tag for this local channel expression parameter.
-        String newName = Helper.makeVariableName(name, ++_localDecId, Tag.LOCAL_NAME);
-        _localParamFields.put(newName, type);
-        _paramDeclNames.put(name, newName);
+        String newName = Helper.makeVariableName(name, ++localDecId, Tag.LOCAL_NAME);
+        localParamFields.put(newName, type);
+        paramDeclNames.put(name, newName);
         
         // This variable could be initialized, e.g., through an
         // assignment operator.
@@ -607,14 +607,14 @@ public class CodeGeneratorJava extends Visitor<Object> {
         // Is it a barrier declaration? If so, we must generate
         // code that creates a barrier object.
         if (ld.type().isBarrierType() && expr == null) {
-            ST stBarrierDecl = _stGroup.getInstanceOf("BarrierDecl");
+            ST stBarrierDecl = stGroup.getInstanceOf("BarrierDecl");
             val = stBarrierDecl.render();
         }
         // Is it a simple declaration for a channel type? If so, and since
         // channels cannot be created using the operator 'new', we generate
         // code to create a channel object.
         if (ld.type().isChannelType() && expr == null) {
-            ST stChannelDecl = _stGroup.getInstanceOf("ChannelDecl");
+            ST stChannelDecl = stGroup.getInstanceOf("ChannelDecl");
             stChannelDecl.add("type", chantype);
             val = stChannelDecl.render();
         }
@@ -633,7 +633,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         if (val != null)
             val = val.replace(DELIMITER, "");
         
-        ST stVar = _stGroup.getInstanceOf("Var");
+        ST stVar = stGroup.getInstanceOf("Var");
         stVar.add("name", newName);
         stVar.add("val", val);
         
@@ -653,8 +653,8 @@ public class CodeGeneratorJava extends Visitor<Object> {
         
         String name = null;
         
-        if (!_paramDeclNames.isEmpty() && _paramDeclNames.containsKey(na.getname()))
-            name = _paramDeclNames.get(na.getname());
+        if (!paramDeclNames.isEmpty() && paramDeclNames.containsKey(na.getname()))
+            name = paramDeclNames.get(na.getname());
         
         if (name == null)
             name = na.getname();
@@ -710,7 +710,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
     public Object visitPrimitiveLiteral(PrimitiveLiteral li) {
         Log.log(li, "Visiting a Primitive Literal (" + li.getText() + ")");
         
-        ST stPrimitiveLiteral = _stGroup.getInstanceOf("PrimitiveLiteral");
+        ST stPrimitiveLiteral = stGroup.getInstanceOf("PrimitiveLiteral");
         if (li.isSuffixed())
             stPrimitiveLiteral.add("type", li.suffix());
         stPrimitiveLiteral.add("value", li.getText());
@@ -780,7 +780,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(cw, "Visiting a ChannelWriteStat");
         
         // Generated template after evaluating this visitor.
-        ST stChanWriteStat = _stGroup.getInstanceOf("ChanWriteStat");
+        ST stChanWriteStat = stGroup.getInstanceOf("ChanWriteStat");
         // 'c.write(x)' is a channel-end expression, where 'c'
         // is the writing end of a channel.
         Expression chanExpr = cw.channel();
@@ -793,7 +793,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         int countLabel = 1; // One for the 'runLabel'.
         // Is the writing end of this channel shared?
         if (chanExpr.type.isChannelEndType() && ((ChannelEndType) chanExpr.type).isShared()) {
-            stChanWriteStat = _stGroup.getInstanceOf("ChannelMany2One");
+            stChanWriteStat = stGroup.getInstanceOf("ChannelMany2One");
             ++countLabel;
         }
         
@@ -803,9 +803,9 @@ public class CodeGeneratorJava extends Visitor<Object> {
         // Add the switch block for resumption.
         for (int label = 0; label < countLabel; ++label) {
             // Increment the jump label.
-            stChanWriteStat.add("resume" + label, ++_jumLabel);
+            stChanWriteStat.add("resume" + label, ++jumpLabel);
             // Add the jump label to the switch list.
-            _switchLabelList.add(renderSwitchLabel(_jumLabel));
+            switchLabelList.add(renderSwitchLabel(jumpLabel));
         }
         
         return stChanWriteStat.render();
@@ -816,7 +816,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(cr, "Visiting a ChannelReadExpr");
         
         // Generated template after evaluating this visitor.
-        ST stChannelReadExpr = _stGroup.getInstanceOf("ChannelReadExpr");
+        ST stChannelReadExpr = stGroup.getInstanceOf("ChannelReadExpr");
         // 'c.read()' is a channel-end expression, where 'c'
         // is the reading end of a channel.
         Expression chanExpr = cr.channel();
@@ -826,9 +826,9 @@ public class CodeGeneratorJava extends Visitor<Object> {
         // Add the 'switch' block for resumption.
         for (int label = 0; label < 2; ++label) {
             // Increment jump label.
-            stChannelReadExpr.add("resume" + label, ++_jumLabel);
+            stChannelReadExpr.add("resume" + label, ++jumpLabel);
             // Add jump label to the switch list.
-            _switchLabelList.add(renderSwitchLabel(_jumLabel));
+            switchLabelList.add(renderSwitchLabel(jumpLabel));
         }
         
         return stChannelReadExpr.render();
@@ -839,7 +839,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(va, "Visiting a Var (" + va.name().getname() + ")");
 
         // Generated template after evaluating this visitor.
-        ST stVar = _stGroup.getInstanceOf("Var");
+        ST stVar = stGroup.getInstanceOf("Var");
         // Returned values for name and expression (if any).
         String name = (String) va.name().visit(this);
         String exprStr = null;
@@ -864,7 +864,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(ae, "Visiting an ArrayAccessExpr");
         
         // Generated template after evaluating this visitor.
-        ST stArrayAccessExpr = _stGroup.getInstanceOf("ArrayAccessExpr");
+        ST stArrayAccessExpr = stGroup.getInstanceOf("ArrayAccessExpr");
         String name = (String) ae.target().visit(this);
         String index = (String) ae.index().visit(this);
         
@@ -883,7 +883,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         // list of values separated by commas and enclosed between
         // braces (note, the syntax for array literals in ProcessJ
         // is different to Java's).
-        if (al.elements().size() > 1 || _isArrayLiteral) {
+        if (al.elements().size() > 1 || isArrayLiteral) {
             // The following extends naturally to two-dimensional, and
             // even higher-dimensional arrays -- but they are not used
             // very often in practice.
@@ -961,7 +961,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(bs, "Visiting a BreakStat");
         
         // Generated template after evaluating this visitor.
-        ST stBreakStat = _stGroup.getInstanceOf("BreakStat");
+        ST stBreakStat = stGroup.getInstanceOf("BreakStat");
         
         if (bs.target() != null) // No parse tree for 'break'.
             stBreakStat.add("name", bs.target().visit(this));
@@ -974,17 +974,17 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(sl, "Visiting a SwitchLabel");
         
         // Generated template after evaluating this visitor.
-        ST stSwitchLabel = _stGroup.getInstanceOf("SwitchLabel");
+        ST stSwitchLabel = stGroup.getInstanceOf("SwitchLabel");
         
         // This could be a default label, in which case, expr()
         // would be 'null'.
         String label = null;
         if (!sl.isDefault())
             label = (String) sl.expr().visit(this);
-        if (_isProtocolCase) {
+        if (isProtocolCase) {
             // Silly way to keep track of a protocol tag, however, this
             // should (in theory) _always_ work.
-            _currProtocolTag = label;
+            currentProtocolTag = label;
             label = "\"" + label + "\"";
         }
         
@@ -998,7 +998,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(sg, "Visit a SwitchGroup");
         
         // Generated template after evaluating this visitor.
-        ST stSwitchGroup = _stGroup.getInstanceOf("SwitchGroup");
+        ST stSwitchGroup = stGroup.getInstanceOf("SwitchGroup");
         
         ArrayList<String> labels = new ArrayList<String>();
         for (SwitchLabel sl : sg.labels())
@@ -1022,10 +1022,10 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(st, "Visiting a SwitchStat");
         
         // Generated template after evaluating this visitor.
-        ST stSwitchStat = _stGroup.getInstanceOf("SwitchStat");
+        ST stSwitchStat = stGroup.getInstanceOf("SwitchStat");
         // Is this a protocol tag?
         if (st.expr().type.isProtocolType())
-            _isProtocolCase = true;
+            isProtocolCase = true;
         
         String expr = (String) st.expr().visit(this);
         ArrayList<String> switchGroup = new ArrayList<String>();
@@ -1033,12 +1033,12 @@ public class CodeGeneratorJava extends Visitor<Object> {
         for (SwitchGroup sg : st.switchBlocks())
             switchGroup.add((String) sg.visit(this));
         
-        stSwitchStat.add("tag", _isProtocolCase);
+        stSwitchStat.add("tag", isProtocolCase);
         stSwitchStat.add("expr", expr);
         stSwitchStat.add("block", switchGroup);
         
         // Reset the value for this protocol tag.
-        _isProtocolCase = false;
+        isProtocolCase = false;
         
         return stSwitchStat.render();
     }
@@ -1048,7 +1048,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(ce, "Visiting a CastExpr");
         
         // Generated template after evaluating this invocation.
-        ST stCastExpr = _stGroup.getInstanceOf("CastExpr");
+        ST stCastExpr = stGroup.getInstanceOf("CastExpr");
         // This result in:
         //      ((type) (expr))
         String type = (String) ce.type().visit(this);
@@ -1068,26 +1068,26 @@ public class CodeGeneratorJava extends Visitor<Object> {
         // Generated template after evaluating this invocation.
         ST stInvocation = null;
         // Target procedure.
-        ProcTypeDecl invokedProc = in.targetProc;
+        ProcTypeDecl pd = in.targetProc;
         // Name of invoked procedure.
-        String invokedProcName = invokedProc.name().getname();
+        String pdName = pd.name().getname();
         // Check local procedures, if none is found then the procedure must come
         // from a different file and maybe package.
-        if (_currCompilation.packageName.equals(invokedProc.myCompilation.packageName)) {
-            String name = invokedProcName + signature(invokedProc);
-            if (Helper.doesProcedureYield(invokedProc))
+        if (currentCompilation.fileName.equals(pd.myCompilation.fileName)) {
+            String name = pdName + signature(pd);
+            if (Helper.doesProcedureYield(pd))
                 name = Helper.makeVariableName(name, 0, Tag.PROCEDURE_NAME);
             else
                 name = Helper.makeVariableName(name, 0, Tag.METHOD_NAME);
-            invokedProcName = invokedProc.myCompilation.fileNoExtension() + "." + name;
-        } else if (invokedProc.isNative) {
+            pdName = pd.myCompilation.fileNoExtension() + "." + name;
+        } else if (pd.isNative) {
             // Make the package visible on import by using the qualified name of
             // the class the procedure belongs to and the name of the directory
             // the procedure's class belongs to, e.g., std.io.println(), where
             //      1.) 'std' is the name of the package,
             //      2.) 'io' is the name of the class/file,
             //      3.) 'println' is the method declared in the class
-            invokedProcName = invokedProc.filename + "." + invokedProcName;
+            pdName = pd.filename + "." + pdName;
         } else
             ; // This procedure is called from another package.
         
@@ -1102,7 +1102,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         
         // For an invocation of a procedure that yields and one which
         // is not inside par-block, we wrap the procedure in a par-block.
-        if (Helper.doesProcedureYield(invokedProc) && _currParBlock == null) {
+        if (Helper.doesProcedureYield(pd) && currentParBlock == null) {
             return (new ParBlock(
                     new Sequence(new ExprStat(in)), // Statements.
                     new Sequence()))                // Barriers.
@@ -1110,17 +1110,17 @@ public class CodeGeneratorJava extends Visitor<Object> {
         }
         
         // Does this procedure yield?
-        if (Helper.doesProcedureYield(invokedProc)) {
-            stInvocation = _stGroup.getInstanceOf("InvocationProcType");
-            stInvocation.add("parBlock", _currParBlock);
+        if (Helper.doesProcedureYield(pd)) {
+            stInvocation = stGroup.getInstanceOf("InvocationProcType");
+            stInvocation.add("parBlock", currentParBlock);
             // Add the barrier this procedure should resign from.
-            if (!_barrierList.isEmpty())
-                stInvocation.add("barrier", _barrierList);
+            if (!barrierList.isEmpty())
+                stInvocation.add("barrier", barrierList);
         } else
             // Must be an invocation made through a static Java method.
-            stInvocation = _stGroup.getInstanceOf("Invocation");
+            stInvocation = stGroup.getInstanceOf("Invocation");
         
-        stInvocation.add("name", invokedProcName);
+        stInvocation.add("name", pdName);
         stInvocation.add("vars", paramsList);
         
         return stInvocation.render();
@@ -1131,8 +1131,8 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(im, "Visiting an import statement (" + im + ")");
         
         // Generated template after evaluating this visitor.
-        ST stImport = _stGroup.getInstanceOf("Import");
-        stImport = _stGroup.getInstanceOf("Import");
+        ST stImport = stGroup.getInstanceOf("Import");
+        stImport = stGroup.getInstanceOf("Import");
         stImport.add("package", im.toString());
         
         return stImport.render();
@@ -1143,7 +1143,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(pd, "Visiting a ProtocolTypeDecl (" + pd.name().getname() + ")");
         
         // Generated template after evaluating this visitor.
-        ST stProtocolClass = _stGroup.getInstanceOf("ProtocolClass");
+        ST stProtocolClass = stGroup.getInstanceOf("ProtocolClass");
         String name = (String) pd.name().visit(this);
         ArrayList<String> modifiers = new ArrayList<String>();
         ArrayList<String> body = new ArrayList<String>();
@@ -1154,9 +1154,9 @@ public class CodeGeneratorJava extends Visitor<Object> {
         // Add extended protocols (if any).
         if (pd.extend().size() > 0) {
             for (Name n : pd.extend()) {
-                ProtocolTypeDecl ptd = (ProtocolTypeDecl) _topLevelDecls.get(n.getname());
+                ProtocolTypeDecl ptd = (ProtocolTypeDecl) topLevelDecls.get(n.getname());
                 for (ProtocolCase pc : ptd.body())
-                    _protocolTagsSwitchedOn.put(pd.name().getname() + "." + pc.name().getname(),
+                    protocolTagsSwitchedOn.put(pd.name().getname() + "." + pc.name().getname(),
                             ptd.name().getname());
             }
         }
@@ -1179,14 +1179,14 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(pc, "Visiting a ProtocolCase (" + pc.name().getname() + ")");
         
         // Generated template after evaluating this visitor.
-        ST stProtocolCase = _stGroup.getInstanceOf("ProtocolCase");
+        ST stProtocolCase = stGroup.getInstanceOf("ProtocolCase");
         
         // Since we are keeping the name of a tag as is, this (in theory)
         // shouldn't cause any name collision.
         String protocName = (String) pc.name().visit(this);
         // This shouldn't create name collision problems even if we
         // use the same visitor for protocols and records.
-        _recordFields.clear();
+        recordFields.clear();
         
         // The scope in which all members of this tag appeared.
         for (RecordMember rm : pc.body())
@@ -1194,9 +1194,9 @@ public class CodeGeneratorJava extends Visitor<Object> {
         
         // The list of fields that should be passed to the constructor
         // of the static class that the record belongs to.
-        if (!_recordFields.isEmpty()) {
-            stProtocolCase.add("types", _recordFields.values());
-            stProtocolCase.add("vars", _recordFields.keySet());
+        if (!recordFields.isEmpty()) {
+            stProtocolCase.add("types", recordFields.values());
+            stProtocolCase.add("vars", recordFields.keySet());
         }
         
         stProtocolCase.add("name", protocName);
@@ -1209,7 +1209,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(pl, "Visiting a ProtocolLiteral (" + pl.name().getname() + ")");
         
         // Generated template after evaluating this visitor.
-        ST stProtocolLiteral = _stGroup.getInstanceOf("ProtocolLiteral");
+        ST stProtocolLiteral = stGroup.getInstanceOf("ProtocolLiteral");
         String type = (String) pl.name().visit(this);
         String tag = (String) pl.tag().visit(this);
         
@@ -1219,7 +1219,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         HashMap<String, String> members = new LinkedHashMap<String, String>();
         // We need the members of the tag currently being used.
         ProtocolCase target = null;
-        ProtocolTypeDecl pt = (ProtocolTypeDecl) _topLevelDecls.get(type);
+        ProtocolTypeDecl pt = (ProtocolTypeDecl) topLevelDecls.get(type);
         if (pt != null) { // This should never be 'null'.
             target = pt.getCase(tag);
             // Now that we have the target tag, iterate over all of its members.
@@ -1253,7 +1253,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(rt, "Visiting a RecordTypeDecl (" + rt.name().getname() + ")");
         
         // Generated template after evaluating this visitor.
-        ST stRecordClass = _stGroup.getInstanceOf("RecordClass");
+        ST stRecordClass = stGroup.getInstanceOf("RecordClass");
         String recName = (String) rt.name().visit(this);
         ArrayList<String> modifiers = new ArrayList<String>();
         
@@ -1261,7 +1261,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
             modifiers.add((String) m.visit(this));
         
         // Remove fields from record.
-        _recordFields.clear();
+        recordFields.clear();
         
         // The scope in which all members appeared in a record.
         for (RecordMember rm : rt.body())
@@ -1269,9 +1269,9 @@ public class CodeGeneratorJava extends Visitor<Object> {
         
         // The list of fields that should be passed to the constructor
         // of the static class that the record belongs to.
-        if (!_recordFields.isEmpty()) {
-            stRecordClass.add("types", _recordFields.values());
-            stRecordClass.add("vars", _recordFields.keySet());
+        if (!recordFields.isEmpty()) {
+            stRecordClass.add("types", recordFields.values());
+            stRecordClass.add("vars", recordFields.keySet());
         }
         
         stRecordClass.add("name", recName);
@@ -1289,7 +1289,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         String type = (String) rm.type().visit(this);
         
         // Add this field to the collection of record members for reference.
-        _recordFields.put(name, type);
+        recordFields.put(name, type);
         
         // Ignored the value returned by this visitor. The types
         // and variables are resolved elsewhere.
@@ -1301,14 +1301,14 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(rl, "Visiting a RecordLiteral (" + rl.name().getname() + ")");
         
         // Generated template after evaluating this visitor.
-        ST stRecordListeral = _stGroup.getInstanceOf("RecordLiteral");
+        ST stRecordListeral = stGroup.getInstanceOf("RecordLiteral");
         String type = (String) rl.name().visit(this);
         
         // This map is used to determine the order in which values
         // are passed to the constructor of the class associated with
         // this record.
         HashMap<String, String> members = new LinkedHashMap<String, String>();
-        RecordTypeDecl rt = (RecordTypeDecl) _topLevelDecls.get(type);
+        RecordTypeDecl rt = (RecordTypeDecl) topLevelDecls.get(type);
         
         if (rt != null) { // This should never be 'null'.
             for (RecordMember rm : rt.body()) {
@@ -1341,7 +1341,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(ra, "Visiting a RecordAccess (" + ra + ")");
 
         // Generated template after evaluating this visitor.
-        ST stRecordAccess = _stGroup.getInstanceOf("RecordAccess");
+        ST stRecordAccess = stGroup.getInstanceOf("RecordAccess");
         
         if (ra.record().type.isRecordType()) {
             String name = (String) ra.record().visit(this);
@@ -1350,18 +1350,18 @@ public class CodeGeneratorJava extends Visitor<Object> {
             stRecordAccess.add("name", name);
             stRecordAccess.add("member", field);
         } else if (ra.record().type.isProtocolType()) {
-            stRecordAccess = _stGroup.getInstanceOf("ProtocolAccess");
+            stRecordAccess = stGroup.getInstanceOf("ProtocolAccess");
             ProtocolTypeDecl pt = (ProtocolTypeDecl) ra.record().type;
             String protocName = (String) pt.name().visit(this); // Wrapper class.
             String name = (String) ra.record().visit(this);     // Reference to inner class type.
             String field = (String) ra.field().getname();       // Field in inner class.
             
             // Cast a protocol to a supertype if needed.
-            if (_protocolTagsSwitchedOn.containsKey(protocName + "." + _currProtocolTag))
-                protocName = _protocolTagsSwitchedOn.get(protocName + "." + _currProtocolTag);
+            if (protocolTagsSwitchedOn.containsKey(protocName + "." + currentProtocolTag))
+                protocName = protocolTagsSwitchedOn.get(protocName + "." + currentProtocolTag);
             
             stRecordAccess.add("protocName", protocName);
-            stRecordAccess.add("tag", _currProtocolTag);
+            stRecordAccess.add("tag", currentProtocolTag);
             stRecordAccess.add("var", name);
             stRecordAccess.add("member", field);
         } else { // This is for arrays and strings.
@@ -1387,30 +1387,30 @@ public class CodeGeneratorJava extends Visitor<Object> {
         if (pb.stats().size() == 0)
             return null;
         // Generated template after evaluating this visitor.
-        ST stParBlock = _stGroup.getInstanceOf("ParBlock");
+        ST stParBlock = stGroup.getInstanceOf("ParBlock");
         // Save previous par-block.
-        String prevParBlock = _currParBlock;
+        String prevParBlock = currentParBlock;
         // Save previous barrier expressions.
-        ArrayList<String> prevBarrier = _barrierList;
-        if (!_barrierList.isEmpty())
-            _barrierList = new ArrayList<String>();
+        ArrayList<String> prevBarrier = barrierList;
+        if (!barrierList.isEmpty())
+            barrierList = new ArrayList<String>();
         // Create a name for this new par-block.
-        _currParBlock = Helper.makeVariableName(Tag.PAR_BLOCK_NAME.toString(), ++_parDecId, Tag.LOCAL_NAME);
+        currentParBlock = Helper.makeVariableName(Tag.PAR_BLOCK_NAME.toString(), ++parDecId, Tag.LOCAL_NAME);
         // Since this is a new par-block, we need to create a variable inside
         // the process in which this par-block was declared.
-        stParBlock.add("name", _currParBlock);
+        stParBlock.add("name", currentParBlock);
         stParBlock.add("count", pb.stats().size());
         stParBlock.add("process", "this");
         
         // Increment the jump label.
-        stParBlock.add("jump", ++_jumLabel);
+        stParBlock.add("jump", ++jumpLabel);
         // Add the jump label to the switch list.
-        _switchLabelList.add(renderSwitchLabel(_jumLabel));
+        switchLabelList.add(renderSwitchLabel(jumpLabel));
         // Add the barrier this par block enrolls in.
         Sequence<Expression> barriers = pb.barriers();
         if (barriers.size() > 0) {
             for (Expression ex : barriers)
-                _barrierList.add((String) ex.visit(this));
+                barrierList.add((String) ex.visit(this));
         }
         
         // Visit the sequence of statements in the par-block.
@@ -1445,13 +1445,13 @@ public class CodeGeneratorJava extends Visitor<Object> {
             stParBlock.add("body", stmts);
         }
         // Add the barrier to the par-block.
-        if (!_barrierList.isEmpty() && pb.barriers().size() > 0)
-            stParBlock.add("barrier", _barrierList);
+        if (!barrierList.isEmpty() && pb.barriers().size() > 0)
+            stParBlock.add("barrier", barrierList);
         
         // Restore the par-block.
-        _currParBlock = prevParBlock;
+        currentParBlock = prevParBlock;
         // Restore barrier expressions.
-        _barrierList = prevBarrier;
+        barrierList = prevBarrier;
         
         return stParBlock.render();
     }
@@ -1461,7 +1461,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(ts, "Visiting a TimeoutStat");
         
         // Generated template after evaluating this visitor.
-        ST stTimeoutStat = _stGroup.getInstanceOf("TimeoutStat");
+        ST stTimeoutStat = stGroup.getInstanceOf("TimeoutStat");
         String timer = (String) ts.timer().visit(this);
         String delay = (String) ts.delay().visit(this);
         
@@ -1469,9 +1469,9 @@ public class CodeGeneratorJava extends Visitor<Object> {
         stTimeoutStat.add("delay", delay);
         
         // Increment the jump label.
-        stTimeoutStat.add("resume0", ++_jumLabel);
+        stTimeoutStat.add("resume0", ++jumpLabel);
         // Add the jump label to the switch list.
-        _switchLabelList.add(renderSwitchLabel(_jumLabel));
+        switchLabelList.add(renderSwitchLabel(jumpLabel));
         
         return stTimeoutStat.render();
     }
@@ -1481,14 +1481,14 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(st, "Visiting a SyncStat");
         
         // Generated template after evaluating this visitor.
-        ST stSyncStat = _stGroup.getInstanceOf("SyncStat");
+        ST stSyncStat = stGroup.getInstanceOf("SyncStat");
         String barrier = (String) st.barrier().visit(this);
         stSyncStat.add("barrier", barrier);
         
         // Increment the jump label.
-        stSyncStat.add("resume0", ++_jumLabel);
+        stSyncStat.add("resume0", ++jumpLabel);
         // Add the jump label to the switch list.
-        _switchLabelList.add(renderSwitchLabel(_jumLabel));
+        switchLabelList.add(renderSwitchLabel(jumpLabel));
         
         return stSyncStat.render();
     }
@@ -1498,7 +1498,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(ue, "Visiting a UnaryPostExpr (" + ue.opString() + ")");
         
         // Generated template after evaluating this visitor.
-        ST stUnaryPostExpr = _stGroup.getInstanceOf("UnaryPostExpr");
+        ST stUnaryPostExpr = stGroup.getInstanceOf("UnaryPostExpr");
         String operand = (String) ue.expr().visit(this);
         String op = ue.opString();
         
@@ -1513,7 +1513,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(ue, "Visiting a UnaryPreExpr (" + ue.opString() + ")");
         
         // Generated template after evaluating this visitor.
-        ST stUnaryPreExpr = _stGroup.getInstanceOf("UnaryPreExpr");
+        ST stUnaryPreExpr = stGroup.getInstanceOf("UnaryPreExpr");
         String operand = (String) ue.expr().visit(this);
         String op = ue.opString();
         
@@ -1528,7 +1528,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(ac, "Visiting an AltCase");
         
         // Generated template after evaluating this visitor.
-        ST stAltCase = _stGroup.getInstanceOf("AltCase");
+        ST stAltCase = stGroup.getInstanceOf("AltCase");
         Statement stat = ac.guard().guard();
         String guard = null;
         String[] stats = (String[]) ac.stat().visit(this);
@@ -1548,7 +1548,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(cd, "Visting ConstantDecl (" + cd.type().typeName() + " " + cd.var().name().getname() + ")");
         
         // Generated template after evaluating this visitor.
-        ST stConstantDecl = _stGroup.getInstanceOf("ConstantDecl");
+        ST stConstantDecl = stGroup.getInstanceOf("ConstantDecl");
         stConstantDecl.add("type", cd.type().visit(this));
         stConstantDecl.add("var", cd.var().visit(this));
         
@@ -1560,9 +1560,9 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(as, "Visiting an AltStat");
         
         // Generated template after evaluating this visitor.
-        ST stAltStat = _stGroup.getInstanceOf("AltStat");
-        ST stBooleanGuards = _stGroup.getInstanceOf("BooleanGuards");
-        ST stObjectGuards = _stGroup.getInstanceOf("ObjectGuards");
+        ST stAltStat = stGroup.getInstanceOf("AltStat");
+        ST stBooleanGuards = stGroup.getInstanceOf("BooleanGuards");
+        ST stObjectGuards = stGroup.getInstanceOf("ObjectGuards");
         
         Sequence<AltCase> cases = as.body();
         ArrayList<String> blocals = new ArrayList<String>();
@@ -1625,9 +1625,9 @@ public class CodeGeneratorJava extends Visitor<Object> {
                 false /* not constant */).visit(this);
         
         // Create a tag for this local alt declaration.
-        String newName = Helper.makeVariableName("alt", ++_localDecId, Tag.LOCAL_NAME);
-        _localParamFields.put(newName, "PJAlt");
-        _paramDeclNames.put(newName, newName);
+        String newName = Helper.makeVariableName("alt", ++localDecId, Tag.LOCAL_NAME);
+        localParamFields.put(newName, "PJAlt");
+        paramDeclNames.put(newName, newName);
         // -->
         
         stAltStat.add("alt", newName);
@@ -1636,12 +1636,12 @@ public class CodeGeneratorJava extends Visitor<Object> {
         stAltStat.add("initGuards", stObjectGuards.render());
         stAltStat.add("bguards", "booleanGuards");
         stAltStat.add("guards", "objectGuards");
-        stAltStat.add("jump", ++_jumLabel);
+        stAltStat.add("jump", ++jumpLabel);
         stAltStat.add("cases", altCases);
         stAltStat.add("index", n.visit(this));
         
         // Add the jump label to the switch list.
-        _switchLabelList.add(renderSwitchLabel(_jumLabel));
+        switchLabelList.add(renderSwitchLabel(jumpLabel));
         
         return stAltStat.render();
     }
@@ -1650,7 +1650,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
     public Object visitReturnStat(ReturnStat rs) {
         Log.log(rs, "Visiting a ReturnStat");
         
-        ST stReturnStat = _stGroup.getInstanceOf("ReturnStat");
+        ST stReturnStat = stGroup.getInstanceOf("ReturnStat");
         String expr = null;
         
         if (rs.expr() != null)
@@ -1688,24 +1688,24 @@ public class CodeGeneratorJava extends Visitor<Object> {
      * This is used for newly-created processes.
      */
     private void resetGlobals() {
-        _parDecId = 0;
-        _varDecId = 0;
-        _localDecId = 0;
-        _jumLabel = 0;
+        parDecId = 0;
+        varDecId = 0;
+        localDecId = 0;
+        jumpLabel = 0;
 
-        _localParamFields.clear();
-        _switchLabelList.clear();
-        _barrierList.clear();
+        localParamFields.clear();
+        switchLabelList.clear();
+        barrierList.clear();
         
-        _formalParamFields.clear();
-        _paramDeclNames.clear();
+        formalParamFields.clear();
+        paramDeclNames.clear();
     }
     
     /**
      * Returns a string representation of a jump label.
      */
     private String renderSwitchLabel(int jump) {
-        ST stSwitchCase = _stGroup.getInstanceOf("SwitchCase");
+        ST stSwitchCase = stGroup.getInstanceOf("SwitchCase");
         stSwitchCase.add("jump", jump);
         return stSwitchCase.render();
     }
@@ -1735,16 +1735,16 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(na.line + ": Creating a New Array");
         
         // Generated template after evaluating this visitor.
-        ST stNewArray = _stGroup.getInstanceOf("NewArray");
+        ST stNewArray = stGroup.getInstanceOf("NewArray");
         String[] dims = (String[]) na.dimsExpr().visit(this);
         String type = (String) na.baseType().visit(this);
 
-        ST stNewArrayLiteral = _stGroup.getInstanceOf("NewArrayLiteral");
+        ST stNewArrayLiteral = stGroup.getInstanceOf("NewArrayLiteral");
         if (na.init() != null) {
             ArrayList<String> inits = new ArrayList<String>();
             Sequence<Expression> seq = na.init().elements();
             for (Expression e : seq) {
-                _isArrayLiteral = e instanceof ArrayLiteral ? true : false;
+                isArrayLiteral = e instanceof ArrayLiteral ? true : false;
                 inits.add((String) e.visit(this));
             }
             
@@ -1759,7 +1759,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         stNewArray.add("init", stNewArrayLiteral.render());
         
         // Reset value for array literal expressions.
-        _isArrayLiteral = false;
+        isArrayLiteral = false;
         
         return stNewArray.render();
     }
@@ -1768,7 +1768,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(cr, "Creating Channel Read Expression");
         
         // Generated template after evaluating this visitor.
-        ST stChannelReadExpr = _stGroup.getInstanceOf("ChannelReadExpr");
+        ST stChannelReadExpr = stGroup.getInstanceOf("ChannelReadExpr");
         // 'c.read()' is a channel-end expression, where 'c'
         // is the reading end of a channel.
         Expression chanExpr = cr.channel();
@@ -1777,7 +1777,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         
         // Is it a timer read expression?
         if (chanExpr.type.isTimerType()) {
-            ST stTimerRedExpr = _stGroup.getInstanceOf("TimerRedExpr");
+            ST stTimerRedExpr = stGroup.getInstanceOf("TimerRedExpr");
             stTimerRedExpr.add("name", lhs);
             return stTimerRedExpr.render();
         }
@@ -1785,7 +1785,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         int countLabel = 2;  // One for the 'runLabel' and one for the 'read' operation.
         // Is the reading end of this channel shared?
         if (chanExpr.type.isChannelEndType() && ((ChannelEndType) chanExpr.type).isShared()) {
-            stChannelReadExpr = _stGroup.getInstanceOf("ChannelOne2Many");
+            stChannelReadExpr = stGroup.getInstanceOf("ChannelOne2Many");
             ++countLabel;
         }
         
@@ -1799,9 +1799,9 @@ public class CodeGeneratorJava extends Visitor<Object> {
         // Add the switch block for resumption.
         for (int label = 0; label < countLabel; ++label) {
             // Increment jump label.
-            stChannelReadExpr.add("resume" + label, ++_jumLabel);
+            stChannelReadExpr.add("resume" + label, ++jumpLabel);
             // Add jump label to the switch list.
-            _switchLabelList.add(renderSwitchLabel(_jumLabel));
+            switchLabelList.add(renderSwitchLabel(jumpLabel));
         }
         
         stChannelReadExpr.add("lhs", lhs);

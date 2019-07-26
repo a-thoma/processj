@@ -55,19 +55,23 @@ public class ProcessJc {
     
     // List of available options for the ProcessJ compiler.
     public static final Option[] options = {
-            new Option("ansiColor",     "-ansi-color",                          "Use color on terminals that support ANSI espace codes"),
+            new Option("ansiColor",     "-ansi-color",                          "Use color on terminals that support ansi espace codes"),
             new Option("help",          "-help",                                "Show this help message and exit"),
             new Option("include",       "-include",     OptionType.STRING,      "Override the default include directory"),
-            new Option("target",        "-target",      OptionType.STRING,      "Specify the target language: C++, Java, JS"),
+            new Option("message",       "-message",                             "Show info of error and warning messages when available"),
+            new Option("target",        "-target",      OptionType.STRING,      "Specify the target language -- c++, Java (default), js"),
             new Option("version",       "-version",                             "Print version information and exit"),
             new Option("visitAll",      "-visit-all",                           "Generate all parse tree visitors")
     };
+    
+    // TODO: -Dansi-color --> needs some work
     
     // <--
     // Fields used by the ProcessJ compiler.
     public boolean ansiColor = false;
     public boolean help = false;
     public String include = null;
+    public boolean message = false;
     public Language target = Settings.language;
     public boolean version = false;
     public boolean visitAll = false;
@@ -88,15 +92,16 @@ public class ProcessJc {
     public static void main(String[] args) {
         ProcessJc processj = new ProcessJc(args);
         // Do we have any arguments?
-        if (args.length == 0 || processj.inputFiles.isEmpty()) {
-            // At least one file must be provided. Otherwise, throw an error if
-            // no file is given, or if the file does not exists.
+        if (args.length == 0 && !processj.help) {
+            // At least one file must be provided. Throw an error if no
+            // file is given, or if the file does not exists.
             System.out.println(new ProcessJMessage.Builder()
                                    .addError(VisitorMessageNumber.RESOLVE_IMPORTS_100)
                                    .build().getST().render());
-            processj.help();
-            processj.exit(1);
+            processj.helpMenu();
         }
+        if (processj.help)
+            processj.helpMenu();
         
         // 
         // PROCESS SOURCE FILES
@@ -153,10 +158,10 @@ public class ProcessJc {
             Library.decodePragmas(c);
             Library.generateLibraries(c);
 
-            // This table will hold all the top level types
+            // This table will hold all the top level types.
             SymbolTable globalTypeTable = new SymbolTable("Main file: " + CompilerMessageManager.INSTANCE.fileName);
 
-            // Dump log messages
+            // Dump log messages.
             if (processj.visitAll)
                 Log.startLogging();
             
@@ -274,9 +279,9 @@ public class ProcessJc {
             // CODE GENERATOR
             // 
             
-            if (Settings.language == processj.target) {
+            if (Settings.language == processj.target)
                 processj.generateCodeJava(c, inFile, globalTypeTable);
-            } else {
+            else {
                 System.err.println("Unknown target language '" + processj.target + "' selected");
                 processj.exit(1);
             }
@@ -346,9 +351,8 @@ public class ProcessJc {
             String arg = args[pos++];
             if (arg.charAt(0) != '-') {
                 // We found an '.pj' file.
-                if (!inputFiles.contains(arg)) {
+                if (!inputFiles.contains(arg))
                     inputFiles.add(arg);
-                }
             } else {
                 boolean foundOption = false;
                 for (Option o : options) {
@@ -379,11 +383,12 @@ public class ProcessJc {
         }
     }
     
-    public void help() {
+    public void helpMenu() {
         for (Option o : options) {
             String name = String.format("%-18s %s", o.optionName, o.description);
             System.out.println(name);
         }
+        this.exit(0);
     }
     
     public ArrayList<File> createFiles() {

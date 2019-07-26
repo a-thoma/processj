@@ -9,7 +9,7 @@ StackInfo(reason, stack) ::= <<
 //========================================================================================
 // 1) filename: The name of a ProcessJ file.
 // 2) lineNumber: The line number in the ProcessJ file.
-File(fileName, lineNumber) ::= "<if(fileName)>>>> <fileName><AddNumber(lineNumber)><endif>"
+File(fileName, lineNumber) ::= "<if(fileName)>\--> <fileName><AddNumber(lineNumber)><endif>"
 AddNumber(lineNumber) ::= "<if(lineNumber)>:<lineNumber><endif>"
 
 //========================================================================================

@@ -11,7 +11,7 @@ import ast.AST;
 
 /**
  * This class is used to create messages during a tree-traversal node
- * when processing the contents in a ProcessJ file, when processing
+ * when processing the contents of a ProcessJ file, when processing
  * the syntax and/or semantics errors when compiling or generating
  * Java source code from a ProcessJ file, or when processing command
  * line options and/or arguments.

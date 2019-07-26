@@ -73,8 +73,7 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
             parser p1 = new parser(s1);
             java_cup.runtime.Symbol r = p1.parse();
             
-            TopLevelDecls.alreadyImportedFiles.put(fileName,
-                    (Compilation) r.value);
+            TopLevelDecls.alreadyImportedFiles.put(fileName, (Compilation) r.value);
             return (Compilation) r.value;
         } catch (java.io.FileNotFoundException e) {
             CompilerMessageManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()

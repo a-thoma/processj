@@ -1,8 +1,8 @@
 package utilities;
 
 /**
- * This class is used for ANSI color manipulation on a terminal console that
- * supports ANSI color codes.
+ * This class is used for ansi color manipulation on a terminal
+ * console that supports ansi color codes.
  * 
  * Usage:
  * - ANSI_PREFIX + (Attribute | Attribute + ANSI_COMMA + (AnsiForeground | AnsiBackground)) + ANSI_POSTFIX
@@ -23,7 +23,8 @@ public class ColorCodes {
     public static final String ANSI_RESET = "\033[0m";
     
     /**
-     * The enum AnsiForeground represents each ANSI foreground color code.
+     * The enum AnsiForeground represents each ansi foreground
+     * color code.
      * 
      * @author Ben
      * @version 10/06/2018
@@ -55,7 +56,8 @@ public class ColorCodes {
     }
     
     /**
-     * The enum AnsiForeground represents each ANSI background color code.
+     * The enum AnsiForeground represents each ansi background
+     * color code.
      * 
      * @author Ben
      * @version 10/06/2018
@@ -87,7 +89,8 @@ public class ColorCodes {
     }
     
     /**
-     * The enum Attribute represents each ANSI attribute color code.
+     * The enum Attribute represents each ansi attribute
+     * color code.
      * 
      * @author Ben
      * @version 10/06/2018
