@@ -12,11 +12,12 @@ import namechecker.ResolveImports;
 import parser.parser;
 import rewriters.CastRewrite;
 import scanner.Scanner;
-import utilities.CompilerMessageManager;
+import utilities.CompilerErrorManager;
 import utilities.ConfigFileReader;
 import utilities.Language;
 import utilities.Log;
 import utilities.ProcessJMessage;
+import utilities.RuntimeInfo;
 import utilities.Settings;
 import utilities.SymbolTable;
 import utilities.VisitorMessageNumber;
@@ -64,8 +65,6 @@ public class ProcessJc {
             new Option("visitAll",      "-visit-all",                           "Generate all parse tree visitors")
     };
     
-    // TODO: -Dansi-color --> needs some work
-    
     // <--
     // Fields used by the ProcessJ compiler.
     public boolean ansiColor = false;
@@ -98,24 +97,26 @@ public class ProcessJc {
             System.out.println(new ProcessJMessage.Builder()
                                    .addError(VisitorMessageNumber.RESOLVE_IMPORTS_100)
                                    .build().getST().render());
-            processj.helpMenu();
+            processj.help();
         }
-        if (processj.help)
-            processj.helpMenu();
         
-        // 
-        // PROCESS SOURCE FILES
-        //
+        if (processj.help)
+            processj.help();
+        
+        if (processj.version)
+            processj.version();
+        
         ArrayList<File> files = processj.createFiles();
         AST root = null;
+        // Process source file, one by one.
         for (File inFile : files) {
             Scanner s = null;
             parser p = null;
             try {
                 String fileAbsolutePath = inFile.getAbsolutePath();
-                // Set package and filename.
-                CompilerMessageManager.INSTANCE.setFileName(fileAbsolutePath);
-                CompilerMessageManager.INSTANCE.setPackageName(fileAbsolutePath);
+                // Set the package and filename.
+                CompilerErrorManager.INSTANCE.setFileName(fileAbsolutePath);
+                CompilerErrorManager.INSTANCE.setPackageName(fileAbsolutePath);
                 
 //                Error.setFileName(fileAbsolutePath);
 //                Error.setPackageName(fileAbsolutePath);
@@ -145,11 +146,11 @@ public class ProcessJc {
             // Set the absolute path, file, and package name from where this Compilation is created.
             System.out.println("-- Setting absolute path, file and package name for '" + inFile.getName() + "'.");
             c.fileName = inFile.getName();
-            // Get the parent's path of the input file.
+            // The parent's path of the input file.
             String parentPath = inFile.getAbsolutePath();
-            // Get the file's parent absolute path.
+            // The parent's absolute path of the input file.
             c.path = parentPath.substring(0, parentPath.lastIndexOf(File.separator));
-            // A package declaration is optional, this can therefore be 'null'.
+            // A package declaration is optional, this can thus be 'null'.
             if (c.packageName() != null)
                 c.packageName = ResolveImports.packageNameToString(c.packageName());
 
@@ -159,100 +160,63 @@ public class ProcessJc {
             Library.generateLibraries(c);
 
             // This table will hold all the top level types.
-            SymbolTable globalTypeTable = new SymbolTable("Main file: " + CompilerMessageManager.INSTANCE.fileName);
+            SymbolTable globalTypeTable = new SymbolTable("Main file: " + CompilerErrorManager.INSTANCE.fileName);
 
             // Dump log messages.
             if (processj.visitAll)
                 Log.startLogging();
             
-            //
-            // VISIT IMPORT DECLARATIONS
-            //
-            
             SymbolTable.hook = null;
+            
+            // Visit import declarations.
             System.out.println("-- Resolving imports.");
             c.visit(new namechecker.ResolveImports<AST>(globalTypeTable));
             globalTypeTable.printStructure("");
             
-//            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
-//                CompilerMessageManager.INSTANCE.printTrace("import declarations");
-//                CompilerMessageManager.INSTANCE.writeToFile("PJErrors");
-//                System.exit(1);
-//            }
-//            globalTypeTable.setImportParent(SymbolTable.hook);
-            
-            // 
-            // VISIT TOP LEVEL DECLARATIONS
-            // 
-            
+            // Visit top-level declarations.
             System.out.println("-- Declaring Top Level Declarations.");
             c.visit(new namechecker.TopLevelDecls<AST>(globalTypeTable));
             
+            // Visit and re-construct record types correctly.
             System.out.println("-- Reconstructing records.");
             c.visit(new rewriters.RecordRewrite(globalTypeTable));
             
-            ///
+            // Visit and re-construct protocol types correctly.
             System.out.println("-- Reconstructing protocols.");
             c.visit(new rewriters.ProtocolRewrite(globalTypeTable));
-            ///
             
+            // Visit and resolve import for top-level declarations.
             System.out.println("-- Checking native Top Level Declarations.");
             c.visit(new namechecker.ResolveImportTopDecls());
-            
-            // 
-            // VISIT RESOLVE PACKAGE TYPES
-            // 
 
-            // Resolve types from imported packages.
+            // Visit and resolve types from imported packages.
             System.out.println("-- Resolving imported types.");
             c.visit(new namechecker.ResolvePackageTypes());
             
-            // 
-            // VISIT NAME CHECKER
-            // 
-            
+            // Visit name checker.
             System.out.println("-- Checking name usage.");
             c.visit(new namechecker.NameChecker<AST>(globalTypeTable));
             
-            // 
-            // VISIT ARRAY TYPES
-            //
-
-            // Re-construct Array Types correctly
+            // Visit and re-construct array types correctly
             System.out.println("-- Reconstrucing array types.");
             root.visit(new namechecker.ArrayTypeConstructor());
             
-            // 
-            // VISIT TYPE CHECKER
-            // 
-            
+            // Visit type checker.
             System.out.println("-- Checking types.");
             c.visit(new typechecker.TypeChecker(globalTypeTable));
             
-            // 
-            // VISIT CASTREWRITE
-            // 
-            
+            // Visit cast-rewrite.
             c.visit(new CastRewrite());
             
-            // 
-            // VISIT REACHABILITY
-            // 
-            
+            // Visit reachability.
             System.out.println("-- Computing reachability.");
             c.visit(new reachability.Reachability());
             
-            // 
-            // VISIT PARALLEL USAGE
-            // 
-            
+            // Visit parallel usage.
             System.out.println("-- Performing parallel usage check.");
             c.visit(new parallel_usage_check.ParallelUsageCheck());
             
-            // 
-            // VISIT YIELD
-            // 
-            
+            // Visit yield.
             c.visit(new yield.Yield());
             System.out.println("-- Marking yielding statements and expressions.");
             c.visit(new rewriters.Yield());
@@ -275,16 +239,11 @@ public class ProcessJc {
             System.out.println("-- Collecting left-hand sides for par for code generation.");
             c.visit(new rewriters.ParFor());
             
-            // 
-            // CODE GENERATOR
-            // 
-            
+            // Run the code generator for the known (specified) target language.
             if (Settings.language == processj.target)
                 processj.generateCodeJava(c, inFile, globalTypeTable);
-            else {
-                System.err.println("Unknown target language '" + processj.target + "' selected");
-                processj.exit(1);
-            }
+            else
+                ; // Throw an error message for unknown target language.
             
             System.out.println("============= S = U = C = C = E = S = S =================");
             System.out.println(String.format("*** File '%s' was compiled successfully ***", inFile.getName()));
@@ -373,6 +332,7 @@ public class ProcessJc {
                             System.out.println("Failed to access field '" + o.fieldName + "'");
                             exit(1);
                         }
+                        break;
                     }
                 }
                 if (!foundOption) {
@@ -383,11 +343,17 @@ public class ProcessJc {
         }
     }
     
-    public void helpMenu() {
+    public void help() {
         for (Option o : options) {
-            String name = String.format("%-18s %s", o.optionName, o.description);
+            String name = String.format("%-20s %s", o.optionName, o.description);
             System.out.println(name);
         }
+        this.exit(0);
+    }
+    
+    public void version() {
+        String msg = "ProcessJ Version: " + RuntimeInfo.runtimeVersion();
+        System.out.println(msg);
         this.exit(0);
     }
     

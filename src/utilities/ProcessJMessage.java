@@ -39,7 +39,7 @@ public class ProcessJMessage extends CompilerMessage {
             stStackInfo.add("stack", throwable.getStackTrace());
         }
         
-        // Apply color code mode if allowed on terminal
+        // Apply color code if allowed on terminal.
         String tag = stTag.render();
         if (Settings.ansiColor)
             tag = ColorCodes.colorTag(stTag.render(), error.getErrorSeverity());

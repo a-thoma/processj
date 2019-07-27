@@ -80,8 +80,8 @@ public abstract class CompilerMessage {
         error = builder.error;
         arguments = builder.arguments;
         throwable = builder.throwable;
-        fileName = builder.fileName == null ? CompilerMessageManager.INSTANCE.fileName : builder.fileName;
-        packageName = builder.packageName == null ? CompilerMessageManager.INSTANCE.fileName : builder.packageName;
+        fileName = builder.fileName == null ? CompilerErrorManager.INSTANCE.fileName : builder.fileName;
+        packageName = builder.packageName == null ? CompilerErrorManager.INSTANCE.fileName : builder.packageName;
         rowNum = builder.myRow;
         columnNum = builder.myColumn;
     }

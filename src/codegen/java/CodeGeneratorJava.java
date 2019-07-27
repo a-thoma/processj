@@ -1428,9 +1428,9 @@ public class CodeGeneratorJava extends Visitor<Object> {
                 if (st instanceof ExprStat && ((ExprStat) st).expr() instanceof Invocation) {
                     ExprStat es = (ExprStat) st;
                     Invocation in = (Invocation) es.expr();
-                    // If this invocation is made on a process then visit the invocation
-                    // and return a string representing the wrapper class for this
-                    // procedure; e.g.,
+                    // If this invocation is made on a process, then visit the
+                    // invocation and return a string representing the wrapper
+                    // class for this procedure; e.g.,
                     //      (new <classType>(...) {
                     //          @Override public synchronized void run() { ... }
                     //          @Override public finalize() { ... }

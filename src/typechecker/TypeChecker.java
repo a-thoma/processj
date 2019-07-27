@@ -11,7 +11,7 @@ import utilities.Log;
 import utilities.SymbolTable;
 import utilities.Visitor;
 import utilities.ProcessJMessage;
-import utilities.CompilerMessageManager;
+import utilities.CompilerErrorManager;
 import utilities.Log;
 import utilities.MessageType;
 import utilities.Visitor;
@@ -131,7 +131,7 @@ public class TypeChecker extends Visitor<Type> {
             // This error does not create an error type cause the baseType() is
             // still the array expression's type.
             if (!indexType.isIntegerType())
-                CompilerMessageManager.INSTANCE.reportMessage(new ProcessJMessage.Builder().addAST(ae)
+                CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder().addAST(ae)
                         .addError(VisitorMessageNumber.TYPE_CHECKER_655).addArguments(indexType.typeName()).build(),
                         MessageType.PRINT_CONTINUE);
         }
@@ -148,7 +148,7 @@ public class TypeChecker extends Visitor<Type> {
         Log.log(al.line + ": visiting an array literal.");
 
         // Array Literals cannot appear without a 'new' keyword.
-        CompilerMessageManager.INSTANCE.reportMessage(
+        CompilerErrorManager.INSTANCE.reportMessage(
                 new ProcessJMessage.Builder().addAST(al).addError(VisitorMessageNumber.TYPE_CHECKER_656).build(),
                 MessageType.PRINT_CONTINUE);
         return null;
@@ -206,7 +206,7 @@ public class TypeChecker extends Visitor<Type> {
          */
         // TODO: Check the implementation of Assignable.
         if (!vType.assignable())
-            CompilerMessageManager.INSTANCE.reportMessage(
+            CompilerErrorManager.INSTANCE.reportMessage(
                     new ProcessJMessage.Builder().addAST(as).addError(VisitorMessageNumber.TYPE_CHECKER_630).build(),
                     MessageType.PRINT_CONTINUE);
 
@@ -216,7 +216,7 @@ public class TypeChecker extends Visitor<Type> {
             // =
             if (!vType.typeAssignmentCompatible(eType)) {
                 as.type = new ErrorType();
-                CompilerMessageManager.INSTANCE
+                CompilerErrorManager.INSTANCE
                         .reportMessage(
                                 new ProcessJMessage.Builder().addAST(as).addError(VisitorMessageNumber.TYPE_CHECKER_601)
                                         .addArguments(eType.typeName(), vType.typeName()).build(),
@@ -238,7 +238,7 @@ public class TypeChecker extends Visitor<Type> {
             else if (!vType.typeAssignmentCompatible(eType)) {
                 // Left-hand side is not assignment compatible with the right-hand side.
                 as.type = new ErrorType();
-                CompilerMessageManager.INSTANCE
+                CompilerErrorManager.INSTANCE
                         .reportMessage(
                                 new ProcessJMessage.Builder().addAST(as).addError(VisitorMessageNumber.TYPE_CHECKER_600)
                                         .addArguments(eType.typeName(), vType.typeName()).build(),
@@ -251,13 +251,13 @@ public class TypeChecker extends Visitor<Type> {
             // <<=, >>=, >>>=
             if (!vType.isIntegralType()) {
                 as.type = new ErrorType();
-                CompilerMessageManager.INSTANCE.reportMessage(new ProcessJMessage.Builder().addAST(as)
+                CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder().addAST(as)
                         .addError(VisitorMessageNumber.TYPE_CHECKER_604).addArguments(as.opString()).build(),
                         MessageType.PRINT_CONTINUE);
             }
             if (!eType.isIntegralType()) {
                 as.type = new ErrorType();
-                CompilerMessageManager.INSTANCE.reportMessage(new ProcessJMessage.Builder().addAST(as)
+                CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder().addAST(as)
                         .addError(VisitorMessageNumber.TYPE_CHECKER_605).addArguments(as.opString()).build(),
                         MessageType.PRINT_CONTINUE);
             }

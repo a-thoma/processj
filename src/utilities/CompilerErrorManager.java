@@ -17,7 +17,7 @@ import java.util.Stack;
  * @version 21/10/2018
  * @since 1.2
  */
-public enum CompilerMessageManager {
+public enum CompilerErrorManager {
     
     INSTANCE
     ;
@@ -28,9 +28,9 @@ public enum CompilerMessageManager {
     private int errorCount;
     
     /**
-     * Last registered message
+     * Last registered message.
      */
-    private CompilerMessage myPostPonedMessage = null;
+    private CompilerMessage postPonedMessage = null;
     
     /**
      * List of errors/warning messages.
@@ -47,13 +47,13 @@ public enum CompilerMessageManager {
      */
     public String packageName = "";
     
-    CompilerMessageManager() {
+    CompilerErrorManager() {
         errorCount = 0;
         stackTrace = new Stack<CompilerMessage>();
     }
     
-    public void add(CompilerMessage cm, MessageNumber m) {
-        ErrorSeverity severity = m.getErrorSeverity();
+    public void add(CompilerMessage cm, MessageNumber msg) {
+        ErrorSeverity severity = msg.getErrorSeverity();
         switch (severity) {
         case INFO:
         case WARNING:
@@ -63,24 +63,24 @@ public enum CompilerMessageManager {
             break;
         }
         stackTrace.push(cm);
-        myPostPonedMessage = cm;
+        postPonedMessage = cm;
     }
     
     public void reportMessage(CompilerMessage cm, MessageType mt) {
         cm = Assert.nonNull(cm, "Compiler message cannot be null.");
-        boolean doStop = false;
+        boolean stop = false;
         add(cm, cm.getMessageNumber());
         
         switch(mt) {
         case PRINT_STOP:
-            doStop = true;
+            stop = true;
         case PRINT_CONTINUE:
-            // Throw the first error that occurred
-            if (myPostPonedMessage == null)
-                myPostPonedMessage = cm;
+            // Throw the first error that occurred.
+            if (postPonedMessage == null)
+                postPonedMessage = cm;
             System.out.println(cm.renderMessage());
-            if (doStop)
-                System.exit(0);
+            if (stop)
+                System.exit(1);
         case DONT_PRINT_CONTINUE:
             break;
         }
@@ -99,19 +99,19 @@ public enum CompilerMessageManager {
     }
     
     public CompilerMessage getPostPonedMessage() {
-        return myPostPonedMessage;
+        return postPonedMessage;
     }
     
-    public void printTrace(String source) {
+    public void printTrace(String src) {
         System.out.println("****************************************");
-        System.out.println("*        E R R O R   R E P O R T       *");
+        System.out.println("*         S T A C K  T R A C E         *");
         System.out.println("****************************************");
-        System.out.println(String.format("%d error(s) in '%s'", errorCount, source));
+        System.out.print(errorCount + " error(s) in '" + src + "'");
         Iterator<CompilerMessage> it = stackTrace.iterator();
         while (it.hasNext()) {
             System.out.println(it.next().renderMessage());
             if (it.hasNext())
-                System.out.println("-------------------------------------------------------");
+                System.out.println("=======================================================");
         }
     }
     

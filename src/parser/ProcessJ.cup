@@ -3,7 +3,7 @@ package parser;
 import scanner.Scanner;
 import ast.*;
 import utilities.Error;
-import utilities.CompilerMessageManager;
+import utilities.CompilerErrorManager;
 import parser.*;
 
 
@@ -47,7 +47,7 @@ parser code  {:
     else {
       Token t = (Token)current.value;
     //System.out.println(Error.fileName + ":" + Scanner.lineCount + ": Syntax error:\n\n" + Scanner.curLine);
-    System.out.println(CompilerMessageManager.INSTANCE.fileName + ":" + Scanner.lineCount + ": Syntax error:\n\n" + Scanner.curLine);
+    System.out.println(CompilerErrorManager.INSTANCE.fileName + ":" + Scanner.lineCount + ": Syntax error:\n\n" + Scanner.curLine);
     for (int i=1; i<Scanner.curLine.length()+1-t.lexeme.length(); i++) 
       System.out.print(" ");
         System.out.println("^");
@@ -431,11 +431,11 @@ type_declarations ::=
 
 //- Sequence[Type :> AST] :> AST // Error.packageName
 type_declaration ::= 
-          procedure_type_declaration:p     {: p.myPackage = CompilerMessageManager.INSTANCE.packageName; RESULT = new Sequence<Type>(p); :}
-        | record_type_declaration:r        {: r.myPackage = CompilerMessageManager.INSTANCE.packageName; RESULT = new Sequence<Type>(r); :}
-        | protocol_type_declaration:p      {: p.myPackage = CompilerMessageManager.INSTANCE.packageName; RESULT = new Sequence<Type>(p); :}
-        | constant_declaration:c           {: c.myPackage = CompilerMessageManager.INSTANCE.packageName; RESULT = c; :}       
-    | EXTERN extern_type:e IDENTIFIER:n  {: e.myPackage = CompilerMessageManager.INSTANCE.packageName; RESULT = new Sequence<Type>(new NamedType(new Name(n), new ExternType(e))); :}
+          procedure_type_declaration:p     {: p.myPackage = CompilerErrorManager.INSTANCE.packageName; RESULT = new Sequence<Type>(p); :}
+        | record_type_declaration:r        {: r.myPackage = CompilerErrorManager.INSTANCE.packageName; RESULT = new Sequence<Type>(r); :}
+        | protocol_type_declaration:p      {: p.myPackage = CompilerErrorManager.INSTANCE.packageName; RESULT = new Sequence<Type>(p); :}
+        | constant_declaration:c           {: c.myPackage = CompilerErrorManager.INSTANCE.packageName; RESULT = c; :}       
+    | EXTERN extern_type:e IDENTIFIER:n  {: e.myPackage = CompilerErrorManager.INSTANCE.packageName; RESULT = new Sequence<Type>(new NamedType(new Name(n), new ExternType(e))); :}
         ;
 
 // Name :> AST

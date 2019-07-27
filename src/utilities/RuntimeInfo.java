@@ -15,7 +15,7 @@ public final class RuntimeInfo {
     // Contains the current version of the ProcessJ runtime system.
     protected static final String VERSION = "2.1.1";
     
-    public static String getRuntimeVersion() {
+    public static String runtimeVersion() {
         return VERSION;
     }
     

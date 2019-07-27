@@ -22,7 +22,7 @@ import ast.SwitchStat;
 import ast.SyncStat;
 import ast.TimeoutStat;
 import ast.WhileStat;
-import utilities.CompilerMessageManager;
+import utilities.CompilerErrorManager;
 import utilities.Log;
 import utilities.MessageType;
 import utilities.ProcessJMessage;
@@ -53,13 +53,13 @@ public class Reachability extends Visitor<Boolean> {
         // if (true) S1 else S2 - S2 is unreachable
         if (is.expr().isConstant() && ((Boolean) is.expr().constantValue())
                 && is.elsepart() != null)
-            CompilerMessageManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
+            CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                                   .addAST(is)
                                   .addError(VisitorMessageNumber.REACHABILITY_800)
                                   .build());
         // if (false) S1 ... - S1 is unreachable
         if (is.expr().isConstant() && (!(Boolean) is.expr().constantValue()))
-            CompilerMessageManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
+            CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                                   .addAST(is)
                                   .addError(VisitorMessageNumber.REACHABILITY_801)
                                   .build());
@@ -82,7 +82,7 @@ public class Reachability extends Visitor<Boolean> {
                 && ((b && // the statement can run to completion
                 !ws.hasBreak && !ws.hasReturn) // but has no breaks, so it will loop forever
                 || !b)) {
-            CompilerMessageManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
+            CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                                   .addAST(ws)
                                   .addError(VisitorMessageNumber.REACHABILITY_802)
                                   .build());
@@ -93,7 +93,7 @@ public class Reachability extends Visitor<Boolean> {
 
         if (ws.expr() != null && ws.expr().isConstant()
                 && (!(Boolean) ws.expr().constantValue())) {
-            CompilerMessageManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
+            CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                                   .addAST(ws)
                                   .addError(VisitorMessageNumber.REACHABILITY_810)
                                   .build());
@@ -120,7 +120,7 @@ public class Reachability extends Visitor<Boolean> {
                 !ds.hasBreak && !ds.hasReturn) || !b) { // but has no breaks, so it will loop forever
             loopConstruct = oldLoopConstruct;
             ds.foreverLoop = true;
-            CompilerMessageManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
+            CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                                   .addAST(ds)
                                   .addError(VisitorMessageNumber.REACHABILITY_809)
                                   .build());
@@ -147,7 +147,7 @@ public class Reachability extends Visitor<Boolean> {
                 b = bl.stats().child(i).visit(this);
                 Log.log("visiting child: " + i + " done");
                 if (!b && bl.stats().size() - 1 > i) {
-                    CompilerMessageManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
+                    CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                                           .addAST(bl.stats().child(i))
                                           .addError(VisitorMessageNumber.REACHABILITY_803)
                                           .addArguments(bl.stats().child(i).line)
@@ -170,7 +170,7 @@ public class Reachability extends Visitor<Boolean> {
         // for (....; false ; ....) S1
         if (fs.expr() != null && fs.expr().isConstant()
                 && (!(Boolean) fs.expr().constantValue())) {
-            CompilerMessageManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
+            CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                                   .addAST(fs)
                                   .addError(VisitorMessageNumber.REACHABILITY_804)
                                   .build());
@@ -187,7 +187,7 @@ public class Reachability extends Visitor<Boolean> {
                 .expr().constantValue()))) && (b && // the statement can run to completion
                 !fs.hasBreak && !fs.hasReturn) || !b) // but has no breaks, so it will loop forever
         {
-            CompilerMessageManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
+            CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                                   .addAST(fs)
                                   .addError(VisitorMessageNumber.REACHABILITY_805)
                                   .build());
@@ -206,13 +206,13 @@ public class Reachability extends Visitor<Boolean> {
     public Boolean visitBreakStat(BreakStat bs) {
         Log.log(bs, "Visiting a break-statement.");
         if (inParBlock)
-            CompilerMessageManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
+            CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                                   .addAST(bs)
                                   .addError(VisitorMessageNumber.REACHABILITY_808)
                                   .build());
 
         if (loopConstruct == null && switchConstruct == null) {
-            CompilerMessageManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
+            CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                                   .addAST(bs)
                                   .addError(VisitorMessageNumber.REACHABILITY_806)
                                   .build());
@@ -239,12 +239,12 @@ public class Reachability extends Visitor<Boolean> {
     public Boolean visitContinueStat(ContinueStat cs) {
         Log.log(cs, "Visiting a continue-statement.");
         if (inParBlock)
-            CompilerMessageManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
+            CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                                   .addAST(cs)
                                   .addError(VisitorMessageNumber.REACHABILITY_811)
                                   .build());
         if (loopConstruct == null) {
-            CompilerMessageManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
+            CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                                   .addAST(cs)
                                   .addError(VisitorMessageNumber.REACHABILITY_812)
                                   .build());
@@ -274,7 +274,7 @@ public class Reachability extends Visitor<Boolean> {
     public Boolean visitReturnStat(ReturnStat rs) {
         Log.log(rs, "Visiting a return-statement.");
         if (inParBlock)
-            CompilerMessageManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
+            CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                                   .addAST(rs)
                                   .addError(VisitorMessageNumber.REACHABILITY_807)
                                   .build());

@@ -34,60 +34,60 @@ public class Error {
 
     public static void error(AST e, String msg) {
 //        System.out.println(fileName + ":" + e.line + ": " + msg);
-        System.out.println(CompilerMessageManager.INSTANCE.fileName + ":" + e.line + ": " + msg);
+        System.out.println(CompilerErrorManager.INSTANCE.fileName + ":" + e.line + ": " + msg);
         System.exit(1);
     }
 
     public static void error(String msg) {
 //        System.out.println(fileName + ": " + msg);
-        System.out.println(CompilerMessageManager.INSTANCE.fileName + ": " + msg);
+        System.out.println(CompilerErrorManager.INSTANCE.fileName + ": " + msg);
         System.exit(1);
     }
 
     public static void error(AST e, String msg, boolean terminate) {
 //        System.out.println(fileName + ":" + e.line + ": " + msg);
-        System.out.println(CompilerMessageManager.INSTANCE.fileName + ":" + e.line + ": " + msg);
+        System.out.println(CompilerErrorManager.INSTANCE.fileName + ":" + e.line + ": " + msg);
         if (terminate)
             System.exit(1);
     }
 
     public static void error(AST e, String msg, boolean terminate, int errorno) {
 //        System.out.print(fileName + ":" + e.line + ": " + msg);
-        System.out.println(CompilerMessageManager.INSTANCE.fileName + ":" + e.line + ": " + msg);
+        System.out.println(CompilerErrorManager.INSTANCE.fileName + ":" + e.line + ": " + msg);
         System.out.print("Error number: " + errorno);
         if (terminate)
             System.exit(1);
         else {
             errorCount++;
 //            errors += "\n" + fileName + ":" + e.line + ": " + msg;
-            errors += "\n" + CompilerMessageManager.INSTANCE.fileName + ":" + e.line + ": " + msg;
+            errors += "\n" + CompilerErrorManager.INSTANCE.fileName + ":" + e.line + ": " + msg;
             errors += "\n" + "Error number: " + errorno;
         }
     }
 
     public static void warning(AST e, String msg, int errorno) {
 //        System.out.print(fileName + ":" + e.line + ": " + msg);
-        System.out.println(CompilerMessageManager.INSTANCE.fileName + ":" + e.line + ": " + msg);
+        System.out.println(CompilerErrorManager.INSTANCE.fileName + ":" + e.line + ": " + msg);
         System.out.print("Warning number: " + errorno);
 //        errors += "\n" + fileName + ":" + e.line + ": " + msg;
-        errors += "\n" + CompilerMessageManager.INSTANCE.fileName + ":" + e.line + ": " + msg;
+        errors += "\n" + CompilerErrorManager.INSTANCE.fileName + ":" + e.line + ": " + msg;
         errors += "\n" + "Warning number: " + errorno;
     }
 
     public static Type addError(AST e, String msg, int errorno) {
 //        System.out.print(fileName + ":" + e.line + ": " + msg);
-        System.out.println(CompilerMessageManager.INSTANCE.fileName + ":" + e.line + ": " + msg);
+        System.out.println(CompilerErrorManager.INSTANCE.fileName + ":" + e.line + ": " + msg);
         System.out.println("Error number: " + errorno);
         errorCount++;
 //        errors += "\n" + fileName + ":" + e.line + ": " + msg;
-        errors += "\n" + CompilerMessageManager.INSTANCE.fileName + ":" + e.line + ": " + msg;
+        errors += "\n" + CompilerErrorManager.INSTANCE.fileName + ":" + e.line + ": " + msg;
         errors += "\n" + "Error number: " + errorno;
         return new ErrorType();
     }
 
     public static void error(String msg, boolean terminate) {
 //        System.out.println(fileName + ": " + msg);
-        System.out.println(CompilerMessageManager.INSTANCE.fileName + ": " + msg);
+        System.out.println(CompilerErrorManager.INSTANCE.fileName + ": " + msg);
         if (terminate)
             System.exit(1);
     }
