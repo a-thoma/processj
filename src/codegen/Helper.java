@@ -175,13 +175,24 @@ public class Helper {
         return sourceFile;
     }
     
-    public static void writeToFile(String output, String sourceFile) {
+    public static void writeToFile(String output, String filename, String workdir) {
         // TODO: Write to home folder
-        String javafile = "/Users/Ben/Desktop/processj/tests/" + sourceFile + ".java";
+//        String outFile = "/Users/Ben/Desktop/processj/tests/" + filename + ".java";
         Writer writer = null;
-
+        
         try {
-            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(javafile), "utf-8"));
+            // <--
+            String home = System.getProperty("user.home");
+            File f = new File(home + File.separator + workdir);            
+            if (!f.exists()) {
+                System.out.println("Missing working directory!");
+                System.exit(1);
+            }
+            
+            String outFile = f.getAbsolutePath() + File.separator + filename + ".java";
+            // -->
+            
+            writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFile), "utf-8"));
             writer.write(output);
             writer.close();
         } catch (Exception e) {

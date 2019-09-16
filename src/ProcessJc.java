@@ -106,6 +106,8 @@ public class ProcessJc {
         if (processj.version)
             processj.version();
         
+        Settings.includeDir = processj.include;
+        
         ArrayList<File> files = processj.createFiles();
         AST root = null;
         // Process source file, one by one.
@@ -245,8 +247,7 @@ public class ProcessJc {
             else
                 ; // Throw an error message for unknown target language.
             
-            System.out.println("============= S = U = C = C = E = S = S =================");
-            System.out.println(String.format("*** File '%s' was compiled successfully ***", inFile.getName()));
+            System.out.println("** COMPILATION COMPLITED SUCCESSFULLY **");
         }
     }
     
@@ -264,23 +265,17 @@ public class ProcessJc {
      *              A symbol table consisting of all the top level types.
      */
     private void generateCodeJava(Compilation compilation, File inFile, SymbolTable topLevelDecls) {
-        // Read in and get the pathname of the input file.
-        String name = inFile.getName().substring(0, inFile.getName().lastIndexOf("."));
-        config = utilities.ConfigFileReader.openConfiguration();
-
+        Properties p = utilities.ConfigFileReader.getProcessJConfig();
         // Run the code generator to decode pragmas, generate libraries,
         // resolve types, and set the symbol table for top level declarations.
         CodeGeneratorJava generator = new CodeGeneratorJava(topLevelDecls);
-
-        // Set the user working directory
-        //generator.setWorkingDir(configFile.getProperty("workingdir"));
-
+        // Set the user working directory.
+        generator.setWorkingDir(p.getProperty("workingdir"));
         // Visit this compilation unit and recursively build the program
         // after returning strings rendered by the string template.
         String code = (String) compilation.visit(generator);
-
         // Write the output to a file
-        Helper.writeToFile(code, compilation.fileNoExtension());
+        Helper.writeToFile(code, compilation.fileNoExtension(), generator.getWorkingDir());
     }
     
     public ProcessJc(String[] args) {
