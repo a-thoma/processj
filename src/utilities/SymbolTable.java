@@ -96,31 +96,6 @@ public class SymbolTable implements DefineTopLevelDecl {
         entries.put(name, entry);
         return true;
     }
-
-    /**
-     * Search a symbol table hierarchy for a named entity. Parents are searched before 
-     * import parents. 
-     *
-     * @param name
-     *            The name of the entry for which we are looking.
-     * @return The associated object - null if no entry is found by that name.
-     */
-//    public Object get(String name) {
-//        Object result = entries.get(name);
-//        if (result == null) {
-//            if (parent != null) {
-//                result = parent.get(name);
-//                if (result == null) {
-//                    if (importParent != null) 
-//                        result = importParent.get(name);
-//                }
-//            } else {
-//              if (importParent != null) 
-//                   result = importParent.get(name);
-//            }
-//        }
-//        return result;
-//    }
     
     public Object get(String name) {
         Object result = entries.get(name);

@@ -8,8 +8,8 @@ import ast.Name;
 import ast.NamedType;
 import ast.Sequence;
 import ast.DefineTopLevelDecl;
-import utilities.PJMessage;
-import utilities.CompilerMessageManager;
+import utilities.ProcessJMessage;
+import utilities.CompilerErrorManager;
 import utilities.Log;
 import utilities.MessageType;
 import utilities.Settings;
@@ -20,11 +20,10 @@ import utilities.VisitorMessageNumber;
 public class ResolvePackageTypes extends Visitor<AST> {
 
     public ResolvePackageTypes() {
-        Log.logHeader("==============================================================");
-        Log.logHeader("*       P A C K A G E D   T Y P E   R E S O L U T I O N      *");
-        Log.logHeader("*       -----------------------------------------------      *");
-        Log.logHeader("*       File: " + CompilerMessageManager.INSTANCE.fileName);
-        Log.logHeader("==============================================================");
+        Log.logHeader("***************************************************");
+        Log.logHeader("* P A C K A G E D   T Y P E   R E S O L U T I O N *");
+        Log.logHeader("***************************************************");
+        Log.logHeader("> File: " + CompilerErrorManager.INSTANCE.fileName);
     }
 
     // X.Y.Z::f, pa is X.Y.Z and we get that turned into X/Y/Z.pj
@@ -51,7 +50,7 @@ public class ResolvePackageTypes extends Visitor<AST> {
         // name declared locally or in an imported file - both will
         // be correctly resolved at name checking time.
         if (pa.size() > 0) {
-            oldCurrentFileName = CompilerMessageManager.INSTANCE.fileName;
+            oldCurrentFileName = CompilerErrorManager.INSTANCE.fileName;
             // Turn X.Y.Z::f into X/Y/Z.pj
             fileName = Settings.absolutePath + makeImportFileName(pa);
             // Does X/Y/Z.pj exist?
@@ -61,21 +60,21 @@ public class ResolvePackageTypes extends Visitor<AST> {
                 fileName = new File(utilities.Settings.includeDir)
                         .getAbsolutePath()
                         + "/"
-                        + utilities.Settings.targetLanguage
+                        + utilities.Settings.language
                         + "/"
                         + makeImportFileName(pa);
                 if (new File(fileName).isFile()) { // Yes it is a library file.
                     // don't do anything just continue after the if.
                 } else {
                     // It was neither a local nor a library file - throw an error...
-                    CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                    CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                                 .addAST(pa)
                                 .addError(VisitorMessageNumber.RESOLVE_IMPORTS_101)
                                 .addArguments(makeImportFileName(pa))
                                 .build());
                 }
             }
-            CompilerMessageManager.INSTANCE.setFileName(fileName);
+            CompilerErrorManager.INSTANCE.setFileName(fileName);
             // Now import it
             comp = ResolveImports.importFile(pa.child(0), fileName);
 
@@ -87,7 +86,7 @@ public class ResolvePackageTypes extends Visitor<AST> {
                 comp.visit(new NameChecker<AST>(st));
                 // TODO: should we type check here?
             }
-            CompilerMessageManager.INSTANCE.setFileName(oldCurrentFileName);
+            CompilerErrorManager.INSTANCE.setFileName(oldCurrentFileName);
             st = SymbolTable.hook;
             // TODO: this should do a proper find if its a symbol table that comes back
             // but we probably need Type checking for that !

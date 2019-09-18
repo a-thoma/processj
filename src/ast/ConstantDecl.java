@@ -2,6 +2,8 @@ package ast;
 
 import utilities.Visitor;
 
+// This ought to be fixed!!! Top-level constants should extend 'Type'
+// instead of AST -- see 'visitCompilation' in CodeGeneratorJava.java
 public class ConstantDecl extends AST implements VarDecl, DefineTopLevelDecl {
 
     public ConstantDecl(Sequence<Modifier> modifiers, Type type, Var var) {

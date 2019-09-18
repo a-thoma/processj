@@ -29,6 +29,10 @@ public abstract class PJChannel<T> {
     
     public abstract boolean isReadyToWrite();
     
+    public abstract T preReadRendezvous(PJProcess p);
+    
+    public abstract void postReadRendezvous(PJProcess p);
+    
     //
     // The methods below must be overridden by the appropriate
     // subclass (channel type)
@@ -55,4 +59,11 @@ public abstract class PJChannel<T> {
     public void unclaimWrite() {
         // empty on purpose
     }
+    
+    // ************************************
+    // Alternations (long for 'alt')
+    // ************************************
+    public abstract PJProcess altGetWriter(PJProcess p);
+    
+    public abstract PJProcess setReaderGetWriter(PJProcess p);
 }

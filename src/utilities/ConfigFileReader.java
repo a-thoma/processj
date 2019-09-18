@@ -3,6 +3,7 @@ package utilities;
 import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
 
@@ -62,5 +63,32 @@ public class ConfigFileReader {
                 }
             }
         }
+    }
+    
+    public static Properties getProcessJConfig() {
+        Properties p = null;
+        InputStream in = null;
+        
+        try {
+            String home = System.getProperty("user.home");
+            String config = home + "/processjrc";
+            in = new FileInputStream(config);
+            p = new Properties();
+            p.load(in);
+        } catch (IOException e) {
+            System.out.println(e);
+            System.exit(1);
+        } finally {
+            if (in != null) {
+                try {
+                    in.close();
+                } catch (IOException e) {
+                    System.out.print(e);
+                    System.exit(1);
+                }
+            }
+        }
+        
+        return p;
     }
 }

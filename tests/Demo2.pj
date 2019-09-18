@@ -1,17 +1,17 @@
 import std.io;
 
-public proc void say() {
+public void say() {
     par {
         println("from say");
         println("say from");
     }
 }
 
-public proc void ben() {
+public void ben() {
     println("form ben");
 }
 
-public proc void yeah() {
+public void yeah() {
     par {
         println("from yeah!");
         println("yeah from!");
@@ -23,7 +23,7 @@ public proc void yeah() {
     }
 }
 
-public proc void main(string args[]) {
+public void main(string args[]) {
     par {
         println("Hello");
         println("World");

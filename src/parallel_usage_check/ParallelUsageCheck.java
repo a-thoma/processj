@@ -11,8 +11,8 @@ import ast.ParBlock;
 import ast.RecordAccess;
 import ast.UnaryPostExpr;
 import ast.UnaryPreExpr;
-import utilities.PJMessage;
-import utilities.CompilerMessageManager;
+import utilities.ProcessJMessage;
+import utilities.CompilerErrorManager;
 import utilities.Log;
 import utilities.MessageType;
 import utilities.Visitor;
@@ -54,7 +54,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
             Log.log(ra, "Visiting a RecordAccess.");
             String name = ra.toString();
             if (writeSet.containsKey(name)) {
-                CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                             .addAST(ra)
                             .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_700)
                             .addArguments(name)
@@ -72,7 +72,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
             Log.log(aae, "Visiting a ArrayAccessExpr.");
             String name = aae.toString();
             if (writeSet.containsKey(name)) {
-                CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                             .addAST(aae)
                             .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_701)
                             .addArguments(name)
@@ -80,7 +80,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
             } else {
                 Log.log(aae, "ArrayAccessExpr: '" + name + "' is added to the read set.");
                 readSet.put(name, aae);
-                CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                             .addAST(aae)
                             .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_702)
                             .addArguments(name)
@@ -109,7 +109,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
             if (as.left() instanceof NameExpr) {
                 String name = ((NameExpr) as.left()).name().getname();
                 if (writeSet.containsKey(name))
-                    CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                    CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                                 .addAST(as)
                                 .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_703)
                                 .addArguments(name)
@@ -122,7 +122,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                 // TODO: the toString() of as.left() if probably not complete
                 String name = as.left().toString();
                 if (writeSet.containsKey(name))
-                    CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                    CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                                 .addAST(as)
                                 .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_704)
                                 .addArguments(name)
@@ -135,7 +135,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                 // TODO: the toString() of as.left() is probably not complete!
                 String name = as.left().toString();
                 if (writeSet.containsKey(name))
-                    CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                    CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                                 .addAST(as)
                                 .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_705)
                                 .addArguments(name)
@@ -143,7 +143,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                 else {
                     Log.log(as, "ArrayAccessExpr: '" + name + "' is added to the write set.");
                     writeSet.put(name, as.left());
-                    CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                    CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                                 .addAST(as.left())
                                 .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_706)
                                 .addArguments(name)
@@ -160,7 +160,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
             // This should only be reads!
             String name = ne.name().getname();
             if (writeSet.containsKey(name))
-                CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                             .addAST(ne)
                             .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_707)
                             .addArguments(name)
@@ -179,7 +179,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
             if (up.expr() instanceof NameExpr) {
                 String name = ((NameExpr) up.expr()).name().getname();
                 if (writeSet.containsKey(name))
-                    CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                    CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                                 .addAST(up)
                                 .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_708)
                                 .addArguments(name)
@@ -192,7 +192,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                 // TODO: the toString() of up.expr() if probably not complete
                 String name = up.expr().toString();
                 if (writeSet.containsKey(name))
-                    CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                    CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                                 .addAST(up)
                                 .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_709)
                                 .addArguments(name)
@@ -205,7 +205,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                 // TODO: the toString() of up.expr() is probably not complete!
                 String name = up.expr().toString();
                 if (writeSet.containsKey(name))
-                    CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                    CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                                 .addAST(up)
                                 .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_710)
                                 .addArguments(name)
@@ -213,7 +213,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                 else {
                     Log.log(up, "ArrayAccessExpr: '" + name + "' is added to the write set.");
                     writeSet.put(name, up.expr());
-                    CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                    CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                                 .addAST(up.expr())
                                 .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_711)
                                 .addArguments(name)
@@ -232,7 +232,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                 if (up.expr() instanceof NameExpr) {
                     String name = ((NameExpr) up.expr()).name().getname();
                     if (writeSet.containsKey(name))
-                        CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                        CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                                     .addAST(up)
                                     .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_712)
                                     .addArguments(name)
@@ -245,7 +245,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                     // TODO: the toString() of up.expr() if probably not complete
                     String name = up.expr().toString();
                     if (writeSet.containsKey(name))
-                        CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                        CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                                     .addAST(up)
                                     .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_713)
                                     .addArguments(name)
@@ -258,7 +258,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                     // TODO: the toString() of up.expr() is probably not complete!
                     String name = up.expr().toString();
                     if (writeSet.containsKey(name))
-                        CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                        CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                                     .addAST(up)
                                     .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_714)
                                     .addArguments(name)
@@ -266,7 +266,7 @@ public class ParallelUsageCheck extends Visitor<Object> {
                     else {
                         Log.log(up, "ArrayAccessExpr: '" + name + "' is added to the write set.");
                         writeSet.put(name, up.expr());
-                        CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                        CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                                     .addAST(up.expr())
                                     .addError(VisitorMessageNumber.PARALLEL_USAGE_CHECKER_715)
                                     .addArguments(name)

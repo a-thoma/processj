@@ -24,8 +24,8 @@ import ast.RecordLiteral;
 import ast.RecordTypeDecl;
 import ast.SwitchLabel;
 import ast.DefineTopLevelDecl;
-import utilities.PJMessage;
-import utilities.CompilerMessageManager;
+import utilities.ProcessJMessage;
+import utilities.CompilerErrorManager;
 import utilities.Log;
 import utilities.MessageType;
 import utilities.SymbolTable;
@@ -41,9 +41,9 @@ public class NameChecker<T extends Object> extends Visitor<T> {
     public NameChecker(SymbolTable currentScope) {
         this.currentScope = currentScope;
         this.topScope = currentScope;
-        Log.log("======================================");
+        Log.log("**************************************");
         Log.log("*       N A M E   C H E C K E R      *");
-        Log.log("======================================");
+        Log.log("**************************************");
 
     }
 
@@ -160,13 +160,13 @@ public class NameChecker<T extends Object> extends Visitor<T> {
             // ...::f()
             Object o = resolveName(in.procedureName());
             if (o == null)
-                CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                             .addAST(in)
                             .addError(VisitorMessageNumber.NAME_CHECKER_403)
                             .addArguments(in.procedureName().getname())
                             .build());
             if (!(o instanceof SymbolTable))
-                CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                             .addAST(in)
                             .addError(VisitorMessageNumber.NAME_CHECKER_404)
                             .addArguments(in.procedureName().getname())
@@ -189,7 +189,7 @@ public class NameChecker<T extends Object> extends Visitor<T> {
         Log.log(ld.line + ": Visting LocalDecl (" + ld.type().typeName() + " "
                 + ld.var().name().getname() + ")");
         if (!currentScope.put(ld.name(), ld))
-            CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+            CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                         .addAST(ld)
                         .addError(VisitorMessageNumber.NAME_CHECKER_400)
                         .addArguments(ld.name())
@@ -208,13 +208,13 @@ public class NameChecker<T extends Object> extends Visitor<T> {
         Object o;
         o = resolveName(nt.name());
         if (o == null)
-            CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+            CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                         .addAST(nt)
                         .addError(VisitorMessageNumber.NAME_CHECKER_401)
                         .addArguments(nt.name().getname())
                         .build());
         if (o instanceof ConstantDecl) {
-            CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+            CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                         .addAST(nt)
                         .addError(VisitorMessageNumber.NAME_CHECKER_407)
                         .addArguments(nt.name().getname())
@@ -244,7 +244,7 @@ public class NameChecker<T extends Object> extends Visitor<T> {
 
         Object o = resolveName(ne.name());
         if (o == null)
-            CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+            CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                         .addAST(ne)
                         .addError(VisitorMessageNumber.NAME_CHECKER_405)
                         .addArguments(ne.name().getname())
@@ -261,7 +261,7 @@ public class NameChecker<T extends Object> extends Visitor<T> {
 
         Object o = resolveName(nm.name());
         if (o == null)
-            CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+            CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                     .addAST(nm)
                     .addError(VisitorMessageNumber.NAME_CHECKER_406)
                     .addArguments(nm.name().getname())
@@ -276,7 +276,7 @@ public class NameChecker<T extends Object> extends Visitor<T> {
                 + ").");
         // TODO: just delete Object o = currentScope.get(pd.name());
         if (!currentScope.put(pd.name(), pd))
-            CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+            CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                         .addAST(pd)
                         .addError(VisitorMessageNumber.NAME_CHECKER_402)
                         .addArguments(pd.name())
@@ -308,7 +308,7 @@ public class NameChecker<T extends Object> extends Visitor<T> {
         for (Name name : pd.implement()) {
             Object o = resolveName(name);
             if (o == null)
-                CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                             .addAST(pd)
                             .addError(VisitorMessageNumber.NAME_CHECKER_408)
                             .addArguments(name.getname())
@@ -317,7 +317,7 @@ public class NameChecker<T extends Object> extends Visitor<T> {
                 // SymbolTable for each procedure as we might have multiple declarations of
                 // procedures with the same name.
             else if (!(o instanceof SymbolTable))
-                CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                         .addAST(pd)
                         .addError(VisitorMessageNumber.NAME_CHECKER_410)
                         .addArguments(name.getname())
@@ -336,13 +336,13 @@ public class NameChecker<T extends Object> extends Visitor<T> {
 
         Object o = resolveName(pl.name());
         if (o == null)
-            CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+            CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                         .addAST(pl)
                         .addError(VisitorMessageNumber.NAME_CHECKER_409)
                         .addArguments(pl.name().getname())
                         .build());
         else if (!(o instanceof ProtocolTypeDecl))
-            CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+            CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                     .addAST(pl)
                     .addError(VisitorMessageNumber.NAME_CHECKER_412)
                     .addArguments(pl.name().getname())
@@ -358,7 +358,7 @@ public class NameChecker<T extends Object> extends Visitor<T> {
                 return null;
             }
         }
-        CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+        CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                 .addAST(pl)
                 .addError(VisitorMessageNumber.NAME_CHECKER_413)
                 .addArguments(pl.tag().getname(), pl.name().getname())
@@ -376,13 +376,13 @@ public class NameChecker<T extends Object> extends Visitor<T> {
         for (Name n : pd.extend()) {
             Object o = resolveName(n);
             if (o == null)
-                CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                         .addAST(n)
                         .addError(VisitorMessageNumber.NAME_CHECKER_414)
                         .addArguments(n.getname())
                         .build());
             else if (!(o instanceof ProtocolTypeDecl))
-                CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                         .addAST(n)
                         .addError(VisitorMessageNumber.NAME_CHECKER_415)
                         .addArguments(n.getname())
@@ -401,13 +401,13 @@ public class NameChecker<T extends Object> extends Visitor<T> {
 
         Object o = resolveName(rl.name());
         if (o == null)
-            CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+            CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                     .addAST(rl)
                     .addError(VisitorMessageNumber.NAME_CHECKER_416)
                     .addArguments(rl.name().getname())
                     .build());
         else if (!(o instanceof RecordTypeDecl))
-            CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+            CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                     .addAST(rl)
                     .addError(VisitorMessageNumber.NAME_CHECKER_417)
                     .addArguments(rl.name().getname())
@@ -425,13 +425,13 @@ public class NameChecker<T extends Object> extends Visitor<T> {
         for (Name n : rt.extend()) {
             Object o = resolveName(n);
             if (o == null)
-                CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                         .addAST(n)
                         .addError(VisitorMessageNumber.NAME_CHECKER_418)
                         .addArguments(n.getname())
                         .build());
             else if (!(o instanceof RecordTypeDecl))
-                CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                         .addAST(n)
                         .addError(VisitorMessageNumber.NAME_CHECKER_419)
                         .addArguments(n.getname())
@@ -442,7 +442,7 @@ public class NameChecker<T extends Object> extends Visitor<T> {
         HashSet<String> hs = new HashSet<String>();
         for (Name name : rt.extend()) {
             if (hs.contains(name.getname()))
-                CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                         .addAST(rt)
                         .addError(VisitorMessageNumber.NAME_CHECKER_420)
                         .addArguments(name.getname(), rt.name().getname())
@@ -469,7 +469,7 @@ public class NameChecker<T extends Object> extends Visitor<T> {
         // A SwitchLabel should be a PrimitiveLiteral OR a NameExpression
         if (!sl.isDefault())
             if (!(sl.expr() instanceof PrimitiveLiteral) && !(sl.expr() instanceof NameExpr))
-                CompilerMessageManager.INSTANCE.reportMessage(new PJMessage.Builder()
+                CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                         .addAST(sl)
                         .addError(VisitorMessageNumber.NAME_CHECKER_421)
                         .build());

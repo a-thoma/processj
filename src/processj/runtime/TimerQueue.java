@@ -35,7 +35,7 @@ public class TimerQueue {
                     PJProcess p = timer.getProcess();
 
                     // If the process is still around then set it ready to run again.
-                    // time.getProcess() will return `null' if the process has terminated.
+                    // time.getProcess() will return 'null' if the process has terminated.
                     if (p != null) {
                         synchronized (p) {
                             p.setReady();

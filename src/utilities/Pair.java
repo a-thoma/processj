@@ -1,8 +1,8 @@
 package utilities;
 
 /**
- * The class {@link Pair} represents a pair of two elements
- * of the same or different data type.
+ * This class represents a pair of two elements of the same or
+ * different data type.
  *
  * @see Tuple
  * @param <K>
@@ -87,8 +87,7 @@ public class Pair<K, V> extends Tuple {
     }
 
     /**
-     * Creates a new {@link Pair} containing elements {@code left} and
-     * {@code right}.
+     * Creates a new Pair containing elements left and right.
      *
      * @param left
      *            The first (or key) element.
@@ -98,10 +97,14 @@ public class Pair<K, V> extends Tuple {
      *            The key type.
      * @param <V>
      *            The value type.
-     * @return A new {@link Pair} initialized with {@code left} and {@code right}
-     *         elements.
+     * @return A new Pair initialized with left and right elements.
      */
     public static <K, V> Pair<K, V> create(K left, V right) {
-        return new Pair<>(left, right);
+        return new Pair<K, V>(left, right);
+    }
+    
+    @Override
+    public String toString() {
+        return String.format("(%s, %s)", key, value);
     }
 }

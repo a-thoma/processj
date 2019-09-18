@@ -1,8 +1,8 @@
 package utilities;
 
 /**
- * The enum {@link Language} defines various types of
- * programming languages available in ProcessJ.
+ * This enum defines various types of programming languages
+ * available in the ProcessJ compiler.
  * 
  * @author Ben
  * @version 08/30/2018
@@ -11,7 +11,6 @@ package utilities;
 public enum Language {
     
     JVM     ("JVM"),
-    C       ("C"),
     CPLUS   ("C++"),
     JS      ("JS")
     ;

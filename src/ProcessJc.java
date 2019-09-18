@@ -1,131 +1,124 @@
 import java.io.File;
-import java.util.*;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
+import java.util.Properties;
 
-import ast.*;
-import cli.*;
-import cli.Formatter;
-import cli.StringUtil;
-import codegeneratorjava.CodeGeneratorJava;
-import codegeneratorjava.Helper;
+import ast.AST;
+import ast.Compilation;
+import codegen.Helper;
+import codegen.java.CodeGeneratorJava;
 import library.Library;
 import namechecker.ResolveImports;
 import parser.parser;
 import rewriters.CastRewrite;
-import rewriters.ParFor;
 import scanner.Scanner;
+import utilities.CompilerErrorManager;
 import utilities.ConfigFileReader;
-import utilities.Error;
-import utilities.PJMessage;
-import utilities.VisitorMessageNumber;
 import utilities.Language;
 import utilities.Log;
-import utilities.CompilerMessageManager;
+import utilities.ProcessJMessage;
+import utilities.RuntimeInfo;
 import utilities.Settings;
 import utilities.SymbolTable;
+import utilities.VisitorMessageNumber;
 
 /**
- * ProcessJ JVM Compiler.
+ * ProcessJ compiler.
  * 
  * @author Ben
- * @version 07/01/2018
- * @since 1.2
  */
 public class ProcessJc {
     
-    public static CLIBuilder optionBuilder = new CLIBuilder().addCommand(PJMain.class);
-    
-    public static void help() {
-        Formatter formatHelp = new Formatter(optionBuilder);
-        System.out.println(formatHelp.buildUsagePage());
-        System.exit(0);
+    // Kinds of available options for the ProcessJ compiler.
+    public static enum OptionType {
+        STRING,
+        BOOLEAN
+        ;
     }
     
+    public static class Option {
+        protected String fieldName;
+        protected String optionName;
+        protected OptionType optionType;
+        protected String description;
+        
+        public Option(String field, String name, OptionType type, String desc) {
+            fieldName = field;
+            optionName = name;
+            optionType = type;
+            description = desc;
+        }
+        
+        public Option(String field, String name, String desc) {
+            this(field, name, OptionType.BOOLEAN, desc);
+        }
+    }
+    
+    // List of available options for the ProcessJ compiler.
+    public static final Option[] options = {
+            new Option("ansiColor",     "-ansi-color",                          "Use color on terminals that support ansi espace codes"),
+            new Option("help",          "-help",                                "Show this help message and exit"),
+            new Option("include",       "-include",     OptionType.STRING,      "Override the default include directory"),
+            new Option("message",       "-message",                             "Show info of error and warning messages when available"),
+            new Option("target",        "-target",      OptionType.STRING,      "Specify the target language -- c++, Java (default), js"),
+            new Option("version",       "-version",                             "Print version information and exit"),
+            new Option("visitAll",      "-visit-all",                           "Generate all parse tree visitors")
+    };
+    
+    // <--
+    // Fields used by the ProcessJ compiler.
+    public boolean ansiColor = false;
+    public boolean help = false;
+    public String include = null;
+    public boolean message = false;
+    public Language target = Settings.language;
+    public boolean version = false;
+    public boolean visitAll = false;
+    // -->
+    
+    private ArrayList<String> inputFiles = new ArrayList<String>();
+    
+    private String[] args = null;
+    
+    private Properties config = ConfigFileReader.openConfiguration();
+    
+    /**
+     * Program execution begins here.
+     * 
+     * @param args
+     *          A vector of command arguments passed to the compiler.
+     */
     public static void main(String[] args) {
-        if (args.length == 0)
-            help();
-        
-        // ===============================================
-        // C O M M A N D   L I N E   P R O C E S S O R
-        // ===============================================
-        
-        // Build options and arguments with user input
-        PJMain pjMain = null;
-        try {
-            optionBuilder.handleArgs(args);
-            pjMain = optionBuilder.getCommand(PJMain.class);
-        } catch(Exception e) {
-            System.out.println(e.getMessage());
-            System.exit(0);
-        }
-        
-        Properties config = ConfigFileReader.openConfiguration();
-        
-        // These fields have default values that could be updated with
-        // user input (see PJMain.java for more info)
-        Settings.includeDir = pjMain.include;
-        Settings.targetLanguage = pjMain.target;
-        boolean sts = pjMain.symbolTable;
-        boolean visitorAll = pjMain.visitorAll;
-        List<File> files = pjMain.files;
-        // Turn on/off colour mode
-        if (pjMain.ansiColour == null) {
-            // Only set the colour mode if the default value in 
-            // properties file is 'yes'
-            if (config.getProperty("colour").equalsIgnoreCase("yes"))
-                Settings.isAnsiColour = true;
-        } else {
-            Settings.isAnsiColour = pjMain.ansiColour;
-            String ansiColorvalue = "no";
-            if (Settings.isAnsiColour)
-                ansiColorvalue = "yes";
-            // Update 'colour' code value in properties file
-            config.setProperty("colour", ansiColorvalue);
-            ConfigFileReader.closeConfiguration(config);
-//            System.exit(0);
-        }
-        
-        // Display usage page
-        if (pjMain.help)
-            help();
-        else if (pjMain.version) { // Display version
-            try {
-                String[] list = pjMain.getVersion().getVersionPrinter();
-                System.out.println(StringUtil.join(Arrays.asList(list), "\n"));
-            } catch (Exception e) {
-                System.out.println(e.getMessage());
-            }
-            System.exit(0);
-        }
-        else if (pjMain.errorCode != null) { // TODO: Display error code information
-            System.out.println("Not available..");
-            System.exit(0);
-        }
-        else if (files == null || files.isEmpty()) { // Check for input file(s)
-            // At least one file must be provided. Otherwise, throw an error if
-            // no file is given, or if a file does not exists
-            System.out.println(new PJMessage.Builder()
+        ProcessJc processj = new ProcessJc(args);
+        // Do we have any arguments?
+        if (args.length == 0 && !processj.help) {
+            // At least one file must be provided. Throw an error if no
+            // file is given, or if the file does not exists.
+            System.out.println(new ProcessJMessage.Builder()
                                    .addError(VisitorMessageNumber.RESOLVE_IMPORTS_100)
                                    .build().getST().render());
-            System.exit(0);
+            processj.help();
         }
         
-        // ===============================================
-        // P R O C C E S S I N G   F I L E S
-        // ===============================================
+        if (processj.help)
+            processj.help();
         
+        if (processj.version)
+            processj.version();
+        
+        Settings.includeDir = processj.include;
+        
+        ArrayList<File> files = processj.createFiles();
         AST root = null;
-        
+        // Process source file, one by one.
         for (File inFile : files) {
             Scanner s = null;
             parser p = null;
             try {
                 String fileAbsolutePath = inFile.getAbsolutePath();
-                // Set package and filename
-                CompilerMessageManager.INSTANCE.setFileName(fileAbsolutePath);
-                CompilerMessageManager.INSTANCE.setPackageName(fileAbsolutePath);
-                
-//                Error.setFileName(fileAbsolutePath);
-//                Error.setPackageName(fileAbsolutePath);
+                // Set the package and filename.
+                CompilerErrorManager.INSTANCE.setFileName(fileAbsolutePath);
+                CompilerErrorManager.INSTANCE.setPackageName(fileAbsolutePath);
                 s = new Scanner(new java.io.FileReader(fileAbsolutePath));
                 p = new parser(s);
             } catch (java.io.FileNotFoundException e) {
@@ -147,225 +140,227 @@ public class ProcessJc {
                 System.exit(1);
             }
 
-            // Cast the result from the parse to a Compilation - this is the root of the tree
+            // Cast the result from the parse to a Compilation -- this is the root of the tree.
             Compilation c = (Compilation) root;
-            // Set absolute path, file and package name from where this Compilation is created
+            // Set the absolute path, file, and package name from where this Compilation is created.
             System.out.println("-- Setting absolute path, file and package name for '" + inFile.getName() + "'.");
-            c.sourceFile = inFile.getName();
-            c.path = inFile.getParentFile().getAbsolutePath(); // get file's parent absolute path
-            if (c.packageName() != null)  // A package declaration is optional, so this can be 'null'
+            c.fileName = inFile.getName();
+            // The parent's path of the input file.
+            String parentPath = inFile.getAbsolutePath();
+            // The parent's absolute path of the input file.
+            c.path = parentPath.substring(0, parentPath.lastIndexOf(File.separator));
+            // A package declaration is optional, this can thus be 'null'.
+            if (c.packageName() != null)
                 c.packageName = ResolveImports.packageNameToString(c.packageName());
 
-            // Decode pragmas - these are used for generating stubs from libraries.
+            // Decode pragmas -- these are used for generating stubs from libraries.
             // No regular program would have them.
             Library.decodePragmas(c);
             Library.generateLibraries(c);
 
-            // This table will hold all the top level types
-            SymbolTable globalTypeTable = new SymbolTable("Main file: " + CompilerMessageManager.INSTANCE.fileName);
+            // This table will hold all the top level types.
+            SymbolTable globalTypeTable = new SymbolTable("Main file: " + CompilerErrorManager.INSTANCE.fileName);
 
-            // Dump log messages
-            if (visitorAll)
+            // Dump log messages.
+            if (processj.visitAll)
                 Log.startLogging();
             
-            // =====================================================
-            // V I S I T   I M P O R T   D E C L A R A T I O N S
-            // =====================================================
+            SymbolTable.hook = null;
             
-	    SymbolTable.hook = null;
-	    System.out.println("-- Resolving imports.");
+            // Visit import declarations.
+            System.out.println("-- Resolving imports.");
             c.visit(new namechecker.ResolveImports<AST>(globalTypeTable));
             globalTypeTable.printStructure("");
             
-//            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
-//                CompilerMessageManager.INSTANCE.printTrace("import declarations");
-//                CompilerMessageManager.INSTANCE.writeToFile("PJErrors");
-//                System.exit(1);
-//            }
-//            globalTypeTable.setImportParent(SymbolTable.hook);
-            
-            // ===========================================================
-            // V I S I T   T O P   L E V E L   D E C L A R A T I O N S
-            // ===========================================================
-
-	    System.out.println("-- Declaring Top Level Declarations.");
+            // Visit top-level declarations.
+            System.out.println("-- Declaring Top Level Declarations.");
             c.visit(new namechecker.TopLevelDecls<AST>(globalTypeTable));
             
+            // Visit and re-construct record types correctly.
             System.out.println("-- Reconstructing records.");
-            c.visit(new rewriters.RecordRewrite<>(globalTypeTable));
+            c.visit(new rewriters.RecordRewrite(globalTypeTable));
             
-	    System.out.println("-- Checking native Top Level Declarations.");
-            c.visit(new namechecker.ResolveImportTopTypeDecl<AST>());
-
-
-//            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
-//                CompilerMessageManager.INSTANCE.printTrace("top level declarations");
-//                System.exit(1);
-//            }
+            // Visit and re-construct protocol types correctly.
+            System.out.println("-- Reconstructing protocols.");
+            c.visit(new rewriters.ProtocolRewrite(globalTypeTable));
             
-//            globalTypeTable = SymbolTable.hook;
+            // Visit and resolve import for top-level declarations.
+            System.out.println("-- Checking native Top Level Declarations.");
+            c.visit(new namechecker.ResolveImportTopDecls());
 
-            // Dump the symbol table structure
-//            if (symbolTable)
-//                globalTypeTable.printStructure("");
-            
-            
-            // ========================================================
-            // V I S I T R E S O L V E   P A C K A G E   T Y P E S
-            // ========================================================
-
-            // Resolve types from imported packages.
-	    System.out.println("-- Resolving imported types.");
+            // Visit and resolve types from imported packages.
+            System.out.println("-- Resolving imported types.");
             c.visit(new namechecker.ResolvePackageTypes());
             
-//            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
-//                CompilerMessageManager.INSTANCE.printTrace("package types");
-//                System.exit(1);
-//            }
-            
-            // =======================================
-            // V I S I T   N A M E   C H E C K E R
-            // =======================================
-	    System.out.println("-- Checking name usage.");
+            // Visit name checker.
+            System.out.println("-- Checking name usage.");
             c.visit(new namechecker.NameChecker<AST>(globalTypeTable));
             
-//            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
-//                CompilerMessageManager.INSTANCE.printTrace("name checker");
-//                System.exit(1);
-//            }
-            
-            // =======================================
-            // V I S I T   A R R A Y   T Y P E S
-            // =======================================
-
-            // Re-construct Array Types correctly
-	    System.out.println("-- Reconstrucing array types.");
+            // Visit and re-construct array types correctly
+            System.out.println("-- Reconstructing array types.");
             root.visit(new namechecker.ArrayTypeConstructor());
             
-//            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
-//                CompilerMessageManager.INSTANCE.printTrace("array types constructor");
-//                System.exit(1);
-//            }
+            // Visit and re-construct array literals
+            System.out.println("-- Reconstructing array literas.");
+            c.visit(new rewriters.ArraysRewrite());
             
-            // ========================================
-            // V I S I T   T Y P E   C H E C K E R
-            // ========================================
-	    System.out.println("-- Checking types.");
+            // Visit type checker.
+            System.out.println("-- Checking types.");
             c.visit(new typechecker.TypeChecker(globalTypeTable));
             
-//            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
-//                CompilerMessageManager.INSTANCE.printTrace("type checking");
-//                System.exit(1);
-//            }
-            
-            // ========================================
-            // V I S I T   R E W R I T E S
-            // ========================================
-            
+            // Visit cast-rewrite.
             c.visit(new CastRewrite());
             
-            // ========================================
-            // V I S I T   R E A C H A B I L I T Y
-            // ========================================
-	    System.out.println("-- Computing reachability.");
+            // Visit reachability.
+            System.out.println("-- Computing reachability.");
             c.visit(new reachability.Reachability());
             
-//            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
-//                CompilerMessageManager.INSTANCE.printTrace("reachability");
-//                System.exit(1);
-//            }
-            
-            // ===========================================
-            // V I S I T   P A R A L L E L   U S A G E
-            // ===========================================
-	    System.out.println("-- Performing parallel usage check.");
+            // Visit parallel usage.
+            System.out.println("-- Performing parallel usage check.");
             c.visit(new parallel_usage_check.ParallelUsageCheck());
             
-//            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
-//                CompilerMessageManager.INSTANCE.printTrace("parallel usage checking");
-//                System.exit(1);
-//            }
-            
-            // ==========================
-            // V I S I T   Y I E L D
-            // ==========================
-            
+            // Visit yield.
             c.visit(new yield.Yield());
-	    System.out.println("-- Marking yielding statements and expressions.");
+            System.out.println("-- Marking yielding statements and expressions.");
             c.visit(new rewriters.Yield());
-	    //c.visit(new rewriters.Expr());
-	    
-	    System.out.println("-- Checking literal inits are free of channel communication.");
-	    c.visit(new semanticcheck.LiteralInits());
-
-
-	    System.out.println("-- Rewriting yielding expressions.");
+            //c.visit(new rewriters.Expr());
+            
+            System.out.println("-- Checking literal inits are free of channel communication.");
+            c.visit(new semanticcheck.LiteralInits());
+            
+            System.out.println("-- Rewriting yielding expressions.");
             new rewriters.ChannelReadRewrite().go(c, null);
-	    //System.out.println("Lets reprint it all");
-	    //c.visit(new printers.ParseTreePrinter());
-	    //c.visit(new printers.PrettyPrinter());
-	    System.out.println("-- Checking break and continue labels.");
-	    new semanticcheck.LabeledBreakContinueCheck().go(c);
-
-	    System.out.println("-- Collecting left-hand sides for par for code generation");
-	    c.visit(new rewriters.ParFor());
-
-
-
-
-//            if (CompilerMessageManager.INSTANCE.getErrorCount() != 0) {
-//                CompilerMessageManager.INSTANCE.printTrace("yield");
-//                System.exit(1);
-//            }
+            //System.out.println("Lets reprint it all");
+            //c.visit(new printers.ParseTreePrinter());
+            //c.visit(new printers.PrettyPrinter());
+            System.out.println("-- Checking break and continue labels.");
+            new semanticcheck.LabeledBreakContinueCheck().go(c);
             
-            // ===============================
-            // C O D E   G E N E R A T O R
-            // ===============================
+            System.out.println("-- Rewriting infinite loops.");
+            new rewriters.ForeverLoopRewrite().go(c);
             
-            if (Settings.targetLanguage == Language.JVM) {
-                generateCodeJava(c, inFile, globalTypeTable);
-            } else {
-                System.err.println(String.format("Unknown target language '%s' selected.", Settings.targetLanguage));
-                System.exit(1);
-            }
+            System.out.println("-- Collecting left-hand sides for par for code generation.");
+            c.visit(new rewriters.ParFor());
             
-            System.out.println("============= S = U = C = C = E = S = S =================");
-            System.out.println(String.format("*** File '%s' was compiled successfully ***", inFile.getName()));
+            // Run the code generator for the known (specified) target language.
+            if (Settings.language == processj.target)
+                processj.generateCodeJava(c, inFile, globalTypeTable);
+            else
+                ; // Throw an error message for unknown target language.
+            
+            System.out.println("** COMPILATION COMPLITED SUCCESSFULLY **");
         }
     }
     
     /**
-     * Given a ProcessJ {@link Compilation} unit, e.g. an abstract
-     * syntax tree object, we will generate the code for the JVM.
-     * The source range for this type of tree is the entire source
-     * file, not including leading and trailing whitespace characters
-     * and comments.
+     * Given a ProcessJ Compilation unit, e.g. an abstract syntax tree
+     * object, we will generate the code for the JVM. The source range
+     * for this type of tree is the entire source file, not including
+     * leading and trailing whitespace characters and comments.
      *
      * @param compilation
-     *              A {@link Compilation} unit consisting of a single
-     *              file.
+     *              A Compilation unit consisting of a single file.
      * @param inFile
      *              The compiled file.
      * @param topLevelDecls
      *              A symbol table consisting of all the top level types.
      */
-    private static void generateCodeJava(Compilation compilation, File inFile, SymbolTable topLevelDecls) {
-        // Read in and get the pathname of the input file
-        String name = inFile.getName().substring(0, inFile.getName().lastIndexOf("."));
-        Properties config = utilities.ConfigFileReader.openConfiguration();
-
-        // Run the code generator to decode pragmas, generate libraries, resolve
-        // types, and set the symbol table for top level declarations
-        CodeGeneratorJava<Object> generator = new CodeGeneratorJava<>(topLevelDecls);
-
-        // Set the user working directory
-        //generator.setWorkingDirectory(configFile.getProperty("workingdir"));
-
+    private void generateCodeJava(Compilation compilation, File inFile, SymbolTable topLevelDecls) {
+        Properties p = utilities.ConfigFileReader.getProcessJConfig();
+        // Run the code generator to decode pragmas, generate libraries,
+        // resolve types, and set the symbol table for top level declarations.
+        CodeGeneratorJava generator = new CodeGeneratorJava(topLevelDecls);
+        // Set the user working directory.
+        generator.setWorkingDir(p.getProperty("workingdir"));
         // Visit this compilation unit and recursively build the program
-        // by returning strings rendered by the string template
-        String templateResult = (String) compilation.visit(generator);
-
+        // after returning strings rendered by the string template.
+        String code = (String) compilation.visit(generator);
         // Write the output to a file
-        Helper.writeToFile(templateResult, compilation.fileNoExtension());
+        Helper.writeToFile(code, compilation.fileNoExtension(), generator.getWorkingDir());
+    }
+    
+    public ProcessJc(String[] args) {
+        this.args = args;
+        Settings.ansiColor = Boolean.valueOf(config.getProperty("color"));
+        // Parse command line arguments.
+        parseArgs();
+        // Switch to turn color mode on/off.
+        ansiColor();
+    }
+    
+    public void ansiColor() {        
+        // Check default value before switching on/off.
+        if (!Settings.ansiColor && this.ansiColor) {
+            // Turn ansi-color mode 'on'.
+            config.setProperty("color", String.valueOf(this.ansiColor));
+        } else if (Settings.ansiColor && this.ansiColor) {
+            // Turn ansi-color mode 'off'.
+            config.setProperty("color", String.valueOf(Boolean.FALSE));
+        }
+        Settings.ansiColor = Boolean.valueOf(config.getProperty("color"));
+        ConfigFileReader.closeConfiguration(config);
+    }
+    
+    public void parseArgs() {
+        for (int pos = 0; pos < args.length;) {
+            String arg = args[pos++];
+            if (arg.charAt(0) != '-') {
+                // We found an '.pj' file.
+                if (!inputFiles.contains(arg))
+                    inputFiles.add(arg);
+            } else {
+                boolean foundOption = false;
+                for (Option o : options) {
+                    if (arg.equals(o.optionName)) {
+                        foundOption = true;
+                        String optValue = null;
+                        if (o.optionType != OptionType.BOOLEAN)
+                            optValue = args[pos++];
+                        // Same as before with Java reflection.
+                        Class<? extends ProcessJc> c = this.getClass();
+                        try {
+                            Field f = c.getField(o.fieldName);
+                            if (optValue != null)
+                                f.set(this, optValue);
+                            else
+                                f.set(this, true);
+                        } catch (Exception e) {
+                            System.out.println("Failed to access field '" + o.fieldName + "'");
+                            exit(1);
+                        }
+                        break;
+                    }
+                }
+                if (!foundOption) {
+                    System.out.println("Invalid option '" + arg + "' found.");
+                    exit(1);
+                }
+            }
+        }
+    }
+    
+    public void help() {
+        for (Option o : options) {
+            String name = String.format("%-20s %s", o.optionName, o.description);
+            System.out.println(name);
+        }
+        this.exit(0);
+    }
+    
+    public void version() {
+        String msg = "ProcessJ Version: " + RuntimeInfo.runtimeVersion();
+        System.out.println(msg);
+        this.exit(0);
+    }
+    
+    public ArrayList<File> createFiles() {
+        ArrayList<File> files = new ArrayList<File>(inputFiles.size());
+        for (String f : inputFiles)
+            files.add(new File(f));
+        return files;
+    }
+    
+    public void exit(int code) {
+        System.exit(code);
     }
 }

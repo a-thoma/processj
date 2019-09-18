@@ -11,7 +11,7 @@
         <property name="cupRuntimeJar" location="resources/jars/java_cup_runtime.jar"/>
         <property name="jflexJar" location="resources/jars/JFlex.jar"/>
         <property name="stringtemplatejar" location="resources/jars/ST-4.0.7.jar"/>
-        <property name="asmjar" location="resources/jars/asm-all-3.3.1.jar"/>
+        <property name="asmjar" location="resources/jars/asm-all-5.2.jar"/>
 	
 	  <!-- =================================================================== -->
 	  <!-- classpath to use within project                                     -->
