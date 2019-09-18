@@ -1,0 +1,51 @@
+#!/bin/bash
+
+##############################################################################
+##                                                                          ##
+##  ProcessJ Group - University of Nevada, Las Vegas                        ##
+##                                                                          ##
+##  use -cp just as in java to use a custom classpath                       ##
+##                                                                          ##
+##############################################################################
+
+homedir=~
+eval homedir=$homedir
+
+## configuration file containing path and other resource information
+CONFIG_FILE="processjrc"
+
+## working directory for generated Java files
+workingdir=""
+## install directory for processj source files
+installdir=""
+
+############################################################################
+
+## check if configuration file exists
+if [ ! -e "$homedir/$CONFIG_FILE" ] ; then
+  echo "Missing ProcessJ configuration file."
+  echo "The configuration file should be in '$homedir'"
+  exit 1
+fi
+
+## set configuration file
+CONFIG_FILE="$homedir/$CONFIG_FILE"
+
+############################################################################
+
+## check if the processjrc file contains an install directory
+installdir="`grep installdir $CONFIG_FILE | cut -d '=' -f 2 | sed 's/ //g'`"
+
+if [ -z "$installdir" ] ; then
+    echo "Configuration file must contain a line of the form: 'installdir=...'"
+    exit 1
+fi
+
+############################################################################
+
+if [ $# -eq 0 ] ; then
+    echo "usage: blah2 filename"
+    exit 1
+fi
+
+java -cp $installdir/bin/:$installdir/lib/JVM:$@.jar $@
