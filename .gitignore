@@ -20,5 +20,3 @@ processjrc
 resources/properties/PJConfig.properties
 
 .DS_Store
-
-.classpath
