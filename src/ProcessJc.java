@@ -119,9 +119,6 @@ public class ProcessJc {
                 // Set the package and filename.
                 CompilerErrorManager.INSTANCE.setFileName(fileAbsolutePath);
                 CompilerErrorManager.INSTANCE.setPackageName(fileAbsolutePath);
-                
-//                Error.setFileName(fileAbsolutePath);
-//                Error.setPackageName(fileAbsolutePath);
                 s = new Scanner(new java.io.FileReader(fileAbsolutePath));
                 p = new parser(s);
             } catch (java.io.FileNotFoundException e) {
@@ -200,8 +197,12 @@ public class ProcessJc {
             c.visit(new namechecker.NameChecker<AST>(globalTypeTable));
             
             // Visit and re-construct array types correctly
-            System.out.println("-- Reconstrucing array types.");
+            System.out.println("-- Reconstructing array types.");
             root.visit(new namechecker.ArrayTypeConstructor());
+            
+            // Visit and re-construct array literals
+            System.out.println("-- Reconstructing array literas.");
+            c.visit(new rewriters.ArraysRewrite());
             
             // Visit type checker.
             System.out.println("-- Checking types.");

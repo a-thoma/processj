@@ -14,3 +14,9 @@ docs\+notes/ProcessJ-TypeSystem\.synctex\.gz
 #Ignore All binary files. ez
 bin/
 Demo\.jar
+
+processjrc
+
+resources/properties/PJConfig.properties
+
+.DS_Store
