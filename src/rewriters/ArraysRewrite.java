@@ -30,9 +30,9 @@ public class ArraysRewrite extends Visitor<AST> {
 			for (int i = 0; i < depth; ++i)
 				s.append(null);
 			ld.var().children[1] = new NewArray(((ArrayType) ld.type()).baseType(),
-												new Sequence<Expression>() /* dimsExpr */,
-												s,
-												((ArrayLiteral) ld.var().init()));
+			                                    new Sequence<Expression>() /* dimsExpr */,
+			                                    s,
+			                                    ((ArrayLiteral) ld.var().init()));
 		}
 		
 		return null;
