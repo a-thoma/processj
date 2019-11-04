@@ -4,7 +4,7 @@ import utilities.Log;
 import utilities.Visitor;
 import ast.*;
 
-public class CastRewrite extends Visitor<Object> {
+public class CastRewrite extends Visitor<AST> {
     
     public CastRewrite() {
         Log.logHeader("****************************************");
@@ -12,8 +12,9 @@ public class CastRewrite extends Visitor<Object> {
         Log.logHeader("****************************************");
     }
     
+    // DONE
     @Override
-    public Object visitChannelWriteStat(ChannelWriteStat cs) {
+    public AST visitChannelWriteStat(ChannelWriteStat cs) {
         Type chanBaseType;
         if (cs.channel().type instanceof ChannelEndType)
             chanBaseType = ((ChannelEndType)cs.channel().type).baseType();
@@ -21,9 +22,9 @@ public class CastRewrite extends Visitor<Object> {
             chanBaseType = ((ChannelType)cs.channel().type).baseType();
         Type exprType = cs.expr().type;
         if (!exprType.typeEqual(chanBaseType)) {
-            // replace the expression in the channel writer by a new cast expression.
-            // that is:    write ( expr ) becomes
-            //             write ( (...) expr )
+            // replace the expression in the channel writer by a new cast expression,
+            // that is:    write ( <expr> ) becomes
+            //             write ( (...) <expr> )
             CastExpr ce = new CastExpr(chanBaseType, cs.expr());
             cs.children[1] = ce;
         }

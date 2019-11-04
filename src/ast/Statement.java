@@ -2,7 +2,7 @@ package ast;
 
 public abstract class Statement extends AST {
 
-    // This sequenec is used in the rewriting phase.                                                                                                                                                               
+    // This sequence is used in the rewriting phase.                                                                                                                                                               
     // It holds Declarations and Assignments of the form:                                                                                                                                                          
     //                                                                                                                                                                                                             
     // T temp_1;                                                                                                                                                                                                   

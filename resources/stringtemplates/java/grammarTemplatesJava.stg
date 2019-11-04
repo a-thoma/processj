@@ -734,3 +734,7 @@ ReturnStat(expr) ::= "<if(expr)>return <expr>;<endif>"
 //========================================================================================
 // 1) name:
 ContinueStat(name) ::= "<if(name)>continue <name><else>continue<endif>;"
+
+//========================================================================================
+//
+InvocationIgnore(name, var) ::= "<name>(<var>);"

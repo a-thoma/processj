@@ -65,18 +65,18 @@ public class CodeGeneratorJava extends Visitor<Object> {
     private SymbolTable topLevelDecls = null;
 
     // Contains formal parameters transformed to fields.
-    private HashMap<String, String> formalParamFields = new LinkedHashMap<String, String>();
+    private HashMap<String, String> formalParams = new LinkedHashMap<String, String>();
     
     // Contains formal parameter names transformed to name tags.
     private HashMap<String, String> paramDeclNames = new LinkedHashMap<String, String>();
     
     // Contains local parameters transformed to fields.
-    private HashMap<String, String> localParamFields = new LinkedHashMap<String, String>();
+    private HashMap<String, String> localParams = new LinkedHashMap<String, String>();
     
-    // Contains the record member transformed to field.
+    // Contains record members transformed to fields.
     private HashMap<String, String> recordFields = new LinkedHashMap<String, String>();
 
-    // Contains the protocol name and the corresponding tags currently switched on.
+    // Contains protocol names and the corresponding tags currently switched on.
     private Hashtable<String, String> protocolTagsSwitchedOn = new Hashtable<String, String>();
     
     // List of switch labels.
@@ -85,16 +85,16 @@ public class CodeGeneratorJava extends Visitor<Object> {
     // List of barrier expressions.
     private ArrayList<String> barrierList = new ArrayList<String>();
 
-    // Identifier for a parameter declaration.
+    // Identifier for parameter declaration.
     private int varDecId = 0;
     
-    // Identifier for a par-block declaration.
+    // Identifier for par-block declaration.
     private int parDecId = 0;
 
-    // Identifier for a local variable declaration.
+    // Identifier for local variable declaration.
     private int localDecId = 0;
     
-    // Jump label used when a procedure yields.
+    // Jump label used when procedures yield.
     private int jumpLabel = 0;
     
     // Access to protocol case.
@@ -145,11 +145,11 @@ public class CodeGeneratorJava extends Visitor<Object> {
     }
     
     /**
-     * Visits a single compilation unit that starts with an optional package
+     * Visit a single compilation unit which starts with an optional package
      * declaration, followed by zero or more import declarations, followed
      * by zero or more type declarations.
      *
-     * @param compilation
+     * @param co
      * 			An AST that represents the entire compilation unit.
      * @return A text generated after evaluating this compilation unit.
      */
@@ -169,19 +169,20 @@ public class CodeGeneratorJava extends Visitor<Object> {
         // Package name for this source file.
         String packagename = co.packageNoName();
         
-        for (Import im : co.imports())
-            importFiles.add((String) im.visit(this));
+        for (Import im : co.imports()) {
+        	if (im != null)
+        		importFiles.add((String) im.visit(this));
+        }
         
         for (AST decl : typeDecls) {
             if (decl instanceof Type) {
-                // Collect procedures, records, protocols, and external
-                // types (if any).
+                // Collect procedures, records, protocols, and external types (if any).
                 String t = (String) ((Type) decl).visit(this);
                 if (t != null)
                     body.add(t);
             } else if (decl instanceof ConstantDecl) {
-                // Iterate over remaining declarations, which is anything
-                // that comes after top-level declarations.
+                // Iterate over remaining declarations, which is anything that
+                // comes after top-level declarations.
                 String cd = (String) ((ConstantDecl) decl).visit(this);
                 if (cd != null)
                     body.add(cd);
@@ -310,9 +311,9 @@ public class CodeGeneratorJava extends Visitor<Object> {
                 stMain.add("class", currentCompilation.fileNoExtension());
                 stMain.add("name", procName);
                 // Pass the list of command line arguments to this main method.
-                if (!formalParamFields.isEmpty()) {
-                    stMain.add("types", formalParamFields.values());
-                    stMain.add("vars", formalParamFields.keySet());
+                if (!formalParams.isEmpty()) {
+                    stMain.add("types", formalParams.values());
+                    stMain.add("vars", formalParams.keySet());
                 }
                 // Add entry point of the program.
                 stProcTypeDecl.add("main", stMain.render());
@@ -321,15 +322,15 @@ public class CodeGeneratorJava extends Visitor<Object> {
             // The list of command line arguments should be passed to the constructor
             // of the static class that the main method belongs to (some procedure class)
             // or should be passed to the Java method (some static method).
-            if (!formalParamFields.isEmpty()) {
-                stProcTypeDecl.add("types", formalParamFields.values());
-                stProcTypeDecl.add("vars", formalParamFields.keySet());
+            if (!formalParams.isEmpty()) {
+                stProcTypeDecl.add("types", formalParams.values());
+                stProcTypeDecl.add("vars", formalParams.keySet());
             }
             // The list of local variables defined in the body of a procedure becomes
             // the member variables of the procedure class.
-            if (!localParamFields.isEmpty()) {
-                stProcTypeDecl.add("ltypes", localParamFields.values());
-                stProcTypeDecl.add("lvars", localParamFields.keySet());
+            if (!localParams.isEmpty()) {
+                stProcTypeDecl.add("ltypes", localParams.values());
+                stProcTypeDecl.add("lvars", localParams.keySet());
             }
             // Add the switch block for resumption.
             if (!switchLabelList.isEmpty()) {
@@ -381,9 +382,13 @@ public class CodeGeneratorJava extends Visitor<Object> {
         if (ws.expr() != null)
             condExpr = ((String) ws.expr().visit(this)).replace(DELIMITER, "");
         
-        if (ws.stat() != null)
-            stats = (String[]) ws.stat().visit(this);
-        else // The body of a while-loop could be empty.
+        if (ws.stat() != null) {
+            Object o = ws.stat().visit(this);
+            if (o instanceof String)
+            	stats = new String[] { (String) o };
+            else
+            	stats = (String[]) o;
+        } else // The body of a while-loop could be empty.
             stats = new String[] { DELIMITER };
         
         stWhileStat.add("expr", condExpr);
@@ -405,8 +410,13 @@ public class CodeGeneratorJava extends Visitor<Object> {
         if (ds.expr() != null)
             condExpr = ((String) ds.expr().visit(this)).replace(DELIMITER, "");
         
-        if (ds.stat() != null)
-            stats = (String[]) ds.stat().visit(this);
+        if (ds.stat() != null) {
+            Object o = ds.stat().visit(this);
+            if (o instanceof String)
+            	stats = new String[] { (String) o };
+            else
+            	stats = (String[]) o;
+        }
         
         stDoStat.add("expr", condExpr);
         stDoStat.add("body", stats);
@@ -557,11 +567,11 @@ public class CodeGeneratorJava extends Visitor<Object> {
         // Create a tag for this parameter and then add it to the collection
         // of parameters for reference.
         String newName = Helper.makeVariableName(name, ++varDecId, Tag.PARAM_NAME);
-        formalParamFields.put(newName, type);
+        formalParams.put(newName, type);
         paramDeclNames.put(name, newName);
         
-        // Ignored the value returned by this visitor. The types
-        // and variables are resolved elsewhere.
+        // Ignored the value returned by this visitor. The types and variables
+        // are _always_ resolved elsewhere.
         return null;
     }
     
@@ -588,11 +598,10 @@ public class CodeGeneratorJava extends Visitor<Object> {
 
         // Create a tag for this local channel expression parameter.
         String newName = Helper.makeVariableName(name, ++localDecId, Tag.LOCAL_NAME);
-        localParamFields.put(newName, type);
+        localParams.put(newName, type);
         paramDeclNames.put(name, newName);
         
-        // This variable could be initialized, e.g., through an
-        // assignment operator.
+        // This variable could be initialized, e.g., through an assignment operator.
         Expression expr = ld.var().init();
         // Visit the expressions associated with this variable.
         if (expr != null) {
@@ -604,8 +613,8 @@ public class CodeGeneratorJava extends Visitor<Object> {
                 val = (String) expr.visit(this);
         }
         
-        // Is it a barrier declaration? If so, we must generate
-        // code that creates a barrier object.
+        // Is it a barrier declaration? If so, we must generate code that
+        // creates a barrier object.
         if (ld.type().isBarrierType() && expr == null) {
             ST stBarrierDecl = stGroup.getInstanceOf("BarrierDecl");
             val = stBarrierDecl.render();
@@ -693,8 +702,8 @@ public class CodeGeneratorJava extends Visitor<Object> {
     public Object visitPrimitiveType(PrimitiveType py) {
         Log.log(py, "Visiting a Primitive Type (" + py.typeName() + ")");
         
-        // ProcessJ primitive types that do not translate
-        // directly to Java primitive types.
+        // ProcessJ primitive types that do not translate directly
+        // to Java primitive types.
         String typeStr = py.typeName();
         if (py.isStringType())
             typeStr = "String";
@@ -1050,7 +1059,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         // Generated template after evaluating this invocation.
         ST stCastExpr = stGroup.getInstanceOf("CastExpr");
         // This result in:
-        //      ((type) (expr))
+        //      ((<type>) (<expr>))
         String type = (String) ce.type().visit(this);
         String expr = (String) ce.expr().visit(this);
         
@@ -1063,6 +1072,17 @@ public class CodeGeneratorJava extends Visitor<Object> {
     @Override
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public Object visitInvocation(Invocation in) {
+    	// Ignore anything that is not a procedure invocation.
+    	if (in.ignore) {
+    		Log.log(in, "Visiting a label/goto point.");
+    		
+    		ST stIgnore = stGroup.getInstanceOf("InvocationIgnore");
+    		stIgnore.add("name", in.procedureName().visit(this));
+    		stIgnore.add("var", in.params().visit(this));
+    		
+    		return stIgnore.render();
+    	}
+    	
         Log.log(in, "Visiting Invocation (" + in.targetProc.name().getname() + ")");
         
         // Generated template after evaluating this invocation.
@@ -1229,9 +1249,9 @@ public class CodeGeneratorJava extends Visitor<Object> {
             }
         }
         
-        // A visit to a RecordLiteral would return a string 'z = 3',
-        // where 'z' is the member of a protocol and '3' is the literal
-        // value used to initialized 'z' with. 
+        // A visit to a RecordLiteral would return a string, e.g., 'z = 3',
+        // where 'z' is the protocol member and '3' is the literal value
+        // used to initialized 'z' with. 
         for (RecordMemberLiteral rm : pl.expressions()) {
             String lhs = (String) rm.name().getname();
             String expr = (String) rm.expr().visit(this);
@@ -1291,8 +1311,8 @@ public class CodeGeneratorJava extends Visitor<Object> {
         // Add this field to the collection of record members for reference.
         recordFields.put(name, type);
         
-        // Ignored the value returned by this visitor. The types
-        // and variables are resolved elsewhere.
+        // Ignored the value returned by this visitor. The types and variables
+        // are _always_ resolved elsewhere.
         return null;
     }
     
@@ -1317,10 +1337,10 @@ public class CodeGeneratorJava extends Visitor<Object> {
             }
         }
         
-        // A visit to a RecordMemberLiteral would return a string 'z = 3',
-        // where 'z' is the member of a record and '3' is the literal value
-        // used to initialized 'z' with. This is something we don't want to
-        // do. Instead, we need to return the literal value assigned to 'z'.
+        // A visit to a RecordMemberLiteral would return a string, e.g., 'z = 3',
+        // where 'z' is the record member and '3' is the literal value used to
+        // initialized 'z' with. This is something we don't want to do. Instead,
+        // we need to return the literal value assigned to 'z'.
         for (RecordMemberLiteral rm : rl.members()) {
             String lhs = (String) rm.name().getname();
             String expr = (String) rm.expr().visit(this);
@@ -1371,7 +1391,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
             // in a string or the number of elements in an N-dimensional array.
             if (ra.isArraySize) // '...'.size for N-dimensional array.
                 stRecordAccess.add("member", "length");
-            else if (ra.isStringLength) // '...'.length for number of character in a string.
+            else if (ra.isStringLength) // '...'.length for number of characters in a string.
                 stRecordAccess.add("member", "length()");
         }
         
@@ -1616,8 +1636,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         stObjectGuards.add("guards", guards);
         
         // <--
-        // This is needed because of the 'StackMapTable' for the
-        // generated Java bytecode.
+        // This is needed because of the 'StackMapTable' for the generated Java bytecode.
         Name n = new Name("index");
         new LocalDecl(
                 new PrimitiveType(PrimitiveType.IntKind),
@@ -1626,7 +1645,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         
         // Create a tag for this local alt declaration.
         String newName = Helper.makeVariableName("alt", ++localDecId, Tag.LOCAL_NAME);
-        localParamFields.put(newName, "PJAlt");
+        localParams.put(newName, "PJAlt");
         paramDeclNames.put(newName, newName);
         // -->
         
@@ -1693,11 +1712,11 @@ public class CodeGeneratorJava extends Visitor<Object> {
         localDecId = 0;
         jumpLabel = 0;
 
-        localParamFields.clear();
+        localParams.clear();
         switchLabelList.clear();
         barrierList.clear();
         
-        formalParamFields.clear();
+        formalParams.clear();
         paramDeclNames.clear();
     }
     
