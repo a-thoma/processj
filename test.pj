@@ -1,0 +1,36 @@
+record A { 
+  int x;
+}
+
+record B extends A {
+  int y;
+}
+
+protocol P {
+  a: {int i;}
+  b: {int j; int k;}
+}
+
+
+public protocol Alternatives {
+    dog: { int i; }
+    cat: { string s; double d; }
+    pig: { Packet p; }
+    canary: { Message m; }
+    poision: { }
+  }
+
+protocol A extends B, C;
+  protocol D extends F, G {
+    elephant: {int i; double j; }
+  }
+
+public proc void main(string args[]) {
+  B b = new B{x = 10, y = 20};
+  b = new A{x = 10};
+  P p = new P{a: i=10};
+  p = new P{b: j=0, k=100};
+  Alternatives a;
+  a = new Alternatives{dog: i=10};
+  a = new Alternatives{cat: s="Meow", d=3.14};
+}

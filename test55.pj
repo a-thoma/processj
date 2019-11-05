@@ -1,0 +1,13 @@
+
+proc void foo() { }
+
+proc void main(string args[]) {
+  int x;
+  chan<int> c;
+  int y;
+  int i;
+
+  for(x=0, foo(7), c.read(), y--; i<10; i++) {
+    
+  }
+}

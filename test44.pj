@@ -1,0 +1,10 @@
+
+public proc void bar(int x) { }
+
+public proc void foo() {
+
+       fork bar(7);
+
+
+
+}

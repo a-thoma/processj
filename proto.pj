@@ -1,0 +1,26 @@
+
+
+record R {
+  int a;
+}
+
+
+
+protocol A {
+  tag1: {int x; int y; }
+  tag2: {R r;}
+}
+
+protocol B {
+  tag3: {boolean b; }
+}
+
+protocol C extends A,B {
+  tag4: { }
+}
+
+
+proc void foo() {
+  C c = new A{tag1:x=1,y=3};
+}
+
