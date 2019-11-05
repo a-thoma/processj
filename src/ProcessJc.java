@@ -239,6 +239,12 @@ public class ProcessJc {
             System.out.println("-- Checking literal inits are free of channel communication.");
             c.visit(new semanticcheck.LiteralInits());
             
+            System.out.println("-- Rewriting infinite loops.");
+            new rewriters.InfiniteLoopRewrite().go(c);
+            
+            System.out.println("-- Rewriting loops.");
+            c.visit(new rewriters.UnrollLoopRewrite());
+            
             System.out.println("-- Rewriting yielding expressions.");
             new rewriters.ChannelReadRewrite().go(c);
             //System.out.println("Lets reprint it all");
@@ -246,12 +252,6 @@ public class ProcessJc {
             //c.visit(new printers.PrettyPrinter());
             System.out.println("-- Checking break and continue labels.");
 //            new semanticcheck.LabeledBreakContinueCheck().go(c);
-            
-            System.out.println("-- Rewriting infinite loops.");
-            new rewriters.InfiniteLoopRewrite().go(c);
-            
-            System.out.println("-- Rewriting loops.");
-            c.visit(new rewriters.UnrollLoopRewrite());
             
             System.out.println("-- Collecting left-hand sides for par for code generation.");
             c.visit(new rewriters.ParFor());
