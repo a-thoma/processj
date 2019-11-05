@@ -29,6 +29,7 @@ public class ProcessJMessage extends CompilerMessage {
             stFile.add("fileName", fileName);
             stFile.add("lineNumber", ast.line);
         }
+        
         if (error != null) {
             stTag.add("tag", error.getErrorSeverity());
             stTag.add("number", error.getNumber());

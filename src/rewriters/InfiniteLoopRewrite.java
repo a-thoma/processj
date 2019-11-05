@@ -20,13 +20,13 @@ import ast.Var;
 import ast.WhileStat;
 
 /**
- * Temporary (silly) fixed for unreachable code due to infinite loop.
+ * Fixed for unreachable code due to infinite loop.
  * 
  * @author Ben
  */
-public class ForeverLoopRewrite {
-    
-    private int tempCounter = 0;
+public class InfiniteLoopRewrite {
+	
+	int tempCounter = 0;
 
     private String nextTemp() {
         return "foreverLoop" + tempCounter++;
@@ -34,7 +34,7 @@ public class ForeverLoopRewrite {
     
     /**
      * This tree-traversal method rewrites 'WhileStat', 'DoStat', and 'ForStat'
-     * parse-tree nodes when the code represented by each of these nodes cannot
+     * parse-tree nodes if the code represented by each of these nodes cannot
      * or may not run to completion due to infinite loop.
      * 
      * 1.) While-loop rewrite:
@@ -75,11 +75,11 @@ public class ForeverLoopRewrite {
             for (int i = 0; i < s.size(); ++i) {
                 if (s.child(i) != null && s.child(i) instanceof Statement) {
                     Statement stat = (Statement) s.child(i);
-                    if (stat instanceof WhileStat) { // WhileStat.
+                    if (stat instanceof WhileStat) { // WhileStat -- done.
                         WhileStat ws = (WhileStat) stat;
                         if (ws.foreverLoop) {
                             String temp = nextTemp();
-                            // Create a local declaration to replace the boolean literal value with in the while-loop.
+                            // Create a local declaration to replace the boolean literal value with in the while-stmt.
                             LocalDecl ld = new LocalDecl(new PrimitiveType(PrimitiveType.BooleanKind),
                                     new Var(new Name(temp), null), true /* constant */);
                             // Replace the boolean literal value with the new local variable.
@@ -96,11 +96,11 @@ public class ForeverLoopRewrite {
                             s.set(i, b);
                         }
                         go(ws.stat());
-                    } else if (stat instanceof DoStat) { // DoStat.
+                    } else if (stat instanceof DoStat) { // DoStat -- done.
                         DoStat ds = (DoStat) stat;
                         if (ds.foreverLoop) {
                             String temp = nextTemp();
-                            // Create a local declaration to replace the boolean literal value with in the do-while loop.
+                            // Create a local declaration to replace the boolean literal value with in the do-stmt.
                             LocalDecl ld = new LocalDecl(new PrimitiveType(PrimitiveType.BooleanKind),
                                     new Var(new Name(temp), null), true /* constant */);
                             // Replace the boolean literal value with the new local variable.
@@ -117,14 +117,15 @@ public class ForeverLoopRewrite {
                             s.set(i, b);
                         }
                         go(ds.stat());
-                    } else if (stat instanceof ForStat) { // ForStat.
+                    } else if (stat instanceof ForStat) { // ForStat -- done.
                         ForStat fs = (ForStat) stat;
                         if (fs.foreverLoop) {
                             String temp = nextTemp();
-                            // Create a local declaration to replace the boolean literal value with in the for-loop.
+                            // Create a local declaration to replace the boolean literal value with in the for-stmt.
                             LocalDecl ld = new LocalDecl(new PrimitiveType(PrimitiveType.BooleanKind),
                                     new Var(new Name(temp), null), true /* constant */);
-                            // Rewrite the expression if it is not of the form: for (...; true ; ...) { ... }
+                            // Rewrite the expression if it isn't of the form:
+                            //		for (...; true ; ...) S1
                             Expression newExpr = fs.expr();
                             if (newExpr == null)
                                 newExpr = new PrimitiveLiteral(new Token(0, Boolean.toString(true), 0, 0, 0), 0 /* kind */);

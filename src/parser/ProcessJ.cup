@@ -1028,7 +1028,7 @@ statement_expressions ::=
 
 //- DoStat :> Statement :> AST
 do_statement ::= 
-          DO statement:s WHILE LPAREN expression:e RPAREN {: RESULT = new DoStat(s, e); :}
+          DO statement:s WHILE LPAREN expression:e RPAREN SEMICOLON {: RESULT = new DoStat(s, e); :}
         ;
 
 // **************************************************

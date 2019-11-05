@@ -7,11 +7,18 @@ public class Invocation extends Expression {
 
     public ProcTypeDecl targetProc = null;
     public SymbolTable candidateMethods = null; // TODO: needs to be filled recursively backwards ..  I think? or perhaps not!
+    
+    public boolean ignore = false; // This is used to ignore invocations for 'labels' and 'gotos' in the codegen phase.
 
     public Invocation(Expression target, Name name, Sequence<Expression> params) {
         super(name);
         nchildren = 3;
         children = new AST[] { target, name, params };
+    }
+    
+    public Invocation(Expression target, Name name, Sequence<Expression> params, boolean ignore) {
+    	this(target, name, params);
+    	this.ignore = ignore;
     }
 
     public String toString() {

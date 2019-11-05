@@ -10,6 +10,7 @@ import codegen.java.CodeGeneratorJava;
 import library.Library;
 import namechecker.ResolveImports;
 import parser.parser;
+import printers.ParseTreePrinter;
 import rewriters.CastRewrite;
 import scanner.Scanner;
 import utilities.CompilerErrorManager;
@@ -145,11 +146,11 @@ public class ProcessJc {
             // Set the absolute path, file, and package name from where this Compilation is created.
             System.out.println("-- Setting absolute path, file and package name for '" + inFile.getName() + "'.");
             c.fileName = inFile.getName();
-            // The parent's path of the input file.
+            // The parent's path of the compilation.
             String parentPath = inFile.getAbsolutePath();
-            // The parent's absolute path of the input file.
+            // The parent's absolute path of the compilation.
             c.path = parentPath.substring(0, parentPath.lastIndexOf(File.separator));
-            // A package declaration is optional, this can thus be 'null'.
+            // A package declaration is optional, this can therefore be 'null'.
             if (c.packageName() != null)
                 c.packageName = ResolveImports.packageNameToString(c.packageName());
 
@@ -184,6 +185,10 @@ public class ProcessJc {
             System.out.println("-- Reconstructing protocols.");
             c.visit(new rewriters.ProtocolRewrite(globalTypeTable));
             
+            // Visit and re-construct if-stat, while-stat, for-stat, and do-stat.
+            System.out.println("-- Reconstructing statements.");
+            c.visit(new rewriters.StatementRewrite());
+            
             // Visit and resolve import for top-level declarations.
             System.out.println("-- Checking native Top Level Declarations.");
             c.visit(new namechecker.ResolveImportTopDecls());
@@ -200,9 +205,15 @@ public class ProcessJc {
             System.out.println("-- Reconstructing array types.");
             root.visit(new namechecker.ArrayTypeConstructor());
             
+//            System.out.println(">> Before");
+//            c.visit(new ParseTreePrinter());
+
             // Visit and re-construct array literals
             System.out.println("-- Reconstructing array literas.");
             c.visit(new rewriters.ArraysRewrite());
+
+//            System.out.println(">> After");
+//            c.visit(new ParseTreePrinter());
             
             // Visit type checker.
             System.out.println("-- Checking types.");
@@ -228,16 +239,19 @@ public class ProcessJc {
             System.out.println("-- Checking literal inits are free of channel communication.");
             c.visit(new semanticcheck.LiteralInits());
             
+            System.out.println("-- Rewriting infinite loops.");
+            new rewriters.InfiniteLoopRewrite().go(c);
+            
+            System.out.println("-- Rewriting loops.");
+            c.visit(new rewriters.UnrollLoopRewrite());
+            
             System.out.println("-- Rewriting yielding expressions.");
-            new rewriters.ChannelReadRewrite().go(c, null);
+            new rewriters.ChannelReadRewrite().go(c);
             //System.out.println("Lets reprint it all");
             //c.visit(new printers.ParseTreePrinter());
             //c.visit(new printers.PrettyPrinter());
             System.out.println("-- Checking break and continue labels.");
-            new semanticcheck.LabeledBreakContinueCheck().go(c);
-            
-            System.out.println("-- Rewriting infinite loops.");
-            new rewriters.ForeverLoopRewrite().go(c);
+//            new semanticcheck.LabeledBreakContinueCheck().go(c);
             
             System.out.println("-- Collecting left-hand sides for par for code generation.");
             c.visit(new rewriters.ParFor());
@@ -253,30 +267,30 @@ public class ProcessJc {
     }
     
     /**
-     * Given a ProcessJ Compilation unit, e.g. an abstract syntax tree
-     * object, we will generate the code for the JVM. The source range
-     * for this type of tree is the entire source file, not including
-     * leading and trailing whitespace characters and comments.
+     * Given a ProcessJ Compilation unit, e.g., an abstract syntax tree object,
+     * we will generate the code for the JVM. The source range for this type of
+     * tree is the entire source file, not including leading and trailing
+     * whitespace characters and comments.
      *
-     * @param compilation
+     * @param co
      *              A Compilation unit consisting of a single file.
      * @param inFile
      *              The compiled file.
-     * @param topLevelDecls
+     * @param s
      *              A symbol table consisting of all the top level types.
      */
-    private void generateCodeJava(Compilation compilation, File inFile, SymbolTable topLevelDecls) {
+    private void generateCodeJava(Compilation co, File inFile, SymbolTable s) {
         Properties p = utilities.ConfigFileReader.getProcessJConfig();
         // Run the code generator to decode pragmas, generate libraries,
         // resolve types, and set the symbol table for top level declarations.
-        CodeGeneratorJava generator = new CodeGeneratorJava(topLevelDecls);
+        CodeGeneratorJava generator = new CodeGeneratorJava(s);
         // Set the user working directory.
         generator.setWorkingDir(p.getProperty("workingdir"));
         // Visit this compilation unit and recursively build the program
         // after returning strings rendered by the string template.
-        String code = (String) compilation.visit(generator);
+        String code = (String) co.visit(generator);
         // Write the output to a file
-        Helper.writeToFile(code, compilation.fileNoExtension(), generator.getWorkingDir());
+        Helper.writeToFile(code, co.fileNoExtension(), generator.getWorkingDir());
     }
     
     public ProcessJc(String[] args) {
@@ -290,13 +304,10 @@ public class ProcessJc {
     
     public void ansiColor() {        
         // Check default value before switching on/off.
-        if (!Settings.ansiColor && this.ansiColor) {
-            // Turn ansi-color mode 'on'.
+        if (!Settings.ansiColor && this.ansiColor) // Turn ansi-color mode 'on'.
             config.setProperty("color", String.valueOf(this.ansiColor));
-        } else if (Settings.ansiColor && this.ansiColor) {
-            // Turn ansi-color mode 'off'.
+        else if (Settings.ansiColor && this.ansiColor) // Turn ansi-color mode 'off'.
             config.setProperty("color", String.valueOf(Boolean.FALSE));
-        }
         Settings.ansiColor = Boolean.valueOf(config.getProperty("color"));
         ConfigFileReader.closeConfiguration(config);
     }

@@ -4,11 +4,11 @@ import utilities.Visitor;
 
 public class NewArray extends Expression {
 
-    public NewArray(Type type, Sequence<Expression> dimsExpr,
+    public NewArray(Type baseType, Sequence<Expression> dimsExpr,
                     Sequence<AST> dims, ArrayLiteral init) {
-        super(type);
+        super(baseType);
         nchildren = 4;
-        children = new AST[] { type, dimsExpr, dims, init };
+        children = new AST[] { baseType, dimsExpr, dims, init };
     }
 
     public Type baseType() {

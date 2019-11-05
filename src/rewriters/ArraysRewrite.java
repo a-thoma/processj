@@ -1,12 +1,17 @@
 package rewriters;
 
+import ast.AST;
+import ast.ArrayLiteral;
 import ast.ArrayType;
+import ast.Expression;
 import ast.Literal;
 import ast.LocalDecl;
+import ast.NewArray;
+import ast.Sequence;
 import utilities.Log;
 import utilities.Visitor;
 
-public class ArraysRewrite extends Visitor<Object> {
+public class ArraysRewrite extends Visitor<AST> {
 	
 	public ArraysRewrite() {
         Log.logHeader("****************************************");
@@ -14,13 +19,20 @@ public class ArraysRewrite extends Visitor<Object> {
         Log.logHeader("****************************************");
 	}
 	
+	// DONE
 	@Override
-	public Object visitLocalDecl(LocalDecl ld) {
+	public AST visitLocalDecl(LocalDecl ld) {
 		Log.log(ld, "Attempting to rewrite array");
 		
 		if (ld.type().isArrayType() && ld.var().init() != null && ld.var().init() instanceof Literal) {
 			int depth = ((ArrayType) ld.type()).getDepth();
-			// Ask for dimsExpr and dims
+			Sequence<AST> s = new Sequence<AST>();
+			for (int i = 0; i < depth; ++i)
+				s.append(null);
+			ld.var().children[1] = new NewArray(((ArrayType) ld.type()).baseType(),
+			                                    new Sequence<Expression>() /* dimsExpr */,
+			                                    s,
+			                                    ((ArrayLiteral) ld.var().init()));
 		}
 		
 		return null;

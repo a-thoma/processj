@@ -11,7 +11,7 @@ public final class Util {
     
     /**
      * Returns 'true' if the parameter is null, or if the runtime class
-     * of the parameter does not represent an array class, or if the length
+     * of the parameter does not represent an array type, or if the length
      * of the array (after casting the parameter) is zero, or if all elements
      * in the array are null.
      *

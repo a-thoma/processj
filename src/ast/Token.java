@@ -17,6 +17,15 @@ public class Token {
         this.charBegin = charBegin;
         this.charEnd = charEnd;
     }
+    
+    // This constructor is used in the rewrite of loops for the codegen.
+    public Token(String text) {
+    	this.kind = -1;
+    	this.lexeme = text;
+    	this.line = 0;
+    	this.charBegin = 0;
+    	this.charEnd = 0;
+    }
 
     public String toString() {
         return "Token " + names[kind] + " '" + lexeme + "' @ line: " + line
