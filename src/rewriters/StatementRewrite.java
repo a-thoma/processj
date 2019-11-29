@@ -44,8 +44,9 @@ public class StatementRewrite extends Visitor<AST> {
 			if (!(is.elsepart() instanceof Block))
 				is.children[2] = new Block(new Sequence<Statement>(is.elsepart()));
 			is.elsepart().visit(this);
-		} else
-			is.children[2] = new Block(new Sequence<Statement>());
+		}
+//		else
+//			is.children[2] = new Block(new Sequence<Statement>());
 		return null;
 	}
 

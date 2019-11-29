@@ -123,6 +123,7 @@ StringEscape  =   \\([btnfr\"\'\\]|[0-3]?{OctDigit}?{OctDigit}|u{HexDigit}{HexDi
   /* Silly keywords */
   "skip"      { return token(sym.SKIP); }
   "stop"      { return token(sym.STOP); }
+  "is"        { return token(sym.IS); } /* instanceof */
 
   /* Control flow related keywords */
   "if"        { return token(sym.IF); }

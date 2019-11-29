@@ -192,6 +192,7 @@ terminal Token NOTEQ;       // "!="
 terminal Token LSHIFT;      // "<<"
 terminal Token RSHIFT;      // ">>"
 terminal Token RRSHIFT;     // ">>>"
+terminal Token IS;			// instanceof
 terminal Token ANDAND;      // "&&"
 terminal Token OROR;        // "||"
 terminal Token PLUS;        // "+"
@@ -1463,6 +1464,7 @@ relational_expression ::=
         | relational_expression:e1 GT shift_expression:e2     {: RESULT = new BinaryExpr(e1, e2, BinaryExpr.GT); :}
         | relational_expression:e1 LTEQ shift_expression:e2   {: RESULT = new BinaryExpr(e1, e2, BinaryExpr.LTEQ); :}
         | relational_expression:e1 GTEQ shift_expression:e2   {: RESULT = new BinaryExpr(e1, e2, BinaryExpr.GTEQ); :}
+        | relational_expression:e1 IS type_name:e2            {: RESULT = new BinaryExpr(e1, new NameExpr(e2), BinaryExpr.INSTANCEOF); :}
         ;
              
 // Expression :> AST    
