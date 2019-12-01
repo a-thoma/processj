@@ -48,6 +48,14 @@ public class RecordTypeDecl extends Type implements DefineTopLevelDecl {
     public String toString() {
         return typeName();
     }
+    
+    public boolean doesExtend(String name) {
+        for (Name n : extend()) {
+            if (n.getname().equals(name))
+                return true;
+        }
+        return false;
+    }
 
     // *************************************************************************
     // ** Visitor Related Methods

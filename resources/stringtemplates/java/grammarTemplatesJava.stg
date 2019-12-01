@@ -738,3 +738,7 @@ ContinueStat(name) ::= "<if(name)>continue <name><else>continue<endif>;"
 //========================================================================================
 //
 InvocationIgnore(name, var) ::= "<name>(<var>);"
+
+//========================================================================================
+//
+RecordExtend(name, val) ::= "<name> instanceof PJRecord && <val>"

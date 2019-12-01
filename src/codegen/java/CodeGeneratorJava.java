@@ -355,12 +355,30 @@ public class CodeGeneratorJava extends Visitor<Object> {
         // Generated template after evaluating this visitor.
         ST stBinaryExpr = stGroup.getInstanceOf("BinaryExpr");
         String op = be.opString();
-        String lhs = (String) be.left().visit(this);
+        String lhs = (String) be.left().visit(this);        
         lhs = lhs.replace(DELIMITER, "");
         lhs = be.left().hasParens ? "(" + lhs + ")" : lhs;
         String rhs = (String) be.right().visit(this);
         rhs = be.right().hasParens ? "(" + rhs + ")" : rhs;
         rhs = rhs.replace(DELIMITER, "");
+        
+        // <--
+        // If 'op' is the keyword 'instanceof', then we need to look at the top
+        // level decls to find the record in question and the record it extends.
+        if (localParams.containsKey(lhs)) {
+            String rtype = localParams.get(lhs); // Get the record's type
+            Object o = topLevelDecls.get(rtype); // Grab the record in question from top decls
+            if (o != null && (o instanceof RecordTypeDecl)) {
+                RecordTypeDecl rtd = (RecordTypeDecl) o;
+                
+                stBinaryExpr = stGroup.getInstanceOf("RecordExtend");
+                stBinaryExpr.add("name", lhs);
+                stBinaryExpr.add("val", rtd.doesExtend(rhs));
+                
+                return stBinaryExpr.render();
+            }
+        }
+        // -->
         
         stBinaryExpr.add("lhs", lhs);
         stBinaryExpr.add("rhs", rhs);
