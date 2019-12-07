@@ -377,9 +377,10 @@ public class UnrollLoopRewrite extends Visitor<AST> {
 		int bl_old;
 		int cl_old;
 		Sequence<Statement> stmts = new Sequence<Statement>();
-
+        int sl_ = newLabel();
 		int bl_ = newLabel();
 		int cl_ = newLabel();
+		
 		// is the statement labeled?
 		if (!fs.getLabel().equals("")) {
 			addLabels(bls, cls, fs.getLabel(), bl_, cl_);
@@ -393,7 +394,7 @@ public class UnrollLoopRewrite extends Visitor<AST> {
 		if (fs.init() != null)
 			stmts.merge(fs.init());
 		// Label(cl');
-		stmts.append(makeLabel(cl_, fs));
+		stmts.append(makeLabel(sl_, fs));
 
 		// [ R[S](...); e3 ]
 		Statement st = (Statement) fs.stats().visit(this);
@@ -402,10 +403,11 @@ public class UnrollLoopRewrite extends Visitor<AST> {
 			body.merge(((Block) st).stats());
 		else
 			body.merge(st);
+		body.append(makeLabel(cl_, fs));
 		if (fs.incr() != null)
 			body.merge(fs.incr());
 		// [ R[S](...); e3; Goto(cl'); ]
-		body.append(makeGoto(cl_, fs));
+		body.append(makeGoto(sl_, fs));
 
 		// { R[S](...); e3; Goto(cl'); }
 		Block block = new Block(body);
