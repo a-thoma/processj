@@ -122,6 +122,25 @@ fi
 
 ############################################################################
 
+## execute the rewrite for GOTO and LABEL instructions
+pushd $workingdir >/dev/null
+
+O=`java -classpath $installdir/bin/:$installdir/resources/jars/asm-all-5.2.jar/:. instrument/GotoLabelRewrite .`
+popd > /dev/null
+
+ERRORS=`echo "${O}" | awk -v n=1 '{if(NR>n) print a[NR%n]; a[NR%n]=$0}'`
+STATUS=`echo "${O}" | awk '/./{line=$0} END{print line}'`
+
+if [ "${STATUS}" = "REWRITING DONE" ] ; then
+  echo "${ERRORS}"
+  echo "Rewriting successful"
+else
+  echo "${ERRORS}"
+  exit 1
+fi
+
+############################################################################
+
 ## execute the Instrumenter
 pushd $workingdir >/dev/null
 

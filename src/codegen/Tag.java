@@ -15,7 +15,7 @@ import java.util.stream.Collectors;
  */
 public enum Tag {
     
-    // Signatures and types. These labels can be used for debugging.
+    /* Signatures and types. These labels can be used for debugging */
     MAIN_NAME           ("([T;)V"   , "mainProcedureType"),
     PROCEDURE_NAME      ("_proc$"   , "procedureType"),
     METHOD_NAME         ("_method$" , "methodType"),
@@ -49,7 +49,6 @@ public enum Tag {
         try {
             return Tag.valueOf(name);
         } catch (IllegalArgumentException e) {
-            // Try one more time.
             Tag result = null;
             for (Tag t : values()) {
                 if (t.tag.startsWith(name)) {

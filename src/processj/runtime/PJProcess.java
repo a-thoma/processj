@@ -118,4 +118,14 @@ public class PJProcess {
      */
     public void resume(int label) {
     }
+    
+    // ------------------------------------------
+    
+    /* Dummy 'LABEL' for ASM bytecode rewrite */
+    public void Label(int label) {
+    }
+    
+    /* Dummy 'GOTO' for ASM bytecode rewrite */
+    public void Goto(int label) {
+    }
 }

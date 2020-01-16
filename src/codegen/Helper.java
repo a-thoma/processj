@@ -55,7 +55,7 @@ public class Helper {
 
         switch (type) {
         case MAIN_NAME:
-            break; // Do nothing for now.
+            break; /* Do nothing for now */
         case PROCEDURE_NAME:
             varName = Tag.PROCEDURE_NAME + name; break;
         case METHOD_NAME:
@@ -160,28 +160,23 @@ public class Helper {
     }
     
     public static String getPackage(String packageName, String sourceFile) {
-        // An invocation comes from a external file (an import) if the source
-        // file from which the invocation is made is different to the package.
+        /* An invocation comes from a external file (an import) if the source
+         * file from which the invocation is made is different to the package */
         if (!packageName.contains(sourceFile)) {
             String includePath = Settings.includeDir + File.separator + Settings.language + File.separator;
-            // The following replaces all '/' with '.'.
+            /* The following replaces all '/' with '.' */
             includePath = includePath.replaceAll(File.separator, "\\.");
             packageName = packageName.replaceAll(includePath, "");
             return packageName;
         }
-        
-        // Otherwise, the invocation must come from the same
-        // source file and package.
+        /* Otherwise, the invocation must come from the same
+         * source file and package */
         return sourceFile;
     }
     
     public static void writeToFile(String output, String filename, String workdir) {
-        // TODO: Write to home folder
-//        String outFile = "/Users/Ben/Desktop/processj/tests/" + filename + ".java";
         Writer writer = null;
-        
         try {
-            // <--
             String home = System.getProperty("user.home");
             File f = new File(home + File.separator + workdir);            
             if (!f.exists()) {
@@ -190,8 +185,6 @@ public class Helper {
             }
             
             String outFile = f.getAbsolutePath() + File.separator + filename + ".java";
-            // -->
-            
             writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFile), "utf-8"));
             writer.write(output);
             writer.close();

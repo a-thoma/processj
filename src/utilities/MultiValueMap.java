@@ -79,9 +79,8 @@ public class MultiValueMap<K, V> implements MultiKeyMap<K, V> {
 
     @Override
     public Collection<V> get(Object key) {
-        if (hashMap.get(key) == null) {
+        if (hashMap.get(key) == null)
             return Collections.<V>emptyList();
-        }
 
         return hashMap.get(key);
     }
@@ -100,9 +99,8 @@ public class MultiValueMap<K, V> implements MultiKeyMap<K, V> {
     public Collection<V> values() {
         Collection<V> result = new ArrayList<>();
 
-        for (Collection<V> collection : hashMap.values()) {
+        for (Collection<V> collection : hashMap.values())
             result.addAll(collection);
-        }
 
         return result;
     }
