@@ -88,37 +88,36 @@ public class ProcessJc {
      *          A vector of command arguments passed to the compiler.
      */
     public static void main(String[] args) {
-        ProcessJc processj = new ProcessJc(args);
+        ProcessJc pj = new ProcessJc(args);
         /* Do we have any arguments? */
-        if (args.length == 0 && !processj.d_help) {
+        if (args.length == 0 && !pj.d_help) {
             /* At least one file must be provided. Throw an error if no
              * file is given, or if the file does not exists */
             System.out.println(new ProcessJMessage.Builder()
                                    .addError(VisitorMessageNumber.RESOLVE_IMPORTS_100)
                                    .build().getST().render());
-            processj.help();
+            pj.help();
         }
         
-        if (processj.d_help)
-            processj.help();
+        if (pj.d_help)
+            pj.help();
         
-        if (processj.d_version)
-            processj.version();
+        if (pj.d_version)
+            pj.version();
         
-        Settings.includeDir = processj.d_include;
-        
-        ArrayList<File> files = processj.createFiles();
+        Settings.includeDir = pj.d_include;
         AST root = null;
         /* Process source file, one by one */
-        for (File inFile : files) {
+        for (String f : pj.inputFiles) {
+            File inFile = new File(f);
             Scanner s = null;
             parser p = null;
             try {
-                String fileAbsolutePath = inFile.getAbsolutePath();
+                String absoluteFilePath = inFile.getAbsolutePath();
                 /* Set the package and filename */
-                CompilerErrorManager.INSTANCE.setFileName(fileAbsolutePath);
-                CompilerErrorManager.INSTANCE.setPackageName(fileAbsolutePath);
-                s = new Scanner(new java.io.FileReader(fileAbsolutePath));
+                CompilerErrorManager.INSTANCE.setFileName(absoluteFilePath);
+                CompilerErrorManager.INSTANCE.setPackageName(absoluteFilePath);
+                s = new Scanner(new java.io.FileReader(absoluteFilePath));
                 p = new parser(s);
             } catch (java.io.FileNotFoundException e) {
                 /* This won't execute! The error is handled above by the command */
@@ -160,7 +159,7 @@ public class ProcessJc {
             SymbolTable globalTypeTable = new SymbolTable("Main file: " + CompilerErrorManager.INSTANCE.fileName);
 
             /* Dump log messages if 'on' */
-            if (processj.d_visitAll)
+            if (pj.d_visitAll)
                 Log.startLogging();
             
             SymbolTable.hook = null;
@@ -254,8 +253,8 @@ public class ProcessJc {
             c.visit(new rewriters.ParFor());
             
             /* Run the code generator for the known (specified) target language */
-            if (Settings.language == processj.d_target)
-                processj.generateCodeJava(c, inFile, globalTypeTable);
+            if (Settings.language == pj.d_target)
+                pj.generateCodeJava(c, inFile, globalTypeTable);
             else
                 ; /* TODO: Throw an error message for unknown target language? */
             
@@ -357,13 +356,6 @@ public class ProcessJc {
         String msg = "ProcessJ Version: " + RuntimeInfo.runtimeVersion();
         System.out.println(msg);
         exit(0);
-    }
-    
-    public ArrayList<File> createFiles() {
-        ArrayList<File> files = new ArrayList<File>(inputFiles.size());
-        for (String f : inputFiles)
-            files.add(new File(f));
-        return files;
     }
     
     public void exit(int code) {

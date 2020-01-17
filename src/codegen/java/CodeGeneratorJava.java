@@ -58,6 +58,9 @@ public class CodeGeneratorJava extends Visitor<Object> {
     /* Currently executing par-block */
     private String d_currParBlock = null;
     
+    /* Currently executing protocol */
+    private String d_currProtocol = null;
+    
     /* All imports are kept in this table */
     private HashSet<String> d_importFiles = new LinkedHashSet<String>();
     
@@ -362,16 +365,22 @@ public class CodeGeneratorJava extends Visitor<Object> {
         
         // <--
         /* If 'op' is the keyword 'instanceof', then we need to look in the
-         * top-level decls table and find the record in question and the
-         * record it extends */
+         * top-level decls table and find the record or protocol in question
+         * and the records or protocols it extends */
         if (d_localParams.containsKey(lhs)) {
-            String rtype = d_localParams.get(lhs); /* Get the record's type */
+            String rtype = d_localParams.get(lhs); /* Get the record's or protocol's type */
             Object o = d_topLevelDecls.get(rtype); /* look up the record in question from top decls */
-            if (o != null && (o instanceof RecordTypeDecl)) {
+            if (o instanceof RecordTypeDecl) {
                 RecordTypeDecl rtd = (RecordTypeDecl) o;
                 stBinaryExpr = d_stGroup.getInstanceOf("RecordExtend");
                 stBinaryExpr.add("name", lhs);
                 stBinaryExpr.add("type", rhs);
+                return stBinaryExpr.render();
+            } else if (rtype.equals(PJProtocolCase.class.getSimpleName())) {
+                ProtocolTypeDecl ptd = (ProtocolTypeDecl) o;
+                stBinaryExpr = d_stGroup.getInstanceOf("RecordExtend");
+                stBinaryExpr.add("name", lhs);
+                stBinaryExpr.add("type", d_currProtocol);
                 return stBinaryExpr.render();
             }
         }
@@ -478,7 +487,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         String name = (String) pd.paramName().visit(this);
         String type = (String) pd.type().visit(this);
         
-        /* Silly fixed for channel types */
+        /* Silly fix for channel types */
         if (pd.type().isChannelType() || pd.type().isChannelEndType())
             type = PJChannel.class.getSimpleName() + type.substring(type.indexOf("<"), type.length());
         
@@ -1069,9 +1078,12 @@ public class CodeGeneratorJava extends Visitor<Object> {
         for (Modifier m : pd.modifiers())
             modifiers.add((String) m.visit(this));
         
-        /* Add extended protocols (if any) */
+        d_currProtocol = name;
+        ArrayList<String> extend = new ArrayList<String>();
+        /* We use tags to associate parent and child protocols */
         if (pd.extend().size() > 0) {
             for (Name n : pd.extend()) {
+                extend.add(n.getname());
                 ProtocolTypeDecl ptd = (ProtocolTypeDecl) d_topLevelDecls.get(n.getname());
                 for (ProtocolCase pc : ptd.body())
                     d_tagsSwitchedOn.put(pd.name().getname() + "." + pc.name().getname(),
@@ -1079,12 +1091,13 @@ public class CodeGeneratorJava extends Visitor<Object> {
             }
         }
         
-        /* The scope in which all members appear in a protocol */
+        /* The scope in which all protocol members appear */
         if (pd.body() != null) {
             for (ProtocolCase pc : pd.body())
                 body.add((String) pc.visit(this));
         }
         
+        stProtocolClass.add("extend", extend);
         stProtocolClass.add("name", name);
         stProtocolClass.add("modifiers", modifiers);
         stProtocolClass.add("body", body);
@@ -1096,7 +1109,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
     public Object visitProtocolCase(ProtocolCase pc) {
         Log.log(pc, "Visiting a ProtocolCase (" + pc.name().getname() + ")");
         
-        ST stProtocolCase = d_stGroup.getInstanceOf("ProtocolCase");
+        ST stProtocolCase = d_stGroup.getInstanceOf("ProtocolType");
         /* Since we are keeping the name of a tag as is, this (in theory)
          * shouldn't cause any name collision */
         String protocName = (String) pc.name().visit(this);
@@ -1108,13 +1121,14 @@ public class CodeGeneratorJava extends Visitor<Object> {
         for (RecordMember rm : pc.body())
             rm.visit(this);
         
-        /* The list of fields that should be passed to the constructor
-         * of the static class that the record belongs to */
+        /* The list of fields passed to the constructor of the static
+         * class that the record belongs to */
         if (!d_recordFields.isEmpty()) {
             stProtocolCase.add("types", d_recordFields.values());
             stProtocolCase.add("vars", d_recordFields.keySet());
         }
         
+        stProtocolCase.add("protType", d_currProtocol);
         stProtocolCase.add("name", protocName);
         
         return stProtocolCase.render();

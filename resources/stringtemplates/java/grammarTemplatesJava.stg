@@ -12,12 +12,12 @@ CodeGeneratorJava visitor.
 // translated by the ProcessJ JVM compiler. The parameters below represent
 // what gets pushed into the template, and, for now, these parameters
 // generate the entire code for a compilable Java file.
-// 1) pathName: A region that organizes a set of related types, procedures,
+// 1.) pathName: A region that organizes a set of related types, procedures,
 //              variables, etc.
-// 2) filename: The name of a ProcessJ file.
-// 3) name: The target class for the JVM.
-// 4) body: A list of declarations generated from a ProcessJ source code.
-// 5) imports: A list of import declarations.
+// 2.) filename: The name of a ProcessJ file.
+// 3.) name: The target class for the JVM.
+// 4.) body: A list of declarations generated from a ProcessJ source code.
+// 5.) imports: A list of import declarations.
 Compilation(pathName, fileName, name, body, version, imports) ::= <<
 import java.util.*;
 import processj.runtime.*;
@@ -43,11 +43,11 @@ public class <name> {
 // A main method definition that represents the entry point of every
 // ProcessJ program and one that is called by the JVM when the program
 // is run.
-// 1) class: the name of the class from which a 'main' process
+// 1.) class: the name of the class from which a 'main' process
 //           can be created and then called by the JVM.
-// 2) name: an instance of an entry point of any ProcessJ program.
-// 3) types: the type of values associated with formal parameters.
-// 4) vars: the names of the formal parameters.
+// 2.) name: an instance of an entry point of any ProcessJ program.
+// 3.) types: the type of values associated with formal parameters.
+// 4.) vars: the names of the formal parameters.
 Main(class, name, types, vars) ::= <<
 public static void main(<types,vars:{t,v | <t> <v>}; separator=", ">) {
 	Scheduler scheduler = new Scheduler();
@@ -62,15 +62,15 @@ public static void main(<types,vars:{t,v | <t> <v>}; separator=", ">) {
 // represents the set of properties and methods that are common to
 // all objects that extend the PJProcess class. The class declarations
 // can include the following components, in order:
-// 1) name: the name of the class preceded by '_proc'.
-// 2) types: data types for formal parameters.
-// 3) vars: unique names for fields preceded by '_pd'.
-// 4) ltypes: data types for local parameters.
-// 5) lvars: unique names for fields preceded by '_ld'.
-// 6) methods: collection of statements that perform an operation.
-// 7) main: the entry point of the program.
-// 8) switchBlock: switch statement to jump through blocks to resume points.
-// 9) syncBody: the body (content) of synchronized method that runs/starts a process.
+// 1.) name: the name of the class preceded by '_proc'.
+// 2.) types: data types for formal parameters.
+// 3.) vars: unique names for fields preceded by '_pd'.
+// 4.) ltypes: data types for local parameters.
+// 5.) lvars: unique names for fields preceded by '_ld'.
+// 6.) methods: collection of statements that perform an operation.
+// 7.) main: the entry point of the program.
+// 8.) switchBlock: switch statement to jump through blocks to resume points.
+// 9.) syncBody: the body (content) of synchronized method that runs/starts a process.
 ProcClass(name, types, vars, ltypes, lvars, methods, main, switchBlock, syncBody) ::= <<
 public static class <name> extends PJProcess {
     <! -------- Instance variables for formal parameters -------- !>
@@ -105,18 +105,18 @@ public static class <name> extends PJProcess {
 // are referred to by names and can be invoked at any point during the
 // execution of the program) and ones that do not extend the class
 // PJProcess.
-// 1) name: the name of the invoked procedure.
-// 2) vars: the names of the formal parameters.
+// 1.) name: the name of the invoked procedure.
+// 2.) vars: the names of the formal parameters.
 Invocation(name, vars) ::= <<
 <name>(<if(vars)><vars; separator=", "><endif>);
 >>
 
 //========================================================================================
 //
-// 1) name:
-// 2) vars:
-// 3) parBlock:
-// 4) barrier:
+// 1.) name:
+// 2.) vars:
+// 3.) parBlock:
+// 4.) barrier:
 InvocationProcType(name, vars, parBlock, barrier) ::= <<
 (new <name>(<if(vars)><vars; separator=", "><endif>) {
     @Override
@@ -133,14 +133,14 @@ InvocationProcType(name, vars, parBlock, barrier) ::= <<
 // required by methods during invocations), the access level such as
 // 'public', 'private', or 'protected', the return value, a body between
 // braces {}, and the name that uniquely identifies the method.
-// 1) modifier: access level such as public, private, or protected.
-// 2) type: the data type of the value returned by the method.
-// 3) name: the name that uniquely applies and identifies the method.
-// 4) types: the type of values associated to formal parameters.
-// 5) vars: the names of the formal parameters preceded by '_ld'.
-// 6) ltypes: data types for local parameters.
-// 7) lvars: unique names for fields preceded by '_ld'.
-// 8) body: the method body enclosed between braces.
+// 1.) modifier: access level such as public, private, or protected.
+// 2.) type: the data type of the value returned by the method.
+// 3.) name: the name that uniquely applies and identifies the method.
+// 4.) types: the type of values associated to formal parameters.
+// 5.) vars: the names of the formal parameters preceded by '_ld'.
+// 6.) ltypes: data types for local parameters.
+// 7.) lvars: unique names for fields preceded by '_ld'.
+// 8.) body: the method body enclosed between braces.
 Method(modifier, type, name, types, vars, ltypes, lvars, body) ::= <<
 <if(modifier)><modifier> <endif>static <type> <name>(<types,vars:{t,v | <t> <v>}; separator=", ">) {
     <! -------- Variables for local parameters -------- !>
@@ -153,9 +153,9 @@ Method(modifier, type, name, types, vars, ltypes, lvars, body) ::= <<
 //========================================================================================
 // A declaration for a member variable that is defined outside of
 // any method but inside the class to which it belongs.
-// 1) modifier: a keyword that defines the access of a field.
-// 2) type: a data type that determines the value a variable can contain.
-// 3) name: a qualified name for the member variable.
+// 1.) modifier: a keyword that defines the access of a field.
+// 2.) type: a data type that determines the value a variable can contain.
+// 3.) name: a qualified name for the member variable.
 Field(modifier, type, name) ::= "<if(modifier)><modifier><else>public<endif> <type> <name>"
 
 //========================================================================================
@@ -163,10 +163,10 @@ Field(modifier, type, name) ::= "<if(modifier)><modifier><else>public<endif> <ty
 // The declaration becomes a simple assignment statement if no type and
 // no operator is specified. If a type is given, it becomes a new declaration
 // in which a value may be assigned to the variable.
-// 1) type: a data type that determines the value a variable can contain.
-// 2) name: a qualified name for the variable.
-// 3) val: the value to be assigned to the variable.
-// 4) op: a build-in operator used to manipulate data and variables.
+// 1.) type: a data type that determines the value a variable can contain.
+// 2.) name: a qualified name for the variable.
+// 3.) val: the value to be assigned to the variable.
+// 4.) op: a build-in operator used to manipulate data and variables.
 Var(type, name, val, op) ::= "<Type(type)><name><Init(val, op)>"
 Type(type) ::= "<if(type)><type> <endif>"
 Init(val, op) ::= "<if(val)> <if(op)><op><else>=<endif> <val>;<else>;<endif>"
@@ -174,7 +174,7 @@ Init(val, op) ::= "<if(val)> <if(op)><op><else>=<endif> <val>;<else>;<endif>"
 //========================================================================================
 // Defines a 'switch' block containing labels. These labels are used to
 // route the flow of control to the resume points of different processes.
-// 1) jumps: a list of cases generated by 'SwitchCase'.
+// 1.) jumps: a list of cases generated by 'SwitchCase'.
 SwitchBlock(jumps) ::= <<
 <if(jumps)>
 switch (this.runLabel) {
@@ -189,7 +189,7 @@ switch (this.runLabel) {
 // Defines a statement in a 'switch' block with one case. The
 // case evaluates to a label representing the resume point of
 // a process. 
-// 1) jump: the label to restart from.
+// 1.) jump: the label to restart from.
 SwitchCase(jump) ::= "case <jump>: resume(<jump>); break;"
 
 //========================================================================================
@@ -198,12 +198,12 @@ SwitchCase(jump) ::= "case <jump>: resume(<jump>); break;"
 // becomes a variable of the process in which it is declared. A reference
 // to the process in which the 'par' appears and the number of processes
 // found in the 'par' block are used to create a PJPar instance.
-// 1) name: the name that uniquely applies and identifies the 'par' block.
-// 2) count: the number of processes to run concurrently.
-// 3) process: the reference to the process in which the 'par' block is defined.
-// 4) body: the statements inside the 'par' block.
-// 5) jump: the label to restart from.
-// 6) barrier:
+// 1.) name: the name that uniquely applies and identifies the 'par' block.
+// 2.) count: the number of processes to run concurrently.
+// 3.) process: the reference to the process in which the 'par' block is defined.
+// 4.) body: the statements inside the 'par' block.
+// 5.) jump: the label to restart from.
+// 6.) barrier:
 ParBlock(name, count, process, body, jump, barrier) ::= <<
 final PJPar <name> = new PJPar(<count>, <process>);
 <if(barrier)><barrier:{b | <b>.enroll(<count>)}; separator=";\n">;<endif>
@@ -226,12 +226,12 @@ if (<name>.shouldYield()) {
 // method is excluded iff it is created inside a par-for. If this is
 // case, then we generated code similar to that of a ProcessClass; e.g.,
 // with member fields.
-// 1) switchBlock: switch statement to jump through blocks to resume points.
-// 2) syncBody: the body (content) of synchronized method that runs/starts a process.
-// 3) parBlock:
-// 4) barrier:
-// 5) ltypes: data types for local parameters that are used in a 'par-for'.
-// 6) lvars: unique names for fields preceded by '_ld' that are used in a 'par-for'.
+// 1.) switchBlock: switch statement to jump through blocks to resume points.
+// 2.) syncBody: the body (content) of synchronized method that runs/starts a process.
+// 3.) parBlock:
+// 4.) barrier:
+// 5.) ltypes: data types for local parameters that are used in a 'par-for'.
+// 6.) lvars: unique names for fields preceded by '_ld' that are used in a 'par-for'.
 AnonymousProcess(switchBlock, syncBody, parBlock, barrier, ltypes, lvars) ::= <<
 new PJProcess() {
     <! -------- Instance variables for local parameters -------- !>
@@ -263,53 +263,53 @@ new PJProcess() {
 
 //========================================================================================
 //
-// 1) type:
+// 1.) type:
 ChannelDecl(type) ::= "<if(type)>new <type>()<endif>"
 
 //========================================================================================
 //
-// 1) count:
+// 1.) count:
 BarrierDecl(count) ::= "new PJBarrier(<if(count)><count><endif>)"
 
 //========================================================================================
 //
-// 1) name:
+// 1.) name:
 TimerRedExpr(name) ::= "<name> = PJTimer.read();"
 
 //========================================================================================
 //
-// 1) value:
-// 2) type:
+// 1.) value:
+// 2.) type:
 PrimitiveLiteral(value, type) ::= "<value><if(type)><type><endif>"
 
 //========================================================================================
 //
-// 1) name:
-// 2) type:
-// 3) dims:
-// 4) vals:
+// 1.) name:
+// 2.) type:
+// 3.) dims:
+// 4.) vals:
 NewArray(name, type, init) ::= <<
 <if(name)><name> = <endif>new <type><init><if(name)>;<endif>
 >>
 
 //========================================================================================
-// 1) dims:
-// 2) vals:
+// 1.) dims:
+// 2.) vals:
 NewArrayLiteral(dims, vals, dim) ::= <<
 <if(dims)><dims:{dim | [<dim>]}; separator = ""><else><dim>{ <vals:{v | <v>}; separator=","> }<endif>
 >>
 
 //========================================================================================
 //
-// 1) name:
-// 2) index:
+// 1.) name:
+// 2.) index:
 ArrayAccessExpr(name, index) ::= "<name>[<index>]"
 
 //========================================================================================
 //
-// 1) name:
-// 2) delay:
-// 3) resume0:
+// 1.) name:
+// 2.) delay:
+// 3.) resume0:
 TimeoutStat(name, delay, resume0) ::= <<
 <name> = new PJTimer(this, <delay>);
 try {
@@ -325,9 +325,9 @@ label(<resume0>);
 
 //========================================================================================
 //
-// 1) chaName: name of the write channel-end.
-// 2) resume0:
-// 3) resume1:
+// 1.) chaName: name of the write channel-end.
+// 2.) resume0:
+// 3.) resume1:
 ChanWriteStat(chanName, writeExpr, resume0) ::= <<
 <chanName>.write(this, <writeExpr>);
 this.runLabel = <resume0>;
@@ -337,9 +337,9 @@ label(<resume0>);<\n>
 
 //========================================================================================
 //
-// 1) chaName: name of the write channel-end.
-// 2) resume0:
-// 3) resume1:
+// 1.) chaName: name of the write channel-end.
+// 2.) resume0:
+// 3.) resume1:
 ChannelReadExpr(chanName, lhs, op, resume0, resume1, extendRv) ::= <<
 if (!<chanName>.isReadyToRead(this)) {
     this.runLabel = <resume0>;
@@ -364,10 +364,10 @@ label(<resume1>);<!-- remove 'line-feed' --!>
 
 //========================================================================================
 //
-// 1) chanName:
-// 2) resume0:
-// 3) resume1:
-// 4) resume2:
+// 1.) chanName:
+// 2.) resume0:
+// 3.) resume1:
+// 4.) resume2:
 ChannelOne2Many(chanName, lhs, op, resume0, resume1, resume2, extendRv) ::= <<
 if (!<chanName>.claimRead(this)) {
     this.runLabel = <resume0>;
@@ -400,10 +400,10 @@ label(<resume2>);
 
 //========================================================================================
 //
-// 1) chanName:
-// 2) writeExpr:
-// 3) resume0:
-// 4) resume1:
+// 1.) chanName:
+// 2.) writeExpr:
+// 3.) resume0:
+// 4.) resume1:
 ChannelMany2One(chanName, writeExpr, resume0, resume1) ::= <<
 if (!<chanName>.claimWrite(this)) {
     this.runLabel = <resume0>;
@@ -422,9 +422,9 @@ label(<resume1>);
 
 //========================================================================================
 //
-// 1) expr:
-// 2) thenPart:
-// 3) elsePart:
+// 1.) expr:
+// 2.) thenPart:
+// 3.) elsePart:
 IfStat(expr, thenPart, elsePart) ::= <<
 if (<expr>) {
     <thenPart; separator="\n">
@@ -435,22 +435,22 @@ if (<expr>) {
 
 //========================================================================================
 //
-// 1) name:
+// 1.) name:
 BreakStat(name) ::= <<
 <if(name)><name><else>break;<endif>
 >>
 
 //========================================================================================
 //
-// 1) label:
+// 1.) label:
 SwitchLabel(label, tag) ::= <<
 <if(label)>case <label><else>default<endif>
 >>
 
 //========================================================================================
 //
-// 1) labels:
-// 2) stats:
+// 1.) labels:
+// 2.) stats:
 SwitchGroup(labels, stats) ::= <<
 <labels:{l | <l>:}; separator="\n">
     <stats; separator="\n">
@@ -458,8 +458,8 @@ SwitchGroup(labels, stats) ::= <<
 
 //========================================================================================
 //
-// 1) expr:
-// 2) block:
+// 1.) expr:
+// 2.) block:
 SwitchStat(expr, block, tag) ::= <<
 switch(<expr><if(tag)>.tag<endif>) {
 <block; separator="\n">
@@ -468,43 +468,44 @@ switch(<expr><if(tag)>.tag<endif>) {
 
 //========================================================================================
 //
-// 1) operand:
-// 2) op:
+// 1.) operand:
+// 2.) op:
 UnaryPostExpr(operand, op) ::= "<if(operand)><operand><op><endif>;"
 
 //========================================================================================
 //
-// 1) operand:
-// 2) op:
+// 1.) operand:
+// 2.) op:
 UnaryPreExpr(operand, op) ::= "<if(operand)><op><operand><endif>;"
 
 //========================================================================================
 //
-// 1) type:
-// 2) expr:
+// 1.) type:
+// 2.) expr:
 CastExpr(type, expr) ::= "<if(type)>((<type>) (<expr>))<endif>"
 
 //========================================================================================
 //
-// 1) lhs:
-// 2) rhs:
-// 3) op:
+// 1.) lhs:
+// 2.) rhs:
+// 3.) op:
 BinaryExpr(lhs, rhs, op) ::= <<
 <lhs> <op> <rhs>
 >>
 
 //========================================================================================
 //
-// 1) package:
-// 2) file
+// 1.) package:
+// 2.) file
 Import(package, file) ::= "import <package><if(file)>.<file><endif>"
 
 //========================================================================================
 //
-// 1) modifier: access level such as public, private, or protected.
-// 2) name: the name that uniquely applies and identifies the record.
-// 3) types:
-// 4) vars:
+// 1.) modifier: access level such as public, private, or protected.
+// 2.) name: the name that uniquely applies and identifies the record.
+// 3.) types:
+// 4.) vars:
+// 5.) extend:
 RecordType(modifiers, name, types, vars, extend) ::= <<
 <if(modifiers)><modifiers; separator=" "> <else>protected <endif>interface I_<name> extends PJRecord { }
 
@@ -521,10 +522,10 @@ RecordType(modifiers, name, types, vars, extend) ::= <<
 
 //========================================================================================
 // TODO: DEPRECATED -- REMOVE IT!
-// 1) modifier: access level such as public, private, or protected.
-// 2) name: the name that uniquely applies and identifies the record.
-// 3) types:
-// 4) vars:
+// 1.) modifier: access level such as public, private, or protected.
+// 2.) name: the name that uniquely applies and identifies the record.
+// 3.) types:
+// 4.) vars:
 RecordClass(modifiers, name, types, vars) ::= <<
 <if(modifiers)><modifiers; separator=" "> <else>protected <endif>static class <name> implements PJRecord {
     <! -------- Member variables -------- !>
@@ -539,35 +540,60 @@ RecordClass(modifiers, name, types, vars) ::= <<
 
 //========================================================================================
 //
-// 1) type:
-// 2) vals:
+// 1.) type:
+// 2.) vals:
 RecordLiteral(type, vals) ::= <<
 new <type>(<vals; separator=", ">)
 >>
 
 //========================================================================================
 //
-// 1) name:
-// 2) member:
+// 1.) name:
+// 2.) member:
 RecordAccess(name, member) ::= "<if(name)><name>.<member><endif>"
 
 //========================================================================================
 //
-// 1) modifier: access level such as public, private, or protected.
-// 2) name: the name that uniquely applies and identifies the protocol.
-// 3) body:
-ProtocolClass(modifiers, name, body) ::= <<
+// 1.) modifier: access level such as public, private, or protected.
+// 2.) name: the name that uniquely applies and identifies the protocol.
+// 3.) body:
+// 4.) extend:
+ProtocolClass(modifiers, name, body, extend) ::= <<
+<if(modifiers)><modifiers; separator=" "> <else>protected <endif>interface I_<name><if(extend)> extends <extend:{e | I_<e>}; separator=", "><endif> { }
+
 <if(modifiers)><modifiers; separator=" "> <else>protected <endif>static class <name> {
     <body; separator="\n\n">
 }
 >>
 
 //========================================================================================
+//========================================================================================
+//========================================================================================
 //
-// 1) modifier:
-// 2) name:
-// 3) types:
-// 4) vars:
+// 1.) modifier:
+// 2.) name:
+// 3.) types:
+// 4.) vars:
+// 5.) protType:
+ProtocolType(modifier, name, types, vars, protType) ::= <<
+<if(modifier)><modifier> <else>protected <endif>static class <name> extends PJProtocolCase<if(protType)> implements I_<protType> <endif> {
+    <! -------- Member variables -------- !>
+    <if(vars)><types,vars:{t,v | public <t> <v>}; separator=";\n">;<\n><endif>
+    <! -------- Default Constructor -------- !>
+    public <name>(<types,vars:{t,v | <t> <v>}; separator=", ">) {
+        <! Initialize member fields !>
+        <if(vars)><vars:{v | this.<v> = <v>}; separator=";\n">;<endif>
+        this.tag = "<name>";
+    }
+}
+>>
+
+//========================================================================================
+//
+// 1.) modifier:
+// 2.) name:
+// 3.) types:
+// 4.) vars:
 ProtocolCase(modifier, name, types, vars) ::= <<
 <if(modifier)><modifier> <else>protected <endif>static class <name> extends PJProtocolCase {
     <! -------- Member variables -------- !>
@@ -583,27 +609,27 @@ ProtocolCase(modifier, name, types, vars) ::= <<
 
 //========================================================================================
 //
-// 1) name:
-// 2) tag:
-// 3) vals:
+// 1.) name:
+// 2.) tag:
+// 3.) vals:
 ProtocolLiteral(type, tag, vals) ::= <<
 new <type>.<tag>(<if(vals)><vals; separator=", "><endif>)
 >>
 
 //========================================================================================
 //
-// 1) protocName:
-// 2) tag:
-// 3) var:
-// 4) member:
+// 1.) protocName:
+// 2.) tag:
+// 3.) var:
+// 4.) member:
 ProtocolAccess(protocName, tag, var, member) ::= <<
 <if(protocName)>(((<protocName>.<tag>) <var>).<member>)<endif>
 >>
 
 //========================================================================================
 //
-// 1) barrier:
-// 2) resume0:
+// 1.) barrier:
+// 2.) resume0:
 SyncStat(barrier, resume0) ::= <<
 <barrier>.sync(this);
 this.runLabel = <resume0>;
@@ -613,13 +639,13 @@ label(<resume0>);
 
 //========================================================================================
 //
-// 1) init:
-// 2) expr:
-// 3) incr:
-// 4) stats:
-// 5) name:
-// 6) count:
-// 7) jump:
+// 1.) init:
+// 2.) expr:
+// 3.) incr:
+// 4.) stats:
+// 5.) name:
+// 6.) count:
+// 7.) jump:
 ParForStat(init, expr, incr, stats, name, count, jump) ::= <<
 final PJPar <name> = new PJPar(0, this);
 ArrayList\<PJProcess> processes = new ArrayList\<PJProcess>();
@@ -645,9 +671,9 @@ label(<jump>);
 
 //========================================================================================
 //
-// 1) number:
-// 2) guardExpr:
-// 3) stats:
+// 1.) number:
+// 2.) guardExpr:
+// 3.) stats:
 AltCase(number, guardExpr, stats) ::= <<
 case <number>:
     <guardExpr>
@@ -657,15 +683,15 @@ case <number>:
 
 //========================================================================================
 //
-// 1) alt:
-// 2) count:
-// 3) initBooleanGuards:
-// 4) initGuards:
-// 5) bguards:
-// 6) guards:
-// 7) jump:
-// 8) cases:
-// 9) index:
+// 1.) alt:
+// 2.) count:
+// 3.) initBooleanGuards:
+// 4.) initGuards:
+// 5.) bguards:
+// 6.) guards:
+// 7.) jump:
+// 8.) cases:
+// 9.) index:
 AltStat(alt, count, initBooleanGuards, initGuards, bguards, guards, jump, cases, index) ::= <<
 <alt> = new PJAlt(<count>, this);
 <initBooleanGuards>
@@ -694,8 +720,8 @@ switch(selected) {
 
 //========================================================================================
 //
-// 1) locals:
-// 2) constants:
+// 1.) locals:
+// 2.) constants:
 BooleanGuards(locals, constants) ::= <<
 <if(locals)><locals; separator="\n"><endif>
 <if(constants)>boolean[] booleanGuards = { <constants; separator=", "> };<endif>
@@ -703,28 +729,30 @@ BooleanGuards(locals, constants) ::= <<
 
 //========================================================================================
 //
-// 1) guards:
+// 1.) guards:
 ObjectGuards(guards) ::= <<
 <if(guards)>Object[] objectGuards = { <guards; separator=", "> };<endif>
 >>
 
 //========================================================================================
 //
-// 1) type:
-// 2) var:
+// 1.) type:
+// 2.) var:
 ConstantDecl(type, var) ::= "public static final <type> <var>"
 
 //========================================================================================
 //
-// 1) expr:
+// 1.) expr:
 ReturnStat(expr) ::= "<if(expr)>return <expr>;<endif>"
 
 //========================================================================================
-// 1) name:
+// 1.) name:
 ContinueStat(name) ::= "<if(name)>continue <name><else>continue<endif>;"
 
 //========================================================================================
 //
+// 1.) name:
+// 2.) var:
 InvocationIgnore(name, var) ::= "<name>(<var>);"
 
 //========================================================================================

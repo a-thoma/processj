@@ -20,7 +20,7 @@ import ast.Var;
 import ast.WhileStat;
 
 /**
- * Fixed for unreachable code due to infinite loop.
+ * Fix for unreachable code due to infinite loop.
  * 
  * @author Ben
  */
