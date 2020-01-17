@@ -132,7 +132,9 @@ ERRORS=`echo "${O}" | awk -v n=1 '{if(NR>n) print a[NR%n]; a[NR%n]=$0}'`
 STATUS=`echo "${O}" | awk '/./{line=$0} END{print line}'`
 
 if [ "${STATUS}" = "REWRITING DONE" ] ; then
-  echo "${ERRORS}"
+   if [ "${ERROR}" != "" ] ; then
+     echo "${ERROR}"
+   fi
   echo "Rewriting successful"
 else
   echo "${ERRORS}"

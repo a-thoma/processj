@@ -32,7 +32,7 @@ public class StatementRewrite extends Visitor<AST> {
 		Log.log(is, "Visiting an if statement");
 		
 		if (is.thenpart() != null) {
-			// 'then-part' should be a block.
+			/* 'then-part' should be a block */
 			if (!(is.thenpart() instanceof Block))
 				is.children[1] = new Block(new Sequence<Statement>(is.thenpart()));
 			is.thenpart().visit(this);

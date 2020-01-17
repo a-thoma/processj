@@ -350,8 +350,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
     @Override
     public Object visitBinaryExpr(BinaryExpr be) {
         Log.log(be, "Visiting a BinaryExpr");
-
-        // Generated template after evaluating this visitor.
+        
         ST stBinaryExpr = d_stGroup.getInstanceOf("BinaryExpr");
         String op = be.opString();
         String lhs = (String) be.left().visit(this);        
@@ -362,18 +361,17 @@ public class CodeGeneratorJava extends Visitor<Object> {
         rhs = rhs.replace(DELIMITER, "");
         
         // <--
-        // If 'op' is the keyword 'instanceof', then we need to look at the top
-        // level decls to find the record in question and the record it extends.
+        /* If 'op' is the keyword 'instanceof', then we need to look in the
+         * top-level decls table and find the record in question and the
+         * record it extends */
         if (d_localParams.containsKey(lhs)) {
-            String rtype = d_localParams.get(lhs); // Get the record's type
-            Object o = d_topLevelDecls.get(rtype); // Grab the record in question from top decls
+            String rtype = d_localParams.get(lhs); /* Get the record's type */
+            Object o = d_topLevelDecls.get(rtype); /* look up the record in question from top decls */
             if (o != null && (o instanceof RecordTypeDecl)) {
                 RecordTypeDecl rtd = (RecordTypeDecl) o;
-                
                 stBinaryExpr = d_stGroup.getInstanceOf("RecordExtend");
                 stBinaryExpr.add("name", lhs);
-                stBinaryExpr.add("val", rtd.doesExtend(rhs));
-                
+                stBinaryExpr.add("type", rhs);
                 return stBinaryExpr.render();
             }
         }
@@ -603,7 +601,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(nt, "Visiting a NamedType (" + nt.name().getname() + ")");
         
         String type = (String) nt.name().getname();
-        // This is for protocol inheritance.
+        /* This is for protocol inheritance */
         if (nt.type() != null && nt.type().isProtocolType())
             type = PJProtocolCase.class.getSimpleName();
 
@@ -686,7 +684,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
     public Object visitChannelEndType(ChannelEndType ct) {
         Log.log(ct, "Visiting a ChannelEndType (" + ct.typeName() + ")");
         
-        // Channel class type.
+        /* Channel class type */
         String chanType = PJOne2OneChannel.class.getSimpleName();
         if (ct.isShared()) {  /* Is it a shared channel? */
             if (ct.isRead())  /* One-2-many channel */
@@ -893,8 +891,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         
         ST stSwitchLabel = d_stGroup.getInstanceOf("SwitchLabel");
         
-        /* This could be a default label, in which case, expr()
-         * would be null */
+        /* This could be a default label, in which case, expr() would be null */
         String label = null;
         if (!sl.isDefault())
             label = (String) sl.expr().visit(this);
@@ -1147,9 +1144,10 @@ public class CodeGeneratorJava extends Visitor<Object> {
             }
         }
         
-        /* A visit to a RecordLiteral returns a string, e.g. 'z = 3',
-         * where 'z' is the protocol member and '3' is the literal value
-         * used to initialized 'z' with */
+        /* A visit to a RecordLiteral returns a string of the form <var> = <val>,
+         * where <var> is a record member and <val> is the value assign to <var>.
+         * Instead of parsing the string, we are going to grab the values assigned
+         * to each protocol member, one by one, after traversing the tree */
         for (RecordMemberLiteral rm : pl.expressions()) {
             String lhs = (String) rm.name().getname();
             String expr = (String) rm.expr().visit(this);
@@ -1170,7 +1168,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
     public Object visitRecordTypeDecl(RecordTypeDecl rt) {
         Log.log(rt, "Visiting a RecordTypeDecl (" + rt.name().getname() + ")");
         
-        ST stRecordClass = d_stGroup.getInstanceOf("RecordClass");
+        ST stRecordType = d_stGroup.getInstanceOf("RecordType");
         String recName = (String) rt.name().visit(this);
         ArrayList<String> modifiers = new ArrayList<String>();
         
@@ -1184,17 +1182,25 @@ public class CodeGeneratorJava extends Visitor<Object> {
         for (RecordMember rm : rt.body())
             rm.visit(this);
         
-        /* The list of fields that should be passed to the constructor
+        /* The list of fields which should be passed to the constructor
          * of the static class that the record belongs to */
         if (!d_recordFields.isEmpty()) {
-            stRecordClass.add("types", d_recordFields.values());
-            stRecordClass.add("vars", d_recordFields.keySet());
+            stRecordType.add("types", d_recordFields.values());
+            stRecordType.add("vars", d_recordFields.keySet());
+        }
+
+        ArrayList<String> extend = new ArrayList<String>();
+        extend.add(recName);
+        if (rt.extend().size() > 0) {
+            for (Name n : rt.extend())
+                extend.add(n.getname());
         }
         
-        stRecordClass.add("name", recName);
-        stRecordClass.add("modifiers", modifiers);
+        stRecordType.add("extend", extend);
+        stRecordType.add("name", recName);
+        stRecordType.add("modifiers", modifiers);
         
-        return stRecordClass.render();
+        return stRecordType.render();
     }
     
     @Override
@@ -1232,10 +1238,11 @@ public class CodeGeneratorJava extends Visitor<Object> {
             }
         }
         
-        /* A visit to a RecordMemberLiteral returns a string, e.g. 'z = 3',
-         * where 'z' is the record member and '3' is the literal value used to
-         * initialized 'z' with, which is something we don't want to do. Instead,
-         * we need to return the literal value assigned to 'z' */
+        /* A visit to a RecordMemberLiteral returns a string of the form
+         * <var> = <val>, where <var> is a record member and <val> is the
+         * value assign to <var>. Instead of parsing the string, we are
+         * going to grab the values assigned to each record member, one by
+         * one, after traversing the tree */
         for (RecordMemberLiteral rm : rl.members()) {
             String lhs = (String) rm.name().getname();
             String expr = (String) rm.expr().visit(this);
@@ -1283,9 +1290,9 @@ public class CodeGeneratorJava extends Visitor<Object> {
             stRecordAccess.add("name", name);
             /* Call the appropriate method to retrieve the number of characters
              * in a string or the number of elements in an N-dimensional array */
-            if (ra.isArraySize) /* 'Xxx'.size for N-dimensional array */
+            if (ra.isArraySize) /* 'Xxx.size' for N-dimensional array */
                 stRecordAccess.add("member", "length");
-            else if (ra.isStringLength) /* 'Xxx'.length for number of characters in a string */
+            else if (ra.isStringLength) /* 'Xxx.length' for number of characters in a string */
                 stRecordAccess.add("member", "length()");
         }
         
@@ -1318,7 +1325,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         /* Increment the jump label and add it to the switch-stmt list */
         stParBlock.add("jump", ++d_jumpLabel);
         d_switchLabelList.add(renderSwitchLabel(d_jumpLabel));
-        /* Add the barrier this par block enrolls in */
+        /* Add the barrier this par-block enrolls in */
         Sequence<Expression> barriers = pb.barriers();
         if (barriers.size() > 0) {
             for (Expression ex : barriers)
@@ -1351,7 +1358,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
                      *      }.schedule(); */
                     if (Helper.doesProcedureYield(in.targetProc))
                         stmts.add((String) in.visit(this));
-                    else // Otherwise, the invocation is made through a static Java method.
+                    else /* Otherwise, the invocation is made through a static Java method */
                         stmts.add((String) createAnonymousProcTypeDecl(st).visit(this));
                 } else
                     stmts.add((String) createAnonymousProcTypeDecl(st).visit(this));
@@ -1646,7 +1653,6 @@ public class CodeGeneratorJava extends Visitor<Object> {
                 d_isArrayLiteral = e instanceof ArrayLiteral ? true : false;
                 inits.add((String) e.visit(this));
             }
-            
             stNewArrayLiteral.add("dim", String.join("", Collections.nCopies(((ArrayType) na.type).getDepth(), "[]")));
             stNewArrayLiteral.add("vals", inits);
         }
