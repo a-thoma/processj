@@ -507,16 +507,26 @@ Import(package, file) ::= "import <package><if(file)>.<file><endif>"
 // 4.) vars:
 // 5.) extend:
 RecordType(modifiers, name, types, vars, extend) ::= <<
-<if(modifiers)><modifiers; separator=" "> <else>protected <endif>interface I_<name> extends PJRecord { }
+<if(modifiers)><modifiers; separator=" "> <else>protected <endif>interface I_<name> extends PJRecord {
+	<! -------- Accessors -------- !>
+    <if(vars)><types,vars:{t,v | public <t> <v>()}; separator=";\n">;<\n><endif>
+    <! -------- Modifiers -------- !>
+    <if(vars)><types,vars:{t,v | public void <v>(<t> d_<v>)}; separator=";\n">;<\n><endif>
+}
 
 <if(modifiers)><modifiers; separator=" "> <else>protected <endif>static class <name> implements <extend:{e | I_<e>}; separator=", "> {
     <! -------- Member variables -------- !>
-    <if(vars)><types,vars:{t,v | public <t> <v>}; separator=";\n">;<\n><endif>
+    <if(vars)><types,vars:{t,v | private <t> d_<v>}; separator=";\n">;<\n><endif>
     <! -------- Default Constructor -------- !>
     public <name>(<types,vars:{t,v | <t> <v>}; separator=", ">) {
         <! Initialize member fields !>
-        <if(vars)><vars:{v | this.<v> = <v>}; separator=";\n">;<endif>
+        <if(vars)><vars:{v | this.d_<v> = <v>}; separator=";\n">;<endif>
     }
+    
+	<! -------- Accessors -------- !>
+    <if(vars)><types,vars:{t,v | @Override public <t> <v>() { return d_<v>; \}}; separator="\n"><\n><endif>
+    <! -------- Modifiers -------- !>
+    <if(vars)><types,vars:{t,v | @Override public void <v>(<t> d_<v>) { this.d_<v> = d_<v>; \}}; separator="\n"><\n><endif>
 }
 >>
 
@@ -549,8 +559,17 @@ new <type>(<vals; separator=", ">)
 //========================================================================================
 //
 // 1.) name:
-// 2.) member:
-RecordAccess(name, member) ::= "<if(name)><name>.<member><endif>"
+// 2.) type:
+// 3.) member:
+RecordAccessor(name, type, member) ::= "<if(name)>((I_<type>)<name>).<member><endif>"
+
+//========================================================================================
+//
+// 1.) name:
+// 2.) type:
+// 3.) member:
+// 4.) value:
+RecordSetter(name, type, member, val) ::= "<if(name)>((I_<type>)<name>).<member>(<val>)<endif>;"
 
 //========================================================================================
 //
@@ -757,4 +776,6 @@ InvocationIgnore(name, var) ::= "<name>(<var>);"
 
 //========================================================================================
 //
+// 1.) name:
+// 2.) type:
 RecordExtend(name, type) ::= "<name> instanceof I_<type>"

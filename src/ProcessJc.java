@@ -57,24 +57,26 @@ public class ProcessJc {
     
     /* List of available options for the ProcessJ compiler */
     public static final Option[] OPTIONS = {
-            new Option("d_colorMode", "-ansi-color", "Use color on terminals that support ansi espace codes"),
-            new Option("d_help", "-help",  "Show this help message and exit"),
+            new Option("d_showColor", "-showColor", "Use color on terminals that support ansi espace codes"),
+            new Option("d_help", "-help", "Show this help message and exit"),
             new Option("d_include", "-include", OptionType.STRING, "Override the default include directory"),
-            new Option("d_message", "-message", "Show info of error and warning messages when available"),
-            new Option("d_target", "-target", OptionType.STRING, "Specify the target language -- c++, Java (default), js"),
+            new Option("d_showMessage", "-showMessage", "Show info of error and warning messages when available"),
+            new Option("d_target", "-target", OptionType.STRING, "Specify the target language -- c++, Java (default)"),
             new Option("d_version", "-version", "Print version information and exit"),
-            new Option("d_visitAll", "-visit-all", "Generate all parse tree visitors")
+            new Option("d_visitor", "-visitor", "Generate all parse tree visitors"),
+            new Option("d_showTree", "-showTree", "Show the AST constructed from the parser")
     };
     
     // <--
     /* Fields used by the ProcessJ compiler */
-    public boolean d_colorMode = false;
-    public boolean d_help = false;
+    public boolean d_showColor = false;
+    public boolean d_printUsageAndExit = false;
     public String d_include = null;
-    public boolean d_message = false;
+    public boolean d_showMessage = false;
     public Language d_target = Settings.language;
     public boolean d_version = false;
-    public boolean d_visitAll = false;
+    public boolean d_visitor = false;
+    public boolean d_showTree = false;
     // -->
     
     private ArrayList<String> inputFiles = new ArrayList<String>();
@@ -90,19 +92,18 @@ public class ProcessJc {
     public static void main(String[] args) {
         ProcessJc pj = new ProcessJc(args);
         /* Do we have any arguments? */
-        if (args.length == 0 && !pj.d_help) {
+        if (args.length == 0 && !pj.d_printUsageAndExit) {
             /* At least one file must be provided. Throw an error if no
              * file is given, or if the file does not exists */
             System.out.println(new ProcessJMessage.Builder()
                                    .addError(VisitorMessageNumber.RESOLVE_IMPORTS_100)
-                                   .build().getST().render());
-            pj.help();
+                                   .build().stTemplate().render());
+            pj.printUsageAndExit();
         }
         
-        if (pj.d_help)
-            pj.help();
-        
-        if (pj.d_version)
+        if (pj.d_printUsageAndExit)
+            pj.printUsageAndExit();
+        else if (pj.d_version)
             pj.version();
         
         Settings.includeDir = pj.d_include;
@@ -158,9 +159,13 @@ public class ProcessJc {
             /* This table will hold all the top level types */
             SymbolTable globalTypeTable = new SymbolTable("Main file: " + CompilerErrorManager.INSTANCE.fileName);
 
-            /* Dump log messages if 'on' */
-            if (pj.d_visitAll)
+            /* Dump log messages if true */
+            if (pj.d_visitor)
                 Log.startLogging();
+            
+            /* Dump generated AST */
+            if (pj.d_showTree)
+                c.visit(new ParseTreePrinter());
             
             SymbolTable.hook = null;
             
@@ -181,7 +186,7 @@ public class ProcessJc {
             System.out.println("-- Reconstructing protocols.");
             c.visit(new rewriters.ProtocolRewrite(globalTypeTable));
             
-            // Visit and re-construct if-stat, while-stat, for-stat, and do-stat.
+            // Visit and re-construct if-stmt, while-stmt, for-stmt, and do-stmt.
             System.out.println("-- Reconstructing statements.");
             c.visit(new rewriters.StatementRewrite());
             
@@ -268,14 +273,14 @@ public class ProcessJc {
      * tree is the entire source file, not including leading and trailing
      * whitespace characters and comments.
      *
-     * @param co
+     * @param c
      *              A Compilation unit consisting of a single file.
      * @param inFile
      *              The compiled file.
      * @param s
      *              A symbol table consisting of all the top level types.
      */
-    private void generateCodeJava(Compilation co, File inFile, SymbolTable s) {
+    private void generateCodeJava(Compilation c, File inFile, SymbolTable s) {
         Properties p = utilities.ConfigFileReader.getProcessJConfig();
         /* Run the code generator to decode pragmas, generate libraries,
          * resolve types, and set the symbol table for top level declarations */
@@ -284,31 +289,29 @@ public class ProcessJc {
         generator.workingDir(p.getProperty("workingdir"));
         /* Visit this compilation unit and recursively build the program
          * after returning strings rendered by the string template */
-        String code = (String) co.visit(generator);
+        String code = (String) c.visit(generator);
         /* Write the output to a file */
-        Helper.writeToFile(code, co.fileNoExtension(), generator.workingDir());
+        Helper.writeToFile(code, c.fileNoExtension(), generator.workingDir());
     }
     
     public ProcessJc(String[] args) {
         this.args = args;
         Settings.ansiColor = Boolean.valueOf(config.getProperty("color"));
-        /* Parse command line arguments */
-        parseArgs();
-        /* Switch to turn color mode on/off */
-        colorMode();
+        run(); /* Parse command line arguments */
+        colorMode(); /* Switch to turn color mode on/off */
     }
     
     public void colorMode() {        
         /* Check default value before switching mode to on/off */
-        if (!Settings.ansiColor && this.d_colorMode) /* Color mode 'on' */
-            config.setProperty("color", String.valueOf(this.d_colorMode));
-        else if (Settings.ansiColor && this.d_colorMode) /* Color mode 'off' */
+        if (!Settings.ansiColor && this.d_showColor) /* Color mode 'on' */
+            config.setProperty("color", String.valueOf(this.d_showColor));
+        else if (Settings.ansiColor && this.d_showColor) /* Color mode 'off' */
             config.setProperty("color", String.valueOf(Boolean.FALSE));
         Settings.ansiColor = Boolean.valueOf(config.getProperty("color"));
         ConfigFileReader.closeConfiguration(config);
     }
     
-    public void parseArgs() {
+    public void run() {
         for (int pos = 0; pos < args.length;) {
             String arg = args[pos++];
             if (arg.charAt(0) != '-') {
@@ -346,7 +349,7 @@ public class ProcessJc {
         }
     }
     
-    public void help() {
+    public void printUsageAndExit() {
         for (Option o : OPTIONS)
             System.out.println(String.format("%-20s %s", o.d_optionName, o.d_desc));
         exit(0);

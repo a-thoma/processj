@@ -28,111 +28,111 @@ public abstract class CompilerMessage {
     /**
      * String template file locator.
      */
-    protected static final String stErrorFile = "resources/stringtemplates/messages/errorTemplate.stg";
+    protected static final String ERROR_FILE = "resources/stringtemplates/messages/errorTemplate.stg";
     
     /**
      * Template for error messages.
      */
-    protected static final STGroup stGroup = new STGroupFile(stErrorFile);
+    protected static final STGroup stGroup = new STGroupFile(ERROR_FILE);
     
     /**
      * Current running AST.
      */
-    protected final AST ast;
+    protected final AST d_ast;
     
     /**
      * Type of error message.
      */
-    protected final MessageNumber error;
+    protected final MessageNumber d_errorNumber;
     
     /**
      * Attributes used in templates.
      */
-    protected final Object[] arguments;
+    protected final Object[] d_arguments;
     
     /**
      * Reason for the error message.
      */
-    protected final Throwable throwable;
+    protected final Throwable d_throwable;
     
     /**
      * Source of the message.
      */
-    protected final String fileName;
+    protected final String d_fileName;
     
     /**
      * Location of the input file.
      */
-    protected final String packageName;
+    protected final String d_packageName;
     
     /**
      * Line in file.
      */
-    protected int rowNum;
+    protected int d_rowNumber;
     
     /**
      * Character that generated the error/warning.
      */
-    protected int columnNum;
+    protected int d_columnNumber;
     
     public CompilerMessage(Builder<?> builder) {
-        ast = builder.ast;
-        error = builder.error;
-        arguments = builder.arguments;
-        throwable = builder.throwable;
-        fileName = builder.fileName == null ? CompilerErrorManager.INSTANCE.fileName : builder.fileName;
-        packageName = builder.packageName == null ? CompilerErrorManager.INSTANCE.fileName : builder.packageName;
-        rowNum = builder.myRow;
-        columnNum = builder.myColumn;
+        d_ast = builder.ast;
+        d_errorNumber = builder.error;
+        d_arguments = builder.arguments;
+        d_throwable = builder.throwable;
+        d_fileName = builder.fileName == null ? CompilerErrorManager.INSTANCE.fileName : builder.fileName;
+        d_packageName = builder.packageName == null ? CompilerErrorManager.INSTANCE.fileName : builder.packageName;
+        d_rowNumber = builder.rowNumber;
+        d_columnNumber = builder.colNumber;
     }
     
     // 
     // GETTERS
     // 
     
-    public AST getAST() {
-        return ast;
+    public AST ast() {
+        return d_ast;
     }
     
-    public MessageNumber getMessageNumber() {
-        return error;
+    public MessageNumber messageNumber() {
+        return d_errorNumber;
     }
     
-    public Object[] getArguments() {
-        return arguments;
+    public Object[] arguments() {
+        return d_arguments;
     }
     
-    public Throwable getThrowable() {
-        return throwable;
+    public Throwable throwable() {
+        return d_throwable;
     }
     
-    public String getFileName() {
-        return fileName;
+    public String fileName() {
+        return d_fileName;
     }
     
-    public String getPackageName() {
-        return packageName;
+    public String packageName() {
+        return d_packageName;
     }
     
-    public int getLine() {
-        return rowNum;
+    public int rowNumber() {
+        return d_rowNumber;
     }
     
-    public int getColumn() {
-        return columnNum;
+    public int columnNumber() {
+        return d_columnNumber;
     }
     
-    public ST getST() {
+    public ST stTemplate() {
         int argCount = 0;
         ST message = null;
-        if (error != null)
-            message = new ST(error.getMessage());
+        if (d_errorNumber != null)
+            message = new ST(d_errorNumber.getMessage());
         else
             message = new ST(EMPTY_STRING);
-        if (arguments != null && arguments.length > 0)
-            argCount = arguments.length;
+        if (d_arguments != null && d_arguments.length > 0)
+            argCount = d_arguments.length;
         for (int i = 0; i < argCount; ++i)
-            message.add("arg" + i, arguments[i]);
+            message.add("arg" + i, d_arguments[i]);
         return message;
     }
     
@@ -141,20 +141,20 @@ public abstract class CompilerMessage {
     @Override
     public String toString() {
         return getClass().getSimpleName() +
-                "(filename="        + (fileName.isEmpty() ? "none" : fileName) +
-                ", package="        + (packageName.isEmpty() ? "none" : packageName) +
-                ", errorNumber="    + error.getNumber() +
-                ", errorMessage="   + error.getMessage() +
-                ", arguments="      + (arguments != null ? "{" +
-                                      Arrays.stream(arguments)
+                "(filename="        + (d_fileName.isEmpty() ? "none" : d_fileName) +
+                ", package="        + (d_packageName.isEmpty() ? "none" : d_packageName) +
+                ", errorNumber="    + d_errorNumber.getNumber() +
+                ", errorMessage="   + d_errorNumber.getMessage() +
+                ", arguments="      + (d_arguments != null ? "{" +
+                                      Arrays.stream(d_arguments)
                                             .map(arg -> arg + "")
                                             .collect(Collectors.joining(",")) + "}"
                                             : "none") +
-                ", reason="         + (throwable != null ?
-                                            throwable.getMessage()
+                ", reason="         + (d_throwable != null ?
+                                            d_throwable.getMessage()
                                             : "none") +
-                ", row="            + rowNum +
-                ", column="         + columnNum +
+                ", row="            + d_rowNumber +
+                ", column="         + d_columnNumber +
                 ")";
     }
     
@@ -162,14 +162,14 @@ public abstract class CompilerMessage {
     public final int hashCode() {
         final int prime = 31;
         int result = 1;
-        result = prime + result + ast.hashCode();
-        result = prime + result + error.hashCode();
-        result = prime + result + Arrays.hashCode(arguments);
-        result = prime + result + throwable.hashCode();
-        result = prime + result + fileName.hashCode();
-        result = prime + result + packageName.hashCode();
-        result = prime + result + rowNum;
-        result = prime + result + columnNum;
+        result = prime + result + d_ast.hashCode();
+        result = prime + result + d_errorNumber.hashCode();
+        result = prime + result + Arrays.hashCode(d_arguments);
+        result = prime + result + d_throwable.hashCode();
+        result = prime + result + d_fileName.hashCode();
+        result = prime + result + d_packageName.hashCode();
+        result = prime + result + d_rowNumber;
+        result = prime + result + d_columnNumber;
         return result;
     }
     
@@ -181,17 +181,17 @@ public abstract class CompilerMessage {
             return false;
         
         CompilerMessage other = (CompilerMessage) obj;
-        if (this.rowNum != other.rowNum || this.columnNum != other.columnNum)
+        if (this.d_rowNumber != other.d_rowNumber || this.d_columnNumber != other.d_columnNumber)
             return false;
-        if (!this.fileName.equals(other.fileName) || !this.packageName.equals(other.packageName))
+        if (!this.d_fileName.equals(other.d_fileName) || !this.d_packageName.equals(other.d_packageName))
             return false;
-        if (this.ast != other.ast) // This is ok!
+        if (this.d_ast != other.d_ast) /* This should be ok */
             return false;
-        if (!this.error.equals(other.error))
+        if (!this.d_errorNumber.equals(other.d_errorNumber))
             return false;
-        if (!Arrays.equals(this.arguments, other.arguments))
+        if (!Arrays.equals(this.d_arguments, other.d_arguments))
             return false;
-        if (!this.throwable.equals(other.throwable))
+        if (!this.d_throwable.equals(other.d_throwable))
             return false;
         
         return true;
@@ -221,8 +221,8 @@ public abstract class CompilerMessage {
         protected Throwable throwable;
         protected String fileName;
         protected String packageName;
-        protected int myRow;
-        protected int myColumn;
+        protected int rowNumber;
+        protected int colNumber;
         
         public Builder() {
             ast = null;
@@ -267,13 +267,13 @@ public abstract class CompilerMessage {
             return builder();
         }
         
-        public B addRow(int myRow) {
-            this.myRow = myRow;
+        public B addRowNumber(int rowNumber) {
+            this.rowNumber = rowNumber;
             return builder();
         }
         
-        public B addColumn(int myColumn) {
-            this.myColumn = myColumn;
+        public B addColNumber(int colNumber) {
+            this.colNumber = colNumber;
             return builder();
         }
     }

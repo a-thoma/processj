@@ -76,7 +76,7 @@ public class Helper {
     /**
      * Returns true if a procedure is capable of yielding or false
      * otherwise. Note that 'yieldability' is determined by checking
-     * the procedure's annotation through annotations().
+     * the procedure's annotation through its annotations() method.
      *
      * @param pd
      *            The procure whose annotation is to be checked.
@@ -86,8 +86,7 @@ public class Helper {
         if (pd == null)
             return false;
         
-        return pd.yields ||
-               (pd.annotations().isDefined("yield") &&
+        return pd.yields || (pd.annotations().isDefined("yield") &&
                Boolean.valueOf(pd.annotations().get("yield")));
     }
     

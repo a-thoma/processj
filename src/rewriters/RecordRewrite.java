@@ -31,24 +31,24 @@ public class RecordRewrite extends Visitor<AST> {
         Log.log(a, "extends a RecordTypeDecl (" + ((RecordTypeDecl) a).name().getname() + ")");
 
         RecordTypeDecl rt = (RecordTypeDecl) a;
-        HashSet<RecordMember> se = new LinkedHashSet<RecordMember>();
+        HashSet<RecordMember> hashSet = new LinkedHashSet<RecordMember>();
         for (RecordMember rm : rt.body()) {
             Log.log(rt, "adding member " + rm.type() + " " + rm.name().getname());
-            se.add(rm);
+            hashSet.add(rm);
         }
-        // Add new members if the record extends other records.
+        /* Add member fields that belong to extended records */
         if (rt.extend().size() > 0) {
             for (Name parent : rt.extend()) {
                 if (sym.get(parent.getname()) != null) {
-                    HashSet<RecordMember> seqr = addExtendedRecords((RecordTypeDecl) sym.get(parent.getname()));
-                    for (RecordMember rm : seqr) {
-                        if (!se.add(rm))
+                    HashSet<RecordMember> memberSet = addExtendedRecords((RecordTypeDecl) sym.get(parent.getname()));
+                    for (RecordMember rm : memberSet) {
+                        if (!hashSet.add(rm))
                             Log.log(rt, "Name '" + rm.name().getname() + "' already in (" + rt.name().getname() + ")");
                     }
                 }
             }
         }        
-        return se;
+        return hashSet;
     }
     
     // DONE
@@ -56,19 +56,19 @@ public class RecordRewrite extends Visitor<AST> {
     public AST visitRecordTypeDecl(RecordTypeDecl rt) {
         Log.log(rt, "Visiting a RecordTypeDecl (" + rt.name().getname() + ")");
         
-        HashSet<RecordMember> se = new LinkedHashSet<RecordMember>();
-        // Merge the sequence of members of all extend records.
+        HashSet<RecordMember> hashSet = new LinkedHashSet<RecordMember>();
+        /* Merge the member fields of all extended records */
         if (rt.extend().size() > 0) {
             for (Name name : rt.extend()) {
                 if (sym.get(name.getname()) != null)
-                    se.addAll(addExtendedRecords((RecordTypeDecl) sym.get(name.getname())));
+                    hashSet.addAll(addExtendedRecords((RecordTypeDecl) sym.get(name.getname())));
             }
         }
         for (RecordMember rm : rt.body())
-            se.add(rm);
+            hashSet.add(rm);
         rt.body().clear();
-        // Rewrite the extend node.
-        for (RecordMember rm : se)
+        /* Rewrite the extend node */
+        for (RecordMember rm : hashSet)
             rt.body().append(rm);
         Log.log(rt, "record " + rt.name().getname() + " with " + rt.body().size() + " member(s)");
         for (RecordMember rm : rt.body())

@@ -29,36 +29,36 @@ public class ProtocolRewrite extends Visitor<AST> {
         Log.logHeader("****************************************");
     }
     
-    public void addName(HashSet<Name> se, Name name) {
+    public void addProtocolName(HashSet<Name> hashSet, Name name) {
     	boolean found = false;
-        for (Name n : se) {
+        for (Name n : hashSet) {
             if (n.getname().equals(name.getname())) {
             	found = true;
             	break;
             }
         }
         if (!found)
-        	se.add(name);
+        	hashSet.add(name);
     }
     
-    public HashSet<Name> addExtendProtocols(AST a) {
+    public HashSet<Name> addExtendProtocolNames(AST a) {
         Log.log(a, "extends a ProtocolypeDecl (" + ((ProtocolTypeDecl) a).name().getname() + ")");
         
         ProtocolTypeDecl pd = (ProtocolTypeDecl) a;
-        HashSet<Name> se = new LinkedHashSet<Name>();
+        HashSet<Name> hashSet = new LinkedHashSet<Name>();
         Log.log(pd, "adding protocol " + pd.name().getname());
-        se.add(pd.name());
-        // Add new tags if the protocol extends other protocols.
+        hashSet.add(pd.name());
+        /* Add member tags that belong to the extended protocols */
         if (pd.extend().size() > 0) {
             for (Name parent : pd.extend()) {
                 if (sym.get(parent.getname()) != null) {
-                    HashSet<Name> seq = addExtendProtocols((ProtocolTypeDecl) sym.get(parent.getname()));
-                    for (Name pdt : seq)
-                    	addName(se, pdt);
+                    HashSet<Name> nameSet = addExtendProtocolNames((ProtocolTypeDecl) sym.get(parent.getname()));
+                    for (Name pdt : nameSet)
+                    	addProtocolName(hashSet, pdt);
                 }
             }
         }
-        return se;
+        return hashSet;
     }
     
     // DONE
@@ -66,19 +66,19 @@ public class ProtocolRewrite extends Visitor<AST> {
     public AST visitProtocolTypeDecl(ProtocolTypeDecl pd) {
         Log.log(pd, "Visiting a ProtocolTypeDecl (" + pd.name().getname() + ")");
         
-        HashSet<Name> se = new LinkedHashSet<Name>();
-        // Merge the sequence of tags of all extend protocols.
+        HashSet<Name> hashSet = new LinkedHashSet<Name>();
+        /* Merge the member tags of all extended protocols */
         if (pd.extend().size() > 0) {
             for (Name name : pd.extend()) {
                 if (sym.get(name.getname()) != null)
-                    se.addAll(addExtendProtocols((ProtocolTypeDecl) sym.get(name.getname())));
+                    hashSet.addAll(addExtendProtocolNames((ProtocolTypeDecl) sym.get(name.getname())));
             }
         }
         for (Name n : pd.extend())
-            addName(se, n);
+            addProtocolName(hashSet, n);
         pd.extend().clear();
-        // Rewrite the extend node.
-        for (Name n : se)
+        /* Rewrite the extend node */
+        for (Name n : hashSet)
             pd.extend().append(n);
         Log.log(pd, "protocol " + pd.name().getname() + " with " + pd.extend().size() + " parent(s)");
         for (Name n : pd.extend())

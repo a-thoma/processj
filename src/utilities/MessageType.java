@@ -2,7 +2,7 @@ package utilities;
 
 /**
  * This enum allows the ProcessJ compiler to register messages at
- * compile-time or run-time that can be (1) displayed on the screen,
+ * compile-time or runtime that can be (1) displayed on the screen,
  * (2) not displayed on the screen, or (3) displayed before terminating
  * the execution of the program. A message of type PRINT_CONTINUE
  * instructs the compiler to display a message and resume program

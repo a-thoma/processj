@@ -57,9 +57,6 @@ parser code  {:
   }
 :};
 
-
-
-
 scan with {: return lexer.next_token(); :};
 
 // -----------------------------------------------------------------------------
@@ -409,8 +406,8 @@ start with source;
 
 //- Compilation :> AST
 source ::= 
-      compilation_unit:c {: RESULT = c; :}
-    ;
+         compilation_unit:c {: RESULT = c; :}
+       ;
 
 // **************************************************
 // 2.0 Type Declarations
@@ -422,7 +419,7 @@ source ::=
 type_declarations_opt ::=
           type_declarations:ts {: RESULT = ts; :}
         | /* epsilon */        {: RESULT = new Sequence<Type>(); :}
-    ;
+        ;
 
 //- Sequence[Type :> AST] :> AST
 type_declarations ::=
@@ -436,7 +433,7 @@ type_declaration ::=
         | record_type_declaration:r        {: r.myPackage = CompilerErrorManager.INSTANCE.packageName; RESULT = new Sequence<Type>(r); :}
         | protocol_type_declaration:p      {: p.myPackage = CompilerErrorManager.INSTANCE.packageName; RESULT = new Sequence<Type>(p); :}
         | constant_declaration:c           {: c.myPackage = CompilerErrorManager.INSTANCE.packageName; RESULT = c; :}       
-    | EXTERN extern_type:e IDENTIFIER:n  {: e.myPackage = CompilerErrorManager.INSTANCE.packageName; RESULT = new Sequence<Type>(new NamedType(new Name(n), new ExternType(e))); :}
+        | EXTERN extern_type:e IDENTIFIER:n  {: e.myPackage = CompilerErrorManager.INSTANCE.packageName; RESULT = new Sequence<Type>(new NamedType(new Name(n), new ExternType(e))); :}
         ;
 
 // Name :> AST
@@ -477,8 +474,8 @@ annotations ::=
 // Annotation :> AST
 range ::=
           IDENTIFIER:i EQ IDENTIFIER:v          {: RESULT = new Annotation(i.lexeme, v.lexeme); :}
-    | IDENTIFIER:i EQ BOOLEAN_LITERAL:v     {: RESULT = new Annotation(i.lexeme, v.lexeme); :}
-    | IDENTIFIER:i EQ INTEGER_LITERAL:v     {: RESULT = new Annotation(i.lexeme, v.lexeme); :}
+        | IDENTIFIER:i EQ BOOLEAN_LITERAL:v     {: RESULT = new Annotation(i.lexeme, v.lexeme); :}
+        | IDENTIFIER:i EQ INTEGER_LITERAL:v     {: RESULT = new Annotation(i.lexeme, v.lexeme); :}
         | IDENTIFIER:i EQ LONG_LITERAL:v        {: RESULT = new Annotation(i.lexeme, v.lexeme); :}
         | IDENTIFIER:i EQ FLOAT_LITERAL:v       {: RESULT = new Annotation(i.lexeme, v.lexeme); :}
         | IDENTIFIER:i EQ DOUBLE_LITERAL:v      {: RESULT = new Annotation(i.lexeme, v.lexeme); :}
@@ -504,14 +501,14 @@ type_list ::=
 
 // Name
 type_name ::=
-      IDENTIFIER:id                   {: RESULT = new Name(id); :}
-    | package_access:pa COLONCOLON IDENTIFIER:id  {: RESULT = new Name(id, pa); :}
-    ;
+          IDENTIFIER:id                   {: RESULT = new Name(id); :}
+        | package_access:pa COLONCOLON IDENTIFIER:id  {: RESULT = new Name(id, pa); :}
+        ;
 
 // Sequence[Name :> AST] :> AST
 package_access ::=
-       IDENTIFIER:id                       {: RESULT = new Sequence<Name>(new Name(id)); :}
-        |  package_access:pa DOT IDENTIFIER:id {: RESULT = pa.append(new Name(id)); :}
+          IDENTIFIER:id                       {: RESULT = new Sequence<Name>(new Name(id)); :}
+        | package_access:pa DOT IDENTIFIER:id {: RESULT = pa.append(new Name(id)); :}
         ;
 
 
@@ -565,14 +562,14 @@ protocol_cases ::=
 
 //- ProtocolCase :> AST
 protocol_case ::= 
-        IDENTIFIER:id COLON record_body_opt:r 
-      {: RESULT = new ProtocolCase(new Name(id), r); :}
+          IDENTIFIER:id COLON record_body_opt:r 
+        {: RESULT = new ProtocolCase(new Name(id), r); :}
         ;
 
 //- Sequence[RecordMember :> AST] :> AST
 record_body_opt ::=
           record_body:r {: RESULT = r; :}
-    | LBRACE /* empty */ RBRACE   {: RESULT = new Sequence<RecordMember>(); :}
+        | LBRACE /* empty */ RBRACE   {: RESULT = new Sequence<RecordMember>(); :}
         ;
 
 //- Sequence[ProtocolCaseDecl :> AST] :> AST // ProtocolCaseDecl is a Type and a Name
@@ -982,11 +979,11 @@ while_statement_no_short_if ::=       WHILE LPAREN expression:e RPAREN statement
 for_statement ::=
         FOR:t LPAREN for_init_opt:i SEMICOLON expression_opt:e SEMICOLON for_update_opt:u RPAREN statement:s     
           {: RESULT = new ForStat(t, i, e, u, new Sequence<Expression>(), s, false); :}
-      | PAR FOR:t LPAREN for_init_opt:i SEMICOLON expression_opt:e SEMICOLON for_update_opt:u RPAREN ENROLL LPAREN argument_list:b RPAREN statement:s
-      {: RESULT = new ForStat(t, i, e, u, b, s, true); :}
-      | PAR FOR:t LPAREN for_init_opt:i SEMICOLON expression_opt:e SEMICOLON for_update_opt:u RPAREN statement:s
-      {: RESULT = new ForStat(t, i, e, u, new Sequence<Expression>(), s, true); :}
-      ;
+       | PAR FOR:t LPAREN for_init_opt:i SEMICOLON expression_opt:e SEMICOLON for_update_opt:u RPAREN ENROLL LPAREN argument_list:b RPAREN statement:s
+       {: RESULT = new ForStat(t, i, e, u, b, s, true); :}
+       | PAR FOR:t LPAREN for_init_opt:i SEMICOLON expression_opt:e SEMICOLON for_update_opt:u RPAREN statement:s
+       {: RESULT = new ForStat(t, i, e, u, new Sequence<Expression>(), s, true); :}
+       ;
 
 // ForStat :> Statement :> AST
 for_statement_no_short_if ::=
@@ -1008,7 +1005,7 @@ for_init_opt ::=
 for_init ::=      
           statement_expressions:e      {: RESULT = e; :}
         | local_variable_declaration:e {: RESULT = e; :}
-       ;
+        ;
 
 // Sequence[ExprStat :> AST] :> AST
 for_update_opt ::=
@@ -1076,8 +1073,8 @@ empty_statement ::=
 barrier_sync_statement ::= 
 //          SYNC primary_no_new_array_or_mobile:e SEMICOLON {: RESULT = new SyncStat(e); :}
         primary:e DOT SYNC LPAREN RPAREN SEMICOLON {: RESULT = new SyncStat(e); :}
-     | IDENTIFIER:id DOT SYNC LPAREN RPAREN SEMICOLON {: RESULT = new SyncStat(new NameExpr(new Name(id))); :}
-      ;
+       | IDENTIFIER:id DOT SYNC LPAREN RPAREN SEMICOLON {: RESULT = new SyncStat(new NameExpr(new Name(id))); :}
+       ;
 
 // TimeoutStat :> Statement :> AST
 timeout_statement ::= 
@@ -1118,7 +1115,7 @@ statement_expression ::=
 // Statement :> AST
 labeled_statement ::=
           IDENTIFIER:id COLON statement:s  {: s.setLabel(id.lexeme); RESULT = s; :}
-         ;
+        ;
 
 // **************************************************
 // 9.8 Break/Continue/Return Statement
@@ -1132,7 +1129,7 @@ break_statement ::=
 // ContinueStat :> Statement :> AST
 continue_statement ::=
           CONTINUE:c identifier_opt:i SEMICOLON {: RESULT = new ContinueStat(c,i); :}
-      ;
+        ;
 
 // Name :> AST
 identifier_opt ::=
@@ -1250,8 +1247,8 @@ primary ::=
         | mobile_creation:e                {: RESULT = e; :}
         | chan_read_expression:e           {: RESULT = e; :}
         | chan_expression:e                {: RESULT = e; :}
-    | primary:e COLONCOLON IDENTIFIER:id       {: RESULT = new NameExpr(new Name(id, primary2PackageAccess(e))); :}
-    | IDENTIFIER:id1 COLONCOLON IDENTIFIER:id2 {: RESULT = new NameExpr(new Name(id2, new Sequence(new Name(id1)))); :}
+        | primary:e COLONCOLON IDENTIFIER:id       {: RESULT = new NameExpr(new Name(id, primary2PackageAccess(e))); :}
+        | IDENTIFIER:id1 COLONCOLON IDENTIFIER:id2 {: RESULT = new NameExpr(new Name(id2, new Sequence(new Name(id1)))); :}
         ;
 
 // Expression :> AST
@@ -1277,9 +1274,9 @@ array_creation_expression ::=
         {: RESULT = new NewArray(new NamedType(new Name(id)), d1, d2, null); :}
         | NEW IDENTIFIER:id dims:d array_initializer:i      
         {: RESULT = new NewArray(new NamedType(new Name(id)), new Sequence<Expression>(), d, i); :}
-    | NEW channel_type:ct dim_exprs:d1 dims_opt:d2
+        | NEW channel_type:ct dim_exprs:d1 dims_opt:d2
         {: RESULT = new NewArray(ct, d1, d2, null); :}
-    | NEW channel_type:ct dims:d array_initializer:i
+        | NEW channel_type:ct dims:d array_initializer:i
         {: RESULT = new NewArray(ct, new Sequence<Expression>(), d, i); :}
         ;
 
@@ -1357,7 +1354,7 @@ array_access ::=
 invocation ::=
           IDENTIFIER:id LPAREN argument_list_opt:l RPAREN   {: RESULT = new Invocation(null, new Name(id), l); :}   
         | primary:p DOT IDENTIFIER:id LPAREN argument_list_opt:l RPAREN   {: RESULT = new Invocation(p, new Name(id), l); :}
-    | primary:p COLONCOLON IDENTIFIER:id LPAREN argument_list_opt:l RPAREN  {: RESULT = new Invocation(null, new Name(id, primary2PackageAccess(p)), l); :} 
+        | primary:p COLONCOLON IDENTIFIER:id LPAREN argument_list_opt:l RPAREN  {: RESULT = new Invocation(null, new Name(id, primary2PackageAccess(p)), l); :} 
         | IDENTIFIER:p COLONCOLON IDENTIFIER:id LPAREN argument_list_opt:l RPAREN  {: RESULT = new Invocation(null, new Name(id, primary2PackageAccess(new NameExpr(new Name(p)))), l); :}  
         | IDENTIFIER:p DOT IDENTIFIER:id LPAREN argument_list_opt:l RPAREN {: RESULT = new Invocation(new NameExpr(new Name(p)), new Name(id), l); :}
 ;
@@ -1425,12 +1422,13 @@ unary_expression_not_plus_minus ::=
              
 // CastExpr :> Expression :> AST
 cast_expression ::=
-          LPAREN expression:e RPAREN unary_expression_not_plus_minus:ex {: if (e instanceof NameExpr) 
+          LPAREN expression:e RPAREN unary_expression_not_plus_minus:ex {:
+									  if (e instanceof NameExpr)
                                         RESULT = new CastExpr(new NamedType(((NameExpr)e).name()), ex);
                                       else
-                                        Error.error(e,"Illegal Expression in cast - Type names only");  
-                                      RESULT = null;
-                                        :}   
+                                        Error.error(e,"Illegal Expression in cast - Type names only");
+									  RESULT = null;
+                                      :}   
         | LPAREN primitive_type:t RPAREN unary_expression:e      {: RESULT = new CastExpr(t, e); :}
         ;
 
@@ -1578,7 +1576,7 @@ literal ::=
         | CHARACTER_LITERAL:l      {: RESULT = new PrimitiveLiteral(l, PrimitiveLiteral.CharKind); :}
         | record_literal:l         {: RESULT = l; :}
         | protocol_literal:l       {: RESULT = l; :}
-    | NULL_LITERAL:l           {: RESULT = new PrimitiveLiteral(l, PrimitiveLiteral.NullKind); :}
+        | NULL_LITERAL:l           {: RESULT = new PrimitiveLiteral(l, PrimitiveLiteral.NullKind); :}
         ;
 
 // RecordLiteral :> Literal :> Expression :> AST
@@ -1601,10 +1599,10 @@ record_literal_argument_list ::=
 // ProtocolLiteral :> Literal :> Expression :> AST
 protocol_literal ::=
 //        NEW type_name:tn LBRACE IDENTIFIER:id2 COLON argument_list_opt:l RBRACE 
-        NEW type_name:tn LBRACE IDENTIFIER:id2 COLON record_literal_argument_list_opt:l RBRACE 
-      {: RESULT = new ProtocolLiteral(tn, new Name(id2), l); :}
-      //      | NEW type_name:tn LBRACE IDENTIFIER:id2 COLON RBRACE
-      ;
+          NEW type_name:tn LBRACE IDENTIFIER:id2 COLON record_literal_argument_list_opt:l RBRACE 
+        {: RESULT = new ProtocolLiteral(tn, new Name(id2), l); :}
+        //      | NEW type_name:tn LBRACE IDENTIFIER:id2 COLON RBRACE
+        ;
 
 // -----------------------------------------------------------------------------
 // End of productions

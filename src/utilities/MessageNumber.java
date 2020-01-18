@@ -12,12 +12,14 @@ package utilities;
  */
 public interface MessageNumber {
     
+    public static final int M1 = -1;
+    
     default ErrorSeverity getErrorSeverity() {
         return ErrorSeverity.INFO;
     }
     
     default int getNumber() {
-        return -1;
+        return M1;
     }
     
     String getMessage();

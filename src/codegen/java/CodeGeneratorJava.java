@@ -68,19 +68,22 @@ public class CodeGeneratorJava extends Visitor<Object> {
     private SymbolTable d_topLevelDecls = null;
 
     /* Formal parameters transformed to fields */
-    private HashMap<String, String> d_formalParams = new LinkedHashMap<String, String>();
+    private HashMap<String, String> d_param2Field = new LinkedHashMap<String, String>();
     
-    /* Formal parameter names transformed to name tags */
-    private HashMap<String, String> d_paramDeclNames = new LinkedHashMap<String, String>();
+    /* Formal parameter names transformed to variable names */
+    private HashMap<String, String> d_param2VarName = new LinkedHashMap<String, String>();
     
     /* Local parameters transformed to fields */
-    private HashMap<String, String> d_localParams = new LinkedHashMap<String, String>();
+    private HashMap<String, String> d_local2Field = new LinkedHashMap<String, String>();
     
     /* Record members transformed to fields */
-    private HashMap<String, String> d_recordFields = new LinkedHashMap<String, String>();
+    private HashMap<String, String> d_recordMem2Field = new LinkedHashMap<String, String>();
 
-    /* Protocol names and the corresponding tags currently switched on */
-    private Hashtable<String, String> d_tagsSwitchedOn = new Hashtable<String, String>();
+    /* Protocol names and tags currently switched on */
+    private Hashtable<String, String> d_protocName2ProtocTag = new Hashtable<String, String>();
+    
+    /* Record declarations and their types */
+    private Hashtable<String, String> d_varName2RecordType = new Hashtable<String, String>();
     
     /* List of switch labels */
     private ArrayList<String> d_switchLabelList = new ArrayList<String>();
@@ -110,6 +113,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
     private boolean d_isArrayLiteral = false;
     
     private final static String DELIMITER = ";";
+    private final static String PARENTHESES = "()";
 
     /**
      * Internal constructor that loads a group file containing a collection of
@@ -313,9 +317,9 @@ public class CodeGeneratorJava extends Visitor<Object> {
                 stMain.add("class", d_currCompilation.fileNoExtension());
                 stMain.add("name", procName);
                 /* Pass the list of command line arguments to this main method */
-                if (!d_formalParams.isEmpty()) {
-                    stMain.add("types", d_formalParams.values());
-                    stMain.add("vars", d_formalParams.keySet());
+                if (!d_param2Field.isEmpty()) {
+                    stMain.add("types", d_param2Field.values());
+                    stMain.add("vars", d_param2Field.keySet());
                 }
                 /* Add the entry point of the program */
                 stProcTypeDecl.add("main", stMain.render());
@@ -324,15 +328,15 @@ public class CodeGeneratorJava extends Visitor<Object> {
             /* The list of command line arguments should be passed to the constructor
              * of the static class that the main method belongs to (a procedure class)
              * or should be passed to the Java method (a static method) */
-            if (!d_formalParams.isEmpty()) {
-                stProcTypeDecl.add("types", d_formalParams.values());
-                stProcTypeDecl.add("vars", d_formalParams.keySet());
+            if (!d_param2Field.isEmpty()) {
+                stProcTypeDecl.add("types", d_param2Field.values());
+                stProcTypeDecl.add("vars", d_param2Field.keySet());
             }
             /* The list of local variables defined in the body of a procedure becomes
              * the member variables of the procedure class */
-            if (!d_localParams.isEmpty()) {
-                stProcTypeDecl.add("ltypes", d_localParams.values());
-                stProcTypeDecl.add("lvars", d_localParams.keySet());
+            if (!d_local2Field.isEmpty()) {
+                stProcTypeDecl.add("ltypes", d_local2Field.values());
+                stProcTypeDecl.add("lvars", d_local2Field.keySet());
             }
             /* Add the switch block for resumption */
             if (!d_switchLabelList.isEmpty()) {
@@ -364,20 +368,20 @@ public class CodeGeneratorJava extends Visitor<Object> {
         rhs = rhs.replace(DELIMITER, "");
         
         // <--
-        /* If 'op' is the keyword 'instanceof', then we need to look in the
+        /* If 'op' is the 'instanceof' keyword, then we need to look in the
          * top-level decls table and find the record or protocol in question
          * and the records or protocols it extends */
-        if (d_localParams.containsKey(lhs)) {
-            String rtype = d_localParams.get(lhs); /* Get the record's or protocol's type */
-            Object o = d_topLevelDecls.get(rtype); /* look up the record in question from top decls */
+        if (d_local2Field.containsKey(lhs)) {
+            String namedType = d_local2Field.get(lhs); /* Look up the the variable's type */
+            Object o = d_topLevelDecls.get(namedType); /* Look up the record in question from top decls */
             if (o instanceof RecordTypeDecl) {
-                RecordTypeDecl rtd = (RecordTypeDecl) o;
+//                RecordTypeDecl rtd = (RecordTypeDecl) o;
                 stBinaryExpr = d_stGroup.getInstanceOf("RecordExtend");
                 stBinaryExpr.add("name", lhs);
                 stBinaryExpr.add("type", rhs);
                 return stBinaryExpr.render();
-            } else if (rtype.equals(PJProtocolCase.class.getSimpleName())) {
-                ProtocolTypeDecl ptd = (ProtocolTypeDecl) o;
+            } else if (namedType.equals(PJProtocolCase.class.getSimpleName())) {
+//                ProtocolTypeDecl ptd = (ProtocolTypeDecl) o;
                 stBinaryExpr = d_stGroup.getInstanceOf("RecordExtend");
                 stBinaryExpr.add("name", lhs);
                 stBinaryExpr.add("type", d_currProtocol);
@@ -458,8 +462,12 @@ public class CodeGeneratorJava extends Visitor<Object> {
         String lhs = null;
         String rhs = null;
         
-        if (as.left() != null)
+        if (as.left() != null) {
+            if (as.left() instanceof RecordAccess)
+                return createRecordAssignment(as);
+            
             lhs =  (String) as.left().visit(this);
+        }
         
         if (as.right() instanceof NewArray)
             return createNewArray(lhs, ((NewArray) as.right()));
@@ -494,8 +502,8 @@ public class CodeGeneratorJava extends Visitor<Object> {
         /* Create a tag for this parameter and then add it to the
          * collection of parameters for reference */
         String newName = Helper.makeVariableName(name, ++d_varDecId, Tag.PARAM_NAME);
-        d_formalParams.put(newName, type);
-        d_paramDeclNames.put(name, newName);
+        d_param2Field.put(newName, type);
+        d_param2VarName.put(name, newName);
         
         /* Ignored the value returned by this visitor. The types and
          * variables are _always_ resolved elsewhere */
@@ -507,26 +515,29 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(ld, "Visting a LocalDecl (" + ld.type().typeName() + " " + ld.var().name().getname() + ")");
 
         /* We could have the following targets:
-         *      T x;                              -> a declaration
-         *      T x = 4;                          -> a simple declaration
-         *      T x = in.read();                  -> a single channel read
-         *      T x = b.read() + c.read() + ...;  -> multiple channel reads
-         *      T x = read();                     -> a Java method that returns a value
-         *      T x = a + b;                      -> a binary expression
-         *      T x = a = b ...;                  -> a complex assignment */
+         *   T x;                              // A declaration
+         *   T x = 4;                          // A simple declaration
+         *   T x = in.read();                  // A single channel read
+         *   T x = b.read() + c.read() + ...;  // Multiple channel reads
+         *   T x = read();                     // A Java method that returns a value
+         *   T x = a + b;                      // A binary expression
+         *   T x = a = b ...;                  // A complex assignment */
         String name = (String) ld.var().name().getname();
         String type = (String) ld.type().visit(this);
         String val = null;
         
         String chantype = type;
-        /* The channel type, e.g. one-2-one, one-2-many, many-2-one, many-to-many */
+        /* Is this a channel? e.g. one-2-one, one-2-many, many-2-one, many-to-many */
         if (ld.type().isChannelType() || ld.type().isChannelEndType())
             type = PJChannel.class.getSimpleName() + type.substring(type.indexOf("<"), type.length());
+        /* Is this a record? Change the type to enable multiple inheritance */
+        else if (ld.type().isNamedType() && (((NamedType)ld.type()).type().isRecordType()))
+            type = PJRecord.class.getSimpleName();
 
         /* Create a tag for this local channel expression parameter */
         String newName = Helper.makeVariableName(name, ++d_localDecId, Tag.LOCAL_NAME);
-        d_localParams.put(newName, type);
-        d_paramDeclNames.put(name, newName);
+        d_local2Field.put(newName, type);
+        d_param2VarName.put(name, newName);
         
         /* This variable could be initialized, e.g. through an assignment operator */
         Expression expr = ld.var().init();
@@ -534,8 +545,11 @@ public class CodeGeneratorJava extends Visitor<Object> {
         if (expr != null) {
             if (ld.type() instanceof PrimitiveType)
                 val = (String) expr.visit(this);
-            else if (ld.type() instanceof NamedType) /* Must be a record or protocol */
+            else if (ld.type() instanceof NamedType) { /* Must be a record or protocol */
                 val = (String) expr.visit(this);
+                /* TODO: ...*/
+                d_varName2RecordType.put(newName, chantype);
+            }
             else if (ld.type() instanceof ArrayType)
                 val = (String) expr.visit(this);
         }
@@ -589,8 +603,8 @@ public class CodeGeneratorJava extends Visitor<Object> {
         
         String name = null;
         
-        if (!d_paramDeclNames.isEmpty() && d_paramDeclNames.containsKey(na.getname()))
-            name = d_paramDeclNames.get(na.getname());
+        if (!d_param2VarName.isEmpty() && d_param2VarName.containsKey(na.getname()))
+            name = d_param2VarName.get(na.getname());
         
         if (name == null)
             name = na.getname();
@@ -613,6 +627,8 @@ public class CodeGeneratorJava extends Visitor<Object> {
         /* This is for protocol inheritance */
         if (nt.type() != null && nt.type().isProtocolType())
             type = PJProtocolCase.class.getSimpleName();
+//        else if (nt.type() != null && nt.type().isRecordType())
+//            type = PJRecord.class.getSimpleName();
 
         return type;
     }
@@ -677,7 +693,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
          * where 'T' is the type to be resolved */
         String type = getChannelType(ct.baseType());
         
-        return chantype + "<" + type + ">";
+        return String.format("%s<%s>", chantype, type);
     }
     
     @Override
@@ -715,7 +731,8 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(cw, "Visiting a ChannelWriteStat");
         
         ST stChanWriteStat = d_stGroup.getInstanceOf("ChanWriteStat");
-        /* 'c.write(x)' is a channel-end expression, where 'c' is the writing end of a channel */
+        /* 'c.write(x)' is a channel-end expression, where 'c' is the writing
+         * end of the channel */
         Expression chanExpr = cw.channel();
         /* 'c' is the name of the channel */
         String chanWriteName = (String) chanExpr.visit(this);
@@ -748,7 +765,8 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(cr, "Visiting a ChannelReadExpr");
         
         ST stChannelReadExpr = d_stGroup.getInstanceOf("ChannelReadExpr");
-        /* 'c.read()' is a channel-end expression, where 'c' is the reading end of a channel */
+        /* 'c.read()' is a channel-end expression, where 'c' is the reading
+         * end of the channel */
         Expression chanExpr = cr.channel();
         /* 'c' is the name of the channel */
         String chanEndName = (String) chanExpr.visit(this);
@@ -771,7 +789,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         /* Returned values for name and expression (if any) */
         String name = (String) va.name().visit(this);
         String exprStr = null;
-        /* This variable could be initialized, e.g., through an assignment
+        /* This variable could be initialized, e.g. through an assignment
          * operator */
         Expression expr = va.init();
         /* Visit the expressions associated with this variable */
@@ -907,7 +925,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         if (d_isProtocolCase) {
             /* Silly way to keep track of a protocol tag */
             d_currProtocolTag = label;
-            label = "\"" + label + "\"";
+            label = String.format("\"%s\"", label);
         }
         
         stSwitchLabel.add("label", label);
@@ -968,7 +986,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(ce, "Visiting a CastExpr");
         
         ST stCastExpr = d_stGroup.getInstanceOf("CastExpr");
-        /* This result in: ((<type>) (<expr>)) */
+        /* This result in: (<type>)(<expr>) */
         String type = (String) ce.type().visit(this);
         String expr = (String) ce.expr().visit(this);
         
@@ -1086,7 +1104,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
                 extend.add(n.getname());
                 ProtocolTypeDecl ptd = (ProtocolTypeDecl) d_topLevelDecls.get(n.getname());
                 for (ProtocolCase pc : ptd.body())
-                    d_tagsSwitchedOn.put(pd.name().getname() + "." + pc.name().getname(),
+                    d_protocName2ProtocTag.put(String.format("%s.%s", pd.name().getname(), pc.name().getname()),
                             ptd.name().getname());
             }
         }
@@ -1109,13 +1127,13 @@ public class CodeGeneratorJava extends Visitor<Object> {
     public Object visitProtocolCase(ProtocolCase pc) {
         Log.log(pc, "Visiting a ProtocolCase (" + pc.name().getname() + ")");
         
-        ST stProtocolCase = d_stGroup.getInstanceOf("ProtocolType");
+        ST stProtocolType = d_stGroup.getInstanceOf("ProtocolType");
         /* Since we are keeping the name of a tag as is, this (in theory)
          * shouldn't cause any name collision */
         String protocName = (String) pc.name().visit(this);
         /* This shouldn't create name collision problems even if we
          * use the same visitor for protocols and records */
-        d_recordFields.clear();
+        d_recordMem2Field.clear();
         
         /* The scope in which all members of this tag appeared */
         for (RecordMember rm : pc.body())
@@ -1123,15 +1141,15 @@ public class CodeGeneratorJava extends Visitor<Object> {
         
         /* The list of fields passed to the constructor of the static
          * class that the record belongs to */
-        if (!d_recordFields.isEmpty()) {
-            stProtocolCase.add("types", d_recordFields.values());
-            stProtocolCase.add("vars", d_recordFields.keySet());
+        if (!d_recordMem2Field.isEmpty()) {
+            stProtocolType.add("types", d_recordMem2Field.values());
+            stProtocolType.add("vars", d_recordMem2Field.keySet());
         }
         
-        stProtocolCase.add("protType", d_currProtocol);
-        stProtocolCase.add("name", protocName);
+        stProtocolType.add("protType", d_currProtocol);
+        stProtocolType.add("name", protocName);
         
-        return stProtocolCase.render();
+        return stProtocolType.render();
     }
     
     @Override
@@ -1190,7 +1208,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
             modifiers.add((String) m.visit(this));
         
         /* Remove fields from previous record */
-        d_recordFields.clear();
+        d_recordMem2Field.clear();
         
         /* The scope in which all members appeared in a record */
         for (RecordMember rm : rt.body())
@@ -1198,9 +1216,9 @@ public class CodeGeneratorJava extends Visitor<Object> {
         
         /* The list of fields which should be passed to the constructor
          * of the static class that the record belongs to */
-        if (!d_recordFields.isEmpty()) {
-            stRecordType.add("types", d_recordFields.values());
-            stRecordType.add("vars", d_recordFields.keySet());
+        if (!d_recordMem2Field.isEmpty()) {
+            stRecordType.add("types", d_recordMem2Field.values());
+            stRecordType.add("vars", d_recordMem2Field.keySet());
         }
 
         ArrayList<String> extend = new ArrayList<String>();
@@ -1225,10 +1243,10 @@ public class CodeGeneratorJava extends Visitor<Object> {
         String type = (String) rm.type().visit(this);
         
         /* Add this field to the collection of record members for reference */
-        d_recordFields.put(name, type);
+        d_recordMem2Field.put(name, type);
         
-        /* Ignored the value returned by this visitor, as the types and variables
-         * are _always_ resolved elsewhere */
+        /* Ignored the value returned by this visitor, as the types and
+         * variables are _always_ resolved elsewhere */
         return null;
     }
     
@@ -1276,41 +1294,42 @@ public class CodeGeneratorJava extends Visitor<Object> {
     public Object visitRecordAccess(RecordAccess ra) {
         Log.log(ra, "Visiting a RecordAccess (" + ra + ")");
         
-        ST stRecordAccess = d_stGroup.getInstanceOf("RecordAccess");
+        ST stRecordAccessor = d_stGroup.getInstanceOf("RecordAccessor");
         
         if (ra.record().type.isRecordType()) {
             String name = (String) ra.record().visit(this);
+            String type = d_varName2RecordType.get(name);
             String field = (String) ra.field().getname();
-            
-            stRecordAccess.add("name", name);
-            stRecordAccess.add("member", field);
+            stRecordAccessor.add("name", name);
+            stRecordAccessor.add("type", type);
+            stRecordAccessor.add("member", field + PARENTHESES);
         } else if (ra.record().type.isProtocolType()) {
-            stRecordAccess = d_stGroup.getInstanceOf("ProtocolAccess");
+            stRecordAccessor = d_stGroup.getInstanceOf("ProtocolAccess");
             ProtocolTypeDecl pt = (ProtocolTypeDecl) ra.record().type;
             String protocName = (String) pt.name().visit(this); /* Wrapper class */
             String name = (String) ra.record().visit(this);     /* Reference to inner class type */
             String field = (String) ra.field().getname();       /* Field in inner class */
             
             /* Cast a protocol to a supertype if needed */
-            if (d_tagsSwitchedOn.containsKey(protocName + "." + d_currProtocolTag))
-                protocName = d_tagsSwitchedOn.get(protocName + "." + d_currProtocolTag);
+            if (d_protocName2ProtocTag.containsKey(protocName + "." + d_currProtocolTag))
+                protocName = d_protocName2ProtocTag.get(protocName + "." + d_currProtocolTag);
             
-            stRecordAccess.add("protocName", protocName);
-            stRecordAccess.add("tag", d_currProtocolTag);
-            stRecordAccess.add("var", name);
-            stRecordAccess.add("member", field);
+            stRecordAccessor.add("protocName", protocName);
+            stRecordAccessor.add("tag", d_currProtocolTag);
+            stRecordAccessor.add("var", name);
+            stRecordAccessor.add("member", field);
         } else { /* This is for arrays and strings */
             String name = (String) ra.record().visit(this);
-            stRecordAccess.add("name", name);
+            stRecordAccessor.add("name", name);
             /* Call the appropriate method to retrieve the number of characters
              * in a string or the number of elements in an N-dimensional array */
             if (ra.isArraySize) /* 'Xxx.size' for N-dimensional array */
-                stRecordAccess.add("member", "length");
+                stRecordAccessor.add("member", "length");
             else if (ra.isStringLength) /* 'Xxx.length' for number of characters in a string */
-                stRecordAccess.add("member", "length()");
+                stRecordAccessor.add("member", "length" + PARENTHESES);
         }
         
-        return stRecordAccess.render();
+        return stRecordAccessor.render();
     }
     
     @Override
@@ -1541,16 +1560,13 @@ public class CodeGeneratorJava extends Visitor<Object> {
         stObjectGuards.add("guards", guards);
         
         // <--
-        /* This is needed because of the 'StackMapTable' for
-         * the generated Java bytecode */
+        /* This is needed because of the 'StackMapTable' for the generated Java bytecode */
         Name n = new Name("index");
-        new LocalDecl(new PrimitiveType(PrimitiveType.IntKind),
-                      new Var(n, null),
-                      false /* not constant */).visit(this);
+        new LocalDecl(new PrimitiveType(PrimitiveType.IntKind), new Var(n, null), false /* not constant */).visit(this);
         /* Create a tag for this local alt declaration */
         String newName = Helper.makeVariableName("alt", ++d_localDecId, Tag.LOCAL_NAME);
-        d_localParams.put(newName, "PJAlt");
-        d_paramDeclNames.put(newName, newName);
+        d_local2Field.put(newName, "PJAlt");
+        d_param2VarName.put(newName, newName);
         // -->
         
         stAltStat.add("alt", newName);
@@ -1616,12 +1632,12 @@ public class CodeGeneratorJava extends Visitor<Object> {
         d_localDecId = 0;
         d_jumpLabel = 0;
 
-        d_localParams.clear();
+        d_local2Field.clear();
         d_switchLabelList.clear();
         d_barrierList.clear();
         
-        d_formalParams.clear();
-        d_paramDeclNames.clear();
+        d_param2Field.clear();
+        d_param2VarName.clear();
     }
     
     /* Returns a string representation of a jump label */
@@ -1683,6 +1699,24 @@ public class CodeGeneratorJava extends Visitor<Object> {
         return stNewArray.render();
     }
     
+    private Object createRecordAssignment(Assignment as) {
+        Log.log(as, "Creating a Record Assignment");
+        
+        ST stRecordSetter = d_stGroup.getInstanceOf("RecordSetter");
+        RecordAccess ra = (RecordAccess) as.left();
+        if (ra.record().type.isRecordType()) {
+            String name = (String) ra.record().visit(this);
+            String type = d_varName2RecordType.get(name);
+            String field = (String) ra.field().getname();
+            stRecordSetter.add("name", name);
+            stRecordSetter.add("type", type);
+            stRecordSetter.add("member", field);
+            stRecordSetter.add("val", (String) as.right().visit(this));
+        }
+        
+        return stRecordSetter.render();
+    }
+    
     private Object createChannelReadExpr(String lhs, String op, ChannelReadExpr cr) {
         Log.log(cr, "Creating Channel Read Expression");
         
@@ -1699,7 +1733,8 @@ public class CodeGeneratorJava extends Visitor<Object> {
             return stTimerRedExpr.render();
         }
         
-        int countLabel = 2;  /* One for the 'runLabel' and one for the 'read' operation */
+        /* One for the 'label' and one for the 'read' operation */
+        int countLabel = 2;
         /* Is the reading end of this channel shared? */
         if (chanExpr.type.isChannelEndType() && ((ChannelEndType) chanExpr.type).isShared()) {
             stChannelReadExpr = d_stGroup.getInstanceOf("ChannelOne2Many");

@@ -8,7 +8,7 @@ import java.io.File;
  */
 public class Settings {
     
-    public static String absolutePath = new File("").getAbsolutePath() + "/";
+    public static String absolutePath = new File("").getAbsolutePath() + File.separator;
     public static String includeDir = "include";
     public static Language language = Language.JVM;
     public static boolean ansiColor = false;

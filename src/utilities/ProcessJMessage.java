@@ -6,7 +6,7 @@ import org.stringtemplate.v4.ST;
  * This class is used to create generic messages for the
  * ProcessJ compiler.
  * 
- * @author Ben
+ * @author ben
  * @since 1.2
  */
 public class ProcessJMessage extends CompilerMessage {
@@ -19,34 +19,34 @@ public class ProcessJMessage extends CompilerMessage {
     }
     
     @Override
-    public ST getST() {
+    public ST stTemplate() {
         ST stFile = stGroup.getInstanceOf("File");
         ST stTag = stGroup.getInstanceOf("Tag");
         ST stStackInfo = stGroup.getInstanceOf("StackInfo");
         ST stMessage = stGroup.getInstanceOf("Message");
         
-        if (ast != null) {
-            stFile.add("fileName", fileName);
-            stFile.add("lineNumber", ast.line);
+        if (d_ast != null) {
+            stFile.add("fileName", d_fileName);
+            stFile.add("lineNumber", d_ast.line);
         }
         
-        if (error != null) {
-            stTag.add("tag", error.getErrorSeverity());
-            stTag.add("number", error.getNumber());
+        if (d_errorNumber != null) {
+            stTag.add("tag", d_errorNumber.getErrorSeverity());
+            stTag.add("number", d_errorNumber.getNumber());
         }
         
-        if (throwable != null) {
-            stStackInfo.add("reason", throwable);
-            stStackInfo.add("stack", throwable.getStackTrace());
+        if (d_throwable != null) {
+            stStackInfo.add("reason", d_throwable);
+            stStackInfo.add("stack", d_throwable.getStackTrace());
         }
         
-        // Apply color code if allowed on terminal.
+        /* Apply color code if allowed on terminal */
         String tag = stTag.render();
         if (Settings.ansiColor)
-            tag = ColorCodes.colorTag(stTag.render(), error.getErrorSeverity());
+            tag = ColorCodes.colorTag(stTag.render(), d_errorNumber.getErrorSeverity());
         
         stMessage.add("tag", tag);
-        stMessage.add("message", super.getST().render());
+        stMessage.add("message", super.stTemplate().render());
         stMessage.add("location", stFile.render());
         stMessage.add("stack", stStackInfo.render());
         
@@ -54,11 +54,11 @@ public class ProcessJMessage extends CompilerMessage {
     }
     
     public String renderMessage() {
-        ST stResult = getST();
+        ST stResult = stTemplate();
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(stResult.render());
-        if (doStackTrace && throwable != null)
-            stringBuilder.append(throwable.toString());
+        if (doStackTrace && d_throwable != null)
+            stringBuilder.append(d_throwable.toString());
         return stringBuilder.toString();
     }
     
