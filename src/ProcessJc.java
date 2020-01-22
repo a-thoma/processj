@@ -29,7 +29,6 @@ import utilities.VisitorMessageNumber;
  * @author ben
  */
 public class ProcessJc {
-    
     /* Kinds of available options for the ProcessJ compiler */
     public static enum OptionType {
         STRING,
@@ -247,7 +246,7 @@ public class ProcessJc {
             c.visit(new rewriters.UnrollLoopRewrite());
             
             System.out.println("-- Rewriting yielding expressions.");
-//            new rewriters.ChannelReadRewrite().go(c);
+            new rewriters.ChannelReadRewrite().go(c);
             //System.out.println("Lets reprint it all");
             //c.visit(new printers.ParseTreePrinter());
             //c.visit(new printers.PrettyPrinter());

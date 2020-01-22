@@ -70,14 +70,14 @@ public class UnrollLoopRewrite extends Visitor<AST> {
 
 	// Contructs a 'Label(...)' invocation
 	private Statement makeLabel(int no, AST a) {
-		return new ExprStat(new Invocation(null, new Name("Label"), new Sequence<Expression>(new PrimitiveLiteral(
+		return new ExprStat(new Invocation(null, new Name("LABEL"), new Sequence<Expression>(new PrimitiveLiteral(
 				new Token(sym.INTEGER_LITERAL, "" + no, a.line, a.charBegin, a.charBegin + ("" + no).length() - 1),
 				PrimitiveLiteral.IntKind)), true));
 	}
 
 	// Constructs a 'Goto(...) invocation.
 	private Statement makeGoto(int no, AST a) {
-		return new ExprStat(new Invocation(null, new Name("Goto"), new Sequence<Expression>(new PrimitiveLiteral(
+		return new ExprStat(new Invocation(null, new Name("GOTO"), new Sequence<Expression>(new PrimitiveLiteral(
 				new Token(sym.INTEGER_LITERAL, "" + no, a.line, a.charBegin, a.charBegin + ("" + no).length() - 1),
 				PrimitiveLiteral.IntKind)), true));
 	}

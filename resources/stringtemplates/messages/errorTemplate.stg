@@ -1,4 +1,10 @@
 
+Info() ::= <<
+<! ----- This template is NEVER rendered ---- !>
+This file contains all required templates for generating error messages,
+during compilation or runtime, when processing a ProcessJ source file.
+>>
+
 //========================================================================================
 // 1) reason: A detail message (where reason is the cause of the exception).
 // 2) stack: A list of method calls from the point were an exception was thrown.

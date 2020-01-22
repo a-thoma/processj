@@ -1425,9 +1425,10 @@ cast_expression ::=
           LPAREN expression:e RPAREN unary_expression_not_plus_minus:ex {:
 									  if (e instanceof NameExpr)
                                         RESULT = new CastExpr(new NamedType(((NameExpr)e).name()), ex);
-                                      else
+                                      else {
                                         Error.error(e,"Illegal Expression in cast - Type names only");
-									  RESULT = null;
+									    RESULT = null;
+									  }
                                       :}   
         | LPAREN primitive_type:t RPAREN unary_expression:e      {: RESULT = new CastExpr(t, e); :}
         ;

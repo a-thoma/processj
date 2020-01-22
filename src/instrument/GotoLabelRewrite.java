@@ -30,8 +30,8 @@ import utilities.Log;
  */
 public class GotoLabelRewrite {
     /* Invocations to rewrite */
-    public static final String LABEL = "Label";
-    public static final String GOTO = "Goto";
+    public static final String LABEL = "LABEL";
+    public static final String GOTO = "GOTO";
     /* Map of GOTOs and LABELs instructions */
     HashMap<Integer, LabelNode> d_map = new HashMap<Integer, LabelNode>();
     /* Path for generated class files */

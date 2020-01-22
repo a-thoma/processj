@@ -1,5 +1,6 @@
 package utilities;
 
+import java.io.File;
 import java.util.Arrays;
 import java.util.stream.Collectors;
 
@@ -25,54 +26,34 @@ public abstract class CompilerMessage {
     private static final Object[] EMPTY_ARGUMENTS = new Object[0];
     private static final String EMPTY_STRING = "";
 
-    /**
-     * String template file locator.
-     */
+    /* String template file locator */
     protected static final String ERROR_FILE = "resources/stringtemplates/messages/errorTemplate.stg";
     
-    /**
-     * Template for error messages.
-     */
+    /* Template for error messages */
     protected static final STGroup stGroup = new STGroupFile(ERROR_FILE);
     
-    /**
-     * Current running AST.
-     */
+    /* Current running AST */
     protected final AST d_ast;
     
-    /**
-     * Type of error message.
-     */
+    /* Type of error message */
     protected final MessageNumber d_errorNumber;
     
-    /**
-     * Attributes used in templates.
-     */
+    /* Attributes used in templates */
     protected final Object[] d_arguments;
     
-    /**
-     * Reason for the error message.
-     */
+    /* Reason for the error message */
     protected final Throwable d_throwable;
     
-    /**
-     * Source of the message.
-     */
+    /* Source of the message */
     protected final String d_fileName;
     
-    /**
-     * Location of the input file.
-     */
+    /* Location of the input file */
     protected final String d_packageName;
     
-    /**
-     * Line in file.
-     */
+    /* Line in file */
     protected int d_rowNumber;
     
-    /**
-     * Character that generated the error/warning.
-     */
+    /* Character that generated the error/warning */
     protected int d_columnNumber;
     
     public CompilerMessage(Builder<?> builder) {
@@ -80,7 +61,8 @@ public abstract class CompilerMessage {
         d_errorNumber = builder.error;
         d_arguments = builder.arguments;
         d_throwable = builder.throwable;
-        d_fileName = builder.fileName == null ? CompilerErrorManager.INSTANCE.fileName : builder.fileName;
+        d_fileName = builder.fileName == null ? new File(CompilerErrorManager.INSTANCE.fileName).getAbsolutePath() :
+                                                new File(builder.fileName).getAbsolutePath();
         d_packageName = builder.packageName == null ? CompilerErrorManager.INSTANCE.fileName : builder.packageName;
         d_rowNumber = builder.rowNumber;
         d_columnNumber = builder.colNumber;
