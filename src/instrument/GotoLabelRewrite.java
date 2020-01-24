@@ -154,13 +154,8 @@ public class GotoLabelRewrite {
                 MethodInsnNode mNode = (MethodInsnNode) node;
                 if (GOTO.equals(mNode.name)) {
                     Log.log("Removing goto instruction");
-                    insList.insert(mNode, new InsnNode(Opcodes.NOP));
-                    insList.insert(mNode, new InsnNode(Opcodes.NOP));
-                    insList.insert(mNode, new InsnNode(Opcodes.NOP));
-                    AbstractInsnNode prevInsn1 = mNode.getPrevious();
-                    AbstractInsnNode prevInsn2 = prevInsn1.getPrevious();
-                    insList.remove(prevInsn2);
-                    insList.remove(prevInsn1);
+                    AbstractInsnNode prevInsn = mNode.getPrevious();
+                    insList.remove(prevInsn);
                     insList.remove(mNode);
                 }
             }
@@ -179,13 +174,8 @@ public class GotoLabelRewrite {
                 MethodInsnNode mNode = (MethodInsnNode) node;
                 if (LABEL.equals(mNode.name)) {
                     Log.log("Removing label instruction");
-                    insList.insert(mNode, new InsnNode(Opcodes.NOP));
-                    insList.insert(mNode, new InsnNode(Opcodes.NOP));
-                    insList.insert(mNode, new InsnNode(Opcodes.NOP));
-                    AbstractInsnNode prevInsn1 = mNode.getPrevious();
-                    AbstractInsnNode prevInsn2 = prevInsn1.getPrevious();
-                    insList.remove(prevInsn2);
-                    insList.remove(prevInsn1);
+                    AbstractInsnNode prevInsn = mNode.getPrevious();
+                    insList.remove(prevInsn);
                     insList.remove(mNode);
                 }
             }
