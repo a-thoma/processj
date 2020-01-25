@@ -9,7 +9,7 @@ import ast.NamedType;
 import ast.Sequence;
 import ast.DefineTopLevelDecl;
 import utilities.ProcessJMessage;
-import utilities.CompilerErrorManager;
+import utilities.ProcessJBugManager;
 import utilities.Log;
 import utilities.MessageType;
 import utilities.Settings;
@@ -23,7 +23,7 @@ public class ResolvePackageTypes extends Visitor<AST> {
         Log.logHeader("***************************************************");
         Log.logHeader("* P A C K A G E D   T Y P E   R E S O L U T I O N *");
         Log.logHeader("***************************************************");
-        Log.logHeader("> File: " + CompilerErrorManager.INSTANCE.fileName);
+        Log.logHeader("> File: " + ProcessJBugManager.INSTANCE.fileName);
     }
 
     // X.Y.Z::f, pa is X.Y.Z and we get that turned into X/Y/Z.pj
@@ -50,7 +50,7 @@ public class ResolvePackageTypes extends Visitor<AST> {
         // name declared locally or in an imported file - both will
         // be correctly resolved at name checking time.
         if (pa.size() > 0) {
-            oldCurrentFileName = CompilerErrorManager.INSTANCE.fileName;
+            oldCurrentFileName = ProcessJBugManager.INSTANCE.fileName;
             // Turn X.Y.Z::f into X/Y/Z.pj
             fileName = Settings.absolutePath + makeImportFileName(pa);
             // Does X/Y/Z.pj exist?
@@ -67,14 +67,14 @@ public class ResolvePackageTypes extends Visitor<AST> {
                     // don't do anything just continue after the if.
                 } else {
                     // It was neither a local nor a library file - throw an error...
-                    CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
+                    ProcessJBugManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                                 .addAST(pa)
                                 .addError(VisitorMessageNumber.RESOLVE_IMPORTS_101)
                                 .addArguments(makeImportFileName(pa))
                                 .build());
                 }
             }
-            CompilerErrorManager.INSTANCE.setFileName(fileName);
+            ProcessJBugManager.INSTANCE.setFileName(fileName);
             // Now import it
             comp = ResolveImports.importFile(pa.child(0), fileName);
 
@@ -86,7 +86,7 @@ public class ResolvePackageTypes extends Visitor<AST> {
                 comp.visit(new NameChecker<AST>(st));
                 // TODO: should we type check here?
             }
-            CompilerErrorManager.INSTANCE.setFileName(oldCurrentFileName);
+            ProcessJBugManager.INSTANCE.setFileName(oldCurrentFileName);
             st = SymbolTable.hook;
             // TODO: this should do a proper find if its a symbol table that comes back
             // but we probably need Type checking for that !

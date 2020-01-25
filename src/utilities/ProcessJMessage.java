@@ -9,7 +9,7 @@ import org.stringtemplate.v4.ST;
  * @author ben
  * @since 1.2
  */
-public class ProcessJMessage extends CompilerMessage {
+public class ProcessJMessage extends ProcessJBugMessage {
     
     private boolean doStackTrace = false;
     
@@ -42,7 +42,7 @@ public class ProcessJMessage extends CompilerMessage {
         
         /* Apply color code if allowed on terminal */
         String tag = stTag.render();
-        if (Settings.ansiColor)
+        if (Settings.showColor)
             tag = ColorCodes.colorTag(stTag.render(), d_errorNumber.getErrorSeverity());
         
         stMessage.add("tag", tag);
@@ -77,7 +77,7 @@ public class ProcessJMessage extends CompilerMessage {
      * @version 10/20/2018
      * @since 1.2
      */
-    public static final class Builder extends CompilerMessage.Builder<Builder> {
+    public static final class Builder extends ProcessJBugMessage.Builder<Builder> {
         
         protected boolean doStackTrace;
         
@@ -91,7 +91,7 @@ public class ProcessJMessage extends CompilerMessage {
         }
 
         @Override
-        public <E extends CompilerMessage> E build() {
+        public <E extends ProcessJBugMessage> E build() {
             @SuppressWarnings("unchecked")
             E error = (E) new ProcessJMessage(this);
             return error;

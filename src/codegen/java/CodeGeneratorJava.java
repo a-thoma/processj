@@ -66,16 +66,16 @@ public class CodeGeneratorJava extends Visitor<Object> {
     /* Top level declarations */
     private SymbolTable d_topLevelDecls = null;
 
-    /* Formal parameters transformed to fields */
+    /* Formal parameters transformed into fields */
     private HashMap<String, String> d_param2Field = new LinkedHashMap<String, String>();
     
-    /* Formal parameter names transformed to variable names */
+    /* Formal parameter names transformed into variable names */
     private HashMap<String, String> d_param2VarName = new LinkedHashMap<String, String>();
     
-    /* Local parameters transformed to fields */
+    /* Local parameters transformed into fields */
     private HashMap<String, String> d_local2Field = new LinkedHashMap<String, String>();
     
-    /* Record members transformed to fields */
+    /* Record members transformed into fields */
     private HashMap<String, String> d_recordMem2Field = new LinkedHashMap<String, String>();
 
     /* Protocol names and tags currently switched on */
@@ -227,9 +227,9 @@ public class CodeGeneratorJava extends Visitor<Object> {
             d_switchLabelList = new ArrayList<String>();
         /* Name of invoked procedure */
         d_currProcName = (String) pd.name().visit(this);
-        /* Procedures are static classes which belong to the same package and class.
-         * To avoid having classes with the same name, we generate a new name for
-         * the currently executing procedure */
+        /* Procedures are static classes which belong to the same package and
+         * class. To avoid having classes with the same name, we generate a
+         * new name for the currently executing procedure */
         String procName = null;
         /* For non-invocations, that is, for anything other than a procedure
          * that yields, we need to extends the PJProcess class anonymously */
@@ -241,7 +241,6 @@ public class CodeGeneratorJava extends Visitor<Object> {
             stProcTypeDecl = d_stGroup.getInstanceOf("AnonymousProcess");
             /* Statements that appear in the procedure being executed */
             String[] body = (String[]) pd.body().visit(this);
-            
             stProcTypeDecl.add("parBlock", d_currParBlock);
             stProcTypeDecl.add("syncBody", body);
             /* Add the barrier this procedure should resign from */
@@ -260,7 +259,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
             resetGlobals();
             /* Formal parameters that must be passed to the procedure */
             Sequence<ParamDecl> formals = pd.formalParams();
-
+            /* Do we have any parameters? */
             if (formals != null && formals.size() > 0) {
                 /* Iterate through and visit every parameter declaration */
                 for (int i = 0; i < formals.size(); ++i) {
@@ -270,9 +269,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
                      * value returned by this visitor */
                     actualParam.visit(this);
                 }
-            } else
-                ; /* If we get here, the procedure does not take any parameters */
-            
+            }            
             /* Visit all declarations that appear in the procedure */
             String[] body = (String[]) pd.body().visit(this);
             /* Retrieve modifier(s) attached to invoked procedure such as private,
@@ -321,7 +318,6 @@ public class CodeGeneratorJava extends Visitor<Object> {
                 /* Add the entry point of the program */
                 stProcTypeDecl.add("main", stMain.render());
             }
-            
             /* The list of command line arguments should be passed to the constructor
              * of the static class that the main method belongs to (a procedure class)
              * or should be passed to the Java method (a static method) */
@@ -329,8 +325,8 @@ public class CodeGeneratorJava extends Visitor<Object> {
                 stProcTypeDecl.add("types", d_param2Field.values());
                 stProcTypeDecl.add("vars", d_param2Field.keySet());
             }
-            /* The list of local variables defined in the body of a procedure becomes
-             * the member variables of the procedure class */
+            /* The list of local variables defined in the body of a procedure
+             * becomes the instance fields of the class */
             if (!d_local2Field.isEmpty()) {
                 stProcTypeDecl.add("ltypes", d_local2Field.values());
                 stProcTypeDecl.add("lvars", d_local2Field.keySet());
@@ -365,20 +361,20 @@ public class CodeGeneratorJava extends Visitor<Object> {
         rhs = rhs.replace(DELIMITER, "");
         
         // <--
-        /* If 'op' is the 'instanceof' keyword, then we need to look in the
-         * top-level decls table and find the record or protocol in question
-         * and the records or protocols it extends */
+        /* If 'op' is the 'instanceof' keyword, we need to look in the
+         * top-level decls table and find the record or protocol in
+         * question and the records or protocols it extends */
         if (d_local2Field.containsKey(lhs)) {
-            String namedType = d_local2Field.get(lhs); /* Look up the the variable's type */
-            Object o = d_topLevelDecls.get(namedType); /* Look up the record in question from top decls */
+            /* Look up the variable's type */
+            String namedType = d_local2Field.get(lhs);
+            /* Look up the record in the top-level decls table */
+            Object o = d_topLevelDecls.get(namedType);
             if (o instanceof RecordTypeDecl) {
-//                RecordTypeDecl rtd = (RecordTypeDecl) o;
                 stBinaryExpr = d_stGroup.getInstanceOf("RecordExtend");
                 stBinaryExpr.add("name", lhs);
                 stBinaryExpr.add("type", String.format("I_%s", rhs));
                 return stBinaryExpr.render();
             } else if (namedType.equals(PJProtocolCase.class.getSimpleName())) {
-//                ProtocolTypeDecl ptd = (ProtocolTypeDecl) o;
                 stBinaryExpr = d_stGroup.getInstanceOf("RecordExtend");
                 stBinaryExpr.add("name", lhs);
                 stBinaryExpr.add("type", d_currProtocol);
@@ -404,7 +400,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         
         ST stContinueStat = d_stGroup.getInstanceOf("ContinueStat");
         String name = null;
-        /* If target is not 'null' then we have a label to jump to */
+        /* If target isn't null, then we have a label to jump to */
         if (cs.target() != null) {
             name = (String) cs.target().visit(this);
             stContinueStat.add("name", name);
@@ -470,11 +466,9 @@ public class CodeGeneratorJava extends Visitor<Object> {
             return createNewArray(lhs, ((NewArray) as.right()));
         else if (as.right() instanceof ChannelReadExpr)
             return createChannelReadExpr(lhs, op, ((ChannelReadExpr) as.right()));
-        else {
-            if (as.right() != null) {
-                rhs = (String) as.right().visit(this);
-                rhs = rhs.replace(DELIMITER, "");
-            }
+        else if (as.right() != null) {
+            rhs = (String) as.right().visit(this);
+            rhs = rhs.replace(DELIMITER, "");
         }
         
         stVar.add("name", lhs);
@@ -571,8 +565,9 @@ public class CodeGeneratorJava extends Visitor<Object> {
         if (expr == null) {
             if (!ld.type().isBarrierType() && (ld.type().isPrimitiveType() ||
                 ld.type().isArrayType() ||  /* Could be an uninitialized array declaration */
-                ld.type().isNamedType()))   /* Could be records or protocols */
-                return null;                /* The 'null' is used to removed empty sequences */
+                ld.type().isNamedType()))   /* Could be a record or protocol declaration */
+                return null;                /* The 'null' is used to removed empty sequences in
+                                               the generated code */
         }
         
         /* If we reach this section of code, then we have a variable
@@ -621,11 +616,9 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(nt, "Visiting a NamedType (" + nt.name().getname() + ")");
         
         String type = (String) nt.name().getname();
-        /* This is for protocol inheritance */
+        /* Is this a protocol? Change the type to enable multiple inheritance */
         if (nt.type() != null && nt.type().isProtocolType())
             type = PJProtocolCase.class.getSimpleName();
-//        else if (nt.type() != null && nt.type().isRecordType())
-//            type = PJRecord.class.getSimpleName();
 
         return type;
     }
@@ -736,8 +729,8 @@ public class CodeGeneratorJava extends Visitor<Object> {
         /* Expression sent through channel */
         String expr = (String) cw.expr().visit(this);
         expr = expr.replace(DELIMITER, "");
-        
-        int countLabel = 1; /* One for the 'runLabel' */
+        /* The value '1' is for the 'runLabel' */
+        int countLabel = 1;
         /* Is the writing end of this channel shared? */
         if (chanExpr.type.isChannelEndType() && ((ChannelEndType) chanExpr.type).isShared()) {
             stChanWriteStat = d_stGroup.getInstanceOf("ChannelMany2One");
@@ -881,8 +874,8 @@ public class CodeGeneratorJava extends Visitor<Object> {
                 if (stats == null)
                     continue;
                 /* These are either
-                 *      1.) a sequence of statements, or
-                 *      2.) a single statement
+                 *    1.) a sequence of statements, or
+                 *    2.) a single statement
                  * found in a block statement, e.g. local declarations,
                  * variable declarations, invocations, etc. */
                 if (stats instanceof String[]) {
@@ -983,7 +976,7 @@ public class CodeGeneratorJava extends Visitor<Object> {
         Log.log(ce, "Visiting a CastExpr");
         
         ST stCastExpr = d_stGroup.getInstanceOf("CastExpr");
-        /* This result in: (<type>)(<expr>) */
+        /* This result in (<type>) (<expr>) */
         String type = (String) ce.type().visit(this);
         String expr = (String) ce.expr().visit(this);
         
@@ -1028,9 +1021,9 @@ public class CodeGeneratorJava extends Visitor<Object> {
             /* Make the package visible on import by using the qualified name of
              * the class the procedure belongs to and the name of the directory
              * the procedure's class belongs to, e.g. std.io.println(), where
-             *      1.) 'std' is the name of the package,
-             *      2.) 'io' is the name of the class/file,
-             *      3.) 'println' is the method declared in the class */
+             *   1.) 'std' is the name of the package,
+             *   2.) 'io' is the name of the class/file,
+             *   3.) 'println' is the method declared in the class */
             pdName = pd.filename + "." + pdName;
         } else
             ; /* TODO: This procedure is called from another package */
@@ -1172,11 +1165,11 @@ public class CodeGeneratorJava extends Visitor<Object> {
                 members.put(name, null);
             }
         }
-        
-        /* A visit to a RecordLiteral returns a string of the form <var> = <val>,
-         * where <var> is a record member and <val> is the value assigned to <var>.
-         * Instead of parsing the string, we are going to grab the values assigned
-         * to each protocol member, one by one, after traversing the parse-tree */
+        /* A visit to a RecordLiteral returns a string of the form
+         * <var> = <val>, where <var> is a record member and <val>
+         * is the value assigned to <var>. Instead of parsing the
+         * string, we are going to grab the values assigned to each
+         * protocol member, one by one, after traversing the parse-tree */
         for (RecordMemberLiteral rm : pl.expressions()) {
             String lhs = (String) rm.name().getname();
             String expr = (String) rm.expr().visit(this);
@@ -1264,11 +1257,11 @@ public class CodeGeneratorJava extends Visitor<Object> {
                 members.put(name, null);
             }
         }
-        
-        /* A visit to a RecordMemberLiteral returns a string of the form <var> = <val>,
-         * where <var> is a record member and <val> is the value assigned to <var>.
-         * Instead of parsing the string, we are going to grab the values assigned to
-         * each record member, one by one, after traversing the parse-tree */
+        /* A visit to a RecordMemberLiteral returns a string of the form
+         * <var> = <val>, where <var> is a record member and <val> is the
+         * value assigned to <var>. Instead of parsing the string, we are
+         * going to grab the values assigned to each record member, one by
+         * one, after traversing the parse-tree */
         for (RecordMemberLiteral rm : rl.members()) {
             String lhs = (String) rm.name().getname();
             String expr = (String) rm.expr().visit(this);
@@ -1312,16 +1305,18 @@ public class CodeGeneratorJava extends Visitor<Object> {
             stAccessor.add("member", field);
         }
         /* This is for arrays and strings -- ProcessJ has no concept of classes,
-         * it therefore has no concept of objects either. Arrays and strings are
-         * treated as primitive data types */
+         * i.e. it has no concept of objects either. Arrays and strings are
+         * therefore treated as primitive data types */
         else {
             String name = (String) ra.record().visit(this);
             stAccessor.add("name", name);
             /* Call the appropriate method to retrieve the number of characters
              * in a string or the number of elements in an N-dimensional array */
-            if (ra.isArraySize) /* 'Xxx.size' for N-dimensional array */
+            if (ra.isArraySize)
+                /* 'Xxx.size' for N-dimensional array */
                 stAccessor.add("member", "length");
-            else if (ra.isStringLength) /* 'Xxx.length' for number of characters in a string */
+            else if (ra.isStringLength)
+                /* 'Xxx.length' for number of characters in a string */
                 stAccessor.add("member", "length()");
         }
         
@@ -1743,7 +1738,6 @@ public class CodeGeneratorJava extends Visitor<Object> {
         
         /* Do we have an extended rendezvous? */
         if (cr.extRV() != null) {
-            /* Yes, so go visit it and then generate the appropriate ST for it */
             Object o = cr.extRV().visit(this);
             stChannelReadExpr.add("extendRv", o);
         }

@@ -11,7 +11,7 @@ import utilities.Log;
 import utilities.SymbolTable;
 import utilities.Visitor;
 import utilities.ProcessJMessage;
-import utilities.CompilerErrorManager;
+import utilities.ProcessJBugManager;
 import utilities.Log;
 import utilities.MessageType;
 import utilities.Visitor;
@@ -131,7 +131,7 @@ public class TypeChecker extends Visitor<Type> {
             // This error does not create an error type cause the baseType() is
             // still the array expression's type.
             if (!indexType.isIntegerType())
-                CompilerErrorManager.INSTANCE.reportMessageAndExit(new ProcessJMessage.Builder()
+                ProcessJBugManager.INSTANCE.reportMessageAndExit(new ProcessJMessage.Builder()
                 		.addAST(ae)
                         .addError(VisitorMessageNumber.TYPE_CHECKER_655)
                         .addArguments(indexType.typeName())
@@ -208,7 +208,7 @@ public class TypeChecker extends Visitor<Type> {
          */
         // TODO: Check the implementation of Assignable.
         if (!vType.assignable())
-            CompilerErrorManager.INSTANCE.reportMessageAndExit(new ProcessJMessage.Builder()
+            ProcessJBugManager.INSTANCE.reportMessageAndExit(new ProcessJMessage.Builder()
             		.addAST(as)
             		.addError(VisitorMessageNumber.TYPE_CHECKER_630)
             		.build(), MessageType.PRINT_CONTINUE);
@@ -219,7 +219,7 @@ public class TypeChecker extends Visitor<Type> {
             // =
             if (!vType.typeAssignmentCompatible(eType)) {
                 as.type = new ErrorType();
-                CompilerErrorManager.INSTANCE.reportMessageAndExit(new ProcessJMessage.Builder()
+                ProcessJBugManager.INSTANCE.reportMessageAndExit(new ProcessJMessage.Builder()
                 		.addAST(as)
                 		.addError(VisitorMessageNumber.TYPE_CHECKER_601)
                 		.addArguments(eType.typeName(), vType.typeName())
@@ -241,7 +241,7 @@ public class TypeChecker extends Visitor<Type> {
             else if (!vType.typeAssignmentCompatible(eType)) {
                 // Left-hand side is not assignment compatible with the right-hand side.
                 as.type = new ErrorType();
-                CompilerErrorManager.INSTANCE.reportMessageAndExit(new ProcessJMessage.Builder()
+                ProcessJBugManager.INSTANCE.reportMessageAndExit(new ProcessJMessage.Builder()
                 		.addAST(as)
                 		.addError(VisitorMessageNumber.TYPE_CHECKER_600)
                 		.addArguments(eType.typeName(), vType.typeName())
@@ -254,7 +254,7 @@ public class TypeChecker extends Visitor<Type> {
             // <<=, >>=, >>>=
             if (!vType.isIntegralType()) {
                 as.type = new ErrorType();
-                CompilerErrorManager.INSTANCE.reportMessageAndExit(new ProcessJMessage.Builder()
+                ProcessJBugManager.INSTANCE.reportMessageAndExit(new ProcessJMessage.Builder()
                 		.addAST(as)
                         .addError(VisitorMessageNumber.TYPE_CHECKER_604)
                         .addArguments(as.opString())
@@ -262,7 +262,7 @@ public class TypeChecker extends Visitor<Type> {
             }
             if (!eType.isIntegralType()) {
                 as.type = new ErrorType();
-                CompilerErrorManager.INSTANCE.reportMessageAndExit(new ProcessJMessage.Builder()
+                ProcessJBugManager.INSTANCE.reportMessageAndExit(new ProcessJMessage.Builder()
                 		.addAST(as)
                         .addError(VisitorMessageNumber.TYPE_CHECKER_605)
                         .addArguments(as.opString())

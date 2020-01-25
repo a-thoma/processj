@@ -183,7 +183,7 @@ public class GotoLabelRewrite {
     }
     
     public void rewrite() {
-        /* Verify we have a valid path */
+        /* Verify that we have a valid path */
         if (!checkPath(Paths.get(d_path), false))
             exit("File '" + d_path + "' does not exists!", 101);
         /* Grab .class files form given directory */

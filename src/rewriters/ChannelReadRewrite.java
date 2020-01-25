@@ -4,7 +4,7 @@ import ast.*;
 import utilities.Visitor;
 import printers.*;
 import utilities.ProcessJMessage;
-import utilities.CompilerErrorManager;
+import utilities.ProcessJBugManager;
 import utilities.MessageType;
 import utilities.VisitorMessageNumber;
 import utilities.Error;

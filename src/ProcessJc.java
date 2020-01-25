@@ -13,7 +13,7 @@ import parser.parser;
 import printers.ParseTreePrinter;
 import rewriters.CastRewrite;
 import scanner.Scanner;
-import utilities.CompilerErrorManager;
+import utilities.ProcessJBugManager;
 import utilities.ConfigFileReader;
 import utilities.Language;
 import utilities.Log;
@@ -60,7 +60,7 @@ public class ProcessJc {
             new Option("d_help", "-help", "Show this help message and exit"),
             new Option("d_include", "-include", OptionType.STRING, "Override the default include directory"),
             new Option("d_showMessage", "-showMessage", "Show info of error and warning messages when available"),
-            new Option("d_target", "-target", OptionType.STRING, "Specify the target language -- c++, Java (default)"),
+            new Option("d_target", "-target", OptionType.STRING, "Specify the target language -- C++, Java (default)"),
             new Option("d_version", "-version", "Print version information and exit"),
             new Option("d_visitor", "-visitor", "Generate all parse tree visitors"),
             new Option("d_showTree", "-showTree", "Show the AST constructed from the parser")
@@ -69,7 +69,7 @@ public class ProcessJc {
     // <--
     /* Fields used by the ProcessJ compiler */
     public boolean d_showColor = false;
-    public boolean d_printUsageAndExit = false;
+    public boolean d_help = false;
     public String d_include = null;
     public boolean d_showMessage = false;
     public Language d_target = Settings.language;
@@ -91,7 +91,7 @@ public class ProcessJc {
     public static void main(String[] args) {
         ProcessJc pj = new ProcessJc(args);
         /* Do we have any arguments? */
-        if (args.length == 0 && !pj.d_printUsageAndExit) {
+        if (args.length == 0 && !pj.d_help) {
             /* At least one file must be provided. Throw an error if no
              * file is given, or if the file does not exists */
             System.out.println(new ProcessJMessage.Builder()
@@ -100,7 +100,7 @@ public class ProcessJc {
             pj.printUsageAndExit();
         }
         
-        if (pj.d_printUsageAndExit)
+        if (pj.d_help)
             pj.printUsageAndExit();
         else if (pj.d_version)
             pj.version();
@@ -115,8 +115,8 @@ public class ProcessJc {
             try {
                 String absoluteFilePath = inFile.getAbsolutePath();
                 /* Set the package and filename */
-                CompilerErrorManager.INSTANCE.setFileName(absoluteFilePath);
-                CompilerErrorManager.INSTANCE.setPackageName(absoluteFilePath);
+                ProcessJBugManager.INSTANCE.setFileName(absoluteFilePath);
+                ProcessJBugManager.INSTANCE.setPackageName(absoluteFilePath);
                 s = new Scanner(new java.io.FileReader(absoluteFilePath));
                 p = new parser(s);
             } catch (java.io.FileNotFoundException e) {
@@ -144,7 +144,7 @@ public class ProcessJc {
             c.fileName = inFile.getName();
             /* The parent's path of the compiled file */
             String parentPath = inFile.getAbsolutePath();
-            /* The parent's absolute path of the compiled */
+            /* The parent's absolute path of the compiled file */
             c.path = parentPath.substring(0, parentPath.lastIndexOf(File.separator));
             /* A package declaration is optional -- this can be null */
             if (c.packageName() != null)
@@ -156,7 +156,7 @@ public class ProcessJc {
             Library.generateLibraries(c);
 
             /* This table will hold all the top level types */
-            SymbolTable globalTypeTable = new SymbolTable("Main file: " + CompilerErrorManager.INSTANCE.fileName);
+            SymbolTable globalTypeTable = new SymbolTable("Main file: " + ProcessJBugManager.INSTANCE.fileName);
 
             /* Dump log messages if true */
             if (pj.d_visitor)
@@ -295,18 +295,18 @@ public class ProcessJc {
     
     public ProcessJc(String[] args) {
         this.args = args;
-        Settings.ansiColor = Boolean.valueOf(config.getProperty("color"));
+        Settings.showColor = Boolean.valueOf(config.getProperty("color"));
         run(); /* Parse command line arguments */
         colorMode(); /* Switch to turn color mode on/off */
     }
     
     public void colorMode() {        
         /* Check default value before switching mode to on/off */
-        if (!Settings.ansiColor && this.d_showColor) /* Color mode 'on' */
+        if (!Settings.showColor && this.d_showColor) /* Color mode 'on' */
             config.setProperty("color", String.valueOf(this.d_showColor));
-        else if (Settings.ansiColor && this.d_showColor) /* Color mode 'off' */
+        else if (Settings.showColor && this.d_showColor) /* Color mode 'off' */
             config.setProperty("color", String.valueOf(Boolean.FALSE));
-        Settings.ansiColor = Boolean.valueOf(config.getProperty("color"));
+        Settings.showColor = Boolean.valueOf(config.getProperty("color"));
         ConfigFileReader.closeConfiguration(config);
     }
     
@@ -350,13 +350,13 @@ public class ProcessJc {
     
     public void printUsageAndExit() {
         for (Option o : OPTIONS)
-            System.out.println(String.format("%-20s %s", o.d_optionName, o.d_desc));
+            System.err.println(String.format("%-20s %s", o.d_optionName, o.d_desc));
         exit(0);
     }
     
     public void version() {
         String msg = "ProcessJ Version: " + RuntimeInfo.runtimeVersion();
-        System.out.println(msg);
+        System.err.println(msg);
         exit(0);
     }
     

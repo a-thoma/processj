@@ -15,14 +15,14 @@ import scanner.Scanner;
 import utilities.ProcessJMessage;
 import utilities.Log;
 import utilities.MessageType;
-import utilities.CompilerErrorManager;
+import utilities.ProcessJBugManager;
 import utilities.SymbolTable;
 import utilities.Visitor;
 import utilities.VisitorMessageNumber;
 
 public class ResolveImports<T extends AST> extends Visitor<T> {
     
-    public static String currentFileName = CompilerErrorManager.INSTANCE.fileName;
+    public static String currentFileName = ProcessJBugManager.INSTANCE.fileName;
     private SymbolTable importChild = null;
     
     public ResolveImports(SymbolTable importChild) {
@@ -30,7 +30,7 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
         Log.logHeader("****************************************");
         Log.logHeader("*    R E S O L V E   I M P O R T S     *");
         Log.logHeader("****************************************");
-        Log.logHeader("> File: " + CompilerErrorManager.INSTANCE.fileName);
+        Log.logHeader("> File: " + ProcessJBugManager.INSTANCE.fileName);
     }
     
     public static String packageNameToString(Sequence<Name> packageName) {
@@ -66,7 +66,7 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
         }
         try {
             // Set the package name
-            CompilerErrorManager.INSTANCE.setPackageName(fileName);
+            ProcessJBugManager.INSTANCE.setPackageName(fileName);
             
             Log.log(a.line + " Starting import of file: '" + fileName + "'");
             Scanner s1 = new Scanner(new java.io.FileReader(fileName));
@@ -76,13 +76,13 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
             TopLevelDecls.alreadyImportedFiles.put(fileName, (Compilation) r.value);
             return (Compilation) r.value;
         } catch (java.io.FileNotFoundException e) {
-            CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
+            ProcessJBugManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                         .addAST(a)
                         .addError(VisitorMessageNumber.RESOLVE_IMPORTS_102)
                         .addArguments(fileName)
                         .build());
         } catch (Exception e) {
-            CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
+            ProcessJBugManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                         .addAST(a)
                         .addError(VisitorMessageNumber.RESOLVE_IMPORTS_106)
                         .addArguments(fileName)
@@ -190,7 +190,7 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
                     // Oh no, the directory wasn't found at all!
                     String packageName = path.replaceAll("/", ".");
                     packageName = packageName.substring(0, packageName.length() - 1);
-                    CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
+                    ProcessJBugManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                                 .addAST(im)
                                 .addError(VisitorMessageNumber.RESOLVE_IMPORTS_103)
                                 .addArguments(packageName)
@@ -201,7 +201,7 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
         } else { // Not a .* import
             fileName = fileName + "/" + im.file().getname() + ".pj";
             // Set package name
-            CompilerErrorManager.INSTANCE.setPackageName(path + "." + im.file().getname());
+            ProcessJBugManager.INSTANCE.setPackageName(path + "." + im.file().getname());
 
             // Is it a local file
             if (new File(fileName).isFile()) {
@@ -219,7 +219,7 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
                 } else {
                     // Nope, nothing found!
                     if (path.equals("")) {
-                        CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
+                        ProcessJBugManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                                     .addAST(im)
                                     .addError(VisitorMessageNumber.RESOLVE_IMPORTS_102)
                                     .addArguments(im.file().getname())
@@ -227,7 +227,7 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
                     } else {
                         String packageName = path.replaceAll("/", ".");
                         packageName = packageName.substring(0, packageName.length() - 1);
-                        CompilerErrorManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
+                        ProcessJBugManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
                                     .addAST(im)
                                     .addError(VisitorMessageNumber.RESOLVE_IMPORTS_105)
                                     .addArguments(im.file().getname(), path)
@@ -245,7 +245,7 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
             String oldCurrentFileName = currentFileName;
             currentFileName = fn;
             // Set current filename
-            CompilerErrorManager.INSTANCE.setFileName(fn);
+            ProcessJBugManager.INSTANCE.setFileName(fn);
             Compilation c = ResolveImports.importFile(im, fn);
             
             // Set absolute path, file and package name from where the Import is created
@@ -274,7 +274,7 @@ public class ResolveImports<T extends AST> extends Visitor<T> {
             
             currentFileName = oldCurrentFileName;
             // Reset filename
-            CompilerErrorManager.INSTANCE.setFileName(oldCurrentFileName);
+            ProcessJBugManager.INSTANCE.setFileName(oldCurrentFileName);
         }
         return null;
     }
