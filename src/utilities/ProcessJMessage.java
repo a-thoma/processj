@@ -3,8 +3,7 @@ package utilities;
 import org.stringtemplate.v4.ST;
 
 /**
- * This class is used to create generic messages for the
- * ProcessJ compiler.
+ * This class is used to create generic messages for the ProcessJ compiler.
  * 
  * @author ben
  * @since 1.2

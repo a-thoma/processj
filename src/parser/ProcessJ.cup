@@ -50,8 +50,8 @@ parser code  {:
     System.out.println(ProcessJBugManager.INSTANCE.fileName + ":" + Scanner.lineCount + ": Syntax error:\n\n" + Scanner.curLine);
     for (int i=1; i<Scanner.curLine.length()+1-t.lexeme.length(); i++) 
       System.out.print(" ");
-        System.out.println("^");
-
+      System.out.println("^");
+	  /* TODO: Handled syntax-error here using the abstract class AstNode */
       System.exit(1);
     }
   }

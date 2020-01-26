@@ -3,7 +3,7 @@ delimiters "<",">"
 Info() ::= <<
 <! ----- This template is NEVER rendered ---- !>
 This file contains all required templates for generating valid Java
-source files when using the ProcessJ compiler. Note, these templates
+source files when using the ProcessJ-JVM compiler. Note, these templates
 and their attributes are rendered in the code generation phase. For
 usage see: CodeGeneratorJava.java
 >>
@@ -11,7 +11,7 @@ usage see: CodeGeneratorJava.java
 //========================================================================================
 // Takes a ProcessJ file and turns it into a Java file that can be run
 // again and again while maintaining the logical structure of the code
-// translated by the ProcessJ JVM compiler. The parameters below represent
+// translated by the ProcessJ-JVM compiler. The parameters below represent
 // what gets pushed into the template, and, for now, these parameters
 // generate the entire code for a compilable Java file.
 // 1.) pathName: A region that organizes a set of related types, procedures,
@@ -94,7 +94,7 @@ public static class <name> extends PJProcess {
         <if(syncBody)><syncBody; separator="\n"><endif>
         terminate();
     }
-<! Entry point of the program, e.g.,
+<! Entry point of the program, e.g.
    public static void main(String[] args) { ... }
 !>
 <if(main)>}<\n><\n><main><else>}<endif>

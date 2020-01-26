@@ -41,6 +41,10 @@ public class Compilation extends AST {
         return v.visitCompilation(this);
     }
     
+    public String fileAndExtension() {
+        return fileName;
+    }
+    
     public String fileNoExtension() {
         return fileName.substring(0, fileName.lastIndexOf("."));
     }

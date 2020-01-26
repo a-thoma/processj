@@ -122,6 +122,7 @@ public class ProcessJc {
             } catch (java.io.FileNotFoundException e) {
                 /* This won't execute! The error is handled above by the command */
             } catch (Exception e) {
+                /* TODO: Handled syntax-error here using the abstract class AstNode */
                 e.printStackTrace();
                 System.exit(1);
             }
