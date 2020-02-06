@@ -49,7 +49,6 @@ public class Tuple<T> extends AbstractList<T> {
     public int hashCode() {
         final int prime = 31;
         int result = 1;
-
         for (final T v : values)
             result = prime * result + v.hashCode();
 

@@ -26,18 +26,18 @@ public class Helper {
      * belong to the same compiled class. The ProcessJ naming convention
      * is as follows:
      * 1.) For a procedure, the procedure is encoded as '_proc$name' where
-     * name is the procedure's unique identifier.
+     *     name is the procedure's unique identifier.
      * 2.) For a Java method, the method is encoded as '_method$name' where
-     * name is the method's unique identifier.
+     *     name is the method's unique identifier.
      * 3.) For parameters, the parameter is encoded as '_pd$nameX' where
-     * name is the name of the argument and 'X' represents the position of
-     * the parameter in the argument list; e.g.,
-     *              foo(_pd$bar0, _pd$foo1, ..., _pd@nameN)
+     *     name is the name of the argument and 'X' represents the position of
+     *     the parameter in the argument list; e.g.,
+     *              foo(_pd$name0, _pd$name1, ..., _pd@nameN)
      * 4.) For locals, the local is encoded as '_ld$nameX' where name is
-     * the name of the local variable and 'X' is the local's unique
-     * identifier.
+     *     the name of the local variable and 'X' is the local's unique
+     *     identifier.
      * 5.) For protocols, the protocol is encoded as '_prot$name' where
-     * name is a protocol tag and 'X' is the protocol's unique identifier.
+     *     name is a protocol tag and 'X' is the protocol's unique identifier.
      * 
      * @param name
      *            The name or tag of a procedure, method, protocol, record,
@@ -57,15 +57,20 @@ public class Helper {
         case MAIN_NAME:
             break; /* Do nothing for now */
         case PROCEDURE_NAME:
-            varName = Tag.PROCEDURE_NAME + name; break;
+            varName = Tag.PROCEDURE_NAME + name;
+            break;
         case METHOD_NAME:
-            varName = Tag.METHOD_NAME + name; break;
+            varName = Tag.METHOD_NAME + name;
+            break;
         case PARAM_NAME:
-            varName = Tag.PARAM_NAME + name + X; break;
+            varName = Tag.PARAM_NAME + name + X;
+            break;
         case LOCAL_NAME:
-            varName = Tag.LOCAL_NAME + name + X; break;
+            varName = Tag.LOCAL_NAME + name + X;
+            break;
         case PROTOCOL_NAME:
-            varName = Tag.PROTOCOL_NAME + name; break;
+            varName = Tag.PROTOCOL_NAME + name;
+            break;
         default:
             break;
         }
@@ -122,8 +127,8 @@ public class Helper {
     }
     
     /**
-     * Returns a string representing a primitive wrapper class
-     * or the class itself.
+     * Returns a string representing a primitive wrapper class or
+     * the class itself.
      * 
      * @param type
      *          A primitive class type or the class itself.
@@ -134,9 +139,8 @@ public class Helper {
     }
     
     /**
-     * Returns true if the name of a variable, method, class,
-     * etc. represents an invalid Java identifier or false
-     * otherwise.
+     * Returns true if the name of a variable, method, class, etc. that
+     * represents an invalid Java identifier or false otherwise.
      * 
      * @param identifier
      *              The name of a variable, method, class, etc.
@@ -160,7 +164,7 @@ public class Helper {
     
     public static String getPackage(String packageName, String sourceFile) {
         /* An invocation comes from a external file (an import) if the source
-         * file from which the invocation is made is different to the package */
+         * file from which the invocation was made is different to the package */
         if (!packageName.contains(sourceFile)) {
             String includePath = Settings.includeDir + File.separator + Settings.language + File.separator;
             /* The following replaces all '/' with '.' */
@@ -168,8 +172,7 @@ public class Helper {
             packageName = packageName.replaceAll(includePath, "");
             return packageName;
         }
-        /* Otherwise, the invocation must come from the same
-         * source file and package */
+        /* Otherwise, the invocation was made from the same source file */
         return sourceFile;
     }
     
@@ -182,7 +185,6 @@ public class Helper {
                 System.out.println("Missing working directory!");
                 System.exit(1);
             }
-            
             String outFile = f.getAbsolutePath() + File.separator + filename + ".java";
             writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFile), "utf-8"));
             writer.write(output);

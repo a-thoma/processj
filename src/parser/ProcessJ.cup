@@ -94,6 +94,7 @@ terminal Token TIMEOUT;     // "timeout"
 /* Silly keywords */
 terminal Token SKIP;        // "skip"
 terminal Token STOP;        // "stop"
+terminal Token IS;			// instanceof
 
 /* Control flow related keywords */
 terminal Token IF;      // "if"
@@ -189,7 +190,6 @@ terminal Token NOTEQ;       // "!="
 terminal Token LSHIFT;      // "<<"
 terminal Token RSHIFT;      // ">>"
 terminal Token RRSHIFT;     // ">>>"
-terminal Token IS;			// instanceof
 terminal Token ANDAND;      // "&&"
 terminal Token OROR;        // "||"
 terminal Token PLUS;        // "+"

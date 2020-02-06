@@ -12,17 +12,22 @@ package utilities;
  */
 public interface MessageNumber {
     
-    public static final int M1 = -1;
+    public static final int UNKNOWN = -1;
     
     default ErrorSeverity getErrorSeverity() {
         return ErrorSeverity.INFO;
     }
     
     default int getNumber() {
-        return M1;
+        return UNKNOWN;
     }
     
-    String getMessage();
+    default String getMessage() {
+        return "EMPTY";
+    }
     
-    MessageType getMessageType();
+    /* If none is given then abort/terminate */
+    default MessageType getMessageType() {
+        return MessageType.PRINT_STOP;
+    }
 }

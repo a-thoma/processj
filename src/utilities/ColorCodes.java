@@ -5,7 +5,7 @@ package utilities;
  * console that supports ansi color codes.
  * 
  * Usage:
- * - ANSI_PREFIX + (Attribute | Attribute + ANSI_COMMA + (AnsiForeground | AnsiBackground)) + ANSI_POSTFIX
+ *   ANSI_PREFIX + (Attribute | Attribute + ANSI_COMMA + (AnsiForeground | AnsiBackground)) + ANSI_POSTFIX
  * 
  * Example:
  * 1.) \033[ + 0 + m = \033[0m (Ansi Reset)
@@ -23,8 +23,7 @@ public class ColorCodes {
     public static final String ANSI_RESET = "\033[0m";
     
     /**
-     * The enum AnsiForeground represents each ansi foreground
-     * color code.
+     * The enum AnsiForeground represents each ansi foreground color code.
      * 
      * @author Ben
      * @version 10/06/2018
@@ -56,8 +55,7 @@ public class ColorCodes {
     }
     
     /**
-     * The enum AnsiForeground represents each ansi background
-     * color code.
+     * The enum AnsiForeground represents each ansi background color code.
      * 
      * @author Ben
      * @version 10/06/2018
@@ -89,8 +87,7 @@ public class ColorCodes {
     }
     
     /**
-     * The enum Attribute represents each ansi attribute
-     * color code.
+     * The enum Attribute represents each ansi attribute color code.
      * 
      * @author Ben
      * @version 10/06/2018

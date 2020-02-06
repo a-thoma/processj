@@ -6,7 +6,7 @@ import java.util.Properties;
 import ast.AST;
 import ast.Compilation;
 import codegen.Helper;
-import codegen.java.CodeGeneratorJava;
+import codegen.java.CodeGenJava;
 import library.Library;
 import namechecker.ResolveImports;
 import parser.parser;
@@ -260,8 +260,11 @@ public class ProcessJc {
             /* Run the code generator for the known (specified) target language */
             if (Settings.language == pj.d_target)
                 pj.generateCodeJava(c, inFile, globalTypeTable);
-            else
-                ; /* TODO: Throw an error message for unknown target language? */
+            else {
+                /* Unknown target language so abort/terminate program */
+                System.out.println("Invalid target language!");
+                System.exit(1);
+            }
             
             System.out.println("** COMPILATION COMPLITED SUCCESSFULLY **");
         }
@@ -284,7 +287,7 @@ public class ProcessJc {
         Properties p = utilities.ConfigFileReader.getProcessJConfig();
         /* Run the code generator to decode pragmas, generate libraries,
          * resolve types, and set the symbol table for top level declarations */
-        CodeGeneratorJava generator = new CodeGeneratorJava(s);
+        CodeGenJava generator = new CodeGenJava(s);
         /* Set the user working directory */
         generator.workingDir(p.getProperty("workingdir"));
         /* Visit this compilation unit and recursively build the program

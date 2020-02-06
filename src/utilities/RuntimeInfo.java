@@ -8,11 +8,13 @@ package utilities;
  * the runtime system being used. Note, the runtime system should be
  * downloaded and manually linked to the ProcessJ compiler.
  * 
- * @author Ben
+ * NOTE: Must be used when we provide the latest stable release.
+ * 
+ * @author ben
  */
 public final class RuntimeInfo {
     
-    // Contains the current version of the ProcessJ runtime system.
+    /* Contains the current version of the ProcessJ runtime system */
     protected static final String VERSION = "2.1.1";
     
     public static String runtimeVersion() {
@@ -24,19 +26,21 @@ public final class RuntimeInfo {
      * system and the current version of the ProcessJ compiler.
      * 
      * @param runtimeVersion
-     *          The version of the rumtime system used to create processes.
+     *          The version of the runtime system used to create processes.
      */
     public static void verifyVersion(String runtimeVersion) {
-        String versionMajorMinor = substringMajorMinorVersion(VERSION);
+        String versionMajorMinor = substrMajorMinorVersion(VERSION);
         boolean runtimeVersionMismatch = false;
         
         if (runtimeVersion != null && runtimeVersion.length() > 0) {
-            String runtimeMajorMinor = substringMajorMinorVersion(runtimeVersion);
+            String runtimeMajorMinor = substrMajorMinorVersion(runtimeVersion);
             runtimeVersionMismatch = !VERSION.equals(runtimeVersion) && !versionMajorMinor.equals(runtimeMajorMinor);
         }
         
-        if (runtimeVersionMismatch)
+        if (runtimeVersionMismatch) {
             System.err.println("Runtime version '" + runtimeVersion + "' does not match current version.");
+            System.exit(1); /* TODO: abort/terminate here? */
+        }
     }
     
     /**
@@ -48,12 +52,12 @@ public final class RuntimeInfo {
      * @param v
      *          The version string.
      */
-    public static String substringMajorMinorVersion(String v) {
-        int majorPart = v.indexOf(".");
-        int minorPart = majorPart >= 0 ? v.indexOf(".", majorPart + 1) : -1;
+    public static String substrMajorMinorVersion(String v) {
+        int majorRel = v.indexOf(".");
+        int minorRel = majorRel >= 0 ? v.indexOf(".", majorRel + 1) : -1;
         int len = v.length();
-        if (minorPart >= 0)
-            len = Math.min(len, minorPart);
+        if (minorRel >= 0)
+            len = Math.min(len, minorRel);
         return v.substring(0,len);
     }
 }

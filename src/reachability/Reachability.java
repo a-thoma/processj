@@ -263,7 +263,14 @@ public class Reachability extends Visitor<Boolean> {
 
     // DONE
     public Boolean visitParBlock(ParBlock pb) {
+        Log.log(pb, "Visiting a par statement.");
         boolean oldInParBlock = inParBlock;
+        /* Warning generated for having an empty par-block */
+        if (pb.stats().size() == 0)
+            ProcessJBugManager.INSTANCE.reportMessage(new ProcessJMessage.Builder()
+                                .addAST(pb)
+                                .addError(VisitorMessageNumber.REACHABILITY_813)
+                                .build());
         inParBlock = true;
         pb.stats().visit(this);
         inParBlock = oldInParBlock;

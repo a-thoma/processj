@@ -232,6 +232,6 @@ public class GotoLabelRewrite {
         if (args.length != 1)
             exit("Invalid command-line arguments", 101);
         new GotoLabelRewrite(args[0]).rewrite();
-        System.out.println("REWRITING DONE");
+        System.out.println("** REWRITING DONE **");
     }
 }
