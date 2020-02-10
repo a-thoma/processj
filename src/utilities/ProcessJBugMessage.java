@@ -51,10 +51,10 @@ public abstract class ProcessJBugMessage {
     protected final String d_packageName;
     
     /* Line in file */
-    protected int d_rowNumber;
+    protected int d_rowNum;
     
     /* Character that generated the error/warning */
-    protected int d_columnNumber;
+    protected int d_colNum;
     
     public ProcessJBugMessage(Builder<?> builder) {
         d_ast = builder.ast;
@@ -64,8 +64,8 @@ public abstract class ProcessJBugMessage {
         d_fileName = builder.fileName == null ? new File(ProcessJBugManager.INSTANCE.fileName).getAbsolutePath() :
                                                 new File(builder.fileName).getAbsolutePath();
         d_packageName = builder.packageName == null ? ProcessJBugManager.INSTANCE.fileName : builder.packageName;
-        d_rowNumber = builder.rowNumber;
-        d_columnNumber = builder.colNumber;
+        d_rowNum = builder.rowNum;
+        d_colNum = builder.colNum;
     }
     
     // 
@@ -97,14 +97,14 @@ public abstract class ProcessJBugMessage {
     }
     
     public int rowNumber() {
-        return d_rowNumber;
+        return d_rowNum;
     }
     
     public int columnNumber() {
-        return d_columnNumber;
+        return d_colNum;
     }
     
-    public ST stTemplate() {
+    public ST st() {
         int argCount = 0;
         ST message = null;
         if (d_errorNumber != null)
@@ -135,8 +135,8 @@ public abstract class ProcessJBugMessage {
                 ", reason="         + (d_throwable != null ?
                                             d_throwable.getMessage()
                                             : "none") +
-                ", row="            + d_rowNumber +
-                ", column="         + d_columnNumber +
+                ", row="            + d_rowNum +
+                ", column="         + d_colNum +
                 ")";
     }
     
@@ -150,8 +150,8 @@ public abstract class ProcessJBugMessage {
         result = prime + result + d_throwable.hashCode();
         result = prime + result + d_fileName.hashCode();
         result = prime + result + d_packageName.hashCode();
-        result = prime + result + d_rowNumber;
-        result = prime + result + d_columnNumber;
+        result = prime + result + d_rowNum;
+        result = prime + result + d_colNum;
         return result;
     }
     
@@ -163,7 +163,7 @@ public abstract class ProcessJBugMessage {
             return false;
         
         ProcessJBugMessage other = (ProcessJBugMessage) obj;
-        if (this.d_rowNumber != other.d_rowNumber || this.d_columnNumber != other.d_columnNumber)
+        if (this.d_rowNum != other.d_rowNum || this.d_colNum != other.d_colNum)
             return false;
         if (!this.d_fileName.equals(other.d_fileName) || !this.d_packageName.equals(other.d_packageName))
             return false;
@@ -203,8 +203,8 @@ public abstract class ProcessJBugMessage {
         protected Throwable throwable;
         protected String fileName;
         protected String packageName;
-        protected int rowNumber;
-        protected int colNumber;
+        protected int rowNum;
+        protected int colNum;
         
         public Builder() {
             ast = null;
@@ -250,12 +250,12 @@ public abstract class ProcessJBugMessage {
         }
         
         public B addRowNumber(int rowNumber) {
-            this.rowNumber = rowNumber;
+            this.rowNum = rowNumber;
             return builder();
         }
         
         public B addColNumber(int colNumber) {
-            this.colNumber = colNumber;
+            this.colNum = colNumber;
             return builder();
         }
     }

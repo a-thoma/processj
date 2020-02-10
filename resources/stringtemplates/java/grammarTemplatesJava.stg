@@ -23,6 +23,7 @@ usage see: CodeGeneratorJava.java
 Compilation(pathName, fileName, name, body, version, imports) ::= <<
 import java.util.*;
 import processj.runtime.*;
+import utilities.*;
 <if(imports)><imports; separator=";\n">;<\n><endif>
 
 /**
@@ -525,10 +526,14 @@ RecordType(modifiers, name, types, vars, extend) ::= <<
         <if(vars)><vars:{v | this.d_<v> = <v>}; separator=";\n">;<endif>
     }
     
-	<! -------- Accessors -------- !>
+    <! -------- Accessors -------- !>
     <if(vars)><types,vars:{t,v | @Override public <t> <v>() { return d_<v>; \}}; separator="\n"><\n><endif>
     <! -------- Modifiers -------- !>
-    <if(vars)><types,vars:{t,v | @Override public void <v>(<t> d_<v>) { this.d_<v> = d_<v>; \}}; separator="\n"><\n><endif>
+    <if(vars)><types,vars:{t,v | @Override public void <v>(<t> d_<v>) { this.d_<v> = d_<v>; \}}; separator="\n"><endif>
+    
+    @Override public String toString() {
+        return messyToString(this);
+    }
 }
 >>
 
@@ -561,17 +566,15 @@ new <type>(<vals; separator=", ">)
 //========================================================================================
 //
 // 1.) name:
-// 2.) type:
 // 3.) member:
-RecordAccessor(name, type, member) ::= "<if(name)>(<if(type)>(I_<type>)<endif><name>).<member><endif>"
+RecordAccessor(name, member) ::= "<if(name)><name>.<member><endif>"
 
 //========================================================================================
 //
 // 1.) name:
-// 2.) type:
 // 3.) member:
 // 4.) value:
-RecordSetter(name, type, member, val) ::= "<if(name)>((I_<type>)<name>).<member>(<val>)<endif>;"
+RecordSetter(name, member, val) ::= "<if(name)><name>.<member>(<val>)<endif>;"
 
 //========================================================================================
 //

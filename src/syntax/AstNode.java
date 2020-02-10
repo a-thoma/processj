@@ -6,4 +6,52 @@ package syntax;
  * @author ben
  */
 public abstract class AstNode {
+    
+    private int d_rowNum = -1;
+    private int d_colNum = -1;
+    private int d_lastRowNum = -1;
+    private int d_lastColNum = -1;
+    
+    public String text() {
+        return "EMPTY -- not implemented yet!";
+    }
+    
+    public int rowNumber() {
+        return d_rowNum;
+    }
+    
+    public int colNumber() {
+        return d_colNum;
+    }
+    
+    public int lastRowNumber() {
+        return d_lastRowNum;
+    }
+    
+    public int lastColNumber() {
+        return d_lastColNum;
+    }
+    
+    public void rowNumber(int rowNum) {
+        d_rowNum = rowNum;
+    }
+    
+    public void colNumber(int colNum) {
+        d_colNum = colNum;
+    }
+    
+    public void lastRowNumber(int lastRowNum) {
+        d_lastRowNum = lastRowNum;
+    }
+    
+    public void lastColNumber(int lastColNum) {
+        d_lastColNum = lastColNum;
+    }
+    
+    public void setNode(AstNode n) {
+        d_rowNum = n.d_rowNum;
+        d_colNum = n.d_colNum;
+        d_lastRowNum = n.d_lastRowNum;
+        d_lastColNum = n.d_lastColNum;
+    }
 }

@@ -51,7 +51,7 @@ public class Types {
     /* Silly keywords */
     public static final int KEYWORD_SKIP = 22;
     public static final int KEYWORD_STOP = 23;
-    public static final int KEYWORD_IS = 24;
+    public static final int KEYWORD_ISTYPE = 24;
     
     /* Control flow related keywords */
     public static final int KEYWORD_IF = 25;
@@ -243,7 +243,7 @@ public class Types {
         
         addKeywords("skip",         KEYWORD_SKIP);
         addKeywords("stop",         KEYWORD_STOP);
-        addKeywords("is",           KEYWORD_IS);
+        addKeywords("istype",       KEYWORD_ISTYPE);
         
         addKeywords("if",           KEYWORD_IF);
         addKeywords("else",         KEYWORD_ELSE);

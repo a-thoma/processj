@@ -96,7 +96,9 @@ public class ProcessJc {
              * file is given, or if the file does not exists */
             System.out.println(new ProcessJMessage.Builder()
                                    .addError(VisitorMessageNumber.RESOLVE_IMPORTS_100)
-                                   .build().stTemplate().render());
+                                   .build()
+                                   .st()
+                                   .render());
             pj.printUsageAndExit();
         }
         
@@ -138,9 +140,11 @@ public class ProcessJc {
                 System.exit(1);
             }
 
-            /* Cast the result from the parse to a Compilation -- this is the root of the tree */
+            /* Cast the result from the parse to a Compilation -- this is
+             * the root of the tree */
             Compilation c = (Compilation) root;
-            /* Set the absolute path, file, and package name from where this compilation is created */
+            /* Set the absolute path, file, and package name from where this
+             * compilation is created */
             System.out.println("-- Setting absolute path, file and package name for '" + inFile.getName() + "'.");
             c.fileName = inFile.getName();
             /* The parent's path of the compiled file */

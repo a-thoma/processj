@@ -18,7 +18,7 @@ public class ProcessJMessage extends ProcessJBugMessage {
     }
     
     @Override
-    public ST stTemplate() {
+    public ST st() {
         ST stFile = stGroup.getInstanceOf("File");
         ST stTag = stGroup.getInstanceOf("Tag");
         ST stStackInfo = stGroup.getInstanceOf("StackInfo");
@@ -45,7 +45,7 @@ public class ProcessJMessage extends ProcessJBugMessage {
             tag = ColorCodes.colorTag(stTag.render(), d_errorNumber.getErrorSeverity());
         
         stMessage.add("tag", tag);
-        stMessage.add("message", super.stTemplate().render());
+        stMessage.add("message", super.st().render());
         stMessage.add("location", stFile.render());
         stMessage.add("stack", stStackInfo.render());
         
@@ -53,7 +53,7 @@ public class ProcessJMessage extends ProcessJBugMessage {
     }
     
     public String renderMessage() {
-        ST stResult = stTemplate();
+        ST stResult = st();
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder.append(stResult.render());
         if (doStackTrace && d_throwable != null)

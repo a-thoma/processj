@@ -81,11 +81,8 @@ public class CodeGenJava extends Visitor<Object> {
     /* Protocol names and tags currently switched on */
     private HashMap<String, String> d_protName2ProtTag = new HashMap<String, String>();
     
-    /* Record declarations and their types */
-    private HashMap<String, String> d_varName2RecordType = new HashMap<String, String>();
-    
     /* List of switch labels */
-    private ArrayList<String> d_switchLabelList = new ArrayList<String>();
+    private ArrayList<String> d_switchCaseList = new ArrayList<String>();
     
     /* List of barrier expressions */
     private ArrayList<String> d_barrierList = new ArrayList<String>();
@@ -175,8 +172,8 @@ public class CodeGenJava extends Visitor<Object> {
         String packagename = co.packageNoName();
         
         for (Import im : co.imports())
-        	if (im != null)
-        		d_importFiles.add((String) im.visit(this));
+            if (im != null)
+                d_importFiles.add((String) im.visit(this));
         
         for (AST decl : typeDecls) {
             if (decl instanceof Type) {
@@ -222,9 +219,9 @@ public class CodeGenJava extends Visitor<Object> {
         /* Save previous procedure state */
         String prevProcName = d_curProcName;
         /* Save previous jump labels */
-        ArrayList<String> prevLabels = d_switchLabelList;
-        if (!d_switchLabelList.isEmpty())
-            d_switchLabelList = new ArrayList<String>();
+        ArrayList<String> prevLabels = d_switchCaseList;
+        if (!d_switchCaseList.isEmpty())
+            d_switchCaseList = new ArrayList<String>();
         /* Name of the invoked procedure */
         d_curProcName = (String) pd.name().visit(this);
         /* Procedures are static classes which belong to the same package and
@@ -235,7 +232,7 @@ public class CodeGenJava extends Visitor<Object> {
          * that yields, we need to extends the PJProcess class anonymously */
         if ("Anonymous".equals(d_curProcName)) {
             /* Preserve current jump label for resumption */
-            int prevJumLabel = d_jumpLabel;
+            int prevJumpLabel = d_jumpLabel;
             d_jumpLabel = 0;
             /* Create an instance for such anonymous procedure */
             stProcTypeDecl = d_stGroup.getInstanceOf("AnonymousProcess");
@@ -247,13 +244,13 @@ public class CodeGenJava extends Visitor<Object> {
             if (!d_barrierList.isEmpty())
                 stProcTypeDecl.add("barrier", d_barrierList);
             /* Add the switch block for yield and resumption */
-            if (!d_switchLabelList.isEmpty()) {
+            if (!d_switchCaseList.isEmpty()) {
                 ST stSwitchBlock = d_stGroup.getInstanceOf("SwitchBlock");
-                stSwitchBlock.add("jumps", d_switchLabelList);
+                stSwitchBlock.add("jumps", d_switchCaseList);
                 stProcTypeDecl.add("switchBlock", stSwitchBlock.render());
             }
             /* Restore jump label so it knows where to resume from */
-            d_jumpLabel = prevJumLabel;
+            d_jumpLabel = prevJumpLabel;
         } else {
             /* Restore global variables for a new PJProcess class */
             resetGlobals();
@@ -332,9 +329,9 @@ public class CodeGenJava extends Visitor<Object> {
                 stProcTypeDecl.add("lvars", d_local2Field.keySet());
             }
             /* Add the switch block for resumption */
-            if (!d_switchLabelList.isEmpty()) {
+            if (!d_switchCaseList.isEmpty()) {
                 ST stSwitchBlock = d_stGroup.getInstanceOf("SwitchBlock");
-                stSwitchBlock.add("jumps", d_switchLabelList);
+                stSwitchBlock.add("jumps", d_switchCaseList);
                 stProcTypeDecl.add("switchBlock", stSwitchBlock.render());
             }
         }
@@ -342,7 +339,7 @@ public class CodeGenJava extends Visitor<Object> {
         /* Restore and reset previous values */
         d_curProcName = prevProcName;
         /* Restore previous jump labels */
-        d_switchLabelList = prevLabels;
+        d_switchCaseList = prevLabels;
 
         return stProcTypeDecl.render();
     }
@@ -361,13 +358,11 @@ public class CodeGenJava extends Visitor<Object> {
         rhs = rhs.replace(DELIMITER, "");
         
         // <--
-        /* If 'op' is the 'instanceof' keyword, we need to look in the
-         * top-level decls table and find the record or protocol in
-         * question and the records or protocols it extends */
+        /* If 'op' is the 'istype' keyword, we need to look in the
+         * top-level decls table for the record or protocol in question
+         * and the records or protocols such record or protocol extends */
         if (d_local2Field.containsKey(lhs)) {
-            /* Look up the variable's type */
             String namedType = d_local2Field.get(lhs);
-            /* Look up the record in the top-level decls table */
             Object o = d_topLvlDecls.get(namedType);
             if (o instanceof RecordTypeDecl) {
                 stBinaryExpr = d_stGroup.getInstanceOf("RecordExtend");
@@ -521,11 +516,8 @@ public class CodeGenJava extends Visitor<Object> {
         /* Is this a channel? e.g. one-2-one, one-2-many, many-2-one, many-to-many */
         if (ld.type().isChannelType() || ld.type().isChannelEndType())
             type = PJChannel.class.getSimpleName() + type.substring(type.indexOf("<"), type.length());
-        /* Is this a record? Change the type to enable multiple inheritance */
-        else if (ld.type().isNamedType() && (((NamedType)ld.type()).type().isRecordType()))
-            type = PJRecord.class.getSimpleName();
 
-        /* Create a tag for this local channel expression parameter */
+        /* Create a tag for this local declaration */
         String newName = Helper.makeVariableName(name, ++d_localDecId, Tag.LOCAL_NAME);
         d_local2Field.put(newName, type);
         d_param2VarName.put(name, newName);
@@ -536,11 +528,8 @@ public class CodeGenJava extends Visitor<Object> {
         if (expr != null) {
             if (ld.type() instanceof PrimitiveType)
                 val = (String) expr.visit(this);
-            else if (ld.type() instanceof NamedType) { /* Must be a record or protocol */
+            else if (ld.type() instanceof NamedType) /* Must be a record or protocol */
                 val = (String) expr.visit(this);
-                /* TODO: cast for protocols and records */
-                d_varName2RecordType.put(newName, chantype);
-            }
             else if (ld.type() instanceof ArrayType)
                 val = (String) expr.visit(this);
         }
@@ -560,8 +549,8 @@ public class CodeGenJava extends Visitor<Object> {
             val = stChannelDecl.render();
         }
         /* After making this local declaration a field of the procedure
-         * in which it was declared, we return if and only if this local
-         * variable is not initialized */
+         * in which it was declared, we return iff this local variable
+         * is not initialized */
         if (expr == null) {
             if (!ld.type().isBarrierType() && (ld.type().isPrimitiveType() ||
                 ld.type().isArrayType() ||  /* Could be an uninitialized array declaration */
@@ -571,7 +560,7 @@ public class CodeGenJava extends Visitor<Object> {
         }
         
         /* If we reach this section of code, then we have a variable
-         * declaration with some initial value(s) */
+         * declaration with some initial value */
         if (val != null)
             val = val.replace(DELIMITER, "");
         
@@ -745,7 +734,7 @@ public class CodeGenJava extends Visitor<Object> {
         for (int label = 0; label < countLabel; ++label) {
             /* Increment jump label and it to the switch-stmt list */
             stChanWriteStat.add("resume" + label, ++d_jumpLabel);
-            d_switchLabelList.add(renderSwitchLabel(d_jumpLabel));
+            d_switchCaseList.add(renderSwitchCase(d_jumpLabel));
         }
         
         return stChanWriteStat.render();
@@ -766,7 +755,7 @@ public class CodeGenJava extends Visitor<Object> {
         for (int label = 0; label < 2; ++label) {
             /* Increment jump label and it to the switch-stmt list */
             stChannelReadExpr.add("resume" + label, ++d_jumpLabel);
-            d_switchLabelList.add(renderSwitchLabel(d_jumpLabel));
+            d_switchCaseList.add(renderSwitchCase(d_jumpLabel));
         }
         
         return stChannelReadExpr.render();
@@ -1027,8 +1016,8 @@ public class CodeGenJava extends Visitor<Object> {
         } else
             ; /* TODO: This procedure is called from another package */
         
-        /* These are the formal parameters of a procedure/method which are
-         * specified by a list of comma-separated arguments */
+        /* These are the formal parameters of the procedure/method being invoked
+         * which are specified by a list of comma-separated arguments */
         Sequence<Expression> parameters = in.params();
         String[] paramsList = (String[]) parameters.visit(this);
         if (paramsList != null)
@@ -1154,21 +1143,23 @@ public class CodeGenJava extends Visitor<Object> {
         /* We need the members of the tag currently being used */
         ProtocolCase target = null;
         ProtocolTypeDecl pt = (ProtocolTypeDecl) d_topLvlDecls.get(type);
-        if (pt != null) { /* This should never be null */
+        
+        if (pt != null) {
             target = pt.getCase(tag);
             /* Now that we have the target tag, iterate over all of its members */
             for (RecordMember rm : target.body()) {
-                String name = (String) rm.name().visit(this);
+                String name = rm.name().getname();
                 members.put(name, null);
             }
         }
-        /* A visit to a RecordLiteral returns a string of the form
+        
+        /* A visit to a 'RecordLiteral' returns a string of the form
          * <var> = <val>, where <var> is a record member and <val> is
          * the value assigned to <var>. Instead of parsing the string,
          * we are going to grab the values assigned to each protocol
-         * member, one by one, after traversing the parse-tree */
+         * member, one by one, while traversing the tree */
         for (RecordMemberLiteral rm : pl.expressions()) {
-            String lhs = (String) rm.name().getname();
+            String lhs = rm.name().getname();
             String expr = (String) rm.expr().visit(this);
             if (members.put(lhs, expr) == null)
                 Log.log(pl, "> Initializing '" + lhs + "' with '" + expr + "'");
@@ -1223,7 +1214,7 @@ public class CodeGenJava extends Visitor<Object> {
     public Object visitRecordMember(RecordMember rm) {
         Log.log(rm, "Visiting a RecordMember (" + rm.type() + " " + rm.name().getname() + ")");
         
-        String name = (String) rm.name().visit(this);
+        String name = rm.name().getname();
         String type = (String) rm.type().visit(this);
         
         /* Add this field to the collection of record members for reference */
@@ -1242,24 +1233,25 @@ public class CodeGenJava extends Visitor<Object> {
         String type = (String) rl.name().visit(this);
         
         /* This map is used to determine the order in which values
-         * are passed to the constructor of the class associated with
-         * this record */
+         * are passed to the constructor of the class associated
+         * with this record */
         HashMap<String, String> members = new LinkedHashMap<String, String>();
         RecordTypeDecl rt = (RecordTypeDecl) d_topLvlDecls.get(type);
         
-        if (rt != null) { /* This should never be null */
+        if (rt != null) {
             for (RecordMember rm : rt.body()) {
-                String name = (String) rm.name().visit(this);
+                String name = rm.name().getname();
                 members.put(name, null);
             }
         }
-        /* A visit to a RecordMemberLiteral returns a string of the form
+        
+        /* A visit to a 'RecordMemberLiteral' returns a string of the form
          * <var> = <val>, where <var> is a record member and <val> is the
          * value assigned to <var>. Instead of parsing the string, we are
          * going to grab the values assigned to each record member, one
-         * by one, after traversing the parse-tree */
+         * by one, while traversing the tree */
         for (RecordMemberLiteral rm : rl.members()) {
-            String lhs = (String) rm.name().getname();
+            String lhs = rm.name().getname();
             String expr = (String) rm.expr().visit(this);
             if (members.put(lhs, expr) == null)
                 Log.log(rl, "> Initializing '" + lhs + "' with '" + expr + "'");
@@ -1279,17 +1271,15 @@ public class CodeGenJava extends Visitor<Object> {
         
         if (ra.record().type.isRecordType()) {
             String name = (String) ra.record().visit(this);
-            String type = d_varName2RecordType.get(name);
-            String field = (String) ra.field().getname();
+            String field = ra.field().getname();
             stAccessor.add("name", name);
-            stAccessor.add("type", type);
             stAccessor.add("member", String.format("%s()", field));
         } else if (ra.record().type.isProtocolType()) {
             stAccessor = d_stGroup.getInstanceOf("ProtocolAccess");
             ProtocolTypeDecl pt = (ProtocolTypeDecl) ra.record().type;
             String protocName = (String) pt.name().visit(this); /* Wrapper class */
-            String name = (String) ra.record().visit(this);     /* Reference to inner class type */
-            String field = (String) ra.field().getname();       /* Field in inner class */
+            String name = (String) ra.record().visit(this); /* Reference to inner class type */
+            String field = ra.field().getname(); /* Field in inner class */
             
             /* Cast a protocol to a super-type if needed */
             if (d_protName2ProtTag.containsKey(String.format("%s.%s", protocName, d_curProtocTag))) 
@@ -1308,11 +1298,9 @@ public class CodeGenJava extends Visitor<Object> {
             stAccessor.add("name", name);
             /* Call the appropriate method to retrieve the number of characters
              * in a string or the number of elements in an N-dimensional array */
-            if (ra.isArraySize)
-                /* 'Xxx.size' for N-dimensional array */
+            if (ra.isArraySize) /* 'Xxx.size' for N-dimensional array */
                 stAccessor.add("member", "length");
-            else if (ra.isStringLength)
-                /* 'Xxx.length' for number of characters in a string */
+            else if (ra.isStringLength) /* 'Xxx.length' for number of characters in a string */
                 stAccessor.add("member", "length()");
         }
         
@@ -1343,7 +1331,7 @@ public class CodeGenJava extends Visitor<Object> {
 
         /* Increment the jump label and add it to the switch-stmt list */
         stParBlock.add("jump", ++d_jumpLabel);
-        d_switchLabelList.add(renderSwitchLabel(d_jumpLabel));
+        d_switchCaseList.add(renderSwitchCase(d_jumpLabel));
         /* Add the barrier this par-block enrolls in */
         Sequence<Expression> barriers = pb.barriers();
         if (barriers.size() > 0) {
@@ -1376,8 +1364,7 @@ public class CodeGenJava extends Visitor<Object> {
                      *    }.schedule(); */
                     if (Helper.doesProcedureYield(in.targetProc))
                         stmts.add((String) in.visit(this));
-                    else
-                        /* Otherwise, the invocation is made through a static Java method */
+                    else /* Otherwise, the invocation is made through a static Java method */
                         stmts.add((String) createAnonymousProcTypeDecl(st).visit(this));
                 } else
                     stmts.add((String) createAnonymousProcTypeDecl(st).visit(this));
@@ -1408,7 +1395,7 @@ public class CodeGenJava extends Visitor<Object> {
         
         /* Increment the jump label and add it to the switch-stmt list */
         stTimeoutStat.add("resume0", ++d_jumpLabel);
-        d_switchLabelList.add(renderSwitchLabel(d_jumpLabel));
+        d_switchCaseList.add(renderSwitchCase(d_jumpLabel));
         
         return stTimeoutStat.render();
     }
@@ -1423,7 +1410,7 @@ public class CodeGenJava extends Visitor<Object> {
         
         /* Increment the jump label and add it to the switch-stmt list */
         stSyncStat.add("resume0", ++d_jumpLabel);
-        d_switchLabelList.add(renderSwitchLabel(d_jumpLabel));
+        d_switchCaseList.add(renderSwitchCase(d_jumpLabel));
         
         return stSyncStat.render();
     }
@@ -1570,7 +1557,7 @@ public class CodeGenJava extends Visitor<Object> {
         stAltStat.add("index", n.visit(this));
         
         /* Add the jump label to the switch-stmt list */
-        d_switchLabelList.add(renderSwitchLabel(d_jumpLabel));
+        d_switchCaseList.add(renderSwitchCase(d_jumpLabel));
         
         return stAltStat.render();
     }
@@ -1623,7 +1610,7 @@ public class CodeGenJava extends Visitor<Object> {
         d_jumpLabel = 0;
 
         d_local2Field.clear();
-        d_switchLabelList.clear();
+        d_switchCaseList.clear();
         d_barrierList.clear();
         
         d_param2Field.clear();
@@ -1631,7 +1618,7 @@ public class CodeGenJava extends Visitor<Object> {
     }
     
     /* Returns a string representation of a jump label */
-    private String renderSwitchLabel(int jump) {
+    private String renderSwitchCase(int jump) {
         ST stSwitchCase = d_stGroup.getInstanceOf("SwitchCase");
         stSwitchCase.add("jump", jump);
         return stSwitchCase.render();
@@ -1696,10 +1683,8 @@ public class CodeGenJava extends Visitor<Object> {
         RecordAccess ra = (RecordAccess) as.left();
         if (ra.record().type.isRecordType()) {
             String name = (String) ra.record().visit(this);
-            String type = d_varName2RecordType.get(name);
-            String field = (String) ra.field().getname();
+            String field = ra.field().getname();
             stRecordSetter.add("name", name);
-            stRecordSetter.add("type", type);
             stRecordSetter.add("member", field);
             stRecordSetter.add("val", (String) as.right().visit(this));
         }
@@ -1738,12 +1723,12 @@ public class CodeGenJava extends Visitor<Object> {
             stChannelReadExpr.add("extendRv", o);
         }
         
-        stChannelReadExpr.add("chanName", chanEndName);        
+        stChannelReadExpr.add("chanName", chanEndName);
         /* Add the switch block for resumption */
         for (int label = 0; label < countLabel; ++label) {
             /* Increment jump label and add it to the switch-stmt list */
             stChannelReadExpr.add("resume" + label, ++d_jumpLabel);
-            d_switchLabelList.add(renderSwitchLabel(d_jumpLabel));
+            d_switchCaseList.add(renderSwitchCase(d_jumpLabel));
         }
         
         stChannelReadExpr.add("lhs", lhs);
@@ -1761,22 +1746,16 @@ public class CodeGenJava extends Visitor<Object> {
             /* Array [t; where 't' is the baste type */
             if (param.type().isArrayType())
                 s = s.replace("[", "ar").replace(DELIMITER, "");
-            /* <Rn; 'n' is the name */
-            else if (param.type().isRecordType())
+            else if (param.type().isRecordType()) /* <Rn; 'n' is the name */
                 s = s.replace("<", "rc").replace(DELIMITER, "");
-            /* <Pn; 'n' is the name */
-            else if (param.type().isProtocolType())
+            else if (param.type().isProtocolType()) /* <Pn; 'n' is the name */
                 s = s.replace("<", "pt").replace(DELIMITER, "");
-            /* {t; where 't' is the channel type */
-            else if (param.type().isChannelType())
+            else if (param.type().isChannelType()) /* {t; where 't' is the channel type */
                 s = s.replace("{", "ct").replace(DELIMITER, "");
-            /* This is for channel-end types */
-            else if (param.type().isChannelEndType()) {
-                if (((ChannelEndType) param.type()).isRead())
-                    /* {t;? -- A channel read */
+            else if (param.type().isChannelEndType()) { /* This is for channel-end types */
+                if (((ChannelEndType) param.type()).isRead()) /* {t;? -- A channel read */
                     s = s.replace("{", "cr").replace(DELIMITER, "").replace("?", "");
-                else
-                    /* {t;! -- A channel write */
+                else /* {t;! -- A channel write */
                     s = s.replace("{", "cw").replace(DELIMITER, "").replace("!", "");
             } else
                 s = s.replace(DELIMITER, "");
