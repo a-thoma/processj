@@ -27,7 +27,7 @@ public class RecordRewrite extends Visitor<AST> {
         Log.logHeader("****************************************");
     }
     
-    public HashSet<RecordMember> addExtendedRecords(AST a) {
+    public HashSet<RecordMember> addExtendedRecord(AST a) {
         Log.log(a, "extends a RecordTypeDecl (" + ((RecordTypeDecl) a).name().getname() + ")");
 
         RecordTypeDecl rt = (RecordTypeDecl) a;
@@ -40,8 +40,8 @@ public class RecordRewrite extends Visitor<AST> {
         if (rt.extend().size() > 0) {
             for (Name parent : rt.extend()) {
                 if (sym.get(parent.getname()) != null) {
-                    HashSet<RecordMember> memberSet = addExtendedRecords((RecordTypeDecl) sym.get(parent.getname()));
-                    for (RecordMember rm : memberSet) {
+                    HashSet<RecordMember> recNames = addExtendedRecord((RecordTypeDecl) sym.get(parent.getname()));
+                    for (RecordMember rm : recNames) {
                         if (!hashSet.add(rm))
                             Log.log(rt, "Name '" + rm.name().getname() + "' already in (" + rt.name().getname() + ")");
                     }
@@ -61,7 +61,7 @@ public class RecordRewrite extends Visitor<AST> {
         if (rt.extend().size() > 0) {
             for (Name name : rt.extend()) {
                 if (sym.get(name.getname()) != null)
-                    hashSet.addAll(addExtendedRecords((RecordTypeDecl) sym.get(name.getname())));
+                    hashSet.addAll(addExtendedRecord((RecordTypeDecl) sym.get(name.getname())));
             }
         }
         for (RecordMember rm : rt.body())

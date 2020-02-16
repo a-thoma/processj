@@ -38,10 +38,10 @@ public class ProtocolRewrite extends Visitor<AST> {
             }
         }
         if (!found)
-        	hashSet.add(name);
+            hashSet.add(name);
     }
     
-    public HashSet<Name> addExtendProtocolNames(AST a) {
+    public HashSet<Name> addExtendProtocolName(AST a) {
         Log.log(a, "extends a ProtocolypeDecl (" + ((ProtocolTypeDecl) a).name().getname() + ")");
         
         ProtocolTypeDecl pd = (ProtocolTypeDecl) a;
@@ -52,8 +52,8 @@ public class ProtocolRewrite extends Visitor<AST> {
         if (pd.extend().size() > 0) {
             for (Name parent : pd.extend()) {
                 if (sym.get(parent.getname()) != null) {
-                    HashSet<Name> nameSet = addExtendProtocolNames((ProtocolTypeDecl) sym.get(parent.getname()));
-                    for (Name pdt : nameSet)
+                    HashSet<Name> protoNames = addExtendProtocolName((ProtocolTypeDecl) sym.get(parent.getname()));
+                    for (Name pdt : protoNames)
                     	addProtocolName(hashSet, pdt);
                 }
             }
@@ -71,7 +71,7 @@ public class ProtocolRewrite extends Visitor<AST> {
         if (pd.extend().size() > 0) {
             for (Name name : pd.extend()) {
                 if (sym.get(name.getname()) != null)
-                    hashSet.addAll(addExtendProtocolNames((ProtocolTypeDecl) sym.get(name.getname())));
+                    hashSet.addAll(addExtendProtocolName((ProtocolTypeDecl) sym.get(name.getname())));
             }
         }
         for (Name n : pd.extend())

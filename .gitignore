@@ -20,3 +20,4 @@ processjrc
 resources/properties/PJConfig.properties
 
 .DS_Store
+/nbproject/private/

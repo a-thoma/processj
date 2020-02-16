@@ -8,6 +8,8 @@ import java.io.Writer;
 
 import ast.ProcTypeDecl;
 import ast.Type;
+import processj.runtime.PJChannel;
+import processj.runtime.PJRecord;
 import utilities.Assert;
 import utilities.Settings;
 
@@ -87,7 +89,7 @@ public class Helper {
      *            The procure whose annotation is to be checked.
      * @return true if the procedure can yield or false otherwise.
      */
-    public static boolean doesProcedureYield(final ProcTypeDecl pd) {
+    public static boolean doesProcYield(final ProcTypeDecl pd) {
         if (pd == null)
             return false;
         
@@ -102,7 +104,7 @@ public class Helper {
      *          A wrapper class type or the class itself.
      * @return The type instances represented by a class.
      */
-    public static Class<?> getWrapperClass(Type type) {
+    private static Class<?> getWrapperClass(Type type) {
         type = Assert.nonNull(type, "The parameter type cannot be null.");
         Class<?> typeName = null;
         
@@ -122,6 +124,10 @@ public class Helper {
             typeName = Character.class;
         else if (type.isShortType())
             typeName = Short.class;
+        else if (type.isRecordType())
+            typeName = PJRecord.class;
+        else if (type.isChannelType() || type.isChannelEndType())
+            typeName = PJChannel.class;
         
         return typeName;
     }
