@@ -136,15 +136,12 @@ public class MultiHashmap<K, V> implements Multimap<K, V> {
     }
 
     @Override
-    public boolean equals(Object obj) {
-        if (obj == null)
-            return false;
-
-        if (this == obj || getClass() != obj.getClass())
+    public boolean equals(Object o) {
+        if (!(o instanceof MultiHashmap))
             return false;
 
         @SuppressWarnings("rawtypes")
-        MultiHashmap other = (MultiHashmap) obj;
+        MultiHashmap other = (MultiHashmap) o;
 
         if (!hashMap.equals(other.hashMap))
             return false;

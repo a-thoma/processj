@@ -1,62 +1,107 @@
 package processj.runtime;
 
-import java.lang.reflect.Field;
-import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  * @author ben
  */
-public class PJRecord {
+public class PJRecord extends HashMap<String, Object> {
     
-    private static int s_id = 0;
-    private int id;
+    private int hashCode;
     
-    public PJRecord() {
-        id = ++s_id;
+    public PJRecord(String[] keys, Object[] values) {
+        for (int i = 0; i < values.length; ++i)
+            super.put(keys[i], values[i]);
     }
     
-    public int getID() {
-        return id;
+    @SuppressWarnings("unchecked")
+    public PJRecord(Map map) {
+        super(map);
     }
     
-    public String toString1() {
-        StringBuilder sb = new StringBuilder("*:[");
-        Iterator<Field> it = Arrays.asList(getClass().getDeclaredFields()).iterator();
-        boolean isSelfRef = false;
-        while (it.hasNext()) {
-            try {
-                Field f = it.next();
-                f.setAccessible(true);
-                if (f.get(this) instanceof PJRecord) {
-                    if (f.get(this) == this) {
-                        sb.append(f.getName()).append(":").append(String.format("[(%s)]", id));
-                        isSelfRef = true;
-                    } else {
-                        String str = ((PJRecord) f.get(this)).toString1();
-                        if (str.startsWith("*"))
-                            str = str.substring(1, str.length());
-                        else {
-                            int star = str.indexOf(")*");
-                            str = str.substring(0, star + 1) + str.substring(star + 2, str.length());
-                        }
-                        sb.append(f.getName()).append(str);
-                    }
-                } else
-                    sb.append(f.getName()).append(":").append(f.get(this));
-                if (it.hasNext())
-                    sb.append(", ");
-            } catch (IllegalArgumentException | IllegalAccessException ex) {
-                Logger.getLogger(PJRecord.class.getName()).log(Level.SEVERE, null, ex);
+    public Object get(String key) {
+        return super.get(key);
+    }
+    
+    @Override
+    public Object put(String key, Object value) {
+        return super.put(key, value);
+    }
+    
+    @Override
+    public Object remove(Object key) {
+        throw new RuntimeException(String.format("Record %s is immutable.", this));
+    }
+    
+    @Override
+    public void putAll(Map map) {
+        throw new RuntimeException(String.format("Record %s is immutable.", this));
+    }
+    
+    @Override
+    public boolean equals(Object o) {
+        if (!(o instanceof PJRecord))
+            return false;
+        
+        PJRecord other = (PJRecord) o;
+        if (size() == other.size()) {
+            for (Object e : entrySet()) {
+                Map.Entry entry = (Map.Entry) e;
+                Object key = entry.getKey();
+                if (!entry.getValue().equals(other.get(key)))
+                    return false;
             }
         }
+        return true;
+    }
+    
+    @Override
+    public int hashCode() {
+        if (hashCode == 0) {
+            for (Object key : keySet()) {
+                int hash = (key != null) ? key.hashCode() : 0xdadd;
+                hashCode ^= hash;
+            }
+        }
+        return hashCode;
+    }
+    
+    private String findKeyFor(HashMap<String, Object> entries, Object o) {
+        for (Map.Entry<String, Object> e : entries.entrySet())
+            if (e.getValue() == o)
+                return e.getKey();
+        return null;
+    }
+    
+    public String toString(HashMap<String, Object> entries) {
+        if (entries == null)
+            entries = new HashMap<String, Object>();
+        System.out.println(">> " + entries.size() + ":" + entries );
+        StringBuilder sb = new StringBuilder("*:[");
+        Iterator<String> it = keySet().iterator();
+        while (it.hasNext()) {
+            String key = it.next();
+            Object value = get(key);
+            if (get(key) instanceof PJRecord) {
+                if (value == this) {
+                    String varName = findKeyFor(entries, value);
+                    varName = varName != null? "*" + varName : "*";
+                    sb.append(key).append(":").append(varName);
+                } else {
+                    entries.put(key, value);
+                    String s = ((PJRecord) value).toString(entries);
+                    if (s.startsWith("*"))
+                        s = s.substring(1, s.length());
+                    sb.append(key).append(s);
+                }
+            } else
+                sb.append(key).append(":").append(value);
+            if (it.hasNext())
+                sb.append(", ");
+        }
         sb.append("]");
-        String s = sb.toString();
-        s = isSelfRef ? String.format("(%s)", id) + s : s;
-        return s;
+        return sb.toString();
     }
 }

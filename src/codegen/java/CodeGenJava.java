@@ -272,10 +272,10 @@ public class CodeGenJava extends Visitor<Object> {
             String procType = (String) pd.returnType().visit(this);
             /* The procedure's annotation determines if we have a yielding procedure
              * or a Java method (a non-yielding procedure) */
-            boolean doYield = Helper.doesProcYield(pd);
+            boolean doesProcYield = Helper.doesProcYield(pd);
             /* Set the template to the correct instance value and then initialize
              * its attributes */
-            if (doYield) {
+            if (doesProcYield) {
                 /* This procedure yields! Grab the instance of a yielding procedure
                  * from the string template in order to define a new class */
                 procName = Helper.makeVariableName(d_curProcName + createProcSignature(pd), 0, Tag.PROCEDURE_NAME);
@@ -311,9 +311,9 @@ public class CodeGenJava extends Visitor<Object> {
                 /* Add the entry point of the program */
                 stProcTypeDecl.add("main", stMain.render());
             }
-            /* The list of command line arguments should be passed to the constructor
+            /* The list of command-line arguments should be passed to the constructor
              * of the static class that the main method belongs or be passed to the
-             * Java method (a static method) */
+             * a static method */
             if (!d_param2Field.isEmpty()) {
                 stProcTypeDecl.add("types", d_param2Field.values());
                 stProcTypeDecl.add("vars", d_param2Field.keySet());

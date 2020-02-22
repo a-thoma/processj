@@ -515,20 +515,22 @@ RecordType(modifiers, name, types, vars, extend) ::= <<
 
 <if(modifiers)><modifiers; separator=" "> <else>protected <endif>static class <name> extends PJRecord implements <extend:{e | I_<e>}; separator=", "> {
     <! -------- Member variables -------- !>
-    <if(vars)><types,vars:{t,v | private <t> <v>}; separator=";\n">;<\n><endif>
+    <! <if(vars)><types,vars:{t,v | private <t> <v>}; separator=";\n">;<\n><endif> !>
     <! -------- Default Constructor -------- !>
     public <name>(<types,vars:{t,v | <t> <v>}; separator=", ">) {
+        <! Collect all members !>
+        super(new String[] { <vars:{v | "<v>"}; separator=", "> }, new Object[] { <vars:{v | <v>}; separator=", "> } );
         <! Initialize member fields !>
-        <if(vars)><vars:{v | this.<v> = <v>}; separator=";\n">;<endif>
+        <! <if(vars)><vars:{v | this.<v> = <v>}; separator=";\n">;<endif> !>
     }
     
     <! -------- Accessors -------- !>
-    <if(vars)><types,vars:{t,v | @Override public <t> <v>() { return <v>; \}}; separator="\n"><\n><endif>
+    <if(vars)><types,vars:{t,v | @Override public <t> <v>() { return (<t>) get("<v>"); \}}; separator="\n"><\n><endif>
     <! -------- Modifiers -------- !>
-    <if(vars)><types,vars:{t,v | @Override public void <v>(<t> <v>) { this.<v> = <v>; \}}; separator="\n"><endif>
-    
+    <if(vars)><types,vars:{t,v | @Override public void <v>(<t> <v>) { put("<v>", <v>); \}}; separator="\n"><endif>
+
     @Override public String toString() {
-        return toString1();
+        return toString(new HashMap\<String, Object>());
     }
 }
 >>
