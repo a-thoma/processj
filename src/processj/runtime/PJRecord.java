@@ -78,7 +78,6 @@ public class PJRecord extends HashMap<String, Object> {
     public String toString(HashMap<String, Object> entries) {
         if (entries == null)
             entries = new HashMap<String, Object>();
-        System.out.println(">> " + entries.size() + ":" + entries );
         StringBuilder sb = new StringBuilder("*:[");
         Iterator<String> it = keySet().iterator();
         while (it.hasNext()) {

@@ -32,77 +32,77 @@ import utilities.Visitor;
 public class CodeGenJava extends Visitor<Object> {
 
     /* String template file locator */
-    private final String stGammarFile = "resources/stringtemplates/java/grammarTemplatesJava.stg";
+    private final String __stGammarFile = "resources/stringtemplates/java/grammarTemplatesJava.stg";
     
     /* Current Java version -- only needed for debugging */
-    private final String d_curJVM = System.getProperty("java.version");
+    private final String __currJVM = System.getProperty("java.version");
 
     /* Collection of templates, imported templates, and/or groups that 
      * contain formal template definitions */
-    private STGroup d_stGroup;
+    private STGroup __stGroup;
     
     /* Current compilation unit */
-    private Compilation d_curCompilation = null;
+    private Compilation __curCompilation = null;
 
     /* The user working directory */
-    private String d_workingDir = null;
+    private String __workingDir = null;
 
     /* Currently executing procedure */
-    private String d_curProcName = null;
+    private String __curProcName = null;
     
     /* Currently executing par-block */
-    private String d_curParBlock = null;
+    private String __curParBlock = null;
     
     /* Currently executing protocol */
-    private String d_curProtocol = null;
+    private String __curProtocol = null;
     
     /* All imports are kept in this table */
-    private HashSet<String> d_importFiles = new LinkedHashSet<String>();
+    private HashSet<String> __importFiles = new LinkedHashSet<String>();
     
     /* Top level declarations */
-    private SymbolTable d_topLvlDecls = null;
+    private SymbolTable __topLvlDecls = null;
 
     /* Formal parameters transformed into fields */
-    private HashMap<String, String> d_param2Field = new LinkedHashMap<String, String>();
+    private HashMap<String, String> __param2Field = new LinkedHashMap<String, String>();
     
     /* Formal parameter names transformed into variable names */
-    private HashMap<String, String> d_param2VarName = new LinkedHashMap<String, String>();
+    private HashMap<String, String> __param2VarName = new LinkedHashMap<String, String>();
     
     /* Local parameters transformed into fields */
-    private HashMap<String, String> d_local2Field = new LinkedHashMap<String, String>();
+    private HashMap<String, String> __local2Field = new LinkedHashMap<String, String>();
     
     /* Record members transformed into fields */
-    private HashMap<String, String> d_recMember2Field = new LinkedHashMap<String, String>();
+    private HashMap<String, String> __recMember2Field = new LinkedHashMap<String, String>();
 
     /* Protocol names and tags currently switched on */
-    private HashMap<String, String> d_protName2ProtTag = new HashMap<String, String>();
+    private HashMap<String, String> __protName2ProtTag = new HashMap<String, String>();
     
     /* List of switch labels */
-    private ArrayList<String> d_switchCases = new ArrayList<String>();
+    private ArrayList<String> __switchCases = new ArrayList<String>();
     
     /* List of barrier expressions */
-    private ArrayList<String> d_barriers = new ArrayList<String>();
+    private ArrayList<String> __barriers = new ArrayList<String>();
 
     /* Identifier for parameter declaration */
-    private int d_varDecId = 0;
+    private int __varDecId = 0;
     
     /* Identifier for par-block declaration */
-    private int d_parDecId = 0;
+    private int __parDecId = 0;
 
     /* Identifier for local variable declaration */
-    private int d_localDecId = 0;
+    private int __localDecId = 0;
     
     /* Jump label used when procedures yield */
-    private int d_jumpLabel = 0;
+    private int __jumpLabel = 0;
     
     /* Access to protocol case */
-    private boolean d_isProtocCase = false;
+    private boolean __isProtocCase = false;
     
     /* Access to protocol tag */
-    private String d_curProtocTag = null;
+    private String __currProtocTag = null;
     
     /* This is used for arrays of N-dimensions */
-    private boolean d_isArrayLiteral = false;
+    private boolean __isArrayLiteral = false;
     
     private final static String DELIMITER = ";";
 
@@ -121,25 +121,25 @@ public class CodeGenJava extends Visitor<Object> {
         Log.logHeader("*         CODE GENERATOR JAVA           *");
         Log.logHeader("*****************************************");
         
-        d_topLvlDecls = s;
-        d_stGroup = new STGroupFile(stGammarFile);
+        __topLvlDecls = s;
+        __stGroup = new STGroupFile(__stGammarFile);
     }
     
     /**
      * Sets the system properties to a current working directory.
      *
      * @param workingDir
-     * 			A working directory.
+     *          A working directory.
      */
     public void workingDir(String workingDir) {
-        d_workingDir = workingDir;
+        __workingDir = workingDir;
     }
     
     /**
      * Return a string representing the current working directory.
      */
     public String workingDir() {
-        return d_workingDir;
+        return __workingDir;
     }
     
     /**
@@ -155,11 +155,11 @@ public class CodeGenJava extends Visitor<Object> {
     public Object visitCompilation(Compilation co) {
         Log.log(co, "Visiting a Compilation");
         
-        d_curCompilation = co;
+        __curCompilation = co;
         /* Code generated by the template */
         String codeGen = null;
         /* Template to fill in */
-        ST stCompilation = d_stGroup.getInstanceOf("Compilation");
+        ST stCompilation = __stGroup.getInstanceOf("Compilation");
         /* Reference to all remaining types */
         ArrayList<String> body = new ArrayList<String>();
         /* Holds all top-level declarations */
@@ -169,7 +169,7 @@ public class CodeGenJava extends Visitor<Object> {
         
         for (Import im : co.imports())
             if (im != null)
-                d_importFiles.add((String) im.visit(this));
+                __importFiles.add((String) im.visit(this));
         
         for (AST decl : typeDecls) {
             if (decl instanceof Type) {
@@ -190,11 +190,11 @@ public class CodeGenJava extends Visitor<Object> {
         stCompilation.add("fileName", co.fileName);
         stCompilation.add("name", co.fileNoExtension());
         stCompilation.add("body", body);
-        stCompilation.add("version", d_curJVM);
+        stCompilation.add("version", __currJVM);
         
         /* Add all import statements to the file (if any) */
-        if (d_importFiles.size() > 0)
-            stCompilation.add("imports", d_importFiles);
+        if (__importFiles.size() > 0)
+            stCompilation.add("imports", __importFiles);
 
         /* This will render the code for debbuging */
         codeGen = stCompilation.render();
@@ -213,40 +213,40 @@ public class CodeGenJava extends Visitor<Object> {
         
         ST stProcTypeDecl = null;
         /* Save previous procedure state */
-        String prevProcName = d_curProcName;
+        String prevProcName = __curProcName;
         /* Save previous jump labels */
-        ArrayList<String> prevLabels = d_switchCases;
-        if (!d_switchCases.isEmpty())
-            d_switchCases = new ArrayList<String>();
+        ArrayList<String> prevLabels = __switchCases;
+        if (!__switchCases.isEmpty())
+            __switchCases = new ArrayList<String>();
         /* Name of the invoked procedure */
-        d_curProcName = (String) pd.name().visit(this);
+        __curProcName = (String) pd.name().visit(this);
         /* Procedures are static classes which belong to the same package and
          * class. To avoid having classes with the same name, we generate a
          * new name for the currently executing procedure */
         String procName = null;
         /* For non-invocations, that is, for anything other than a procedure
          * that yields, we need to extends the PJProcess class anonymously */
-        if ("Anonymous".equals(d_curProcName)) {
+        if ("Anonymous".equals(__curProcName)) {
             /* Preserve current jump label for resumption */
-            int prevJumpLabel = d_jumpLabel;
-            d_jumpLabel = 0;
+            int prevJumpLabel = __jumpLabel;
+            __jumpLabel = 0;
             /* Create an instance for such anonymous procedure */
-            stProcTypeDecl = d_stGroup.getInstanceOf("AnonymousProcess");
+            stProcTypeDecl = __stGroup.getInstanceOf("AnonymousProcess");
             /* Statements that appear in the procedure being executed */
             String[] body = (String[]) pd.body().visit(this);
-            stProcTypeDecl.add("parBlock", d_curParBlock);
+            stProcTypeDecl.add("parBlock", __curParBlock);
             stProcTypeDecl.add("syncBody", body);
             /* Add the barrier this procedure should resign from */
-            if (!d_barriers.isEmpty())
-                stProcTypeDecl.add("barrier", d_barriers);
+            if (!__barriers.isEmpty())
+                stProcTypeDecl.add("barrier", __barriers);
             /* Add the switch block for yield and resumption */
-            if (!d_switchCases.isEmpty()) {
-                ST stSwitchBlock = d_stGroup.getInstanceOf("SwitchBlock");
-                stSwitchBlock.add("jumps", d_switchCases);
+            if (!__switchCases.isEmpty()) {
+                ST stSwitchBlock = __stGroup.getInstanceOf("SwitchBlock");
+                stSwitchBlock.add("jumps", __switchCases);
                 stProcTypeDecl.add("switchBlock", stSwitchBlock.render());
             }
             /* Restore jump label so it knows where to resume from */
-            d_jumpLabel = prevJumpLabel;
+            __jumpLabel = prevJumpLabel;
         } else {
             /* Restore global variables for a new PJProcess class */
             resetGlobals();
@@ -278,16 +278,16 @@ public class CodeGenJava extends Visitor<Object> {
             if (doesProcYield) {
                 /* This procedure yields! Grab the instance of a yielding procedure
                  * from the string template in order to define a new class */
-                procName = Helper.makeVariableName(d_curProcName + createProcSignature(pd), 0, Tag.PROCEDURE_NAME);
-                stProcTypeDecl = d_stGroup.getInstanceOf("ProcClass");
+                procName = Helper.makeVariableName(__curProcName + createProcSignature(pd), 0, Tag.PROCEDURE_NAME);
+                stProcTypeDecl = __stGroup.getInstanceOf("ProcClass");
                 stProcTypeDecl.add("name", procName);
                 /* Add the statements that appear in the body of the procedure */
                 stProcTypeDecl.add("syncBody", body);
             } else {
                 /* Otherwise, grab the instance of a non-yielding procedure to
                  * define a new static Java method */
-                procName = Helper.makeVariableName(d_curProcName + createProcSignature(pd), 0, Tag.METHOD_NAME);
-                stProcTypeDecl = d_stGroup.getInstanceOf("Method");
+                procName = Helper.makeVariableName(__curProcName + createProcSignature(pd), 0, Tag.METHOD_NAME);
+                stProcTypeDecl = __stGroup.getInstanceOf("Method");
                 stProcTypeDecl.add("name", procName);
                 stProcTypeDecl.add("type", procType);
                 /* Do we have any access modifier? If so, add them */
@@ -298,15 +298,15 @@ public class CodeGenJava extends Visitor<Object> {
             
             /* Create an entry point for the ProcessJ program, which is just
              * a Java main method that is called by the JVM */
-            if ("main".equals(d_curProcName) && pd.signature().equals(Tag.MAIN_NAME.toString())) {
+            if ("main".equals(__curProcName) && pd.signature().equals(Tag.MAIN_NAME.toString())) {
                 /* Create an instance of a Java main method template */
-                ST stMain = d_stGroup.getInstanceOf("Main");
-                stMain.add("class", d_curCompilation.fileNoExtension());
+                ST stMain = __stGroup.getInstanceOf("Main");
+                stMain.add("class", __curCompilation.fileNoExtension());
                 stMain.add("name", procName);
                 /* Pass the list of command line arguments to this main method */
-                if (!d_param2Field.isEmpty()) {
-                    stMain.add("types", d_param2Field.values());
-                    stMain.add("vars", d_param2Field.keySet());
+                if (!__param2Field.isEmpty()) {
+                    stMain.add("types", __param2Field.values());
+                    stMain.add("vars", __param2Field.keySet());
                 }
                 /* Add the entry point of the program */
                 stProcTypeDecl.add("main", stMain.render());
@@ -314,28 +314,28 @@ public class CodeGenJava extends Visitor<Object> {
             /* The list of command-line arguments should be passed to the constructor
              * of the static class that the main method belongs or be passed to the
              * a static method */
-            if (!d_param2Field.isEmpty()) {
-                stProcTypeDecl.add("types", d_param2Field.values());
-                stProcTypeDecl.add("vars", d_param2Field.keySet());
+            if (!__param2Field.isEmpty()) {
+                stProcTypeDecl.add("types", __param2Field.values());
+                stProcTypeDecl.add("vars", __param2Field.keySet());
             }
             /* The list of local variables defined in the body of a procedure
              * becomes the instance fields of the class */
-            if (!d_local2Field.isEmpty()) {
-                stProcTypeDecl.add("ltypes", d_local2Field.values());
-                stProcTypeDecl.add("lvars", d_local2Field.keySet());
+            if (!__local2Field.isEmpty()) {
+                stProcTypeDecl.add("ltypes", __local2Field.values());
+                stProcTypeDecl.add("lvars", __local2Field.keySet());
             }
             /* Add the switch block for resumption */
-            if (!d_switchCases.isEmpty()) {
-                ST stSwitchBlock = d_stGroup.getInstanceOf("SwitchBlock");
-                stSwitchBlock.add("jumps", d_switchCases);
+            if (!__switchCases.isEmpty()) {
+                ST stSwitchBlock = __stGroup.getInstanceOf("SwitchBlock");
+                stSwitchBlock.add("jumps", __switchCases);
                 stProcTypeDecl.add("switchBlock", stSwitchBlock.render());
             }
         }
         
         /* Restore and reset previous values */
-        d_curProcName = prevProcName;
+        __curProcName = prevProcName;
         /* Restore previous jump labels */
-        d_switchCases = prevLabels;
+        __switchCases = prevLabels;
 
         return stProcTypeDecl.render();
     }
@@ -344,7 +344,7 @@ public class CodeGenJava extends Visitor<Object> {
     public Object visitBinaryExpr(BinaryExpr be) {
         Log.log(be, "Visiting a BinaryExpr");
         
-        ST stBinaryExpr = d_stGroup.getInstanceOf("BinaryExpr");
+        ST stBinaryExpr = __stGroup.getInstanceOf("BinaryExpr");
         String op = be.opString();
         String lhs = (String) be.left().visit(this);        
         lhs = lhs.replace(DELIMITER, "");
@@ -357,18 +357,18 @@ public class CodeGenJava extends Visitor<Object> {
         /* If 'op' is the 'istype' keyword, we need to look in the top-level
          * decls table for the record or protocol in question and the records
          * or protocols such record or protocol extends */
-        if (d_local2Field.containsKey(lhs)) {
-            String namedType = d_local2Field.get(lhs);
-            Object o = d_topLvlDecls.get(namedType);
+        if (__local2Field.containsKey(lhs)) {
+            String namedType = __local2Field.get(lhs);
+            Object o = __topLvlDecls.get(namedType);
             if (o instanceof RecordTypeDecl) {
-                stBinaryExpr = d_stGroup.getInstanceOf("RecordExtend");
+                stBinaryExpr = __stGroup.getInstanceOf("RecordExtend");
                 stBinaryExpr.add("name", lhs);
                 stBinaryExpr.add("type", String.format("I_%s", rhs));
                 return stBinaryExpr.render();
             } else if (namedType.equals(PJProtocolCase.class.getSimpleName())) {
-                stBinaryExpr = d_stGroup.getInstanceOf("RecordExtend");
+                stBinaryExpr = __stGroup.getInstanceOf("RecordExtend");
                 stBinaryExpr.add("name", lhs);
-                stBinaryExpr.add("type", d_curProtocol);
+                stBinaryExpr.add("type", __curProtocol);
                 return stBinaryExpr.render();
             }
         }
@@ -389,7 +389,7 @@ public class CodeGenJava extends Visitor<Object> {
     public Object visitContinueStat(ContinueStat cs) {
         Log.log(cs, "Visiting a ContinueStat");
         
-        ST stContinueStat = d_stGroup.getInstanceOf("ContinueStat");
+        ST stContinueStat = __stGroup.getInstanceOf("ContinueStat");
         String name = null;
         /* If target isn't null, then we have a label to jump to */
         if (cs.target() != null) {
@@ -404,7 +404,7 @@ public class CodeGenJava extends Visitor<Object> {
     public Object visitIfStat(IfStat is) {
         Log.log(is, "Visiting a IfStat");
         
-        ST stIfStat = d_stGroup.getInstanceOf("IfStat");
+        ST stIfStat = __stGroup.getInstanceOf("IfStat");
         /* Sequence of statements enclosed in a block-stmt */
         String[] thenStats = null;
         String[] thenParts = null;
@@ -440,7 +440,7 @@ public class CodeGenJava extends Visitor<Object> {
     public Object visitAssignment(Assignment as) {
         Log.log(as, "Visiting an Assignment");
         
-        ST stVar = d_stGroup.getInstanceOf("Var");
+        ST stVar = __stGroup.getInstanceOf("Var");
         
         String op = as.opString();
         String lhs = null;
@@ -483,9 +483,9 @@ public class CodeGenJava extends Visitor<Object> {
         
         /* Create a tag for this parameter and then add it to the
          * collection of parameters for reference */
-        String newName = Helper.makeVariableName(name, ++d_varDecId, Tag.PARAM_NAME);
-        d_param2Field.put(newName, type);
-        d_param2VarName.put(name, newName);
+        String newName = Helper.makeVariableName(name, ++__varDecId, Tag.PARAM_NAME);
+        __param2Field.put(newName, type);
+        __param2VarName.put(name, newName);
         
         /* Ignored the value returned by this visitor. The types and
          * variables are _always_ resolved elsewhere */
@@ -514,9 +514,9 @@ public class CodeGenJava extends Visitor<Object> {
             type = PJChannel.class.getSimpleName() + type.substring(type.indexOf("<"), type.length());
 
         /* Create a tag for this local declaration */
-        String newName = Helper.makeVariableName(name, ++d_localDecId, Tag.LOCAL_NAME);
-        d_local2Field.put(newName, type);
-        d_param2VarName.put(name, newName);
+        String newName = Helper.makeVariableName(name, ++__localDecId, Tag.LOCAL_NAME);
+        __local2Field.put(newName, type);
+        __param2VarName.put(name, newName);
         
         /* This variable could be initialized, e.g. through an assignment operator */
         Expression expr = ld.var().init();
@@ -533,14 +533,14 @@ public class CodeGenJava extends Visitor<Object> {
         /* Is it a barrier declaration? If so, we must generate code that
          * creates a barrier object */
         if (ld.type().isBarrierType() && expr == null) {
-            ST stBarrierDecl = d_stGroup.getInstanceOf("BarrierDecl");
+            ST stBarrierDecl = __stGroup.getInstanceOf("BarrierDecl");
             val = stBarrierDecl.render();
         }
         /* Is it a simple declaration for a channel type? If so, and since
          * channels cannot be created using the operator 'new', we generate
          * code to create a channel object */
         if (ld.type().isChannelType() && expr == null) {
-            ST stChannelDecl = d_stGroup.getInstanceOf("ChannelDecl");
+            ST stChannelDecl = __stGroup.getInstanceOf("ChannelDecl");
             stChannelDecl.add("type", chantype);
             val = stChannelDecl.render();
         }
@@ -560,7 +560,7 @@ public class CodeGenJava extends Visitor<Object> {
         if (val != null)
             val = val.replace(DELIMITER, "");
         
-        ST stVar = d_stGroup.getInstanceOf("Var");
+        ST stVar = __stGroup.getInstanceOf("Var");
         stVar.add("name", newName);
         stVar.add("val", val);
         
@@ -580,8 +580,8 @@ public class CodeGenJava extends Visitor<Object> {
         
         String name = null;
         
-        if (!d_param2VarName.isEmpty() && d_param2VarName.containsKey(na.getname()))
-            name = d_param2VarName.get(na.getname());
+        if (!__param2VarName.isEmpty() && __param2VarName.containsKey(na.getname()))
+            name = __param2VarName.get(na.getname());
         
         if (name == null)
             name = na.getname();
@@ -636,7 +636,7 @@ public class CodeGenJava extends Visitor<Object> {
     public Object visitPrimitiveLiteral(PrimitiveLiteral li) {
         Log.log(li, "Visiting a Primitive Literal (" + li.getText() + ")");
         
-        ST stPrimitiveLiteral = d_stGroup.getInstanceOf("PrimitiveLiteral");
+        ST stPrimitiveLiteral = __stGroup.getInstanceOf("PrimitiveLiteral");
         if (li.isSuffixed())
             stPrimitiveLiteral.add("type", li.suffix());
         stPrimitiveLiteral.add("value", li.getText());
@@ -706,7 +706,7 @@ public class CodeGenJava extends Visitor<Object> {
     public Object visitChannelWriteStat(ChannelWriteStat cw) {
         Log.log(cw, "Visiting a ChannelWriteStat");
         
-        ST stChanWriteStat = d_stGroup.getInstanceOf("ChanWriteStat");
+        ST stChanWriteStat = __stGroup.getInstanceOf("ChanWriteStat");
         /* 'c.write(x)' is a channel-end expression, where 'c' is the
          * writing end of the channel */
         Expression chanExpr = cw.channel();
@@ -719,7 +719,7 @@ public class CodeGenJava extends Visitor<Object> {
         int countLabel = 1;
         /* Is the writing end of this channel shared? */
         if (chanExpr.type.isChannelEndType() && ((ChannelEndType) chanExpr.type).isShared()) {
-            stChanWriteStat = d_stGroup.getInstanceOf("ChannelMany2One");
+            stChanWriteStat = __stGroup.getInstanceOf("ChannelMany2One");
             ++countLabel;
         }
         
@@ -729,8 +729,8 @@ public class CodeGenJava extends Visitor<Object> {
         /* Add the switch block for resumption */
         for (int label = 0; label < countLabel; ++label) {
             /* Increment jump label and it to the switch-stmt list */
-            stChanWriteStat.add("resume" + label, ++d_jumpLabel);
-            d_switchCases.add(renderSwitchCase(d_jumpLabel));
+            stChanWriteStat.add("resume" + label, ++__jumpLabel);
+            __switchCases.add(renderSwitchCase(__jumpLabel));
         }
         
         return stChanWriteStat.render();
@@ -740,7 +740,7 @@ public class CodeGenJava extends Visitor<Object> {
     public Object visitChannelReadExpr(ChannelReadExpr cr) {
         Log.log(cr, "Visiting a ChannelReadExpr");
         
-        ST stChannelReadExpr = d_stGroup.getInstanceOf("ChannelReadExpr");
+        ST stChannelReadExpr = __stGroup.getInstanceOf("ChannelReadExpr");
         /* 'c.read()' is a channel-end expression, where 'c' is the reading
          * end of the channel */
         Expression chanExpr = cr.channel();
@@ -752,8 +752,8 @@ public class CodeGenJava extends Visitor<Object> {
         /* Add the switch block for resumption */
         for (int label = 0; label < countLabel; ++label) {
             /* Increment jump label and it to the switch-stmt list */
-            stChannelReadExpr.add("resume" + label, ++d_jumpLabel);
-            d_switchCases.add(renderSwitchCase(d_jumpLabel));
+            stChannelReadExpr.add("resume" + label, ++__jumpLabel);
+            __switchCases.add(renderSwitchCase(__jumpLabel));
         }
         
         return stChannelReadExpr.render();
@@ -763,7 +763,7 @@ public class CodeGenJava extends Visitor<Object> {
     public Object visitVar(Var va) {
         Log.log(va, "Visiting a Var (" + va.name().getname() + ")");
         
-        ST stVar = d_stGroup.getInstanceOf("Var");
+        ST stVar = __stGroup.getInstanceOf("Var");
         /* Returned values for name and expression (if any) */
         String name = (String) va.name().visit(this);
         String exprStr = null;
@@ -787,7 +787,7 @@ public class CodeGenJava extends Visitor<Object> {
     public Object visitArrayAccessExpr(ArrayAccessExpr ae) {
         Log.log(ae, "Visiting an ArrayAccessExpr");
         
-        ST stArrayAccessExpr = d_stGroup.getInstanceOf("ArrayAccessExpr");
+        ST stArrayAccessExpr = __stGroup.getInstanceOf("ArrayAccessExpr");
         String name = (String) ae.target().visit(this);
         String index = (String) ae.index().visit(this);
         
@@ -805,7 +805,7 @@ public class CodeGenJava extends Visitor<Object> {
         /* Is the array initialize at compile time? If so, create a list
          * of values separated by commas and enclosed between braces -- the
          * syntax for array literals in ProcessJ is different to Java's */
-        if (al.elements().size() > 1 || d_isArrayLiteral) {
+        if (al.elements().size() > 1 || __isArrayLiteral) {
             /* The following extends naturally to two-dimensional, and
              * even higher-dimensional arrays -- but they are not used
              * very often in practice */
@@ -882,7 +882,7 @@ public class CodeGenJava extends Visitor<Object> {
     public Object visitBreakStat(BreakStat bs) {
         Log.log(bs, "Visiting a BreakStat");
         
-        ST stBreakStat = d_stGroup.getInstanceOf("BreakStat");
+        ST stBreakStat = __stGroup.getInstanceOf("BreakStat");
         /* No parse-tree for 'break' */
         if (bs.target() != null)
             stBreakStat.add("name", bs.target().visit(this));
@@ -894,15 +894,15 @@ public class CodeGenJava extends Visitor<Object> {
     public Object visitSwitchLabel(SwitchLabel sl) {
         Log.log(sl, "Visiting a SwitchLabel");
         
-        ST stSwitchLabel = d_stGroup.getInstanceOf("SwitchLabel");
+        ST stSwitchLabel = __stGroup.getInstanceOf("SwitchLabel");
         
         /* This could be a default label, in which case, expr() would be null */
         String label = null;
         if (!sl.isDefault())
             label = (String) sl.expr().visit(this);
-        if (d_isProtocCase) {
+        if (__isProtocCase) {
             /* The protocol tag currently being used */
-            d_curProtocTag = label;
+            __currProtocTag = label;
             label = String.format("\"%s\"", label);
         }
         
@@ -915,7 +915,7 @@ public class CodeGenJava extends Visitor<Object> {
     public Object visitSwitchGroup(SwitchGroup sg) {
         Log.log(sg, "Visit a SwitchGroup");
         
-        ST stSwitchGroup = d_stGroup.getInstanceOf("SwitchGroup");
+        ST stSwitchGroup = __stGroup.getInstanceOf("SwitchGroup");
         
         ArrayList<String> labels = new ArrayList<String>();
         for (SwitchLabel sl : sg.labels())
@@ -936,10 +936,10 @@ public class CodeGenJava extends Visitor<Object> {
     public Object visitSwitchStat(SwitchStat st) {
         Log.log(st, "Visiting a SwitchStat");
         
-        ST stSwitchStat = d_stGroup.getInstanceOf("SwitchStat");
+        ST stSwitchStat = __stGroup.getInstanceOf("SwitchStat");
         /* Is this a protocol tag? */
         if (st.expr().type.isProtocolType())
-            d_isProtocCase = true;
+            __isProtocCase = true;
         
         String expr = (String) st.expr().visit(this);
         ArrayList<String> switchGroup = new ArrayList<String>();
@@ -947,12 +947,12 @@ public class CodeGenJava extends Visitor<Object> {
         for (SwitchGroup sg : st.switchBlocks())
             switchGroup.add((String) sg.visit(this));
         
-        stSwitchStat.add("tag", d_isProtocCase);
+        stSwitchStat.add("tag", __isProtocCase);
         stSwitchStat.add("expr", expr);
         stSwitchStat.add("block", switchGroup);
         
         /* Reset the value for this protocol tag */
-        d_isProtocCase = false;
+        __isProtocCase = false;
         
         return stSwitchStat.render();
     }
@@ -961,7 +961,7 @@ public class CodeGenJava extends Visitor<Object> {
     public Object visitCastExpr(CastExpr ce) {
         Log.log(ce, "Visiting a CastExpr");
         
-        ST stCastExpr = d_stGroup.getInstanceOf("CastExpr");
+        ST stCastExpr = __stGroup.getInstanceOf("CastExpr");
         /* This result in (<type>) (<expr>) */
         String type = (String) ce.type().visit(this);
         String expr = (String) ce.expr().visit(this);
@@ -975,16 +975,16 @@ public class CodeGenJava extends Visitor<Object> {
     @Override
     @SuppressWarnings({ "rawtypes", "unchecked" })
     public Object visitInvocation(Invocation in) {
-    	/* We ignore any GOTO or LABEL invocation because it is only needed
-    	 * for the ASM bytecode rewrite */
-    	if (in.ignore) {
+        /* We ignore any GOTO or LABEL invocation because it is only needed
+         * for the ASM bytecode rewrite */
+        if (in.ignore) {
             Log.log(in, "Visiting a " + in.procedureName().getname());
-            ST stIgnore = d_stGroup.getInstanceOf("InvocationIgnore");
+            ST stIgnore = __stGroup.getInstanceOf("InvocationIgnore");
             stIgnore.add("name", in.procedureName().visit(this));
             stIgnore.add("var", in.params().visit(this));
             return stIgnore.render();
-    	}
-    	
+        }
+        
         Log.log(in, "Visiting Invocation (" + in.targetProc.name().getname() + ")");
         
         ST stInvocation = null;
@@ -994,7 +994,7 @@ public class CodeGenJava extends Visitor<Object> {
         String pdName = pd.name().getname();
         /* Check local procedures, if none is found then the procedure must come
          * from a different file and maybe package */
-        if (d_curCompilation.fileName.equals(pd.myCompilation.fileName)) {
+        if (__curCompilation.fileName.equals(pd.myCompilation.fileName)) {
             String name = pdName + createProcSignature(pd);
             if (Helper.doesProcYield(pd))
                 name = Helper.makeVariableName(name, 0, Tag.PROCEDURE_NAME);
@@ -1022,7 +1022,7 @@ public class CodeGenJava extends Visitor<Object> {
         
         /* For an invocation of a procedure that yields and one which
          * is not inside par-block, we wrap the procedure in a par-block */
-        if (Helper.doesProcYield(pd) && d_curParBlock == null) {
+        if (Helper.doesProcYield(pd) && __curParBlock == null) {
             return (new ParBlock(
                     new Sequence(new ExprStat(in)), /* Statements */
                     new Sequence()))                /* Barriers */
@@ -1031,14 +1031,14 @@ public class CodeGenJava extends Visitor<Object> {
         
         /* Does this procedure yield? */
         if (Helper.doesProcYield(pd)) {
-            stInvocation = d_stGroup.getInstanceOf("InvocationProcType");
-            stInvocation.add("parBlock", d_curParBlock);
+            stInvocation = __stGroup.getInstanceOf("InvocationProcType");
+            stInvocation.add("parBlock", __curParBlock);
             /* Add the barrier this procedure should resign from */
-            if (!d_barriers.isEmpty())
-                stInvocation.add("barrier", d_barriers);
+            if (!__barriers.isEmpty())
+                stInvocation.add("barrier", __barriers);
         } else
             /* Must be an invocation made through a static Java method */
-            stInvocation = d_stGroup.getInstanceOf("Invocation");
+            stInvocation = __stGroup.getInstanceOf("Invocation");
         
         stInvocation.add("name", pdName);
         stInvocation.add("vars", paramsList);
@@ -1050,8 +1050,8 @@ public class CodeGenJava extends Visitor<Object> {
     public Object visitImport(Import im) {
         Log.log(im, "Visiting an import statement (" + im + ")");
         
-        ST stImport = d_stGroup.getInstanceOf("Import");
-        stImport = d_stGroup.getInstanceOf("Import");
+        ST stImport = __stGroup.getInstanceOf("Import");
+        stImport = __stGroup.getInstanceOf("Import");
         stImport.add("package", im.toString());
         
         return stImport.render();
@@ -1061,7 +1061,7 @@ public class CodeGenJava extends Visitor<Object> {
     public Object visitProtocolTypeDecl(ProtocolTypeDecl pd) {
         Log.log(pd, "Visiting a ProtocolTypeDecl (" + pd.name().getname() + ")");
         
-        ST stProtocolClass = d_stGroup.getInstanceOf("ProtocolClass");
+        ST stProtocolClass = __stGroup.getInstanceOf("ProtocolClass");
         String name = (String) pd.name().visit(this);
         ArrayList<String> modifiers = new ArrayList<String>();
         ArrayList<String> body = new ArrayList<String>();
@@ -1069,15 +1069,15 @@ public class CodeGenJava extends Visitor<Object> {
         for (Modifier m : pd.modifiers())
             modifiers.add((String) m.visit(this));
         
-        d_curProtocol = name;
+        __curProtocol = name;
         ArrayList<String> extend = new ArrayList<String>();
         /* We use tags to associate parent and child protocols */
         if (pd.extend().size() > 0) {
             for (Name n : pd.extend()) {
                 extend.add(n.getname());
-                ProtocolTypeDecl ptd = (ProtocolTypeDecl) d_topLvlDecls.get(n.getname());
+                ProtocolTypeDecl ptd = (ProtocolTypeDecl) __topLvlDecls.get(n.getname());
                 for (ProtocolCase pc : ptd.body())
-                    d_protName2ProtTag.put(String.format("%s.%s", pd.name().getname(),
+                    __protName2ProtTag.put(String.format("%s.%s", pd.name().getname(),
                             pc.name().getname()), ptd.name().getname());
             }
         }
@@ -1099,13 +1099,13 @@ public class CodeGenJava extends Visitor<Object> {
     public Object visitProtocolCase(ProtocolCase pc) {
         Log.log(pc, "Visiting a ProtocolCase (" + pc.name().getname() + ")");
         
-        ST stProtocolType = d_stGroup.getInstanceOf("ProtocolType");
+        ST stProtocolType = __stGroup.getInstanceOf("ProtocolType");
         /* Since we are keeping the name of a tag as is, this (in theory)
          * shouldn't cause any name collision */
         String protocName = (String) pc.name().visit(this);
         /* This shouldn't create name collision problems even if we
          * use the same visitor for protocols and records */
-        d_recMember2Field.clear();
+        __recMember2Field.clear();
         
         /* The scope in which all members of this tag appeared */
         for (RecordMember rm : pc.body())
@@ -1113,12 +1113,12 @@ public class CodeGenJava extends Visitor<Object> {
         
         /* The list of fields passed to the constructor of the static
          * class that the record belongs to */
-        if (!d_recMember2Field.isEmpty()) {
-            stProtocolType.add("types", d_recMember2Field.values());
-            stProtocolType.add("vars", d_recMember2Field.keySet());
+        if (!__recMember2Field.isEmpty()) {
+            stProtocolType.add("types", __recMember2Field.values());
+            stProtocolType.add("vars", __recMember2Field.keySet());
         }
         
-        stProtocolType.add("protType", d_curProtocol);
+        stProtocolType.add("protType", __curProtocol);
         stProtocolType.add("name", protocName);
         
         return stProtocolType.render();
@@ -1128,7 +1128,7 @@ public class CodeGenJava extends Visitor<Object> {
     public Object visitProtocolLiteral(ProtocolLiteral pl) {
         Log.log(pl, "Visiting a ProtocolLiteral (" + pl.name().getname() + ")");
         
-        ST stProtocolLiteral = d_stGroup.getInstanceOf("ProtocolLiteral");
+        ST stProtocolLiteral = __stGroup.getInstanceOf("ProtocolLiteral");
         String type = (String) pl.name().visit(this);
         String tag = (String) pl.tag().visit(this);
         
@@ -1137,7 +1137,7 @@ public class CodeGenJava extends Visitor<Object> {
          * kind of protocol */
         HashMap<String, String> members = new LinkedHashMap<String, String>();
         /* We need the members of the tag currently being used */
-        ProtocolTypeDecl pt = (ProtocolTypeDecl) d_topLvlDecls.get(type);
+        ProtocolTypeDecl pt = (ProtocolTypeDecl) __topLvlDecls.get(type);
         
         if (pt != null) {
             ProtocolCase target = pt.getCase(tag);
@@ -1171,7 +1171,7 @@ public class CodeGenJava extends Visitor<Object> {
     public Object visitRecordTypeDecl(RecordTypeDecl rt) {
         Log.log(rt, "Visiting a RecordTypeDecl (" + rt.name().getname() + ")");
         
-        ST stRecordType = d_stGroup.getInstanceOf("RecordType");
+        ST stRecordType = __stGroup.getInstanceOf("RecordType");
         String recName = (String) rt.name().visit(this);
         ArrayList<String> modifiers = new ArrayList<String>();
         
@@ -1179,7 +1179,7 @@ public class CodeGenJava extends Visitor<Object> {
             modifiers.add((String) m.visit(this));
         
         /* Remove fields from previous record */
-        d_recMember2Field.clear();
+        __recMember2Field.clear();
         
         /* The scope in which all members appeared in a record */
         for (RecordMember rm : rt.body())
@@ -1187,9 +1187,9 @@ public class CodeGenJava extends Visitor<Object> {
         
         /* The list of fields which should be passed to the constructor
          * of the static class that the record belongs to */
-        if (!d_recMember2Field.isEmpty()) {
-            stRecordType.add("types", d_recMember2Field.values());
-            stRecordType.add("vars", d_recMember2Field.keySet());
+        if (!__recMember2Field.isEmpty()) {
+            stRecordType.add("types", __recMember2Field.values());
+            stRecordType.add("vars", __recMember2Field.keySet());
         }
 
         ArrayList<String> extend = new ArrayList<String>();
@@ -1213,7 +1213,7 @@ public class CodeGenJava extends Visitor<Object> {
         String type = (String) rm.type().visit(this);
         
         /* Add this field to the collection of record members for reference */
-        d_recMember2Field.put(name, type);
+        __recMember2Field.put(name, type);
         
         /* Ignored the value returned by this visitor, as the types
          * and variables are _always_ resolved elsewhere */
@@ -1224,14 +1224,14 @@ public class CodeGenJava extends Visitor<Object> {
     public Object visitRecordLiteral(RecordLiteral rl) {
         Log.log(rl, "Visiting a RecordLiteral (" + rl.name().getname() + ")");
         
-        ST stRecordListeral = d_stGroup.getInstanceOf("RecordLiteral");
+        ST stRecordListeral = __stGroup.getInstanceOf("RecordLiteral");
         String type = (String) rl.name().visit(this);
         
         /* This map is used to determine the order in which values
          * are passed to the constructor of the class associated
          * with this record */
         HashMap<String, String> members = new LinkedHashMap<String, String>();
-        RecordTypeDecl rt = (RecordTypeDecl) d_topLvlDecls.get(type);
+        RecordTypeDecl rt = (RecordTypeDecl) __topLvlDecls.get(type);
         
         if (rt != null) {
             for (RecordMember rm : rt.body()) {
@@ -1262,7 +1262,7 @@ public class CodeGenJava extends Visitor<Object> {
     public Object visitRecordAccess(RecordAccess ra) {
         Log.log(ra, "Visiting a RecordAccess (" + ra + ")");
         
-        ST stAccessor = d_stGroup.getInstanceOf("RecordAccessor");
+        ST stAccessor = __stGroup.getInstanceOf("RecordAccessor");
         
         if (ra.record().type.isRecordType()) {
             String name = (String) ra.record().visit(this);
@@ -1270,19 +1270,19 @@ public class CodeGenJava extends Visitor<Object> {
             stAccessor.add("name", name);
             stAccessor.add("member", String.format("%s()", field));
         } else if (ra.record().type.isProtocolType()) {
-            stAccessor = d_stGroup.getInstanceOf("ProtocolAccess");
+            stAccessor = __stGroup.getInstanceOf("ProtocolAccess");
             ProtocolTypeDecl pt = (ProtocolTypeDecl) ra.record().type;
             String protocName = (String) pt.name().visit(this); /* Wrapper class */
             String name = (String) ra.record().visit(this); /* Reference to inner class type */
             String field = ra.field().getname(); /* Field in inner class */
             
             /* Cast a protocol to a super-type if needed */
-            String key = String.format("%s.%s", protocName, d_curProtocTag);
-            if (d_protName2ProtTag.get(key) != null) 
-                protocName = d_protName2ProtTag.get(key);
+            String key = String.format("%s.%s", protocName, __currProtocTag);
+            if (__protName2ProtTag.get(key) != null) 
+                protocName = __protName2ProtTag.get(key);
             
             stAccessor.add("protocName", protocName);
-            stAccessor.add("tag", d_curProtocTag);
+            stAccessor.add("tag", __currProtocTag);
             stAccessor.add("var", name);
             stAccessor.add("member", field);
         }
@@ -1310,29 +1310,29 @@ public class CodeGenJava extends Visitor<Object> {
         /* Don't generate code for an empty par statement */
         if (pb.stats().size() == 0)
             return null;
-        ST stParBlock = d_stGroup.getInstanceOf("ParBlock");
+        ST stParBlock = __stGroup.getInstanceOf("ParBlock");
         /* Save the previous par-block */
-        String prevParBlock = d_curParBlock;
+        String prevParBlock = __curParBlock;
         /* Save previous barrier expressions */
-        ArrayList<String> prevBarrier = d_barriers;
-        if (!d_barriers.isEmpty())
-            d_barriers = new ArrayList<String>();
+        ArrayList<String> prevBarrier = __barriers;
+        if (!__barriers.isEmpty())
+            __barriers = new ArrayList<String>();
         /* Create a name for this new par-block */
-        d_curParBlock = Helper.makeVariableName(Tag.PAR_BLOCK_NAME.toString(), ++d_parDecId, Tag.LOCAL_NAME);
+        __curParBlock = Helper.makeVariableName(Tag.PAR_BLOCK_NAME.toString(), ++__parDecId, Tag.LOCAL_NAME);
         /* Since this is a new par-block, we need to create a variable
          * inside the process in which this par-block was declared */
-        stParBlock.add("name", d_curParBlock);
+        stParBlock.add("name", __curParBlock);
         stParBlock.add("count", pb.stats().size());
         stParBlock.add("process", "this");
 
         /* Increment the jump label and add it to the switch-stmt list */
-        stParBlock.add("jump", ++d_jumpLabel);
-        d_switchCases.add(renderSwitchCase(d_jumpLabel));
+        stParBlock.add("jump", ++__jumpLabel);
+        __switchCases.add(renderSwitchCase(__jumpLabel));
         /* Add the barrier this par-block enrolls in */
         Sequence<Expression> barriers = pb.barriers();
         if (barriers.size() > 0)
             for (Expression ex : barriers)
-                d_barriers.add((String) ex.visit(this));
+                __barriers.add((String) ex.visit(this));
             
         /* Visit the sequence of statements in the par-block */
         Sequence<Statement> statements = pb.stats();
@@ -1368,12 +1368,12 @@ public class CodeGenJava extends Visitor<Object> {
             stParBlock.add("body", stmts);
         }
         /* Add the barrier to the par-block */
-        if (!d_barriers.isEmpty() && pb.barriers().size() > 0)
-            stParBlock.add("barrier", d_barriers);
+        if (!__barriers.isEmpty() && pb.barriers().size() > 0)
+            stParBlock.add("barrier", __barriers);
         /* Restore the par-block */
-        d_curParBlock = prevParBlock;
+        __curParBlock = prevParBlock;
         /* Restore barrier expressions */
-        d_barriers = prevBarrier;
+        __barriers = prevBarrier;
         
         return stParBlock.render();
     }
@@ -1382,7 +1382,7 @@ public class CodeGenJava extends Visitor<Object> {
     public Object visitTimeoutStat(TimeoutStat ts) {
         Log.log(ts, "Visiting a TimeoutStat");
         
-        ST stTimeoutStat = d_stGroup.getInstanceOf("TimeoutStat");
+        ST stTimeoutStat = __stGroup.getInstanceOf("TimeoutStat");
         String timer = (String) ts.timer().visit(this);
         String delay = (String) ts.delay().visit(this);
         
@@ -1390,8 +1390,8 @@ public class CodeGenJava extends Visitor<Object> {
         stTimeoutStat.add("delay", delay);
         
         /* Increment the jump label and add it to the switch-stmt list */
-        stTimeoutStat.add("resume0", ++d_jumpLabel);
-        d_switchCases.add(renderSwitchCase(d_jumpLabel));
+        stTimeoutStat.add("resume0", ++__jumpLabel);
+        __switchCases.add(renderSwitchCase(__jumpLabel));
         
         return stTimeoutStat.render();
     }
@@ -1400,13 +1400,13 @@ public class CodeGenJava extends Visitor<Object> {
     public Object visitSyncStat(SyncStat st) {
         Log.log(st, "Visiting a SyncStat");
         
-        ST stSyncStat = d_stGroup.getInstanceOf("SyncStat");
+        ST stSyncStat = __stGroup.getInstanceOf("SyncStat");
         String barrier = (String) st.barrier().visit(this);
         stSyncStat.add("barrier", barrier);
         
         /* Increment the jump label and add it to the switch-stmt list */
-        stSyncStat.add("resume0", ++d_jumpLabel);
-        d_switchCases.add(renderSwitchCase(d_jumpLabel));
+        stSyncStat.add("resume0", ++__jumpLabel);
+        __switchCases.add(renderSwitchCase(__jumpLabel));
         
         return stSyncStat.render();
     }
@@ -1415,7 +1415,7 @@ public class CodeGenJava extends Visitor<Object> {
     public Object visitUnaryPostExpr(UnaryPostExpr ue) {
         Log.log(ue, "Visiting a UnaryPostExpr (" + ue.opString() + ")");
         
-        ST stUnaryPostExpr = d_stGroup.getInstanceOf("UnaryPostExpr");
+        ST stUnaryPostExpr = __stGroup.getInstanceOf("UnaryPostExpr");
         String operand = (String) ue.expr().visit(this);
         String op = ue.opString();
         
@@ -1429,7 +1429,7 @@ public class CodeGenJava extends Visitor<Object> {
     public Object visitUnaryPreExpr(UnaryPreExpr ue) {
         Log.log(ue, "Visiting a UnaryPreExpr (" + ue.opString() + ")");
         
-        ST stUnaryPreExpr = d_stGroup.getInstanceOf("UnaryPreExpr");
+        ST stUnaryPreExpr = __stGroup.getInstanceOf("UnaryPreExpr");
         String operand = (String) ue.expr().visit(this);
         String op = ue.opString();
         
@@ -1443,7 +1443,7 @@ public class CodeGenJava extends Visitor<Object> {
     public Object visitAltCase(AltCase ac) {
         Log.log(ac, "Visiting an AltCase");
         
-        ST stAltCase = d_stGroup.getInstanceOf("AltCase");
+        ST stAltCase = __stGroup.getInstanceOf("AltCase");
         Statement stat = ac.guard().guard();
         String guard = null;
         String[] stats = (String[]) ac.stat().visit(this);
@@ -1462,7 +1462,7 @@ public class CodeGenJava extends Visitor<Object> {
     public Object visitConstantDecl(ConstantDecl cd) {
         Log.log(cd, "Visting ConstantDecl (" + cd.type().typeName() + " " + cd.var().name().getname() + ")");
         
-        ST stConstantDecl = d_stGroup.getInstanceOf("ConstantDecl");
+        ST stConstantDecl = __stGroup.getInstanceOf("ConstantDecl");
         stConstantDecl.add("type", cd.type().visit(this));
         stConstantDecl.add("var", cd.var().visit(this));
         
@@ -1473,9 +1473,9 @@ public class CodeGenJava extends Visitor<Object> {
     public Object visitAltStat(AltStat as) {
         Log.log(as, "Visiting an AltStat");
         
-        ST stAltStat = d_stGroup.getInstanceOf("AltStat");
-        ST stBooleanGuards = d_stGroup.getInstanceOf("BooleanGuards");
-        ST stObjectGuards = d_stGroup.getInstanceOf("ObjectGuards");
+        ST stAltStat = __stGroup.getInstanceOf("AltStat");
+        ST stBooleanGuards = __stGroup.getInstanceOf("BooleanGuards");
+        ST stObjectGuards = __stGroup.getInstanceOf("ObjectGuards");
         
         Sequence<AltCase> cases = as.body();
         ArrayList<String> blocals = new ArrayList<String>();
@@ -1537,9 +1537,9 @@ public class CodeGenJava extends Visitor<Object> {
                 new Var(n, null),
                 false /* not constant */).visit(this);
         /* Create a tag for this local alt declaration */
-        String newName = Helper.makeVariableName("alt", ++d_localDecId, Tag.LOCAL_NAME);
-        d_local2Field.put(newName, "PJAlt");
-        d_param2VarName.put(newName, newName);
+        String newName = Helper.makeVariableName("alt", ++__localDecId, Tag.LOCAL_NAME);
+        __local2Field.put(newName, "PJAlt");
+        __param2VarName.put(newName, newName);
         // -->
         
         stAltStat.add("alt", newName);
@@ -1548,12 +1548,12 @@ public class CodeGenJava extends Visitor<Object> {
         stAltStat.add("initGuards", stObjectGuards.render());
         stAltStat.add("bguards", "booleanGuards");
         stAltStat.add("guards", "objectGuards");
-        stAltStat.add("jump", ++d_jumpLabel);
+        stAltStat.add("jump", ++__jumpLabel);
         stAltStat.add("cases", altCases);
         stAltStat.add("index", n.visit(this));
         
         /* Add the jump label to the switch-stmt list */
-        d_switchCases.add(renderSwitchCase(d_jumpLabel));
+        __switchCases.add(renderSwitchCase(__jumpLabel));
         
         return stAltStat.render();
     }
@@ -1562,7 +1562,7 @@ public class CodeGenJava extends Visitor<Object> {
     public Object visitReturnStat(ReturnStat rs) {
         Log.log(rs, "Visiting a ReturnStat");
         
-        ST stReturnStat = d_stGroup.getInstanceOf("ReturnStat");
+        ST stReturnStat = __stGroup.getInstanceOf("ReturnStat");
         String expr = null;
         
         if (rs.expr() != null)
@@ -1600,22 +1600,22 @@ public class CodeGenJava extends Visitor<Object> {
     
     /* This is used for newly-created processes */
     private void resetGlobals() {
-        d_parDecId = 0;
-        d_varDecId = 0;
-        d_localDecId = 0;
-        d_jumpLabel = 0;
+        __parDecId = 0;
+        __varDecId = 0;
+        __localDecId = 0;
+        __jumpLabel = 0;
 
-        d_local2Field.clear();
-        d_switchCases.clear();
-        d_barriers.clear();
+        __local2Field.clear();
+        __switchCases.clear();
+        __barriers.clear();
         
-        d_param2Field.clear();
-        d_param2VarName.clear();
+        __param2Field.clear();
+        __param2VarName.clear();
     }
     
     /* Returns a string representation of a jump label */
     private String renderSwitchCase(int jump) {
-        ST stSwitchCase = d_stGroup.getInstanceOf("SwitchCase");
+        ST stSwitchCase = __stGroup.getInstanceOf("SwitchCase");
         stSwitchCase.add("jump", jump);
         return stSwitchCase.render();
     }
@@ -1644,17 +1644,17 @@ public class CodeGenJava extends Visitor<Object> {
     private Object createNewArray(String lhs, NewArray na) {
         Log.log(na.line + ": Creating a New Array");
         
-        ST stNewArray = d_stGroup.getInstanceOf("NewArray");
+        ST stNewArray = __stGroup.getInstanceOf("NewArray");
         String[] dims = (String[]) na.dimsExpr().visit(this);
         String type = (String) na.baseType().visit(this);
 
-        ST stNewArrayLiteral = d_stGroup.getInstanceOf("NewArrayLiteral");
+        ST stNewArrayLiteral = __stGroup.getInstanceOf("NewArrayLiteral");
         if (na.init() != null) {
             ArrayList<String> inits = new ArrayList<String>();
             Sequence<Expression> seq = na.init().elements();
             for (Expression e : seq) {
                 if (e instanceof ArrayLiteral)
-                    d_isArrayLiteral = true;
+                    __isArrayLiteral = true;
                 inits.add((String) e.visit(this));
             }
             stNewArrayLiteral.add("dim", String.join("", Collections.nCopies(((ArrayType) na.type).getDepth(), "[]")));
@@ -1668,7 +1668,7 @@ public class CodeGenJava extends Visitor<Object> {
         stNewArray.add("init", stNewArrayLiteral.render());
         
         /* Reset value for array literal expression */
-        d_isArrayLiteral = false;
+        __isArrayLiteral = false;
         
         return stNewArray.render();
     }
@@ -1676,7 +1676,7 @@ public class CodeGenJava extends Visitor<Object> {
     private Object createRecordAssignment(Assignment as) {
         Log.log(as, "Creating a Record Assignment");
         
-        ST stRecordSetter = d_stGroup.getInstanceOf("RecordSetter");
+        ST stRecordSetter = __stGroup.getInstanceOf("RecordSetter");
         RecordAccess ra = (RecordAccess) as.left();
         if (ra.record().type.isRecordType()) {
             String name = (String) ra.record().visit(this);
@@ -1692,7 +1692,7 @@ public class CodeGenJava extends Visitor<Object> {
     private Object createChannelReadExpr(String lhs, String op, ChannelReadExpr cr) {
         Log.log(cr, "Creating Channel Read Expression");
         
-        ST stChannelReadExpr = d_stGroup.getInstanceOf("ChannelReadExpr");
+        ST stChannelReadExpr = __stGroup.getInstanceOf("ChannelReadExpr");
         /* 'c.read()' is a channel-end expression, where 'c' is the
          * reading end of a channel */
         Expression chanExpr = cr.channel();
@@ -1701,7 +1701,7 @@ public class CodeGenJava extends Visitor<Object> {
         
         /* Is it a timer read expression? */
         if (chanExpr.type.isTimerType()) {
-            ST stTimerRedExpr = d_stGroup.getInstanceOf("TimerRedExpr");
+            ST stTimerRedExpr = __stGroup.getInstanceOf("TimerRedExpr");
             stTimerRedExpr.add("name", lhs);
             return stTimerRedExpr.render();
         }
@@ -1710,7 +1710,7 @@ public class CodeGenJava extends Visitor<Object> {
         int countLabel = 2;
         /* Is the reading end of this channel shared? */
         if (chanExpr.type.isChannelEndType() && ((ChannelEndType) chanExpr.type).isShared()) {
-            stChannelReadExpr = d_stGroup.getInstanceOf("ChannelOne2Many");
+            stChannelReadExpr = __stGroup.getInstanceOf("ChannelOne2Many");
             ++countLabel;
         }
         
@@ -1724,8 +1724,8 @@ public class CodeGenJava extends Visitor<Object> {
         /* Add the switch block for resumption */
         for (int label = 0; label < countLabel; ++label) {
             /* Increment jump label and add it to the switch-stmt list */
-            stChannelReadExpr.add("resume" + label, ++d_jumpLabel);
-            d_switchCases.add(renderSwitchCase(d_jumpLabel));
+            stChannelReadExpr.add("resume" + label, ++__jumpLabel);
+            __switchCases.add(renderSwitchCase(__jumpLabel));
         }
         
         stChannelReadExpr.add("lhs", lhs);

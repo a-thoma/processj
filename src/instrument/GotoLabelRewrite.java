@@ -33,9 +33,9 @@ public class GotoLabelRewrite {
     public static final String LABEL = "LABEL";
     public static final String GOTO = "GOTO";
     /* Map of GOTOs and LABELs instructions */
-    HashMap<Integer, LabelNode> d_map = new HashMap<Integer, LabelNode>();
+    HashMap<Integer, LabelNode> __map = new HashMap<Integer, LabelNode>();
     /* Path for generated class files */
-    private String d_path;
+    private String __path;
     
     public static boolean checkPath(Path path, boolean isFile) {
         if (path == null || !Files.exists(path))
@@ -49,11 +49,11 @@ public class GotoLabelRewrite {
     }
     
     public GotoLabelRewrite(String path) {
-        d_path = path.isEmpty() ? "" : path;
+        __path = path.isEmpty() ? "" : path;
         Log.doLog = false; /* Change this to 'true' for debugging */
         Log.log("======================================");
         Log.log(" Rewriting goto and labels..");
-        Log.log(" Path: " + d_path);
+        Log.log(" Path: " + __path);
         Log.log("======================================");
     }
     
@@ -98,8 +98,8 @@ public class GotoLabelRewrite {
                         InsnNode insNode = (InsnNode) prevIns;
                         operand = getOpcode(insNode.getOpcode());
                     }
-                    if (d_map.get(operand) != null)
-                        insList.insert(mNode, new JumpInsnNode(Opcodes.GOTO, d_map.get(operand)));
+                    if (__map.get(operand) != null)
+                        insList.insert(mNode, new JumpInsnNode(Opcodes.GOTO, __map.get(operand)));
                 }
             }
         }
@@ -129,13 +129,13 @@ public class GotoLabelRewrite {
                     if (prevIns instanceof IntInsnNode) {
                         IntInsnNode iiNode = (IntInsnNode) prevIns;
                         Log.log("Adding operand " + iiNode.operand);
-                        d_map.put(iiNode.operand, ln);
+                        __map.put(iiNode.operand, ln);
                     } else {
                         /* We have a node that represents a zero operand instruction */
                         InsnNode insNode = (InsnNode) prevIns;
                         int operand = getOpcode(insNode.getOpcode());
                         Log.log("Adding operand " + operand);
-                        d_map.put(operand, ln);
+                        __map.put(operand, ln);
                     }
                 }
             }
@@ -184,10 +184,10 @@ public class GotoLabelRewrite {
     
     public void rewrite() {
         /* Verify that we have a valid path */
-        if (!checkPath(Paths.get(d_path), false))
-            exit("File '" + d_path + "' does not exists!", 101);
+        if (!checkPath(Paths.get(__path), false))
+            exit("File '" + __path + "' does not exists!", 101);
         /* Grab .class files form given directory */
-        File[] cf = new File(d_path).listFiles();
+        File[] cf = new File(__path).listFiles();
         if (cf == null || cf.length == 0)
             exit("Missing .class files!", 101);
         for (File f : cf) {

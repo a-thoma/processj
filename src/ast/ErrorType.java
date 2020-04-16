@@ -33,7 +33,7 @@ public class ErrorType extends Type {
 
     @Override 
     public boolean isErrorType() {
-	return true;
+        return true;
     }
 
     // Error types should not be checked like this...

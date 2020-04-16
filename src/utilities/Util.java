@@ -32,10 +32,9 @@ public final class Util {
             if (objects.length == 0)
                 return true;
             else {
-                for (Object o : objects) {
+                for (Object o : objects)
                     if (o == null)
                         return true;
-                }
             }
         }
         return false;

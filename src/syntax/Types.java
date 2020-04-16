@@ -213,9 +213,9 @@ public class Types {
     }
     
     static {
-        addSymbols("EOF",           EOF);
-        addSymbols("\n",            NEWLINE);
-        addSymbols("UNKNOWN",       UNKNOWN);
+        addSymbols("<EOF>",         EOF);
+        addSymbols("<\n>",          NEWLINE);
+        addSymbols("<UNKNOWN>",     UNKNOWN);
         
         addKeywords("boolean",      KEYWORD_BOOLEAN);
         addKeywords("byte",         KEYWORD_BYTE);

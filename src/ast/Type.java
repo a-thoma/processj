@@ -18,11 +18,7 @@ public abstract class Type extends AST {
     }
 
     public abstract String typeName();
-
-    /*
-     * public boolean DELETE_identical(Type other) { if
-     * (signature().equals(other.signature())) return true; return false; }
-     */
+    
     public boolean assignable() {
         return (!typeName().equals("null") && !typeName().equals("void"));
     }
@@ -50,8 +46,8 @@ public abstract class Type extends AST {
     }
     
     /*
-     * NOTE: the general implementation of all these should be to return
-     * 'false'. Each type should in turn implement which ever one applies to it. 
+     * NOTE: the general implementation of all these should be to return 'false'.
+     * Each type should in turn implement which ever one applies to it. 
      */
 
     // Reimplemented in PrimitiveType

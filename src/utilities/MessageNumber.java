@@ -23,7 +23,7 @@ public interface MessageNumber {
     }
     
     default String getMessage() {
-        return "EMPTY";
+        return "<EMPTY>";
     }
     
     /* If none is given then abort/terminate */
