@@ -7,6 +7,7 @@ import ast.AST;
 import ast.Compilation;
 import codegen.Helper;
 import codegen.java.CodeGeneratorJava;
+import codegen.cpp.CodeGeneratorCPP;
 import library.Library;
 import namechecker.ResolveImports;
 import parser.parser;
@@ -106,8 +107,8 @@ public class ProcessJc {
         
         if (processj.version)
             processj.version();
-        
-        Settings.includeDir = processj.include;
+//        TODO: what the fuck is this line for? this breaks the import resolution with a NullPtrException...
+//        Settings.includeDir = processj.include;
         
         ArrayList<File> files = processj.createFiles();
         AST root = null;
@@ -257,10 +258,20 @@ public class ProcessJc {
             c.visit(new rewriters.ParFor());
             
             // Run the code generator for the known (specified) target language.
-            if (Settings.language == processj.target)
-                processj.generateCodeJava(c, inFile, globalTypeTable);
-            else
-                ; // Throw an error message for unknown target language.
+//            if (Settings.language == processj.target)
+//                processj.generateCodeJava(c, inFile, globalTypeTable);
+//            else
+//            	;
+            
+            // switch on language requested
+            if(Settings.language == Language.JVM) {
+            	System.out.println("Generating code for the JVM");
+            	processj.generateCodeJava(c,  inFile,  globalTypeTable);
+            }
+            else if(Settings.language == Language.CPLUS) {
+            	System.out.println("Generating CPP code");
+            	processj.generateCodeCPP(c,  inFile, globalTypeTable);
+            }
             
             System.out.println("** COMPILATION COMPLITED SUCCESSFULLY **");
         }
@@ -280,7 +291,10 @@ public class ProcessJc {
      *              A symbol table consisting of all the top level types.
      */
     private void generateCodeJava(Compilation co, File inFile, SymbolTable s) {
+
+        System.out.println("Getting PJConfig");
         Properties p = utilities.ConfigFileReader.getProcessJConfig();
+        System.out.println("After getting PJConfig");
         // Run the code generator to decode pragmas, generate libraries,
         // resolve types, and set the symbol table for top level declarations.
         CodeGeneratorJava generator = new CodeGeneratorJava(s);
@@ -291,6 +305,50 @@ public class ProcessJc {
         String code = (String) co.visit(generator);
         // Write the output to a file
         Helper.writeToFile(code, co.fileNoExtension(), generator.getWorkingDir());
+    }
+    
+    /**
+     * Given a ProcessJ Compilation unit, e.g., an abstract syntax tree object,
+     * we will generate code for a C++ compiler. The source range for this type of
+     * tree is the entire source file, not including leading and trailing
+     * whitespace characters and comments.
+     *
+     * @param co
+     *              A Compilation unit consisting of a single file.
+     * @param inFile
+     *              The compiled file.
+     * @param s
+     *              A symbol table consisting of all the top level types.
+     *              
+     * @author Alexander Thomason
+     */
+    private void generateCodeCPP(Compilation co, File inFile, SymbolTable s) {
+    	System.out.println("Beginning of generateCodeCPP");
+    	System.out.println("Starting the logger (For debugging)");
+    	Log.startLogging();
+    	System.out.println("Logging started. Continuing on...");
+    	/* TODO: write generateCodeCPP -- should be similar to above method
+    	 * ---
+    	 * this means we need to make a new object, CodeGeneratorCPP like CodeGeneratorJava
+    	 * and slap that into the runtime. we also need to rewrite the stg file to generate
+    	 * cpp instead of java. also need to check how jars are made so that we produce a
+    	 * real binary instead of accidentally trying to make a (probably malformed) jar
+    	 */
+    	System.out.println("Before getting PJConfig (necessary?)");
+    	Properties p = utilities.ConfigFileReader.getProcessJConfig();
+    	System.out.println("After getting PJConfig (necessary?)");
+    	
+    	System.out.println("Creating code generator");
+    	CodeGeneratorCPP generator = new CodeGeneratorCPP(s);
+    	System.out.println("Getting working directory from config...");
+    	generator.setWorkingDir(p.getProperty("workingdir"));
+    	System.out.println("workingdir is " + generator.getWorkingDir());
+    	System.out.println("Generating code...");
+    	String code = (String) co.visit(generator);
+    	System.out.println("Code generated. Writing to file...");
+    	Helper.writeToFile(code,  co.fileNoExtension(), generator.getWorkingDir());
+    	System.out.println("Files written.");
+    	System.out.println("End of generateCodeCPP");
     }
     
     public ProcessJc(String[] args) {

@@ -11,7 +11,7 @@ package utilities;
 public enum Language {
     
     JVM     ("JVM"),
-    CPLUS   ("C++"),
+    CPLUS   ("C++"), // could we maybe change this to CPP or CPLUSPLUS or something better?
     JS      ("JS")
     ;
     

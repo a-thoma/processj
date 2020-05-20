@@ -72,6 +72,7 @@ public class ConfigFileReader {
         try {
             String home = System.getProperty("user.home");
             String config = home + "/processjrc";
+            // String config = home + "/.processjrc";
             in = new FileInputStream(config);
             p = new Properties();
             p.load(in);

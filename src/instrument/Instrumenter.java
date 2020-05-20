@@ -68,6 +68,9 @@ public class Instrumenter {
                     Log.log("Instrumenting => " + file.getName());
 
                     FileInputStream is = new FileInputStream(file);
+                    /* TODO: IllegalArgumentException thrown on above file
+                     * in Hello.pj...?
+                     */
                     ClassReader cr = new ClassReader(is);
 
                     byte[] bytes = getClassBytes(cr, false);

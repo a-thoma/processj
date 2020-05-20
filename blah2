@@ -12,7 +12,7 @@ homedir=~
 eval homedir=$homedir
 
 ## configuration file containing path and other resource information
-CONFIG_FILE="processjrc"
+CONFIG_FILE=".processjrc"
 
 ## working directory for generated Java files
 workingdir=""
@@ -40,6 +40,9 @@ if [ -z "$installdir" ] ; then
     echo "Configuration file must contain a line of the form: 'installdir=...'"
     exit 1
 fi
+
+# set install directory
+installdir="$homedir/$installdir"
 
 ############################################################################
 

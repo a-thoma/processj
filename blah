@@ -12,7 +12,7 @@ homedir=~
 eval homedir=$homedir
 
 ## configuration file containing path and other resource information
-CONFIG_FILE="processjrc"
+CONFIG_FILE=".processjrc"
 
 ## working directory for generated Java files
 workingdir=""
@@ -48,6 +48,7 @@ fi
 
 ## set working directory
 workingdir="$homedir/$workingdir"
+# echo "working dir is $workingdir"
 
 ############################################################################
 
@@ -81,6 +82,10 @@ if [ -z "$installdir" ] ; then
     exit 1
 fi
 
+## set install directory
+installdir="$homedir/$installdir"
+# echo "installdir is $installdir"
+
 ############################################################################
 
 ## display usage
@@ -91,7 +96,7 @@ fi
 
 ## run the processj compiler
 PROCESSJC=`java -cp $installdir/bin:$installdir/resources/jars/java_cup_runtime.jar:$installdir/resources/jars/ST-4.0.7.jar:$installdir/resources/jars/asm-all-5.2.jar:$installdir:$installdir/bin:. ProcessJc -include $installdir/include $@`
-
+# PROCESSJC=`java -cp $installdir/resources/jars/java_cup_runtime.jar:$installdir/resources/jars/ST-4.0.7.jar:$installdir/resources/jars/asm-all-5.2.jar:$installdir:$installdir/bin:. ProcessJc -include $installdir/include $@`
 ## TODO do silly check for errors
 #ERRORS=`echo "${PROCESSJC}" | awk '{print;}'`
 ERRORS=`echo "${PROCESSJC}" | awk -v n=1 '{if(NR>n) print a[NR%n]; a[NR%n]=$0}'`
