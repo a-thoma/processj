@@ -110,6 +110,9 @@ else
   exit 1
 fi
 
+# workaround to stop after compilation for now
+exit 0
+
 ############################################################################
 
 ## run the generated Java files with the JVM
