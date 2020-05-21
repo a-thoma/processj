@@ -1146,14 +1146,25 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         return stInvocation.render();
     }
     
+    /* TODO: this needs to be rewritten to handle a few issues
+     * ---
+     * for instance, Hello.pj has "import std.*;" at the top.
+     * this doesn't exactly map directly to c++'s #include guards,
+     * and needs to be handled appropriately here
+     */
     @Override
     public Object visitImport(Import im) {
         Log.log(im, "Visiting an import statement (" + im + ")");
+        Log.log(im, "import statement is: " + im.toString());
         
         // Generated template after evaluating this visitor.
         ST stImport = stGroup.getInstanceOf("Import");
+
+        Log.log(im, "import stringtemplate instance is " + stImport.render());
         stImport = stGroup.getInstanceOf("Import");
-        stImport.add("package", im.toString());
+//        stImport.add("package", im.toString());
+
+        Log.log(im, "import stringtemplate is " + stImport.render());
         
         return stImport.render();
     }

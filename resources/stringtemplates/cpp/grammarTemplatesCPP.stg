@@ -19,7 +19,7 @@ CodeGeneratorCPP visitor.
 // 4) body: A list of declarations generated from a ProcessJ source code.
 // 5) imports: A list of import declarations.
 Compilation(pathName, fileName, name, body, version, imports) ::= <<
-#include \<runtime/pj_runtime.hpp\>
+#include \<runtime/pj_runtime.hpp>
 <if(imports)><imports; separator=";\n">;<\n><endif>
 
 /**
@@ -496,7 +496,7 @@ BinaryExpr(lhs, rhs, op) ::= <<
 //
 // 1) package:
 // 2) file
-Import(package, file) ::= "import <package><if(file)>.<file><endif>"
+Import(package, file) ::= "#include \<<package><if(file)>/<file><endif>>"
 
 //========================================================================================
 //
