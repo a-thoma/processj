@@ -1155,6 +1155,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
     @Override
     public Object visitImport(Import im) {
         Log.log(im, "Visiting an import statement (" + im + ")");
+        Log.log(im, "IMPORTANT: this visitor is not implemented yet");
         Log.log(im, "import statement is: " + im.toString());
         
         // Generated template after evaluating this visitor.
@@ -1166,7 +1167,8 @@ public class CodeGeneratorCPP extends Visitor<Object> {
 
         Log.log(im, "import stringtemplate is " + stImport.render());
         
-        return stImport.render();
+//        return stImport.render();
+        return "// don't forget to fix the imports, dummy";
     }
     
     @Override

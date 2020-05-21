@@ -18,6 +18,8 @@ CodeGeneratorCPP visitor.
 // 3) name: The target class for the JVM.
 // 4) body: A list of declarations generated from a ProcessJ source code.
 // 5) imports: A list of import declarations.
+//---
+// needs to be finished: is this all we need?
 Compilation(pathName, fileName, name, body, version, imports) ::= <<
 #include \<runtime/pj_runtime.hpp>
 <if(imports)><imports; separator=";\n">;<\n><endif>
@@ -32,10 +34,10 @@ Compilation(pathName, fileName, name, body, version, imports) ::= <<
  * @author ProcessJ Group - University of Nevada, Las Vegas.
  * @since 1.2
  */
-public class <name> {
+<!class <name> {!>
     
-    <if(body)><body; separator="\n\n"><endif>
-}
+<if(body)><body; separator="\n\n"><endif>
+<!}!>
 >>
 
 //========================================================================================
@@ -48,7 +50,7 @@ public class <name> {
 // 3) types: the type of values associated with formal parameters.
 // 4) vars: the names of the formal parameters.
 Main(class, name, types, vars) ::= <<
-public static void main(<types,vars:{t,v | <t> <v>}; separator=", ">) {
+int main(<types,vars:{t,v | <t> <v>}; separator=", ">) {
 	Scheduler scheduler = new Scheduler();
     PJProcess.scheduler = scheduler;
     (new <class>.<name>(<vars; separator=", ">)).schedule();
@@ -56,6 +58,24 @@ public static void main(<types,vars:{t,v | <t> <v>}; separator=", ">) {
 }
 >>
 
+// TODO: finish up ProcClass below (don't need access
+// specifiers in the decls, just static lifetime
+// specifiers)
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //========================================================================================
 // Defines a class from which a process is created. This template
 // represents the set of properties and methods that are common to
@@ -71,7 +91,7 @@ public static void main(<types,vars:{t,v | <t> <v>}; separator=", ">) {
 // 8) switchBlock: switch statement to jump through blocks to resume points.
 // 9) syncBody: the body (content) of synchronized method that runs/starts a process.
 ProcClass(name, types, vars, ltypes, lvars, methods, main, switchBlock, syncBody) ::= <<
-public static class <name> extends PJProcess {
+public class <name> : public PJProcess {
     <! -------- Instance variables for formal parameters -------- !>
     <if(vars)><types,vars:{t,v | protected <t> <v>}; separator=";\n">;<\n><endif>
     <! -------- Instance variables for local parameters -------- !>
@@ -141,7 +161,7 @@ InvocationProcType(name, vars, parBlock, barrier) ::= <<
 // 7) lvars: unique names for fields preceded by '_ld'.
 // 8) body: the method body enclosed between braces.
 Method(modifier, type, name, types, vars, ltypes, lvars, body) ::= <<
-<if(modifier)><modifier> <endif>static <type> <name>(<types,vars:{t,v | <t> <v>}; separator=", ">) {
+static <type> <name>(<types,vars:{t,v | <t> <v>}; separator=", ">) {
     <! -------- Variables for local parameters -------- !>
     <if(lvars)><ltypes,lvars:{t,v | <t> <v>}; separator=";\n">;<\n><endif>
     <! The body may be an invocation or a sequence of statements !>
