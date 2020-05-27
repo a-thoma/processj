@@ -706,7 +706,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         // to Java primitive types.
         String typeStr = py.typeName();
         if (py.isStringType())
-            typeStr = "String";
+            typeStr = "std::string";
         else if (py.isTimerType())
             typeStr = PJTimer.class.getSimpleName();
         else if (py.isBarrierType())
