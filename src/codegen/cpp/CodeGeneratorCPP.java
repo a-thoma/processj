@@ -910,7 +910,11 @@ public class CodeGeneratorCPP extends Visitor<Object> {
     public Object visitArrayType(ArrayType at) {
         Log.log(at, "Visiting an ArrayType (" + at.typeName() + ")");
 
-        String stArrayType = (String) at.baseType().visit(this) + "[]";
+        /* NOTE: still need to add brackets _after_ the name of the array,
+         * but this isn't the place to do it
+         */
+        // String stArrayType = (String) at.baseType().visit(this) + "[]";
+        String stArrayType = (String) at.baseType().visit(this);
 
         return stArrayType;
     }
