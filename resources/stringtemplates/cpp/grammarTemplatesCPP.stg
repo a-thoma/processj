@@ -51,10 +51,18 @@ Compilation(pathName, fileName, name, body, version, imports) ::= <<
 // 4) vars: the names of the formal parameters.
 Main(class, name, types, vars) ::= <<
 int main(<types,vars:{t,v | <t> <v>}; separator=", ">) {
-	Scheduler scheduler = new Scheduler();
-    PJProcess.scheduler = scheduler;
-    (new <class>.<name>(<vars; separator=", ">)).schedule();
-    PJProcess.scheduler.start();
+	// Scheduler scheduler = new Scheduler();
+    // PJProcess.scheduler = scheduler;
+    // (new <class>.<name>(<vars; separator=", ">)).schedule();
+    // PJProcess.scheduler.start();
+    std::cout \<\< "\n *** CREATING SCHEDULER *** \n\n";
+    pj_runtime::pj_scheduler sched;
+    std::cout \<\< "\n *** CREATING MAIN PROCESS *** \n\n";
+    <name> main_proc = new <name>(<vars; separator=", ">);
+    std::cout \<\< "\n *** SCHEDULING MAIN PROCESS *** \n\n";
+    sched.insert(main_proc);
+    std::cout \<\< "\n *** STARTING SCHEDULER *** \n\n";
+    sched.start();
 }
 >>
 
