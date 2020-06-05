@@ -74,6 +74,11 @@ int main(<if(vars && types)>int argc, char* <vars>[]<endif>)
 // TODO: finish up ProcClass below (don't need access
 // specifiers in the decls, just static lifetime
 // specifiers)
+// also need a way to pass argv to proc$main...?
+// it could be turned into a vector easily but
+// then proc$main needs to have a ctor overloaded to
+// accept a std::vector<T> of the args...
+// need to flesh this out
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
@@ -105,29 +110,31 @@ int main(<if(vars && types)>int argc, char* <vars>[]<endif>)
 // 9) syncBody: the body (content) of synchronized method that runs/starts a process.
 ProcClass(name, types, vars, ltypes, lvars, methods, main, switchBlock, syncBody) ::= <<
 class <name> : public pj_runtime::pj_process {
+
     <! TODO: this isn't right. need to fix class structure e.g. public, protected,
      ! private sections of code, destructor, etc.
      !>
     <! -------- Instance variables for formal parameters -------- !>
-    <if(vars)><types,vars:{t,v | protected <t> <v>}; separator=";\n">;<\n><endif>
+    <!<if(vars)><types,vars:{t,v | protected <t> <v>}; separator=";\n">;<\n><endif>!>
     <! -------- Instance variables for local parameters -------- !>
-    <if(lvars)><ltypes,lvars:{t,v | protected <t> <v>}; separator=";\n">;<\n><endif>
+    <!<if(lvars)><ltypes,lvars:{t,v | protected <t> <v>}; separator=";\n">;<\n><endif>!>
     <! -------- Instance methods -------- !>
-    <if(methods)><methods; separator="\n"><\n><endif>
+    <!<if(methods)><methods; separator="\n"><\n><endif>!>
     <! -------- Default Constructor -------- !>
     <name>(<types,vars:{t,v | <t> <v>}; separator=", ">) {
         <! Initialize member fields !>
         <if(vars)><vars:{v | this.<v> = <v>}; separator=";\n">;<endif>
     }
+
     <! -------- Default Destructor -------- !>
     virtual ~<name>() = default;
 
     <! -------- Run Method -------- !>
-    void run() {
+    <!void run() {
         <if(switchBlock)><switchBlock; separator="\n"><endif>
         <if(syncBody)><syncBody; separator="\n"><endif>
         terminate();
-    }
+    }!>
 }
 <! Entry point of the program, e.g.,
  ! void main(int argc, char* argv[]) { ... }
