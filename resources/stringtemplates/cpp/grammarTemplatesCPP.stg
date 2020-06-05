@@ -50,15 +50,20 @@ Compilation(pathName, fileName, name, body, version, imports) ::= <<
 // 3) types: the type of values associated with formal parameters.
 // 4) vars: the names of the formal parameters.
 Main(class, name, types, vars) ::= <<
-int main(<types,vars:{t,v | <t> <v>}; separator=", ">) {
-	// Scheduler scheduler = new Scheduler();
+<! NOTE: since ProcessJ only ever has one argument in main (same rules as Java)
+ ! we can simply add an argc, and rename argv to whatever the args are called
+ ! by the ProcessJ internal naming convention
+ !>
+int main(<if(vars && types)>int argc, char* <vars>[]<endif>)
+{
+    // Scheduler scheduler = new Scheduler();
     // PJProcess.scheduler = scheduler;
     // (new <class>.<name>(<vars; separator=", ">)).schedule();
     // PJProcess.scheduler.start();
     std::cout \<\< "\n *** CREATING SCHEDULER *** \n\n";
     pj_runtime::pj_scheduler sched;
     std::cout \<\< "\n *** CREATING MAIN PROCESS *** \n\n";
-    <name> main_proc = new <name>(<vars; separator=", ">);
+    <name>* main_proc = new <name>(<vars; separator=", ">, argc);
     std::cout \<\< "\n *** SCHEDULING MAIN PROCESS *** \n\n";
     sched.insert(main_proc);
     std::cout \<\< "\n *** STARTING SCHEDULER *** \n\n";
