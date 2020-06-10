@@ -12,7 +12,7 @@ homedir=~
 eval homedir=$homedir
 
 ## configuration file containing path and other resource information
-CONFIG_FILE=".processjrc"
+CONFIG_FILE="processjrc"
 
 ## working directory for generated Java files
 workingdir=""
@@ -47,7 +47,7 @@ else
 fi
 
 ## set working directory
-workingdir="$homedir/$workingdir"
+# workingdir="$homedir/$workingdir"
 # echo "working dir is $workingdir"
 
 ############################################################################
@@ -83,7 +83,7 @@ if [ -z "$installdir" ] ; then
 fi
 
 ## set install directory
-installdir="$homedir/$installdir"
+# installdir="$homedir/$installdir"
 # echo "installdir is $installdir"
 
 ############################################################################
