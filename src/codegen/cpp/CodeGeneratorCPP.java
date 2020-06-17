@@ -1149,13 +1149,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         
         return stInvocation.render();
     }
-    
-    /* TODO: this needs to be rewritten to handle a few issues
-     * ---
-     * for instance, Hello.pj has "import std.*;" at the top.
-     * this doesn't exactly map directly to c++'s #include guards,
-     * and needs to be handled appropriately here
-     */
+
     @Override
     public Object visitImport(Import im) {
         Log.log(im, "Visiting an import statement (" + im + ")");
@@ -1167,12 +1161,38 @@ public class CodeGeneratorCPP extends Visitor<Object> {
 
         Log.log(im, "import stringtemplate instance is " + stImport.render());
         stImport = stGroup.getInstanceOf("Import");
-//        stImport.add("package", im.toString());
+        // NOTE: is the below commented-out line important still...?
+        // i.e. does removing this have repercussions? find out...
+        // stImport.add("package", im.toString());
 
-        Log.log(im, "import stringtemplate is " + stImport.render());
+        // replace dots with slashes to build the path to the file we
+        // want to include
+        String importPath = im.toString().replace('.', '/');
+
+        // debug logging -- delete later
+        Log.log(im, "import path is " + importPath);
+
+        // if the import line has a wild card
+        if(importPath.endsWith("*")) {
+            // TODO: need to get the name of all files in the directory
+            // i.e. std/* would mean we need to build a string
+            // for #include <std/foo.hpp>\n#include <std/bar.hpp>\n...
+            // here.
+            Log.log(im, "wildcard found (not implemented yet)");
+            return "// wildcard imports not supported yet ;^)";
+        }
+        // otherwise just build the include for that file
+        String includeLine = "#include <" + importPath + ".hpp>";
+
+        // debug logging -- delete later and just return the raw string
+        // ---
+        // maybe add some error checking later if necessary (i.e. the
+        // file we want to include may not exist)
+        Log.log(im, "includeLine is " + includeLine);
+        return includeLine;
         
-//        return stImport.render();
-        return "// don't forget to fix the imports, dummy";
+        // NOTE: leaving the old return here just in case...?
+        // return stImport.render();
     }
     
     @Override
