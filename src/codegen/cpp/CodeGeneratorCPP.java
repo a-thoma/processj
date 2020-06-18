@@ -1153,7 +1153,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
     @Override
     public Object visitImport(Import im) {
         Log.log(im, "Visiting an import statement (" + im + ")");
-        Log.log(im, "IMPORTANT: this visitor is not implemented yet");
+        Log.log(im, "IMPORTANT: this visitor is not finished yet");
         Log.log(im, "import statement is: " + im.toString());
         
         // Generated template after evaluating this visitor.
@@ -1172,17 +1172,30 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         // debug logging -- delete later
         Log.log(im, "import path is " + importPath);
 
+        // declare our include line -- this is our return value
+        String includeLine = "";
+
         // if the import line has a wild card
-        if(importPath.endsWith("*")) {
-            // TODO: need to get the name of all files in the directory
-            // i.e. std/* would mean we need to build a string
-            // for #include <std/foo.hpp>\n#include <std/bar.hpp>\n...
-            // here.
-            Log.log(im, "wildcard found (not implemented yet)");
-            return "// wildcard imports not supported yet ;^)";
+        if (importPath.endsWith("*")) {
+
+            // we need to build a string with _all_ of the headers
+            // we want to include
+            Log.log(im, "wildcard detected, building import list");
+
+            // look through the directory/ies
+            String[] foundImports = findImports(importPath);
+
+            // build the full import
+            Log.log(im, "building import statement(s)");
+            for (int i = 0; i < foundImports.length; i++) {
+                includeLine += "#include <" + foundImports[i] + ">\n";
+            }
+
+            return includeLine;
         }
+
         // otherwise just build the include for that file
-        String includeLine = "#include <" + importPath + ".hpp>";
+        includeLine = "#include <" + importPath + ".hpp>";
 
         // debug logging -- delete later and just return the raw string
         // ---
@@ -1896,5 +1909,17 @@ public class CodeGeneratorCPP extends Visitor<Object> {
                 s = s.replace(";", "");
         }
         return String.valueOf(s.hashCode()).replace("-", "$");
+    }
+
+    /**
+     * Returns an array of filenames to import in the
+     * event of a wildcard import
+     */
+    private String[] findImports(String importPath) {
+        String[] imports = {};
+
+        // TODO: build array of files (full path from include dir),
+
+        return imports;
     }
 }

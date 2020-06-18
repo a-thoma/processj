@@ -6,7 +6,14 @@ public void bar() { }
 
 public void main(string[] args) {
 	par {
-		println("Print from Hello");
+		// TODO: we need rewriters for println to std::cout
+		// ---
+		// this will be necessary for every library we use...
+		// is there a way to rewrite the imports for function calls?
+		// it almost seems like it'd be better rewriting a lot of
+		// this transpiler from scratch, but that's way more work
+		// than i think it'd be worth...
+		// println("Print from Hello");
 		foo();
 		bar();
 	}
