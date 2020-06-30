@@ -40,7 +40,7 @@ import java.io.File;
 public class CodeGeneratorCPP extends Visitor<Object> {
 
     // String template file locator.
-    private final String stGammarFile = "resources/stringtemplates/cpp/grammarTemplatesCPP.stg";
+    private final String stGrammarFile = "resources/stringtemplates/cpp/grammarTemplatesCPP.stg";
     
     // Current java version.
     private final String currentJVM = System.getProperty("java.version");
@@ -127,7 +127,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         Log.logHeader("*****************************************");
         
         topLevelDecls = s;
-        stGroup = new STGroupFile(stGammarFile);
+        stGroup = new STGroupFile(stGrammarFile);
     }
     
     /**
