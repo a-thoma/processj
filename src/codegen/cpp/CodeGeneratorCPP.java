@@ -1186,6 +1186,13 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             Log.log(im, "wildcard detected, building import list");
 
             // look through the directory/ies
+            // ---
+            // these come back as blah.pj, but might need to be
+            // modified in findImports() to blah.hpp later.
+            // depending on what ben says in the email reply
+            // i get back from him, these could be .pj and then
+            // i could add a pragma to include native c++,
+            // or some other solution. check back later...
             String[] foundImports = findImports(importPath);
             if (foundImports != null) {
                 // build the full import
