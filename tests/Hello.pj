@@ -5,7 +5,7 @@ public void foo() { }
 public void bar() { }
 
 public void main(string[] args) {
-	par {
+	//par {
 		// TODO: we need rewriters for println to std::cout
 		// ---
 		// this will be necessary for every library we use...
@@ -13,8 +13,8 @@ public void main(string[] args) {
 		// it almost seems like it'd be better rewriting a lot of
 		// this transpiler from scratch, but that's way more work
 		// than i think it'd be worth...
-		// println("Print from Hello");
+		println("Print from Hello");
 		foo();
 		bar();
-	}
+	//}
 }
