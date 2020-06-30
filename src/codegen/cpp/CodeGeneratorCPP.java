@@ -1106,7 +1106,8 @@ public class CodeGeneratorCPP extends Visitor<Object> {
                 name = Helper.makeVariableName(name, 0, Tag.PROCEDURE_NAME);
             else
                 name = Helper.makeVariableName(name, 0, Tag.METHOD_NAME);
-            pdName = pd.myCompilation.fileNoExtension() + "." + name;
+            // pdName = pd.myCompilation.fileNoExtension() + "." + name;
+            pdName = name;
         } else if (pd.isNative) {
             // Make the package visible on import by using the qualified name of
             // the class the procedure belongs to and the name of the directory
