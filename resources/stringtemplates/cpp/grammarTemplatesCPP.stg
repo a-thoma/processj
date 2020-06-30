@@ -135,11 +135,11 @@ class <name> : public pj_runtime::pj_process
     virtual ~<name>() = default;
 
     <! -------- Run Method -------- !>
-    <!void run() {
+    void run() {
         <if(switchBlock)><switchBlock; separator="\n"><endif>
-        <if(syncBody)><syncBody; separator="\n"><endif>
+        <!b<if(syncBody)><syncBody; separator="\n"><endif>!>
         terminate();
-    }!>
+    }
 }
 <! Entry point of the program, e.g.,
  ! void main(int argc, char* argv[]) { ... }
