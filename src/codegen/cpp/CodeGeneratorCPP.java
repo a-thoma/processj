@@ -21,6 +21,9 @@ import utilities.Log;
 import utilities.SymbolTable;
 import utilities.Visitor;
 
+// required for finding imports
+import java.io.File;
+
 /**
  * A tree walker that collects data from an AST object and then
  * pushes this data into a template to translate a ProcessJ source
@@ -1184,11 +1187,12 @@ public class CodeGeneratorCPP extends Visitor<Object> {
 
             // look through the directory/ies
             String[] foundImports = findImports(importPath);
-
-            // build the full import
-            Log.log(im, "building import statement(s)");
-            for (int i = 0; i < foundImports.length; i++) {
-                includeLine += "#include <" + foundImports[i] + ">\n";
+            if (foundImports != null) {
+                // build the full import
+                Log.log(im, "building import statement(s)");
+                for (int i = 0; i < foundImports.length; i++) {
+                    includeLine += "#include <" + foundImports[i] + ">\n";
+                }
             }
 
             return includeLine;
@@ -1916,9 +1920,27 @@ public class CodeGeneratorCPP extends Visitor<Object> {
      * event of a wildcard import
      */
     private String[] findImports(String importPath) {
-        String[] imports = {};
+        Log.log("in findImports");
+        Log.log("NOTE: current directory is " + System.getProperty("user.dir") + ".");
+        // build fully qualified path to our include directory
+        String dir = "include/C++/" + importPath;
+        Log.log("dir length is " + dir.length() + ".");
+        // chop off the last /*
+        dir = dir.substring(0, dir.length() - 2);
+        Log.log("Finding files in directory " + dir + "...");
 
-        // TODO: build array of files (full path from include dir),
+        File f = new File(dir);
+
+
+        String[] imports = f.list();
+
+        if (imports == null) {
+            Log.log("Found no imports.");
+        } else {
+            for(String str : imports) {
+                Log.log("Found file " + str + ".");
+            }
+        }
 
         return imports;
     }
