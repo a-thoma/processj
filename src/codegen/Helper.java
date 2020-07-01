@@ -175,7 +175,7 @@ public class Helper {
         return sourceFile;
     }
     
-    public static void writeToFile(String output, String filename, String workdir) {
+    public static void writeToFile(String output, String filename, String workdir, boolean isJavaFile) {
         // TODO: Write to home folder
 //        String outFile = "/Users/Ben/Desktop/processj/tests/" + filename + ".java";
         Writer writer = null;
@@ -189,7 +189,12 @@ public class Helper {
                 System.exit(1);
             }
             
-            String outFile = f.getAbsolutePath() + File.separator + filename + ".java";
+            String outFile = "";
+            if (isJavaFile == true) {
+                outFile = f.getAbsolutePath() + File.separator + filename + ".java";
+            } else {
+                outFile = f.getAbsolutePath() + File.separator + filename + ".cpp";
+            }
             // -->
             
             writer = new BufferedWriter(new OutputStreamWriter(new FileOutputStream(outFile), "utf-8"));
