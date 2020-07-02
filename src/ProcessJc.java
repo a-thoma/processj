@@ -304,7 +304,7 @@ public class ProcessJc {
         // after returning strings rendered by the string template.
         String code = (String) co.visit(generator);
         // Write the output to a file
-        Helper.writeToFile(code, co.fileNoExtension(), generator.getWorkingDir());
+        Helper.writeToFile(code, co.fileNoExtension(), generator.getWorkingDir(), true);
     }
     
     /**
@@ -346,7 +346,7 @@ public class ProcessJc {
     	System.out.println("Generating code...");
     	String code = (String) co.visit(generator);
     	System.out.println("Code generated. Writing to file...");
-    	Helper.writeToFile(code,  co.fileNoExtension(), generator.getWorkingDir());
+    	Helper.writeToFile(code,  co.fileNoExtension(), generator.getWorkingDir(), false);
     	System.out.println("Files written.");
     	System.out.println("End of generateCodeCPP");
     }
