@@ -253,6 +253,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
                 stSwitchBlock.add("jumps", switchLabelList);
                 stProcTypeDecl.add("switchBlock", stSwitchBlock.render());
             }
+
             // Restore jump label.
             jumpLabel = prevJumLabel;
         } else {
@@ -338,13 +339,49 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             // Add the switch block for resumption.
             if (!switchLabelList.isEmpty()) {
                 ST stSwitchBlock = stGroup.getInstanceOf("SwitchBlock");
-                stSwitchBlock.add("jumps", switchLabelList);
+                // stSwitchBlock.add("jumps", switchLabelList);
+
+                Log.log(pd, "the switchLabelList is (before):\n");
+                for (int i = 0; i < switchLabelList.size(); i++) {
+                    Log.log(switchLabelList.get(i));
+                }
+                // Append the name of the process to the labels
+                String str;
+                ArrayList<String> newSwitchLabelList = new ArrayList<String>();
+                for(int i = 0; i < switchLabelList.size(); i++) {
+                    /* TODO: split label like:
+                     * "case 0: goto " + procName +  "LN; break;"
+                     * by making a substring upto LN and wrapping them
+                     * around the procName
+                     */
+                    // find end index of the substring, "case <num>: goto " by finding
+                    // where "goto" is and going 1 past that (usable whitespace)
+                    int gotoIndex = switchLabelList.get(i).lastIndexOf("goto") + 5;
+                    // make our first substring from that index
+                    str = switchLabelList.get(i).substring(0, gotoIndex);
+                    Log.log(pd, "my substring is " + str);
+                    // make the new string by combining our beginning substring,
+                    // the procName variable, and the last index of "goto" onwards
+                    String newstr = str +
+                                    procName +
+                                    switchLabelList.get(i).substring(gotoIndex, switchLabelList.get(i).length());
+                    Log.log(pd, "my new label is " + newstr);
+                    newSwitchLabelList.add(i, newstr);
+                }
+                Log.log(pd, "the switchLabelList is (after):\n");
+                for (int i = 0; i < newSwitchLabelList.size(); i++) {
+                    Log.log(newSwitchLabelList.get(i));
+                }
+
+                stSwitchBlock.add("jumps", newSwitchLabelList);
+                stSwitchBlock.add("name", procName);
                 stProcTypeDecl.add("switchBlock", stSwitchBlock.render());
             }
         }
         
         // Restore and reset previous values.
         currentProcName = prevProcName;
+
         // Restore previous jump labels.
         switchLabelList = prevLabels;
 
@@ -1003,7 +1040,6 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             currentProtocolTag = label;
             label = "\"" + label + "\"";
         }
-        
         stSwitchLabel.add("label", label);
         
         return stSwitchLabel.render();
@@ -1015,7 +1051,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         
         // Generated template after evaluating this visitor.
         ST stSwitchGroup = stGroup.getInstanceOf("SwitchGroup");
-        
+
         ArrayList<String> labels = new ArrayList<String>();
         for (SwitchLabel sl : sg.labels())
             labels.add((String) sl.visit(this));
