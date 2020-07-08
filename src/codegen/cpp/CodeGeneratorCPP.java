@@ -349,11 +349,11 @@ public class CodeGeneratorCPP extends Visitor<Object> {
                 String str;
                 ArrayList<String> newSwitchLabelList = new ArrayList<String>();
                 for(int i = 0; i < switchLabelList.size(); i++) {
-                    /* TODO: split label like:
-                     * "case 0: goto " + procName +  "LN; break;"
-                     * by making a substring upto LN and wrapping them
-                     * around the procName
-                     */
+                    // split label like:
+                    // "case 0: goto " + procName +  "LN; break;"
+                    //  by making a substring upto LN and wrapping them
+                    // around the procName
+                    
                     // find end index of the substring, "case <num>: goto " by finding
                     // where "goto" is and going 1 past that (usable whitespace)
                     int gotoIndex = switchLabelList.get(i).lastIndexOf("goto") + 5;
