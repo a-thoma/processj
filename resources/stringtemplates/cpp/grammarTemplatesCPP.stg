@@ -272,20 +272,24 @@ SwitchCase(jump) ::= "case <jump>: goto L<jump>; break;"
 // 4) body: the statements inside the 'par' block.
 // 5) jump: the label to restart from.
 // 6) barrier:
-ParBlock(name, count, process, body, jump, barrier) ::= <<
+ParBlock(name, count, process, body, jump, barrier, procName) ::= <<
 <! TODO: yet to be evaluated and adjusted !>
 final PJPar <name> = new PJPar(<count>, <process>);
 <if(barrier)><barrier:{b | <b>.enroll(<count>)}; separator=";\n">;<endif>
+
+<! TODO: is this where the first label should go? !>
+<procName>L0:
 
 <if(body)><body; separator="\n\n"><endif>
 
 <! Not to be scheduled again until 'data' is ready !>
 // This does not work in C++ (label should be the actual \<ProcName>L\<labelNumber>)
+// my procName is <procName>
 if (<name>.shouldYield()) {
     this.runLabel = <jump>;
     yield();
-    label(<jump>);
-}<\n>
+}</n>
+<procName>L<jump>:
 >>
 
 //========================================================================================

@@ -88,6 +88,9 @@ public class CodeGeneratorCPP extends Visitor<Object> {
     // List of barrier expressions.
     private ArrayList<String> barrierList = new ArrayList<String>();
 
+    // Contains names of classes/procs mapped to their generated names
+    private HashMap<String, String> generatedProcNames = new HashMap<String, String>();
+
     // Identifier for parameter declaration.
     private int varDecId = 0;
     
@@ -241,7 +244,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             stProcTypeDecl = stGroup.getInstanceOf("AnonymousProcess");
             // Statements that appear in the procedure.
             String[] body = (String[]) pd.body().visit(this);
-            
+
             stProcTypeDecl.add("parBlock", currentParBlock);
             stProcTypeDecl.add("syncBody", body);
             // Add the barrier this procedure should resign from.
@@ -253,7 +256,6 @@ public class CodeGeneratorCPP extends Visitor<Object> {
                 stSwitchBlock.add("jumps", switchLabelList);
                 stProcTypeDecl.add("switchBlock", stSwitchBlock.render());
             }
-
             // Restore jump label.
             jumpLabel = prevJumLabel;
         } else {
@@ -272,9 +274,6 @@ public class CodeGeneratorCPP extends Visitor<Object> {
                 }
             } else
                 ; // The procedure does not take any parameters.
-            
-            // Visit all declarations that appear in the procedure.
-            String[] body = (String[]) pd.body().visit(this);
 
             // Retrieve modifier(s) attached to invoked procedure such as private,
             // public, protected, etc.
@@ -289,24 +288,31 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             if (doYield) {
                 // This procedure yields! Grab the instance of a yielding procedure
                 // from the string template in order to define a new class.
-                procName = Helper.makeVariableName(currentProcName + signature(pd), 0, Tag.PROCEDURE_NAME);
+                procName = Helper.makeVariableName(currentProcName + signature(pd), 0, Tag.PROCEDURE_NAME);     
+                generatedProcNames.put(currentProcName, procName);
+                Log.log("Stored " + currentProcName + "'s helper name as " + generatedProcNames.get(currentProcName) + ".");
                 stProcTypeDecl = stGroup.getInstanceOf("ProcClass");
                 stProcTypeDecl.add("name", procName);
+                // Visit all declarations that appear in the procedure.
+                String[] body = (String[]) pd.body().visit(this);
                 // The statements that appear in the body of the procedure.
                 stProcTypeDecl.add("syncBody", body);
             } else {
                 // Otherwise, grab the instance of a non-yielding procedure instead
                 // to define a new static Java method.
-                procName = Helper.makeVariableName(currentProcName + signature(pd), 0, Tag.METHOD_NAME);
+                procName = Helper.makeVariableName(currentProcName + signature(pd), 0, Tag.METHOD_NAME);     
+                generatedProcNames.put(currentProcName, procName);
+                Log.log("Stored " + currentProcName + "'s helper name as " + generatedProcNames.get(currentProcName) + ".");
                 stProcTypeDecl = stGroup.getInstanceOf("Method");
                 stProcTypeDecl.add("name", procName);
                 stProcTypeDecl.add("type", procType);
                 // Do we have any modifier?
                 if (modifiers != null && modifiers.length > 0)
                     stProcTypeDecl.add("modifier", modifiers);
+                // Visit all declarations that appear in the procedure.
+                String[] body = (String[]) pd.body().visit(this);
                 stProcTypeDecl.add("body", body);
             }
-            
             // Create an entry point for the ProcessJ program, which is just
             // a Java main method that is called by the JVM.
             if ("main".equals(currentProcName) && pd.signature().equals(Tag.MAIN_NAME.toString())) {
@@ -353,7 +359,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
                     // "case 0: goto " + procName +  "LN; break;"
                     //  by making a substring upto LN and wrapping them
                     // around the procName
-                    
+
                     // find end index of the substring, "case <num>: goto " by finding
                     // where "goto" is and going 1 past that (usable whitespace)
                     int gotoIndex = switchLabelList.get(i).lastIndexOf("goto") + 5;
@@ -1519,6 +1525,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         stParBlock.add("name", currentParBlock);
         stParBlock.add("count", pb.stats().size());
         stParBlock.add("process", "this");
+        stParBlock.add("procName", generatedProcNames.get(currentProcName));
         
         // Increment the jump label.
         stParBlock.add("jump", ++jumpLabel);
