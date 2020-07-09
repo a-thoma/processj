@@ -61,6 +61,9 @@ public class CodeGeneratorCPP extends Visitor<Object> {
     // Current par-block.
     private String currentParBlock = null;
 
+    // Counter for anonymous processes generated in a par
+    private int parAnonProcCount = 0;
+
     // Contains par block objects mapped to their names
     private HashMap<Object, String> parBlockNames = new HashMap<Object, String>();
 
@@ -261,6 +264,11 @@ public class CodeGeneratorCPP extends Visitor<Object> {
                 stSwitchBlock.add("jumps", switchLabelList);
                 stProcTypeDecl.add("switchBlock", stSwitchBlock.render());
             }
+            // add a generated name of the process
+            parAnonProcCount++;
+            stProcTypeDecl.add("name", Helper.makeVariableName("Anonymous" + Integer.toString(parAnonProcCount) + signature(pd), 0, Tag.PROCEDURE_NAME));
+            stProcTypeDecl.add("anonCounter", parAnonProcCount);
+
             // Restore jump label.
             jumpLabel = prevJumLabel;
         } else {
