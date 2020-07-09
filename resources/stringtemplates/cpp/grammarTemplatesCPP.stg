@@ -286,8 +286,6 @@ ParBlock(name, count, process, body, jump, barrier, procName) ::= <<
 <if(body)><body; separator="\n\n"><endif>
 
 <! Not to be scheduled again until 'data' is ready !>
-// This does not work in C++ (label should be the actual \<ProcName>L\<labelNumber>)
-// my procName is <procName>
 if (<name>.should_yield()) {
     this->set_label(<jump>);
 }</n>
