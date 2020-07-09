@@ -109,7 +109,7 @@ int main(<if(vars && types)>int argc, char* <vars>[]<endif>)
 // 7) main: the entry point of the program.
 // 8) switchBlock: switch statement to jump through blocks to resume points.
 // 9) syncBody: the body (content) of synchronized method that runs/starts a process.
-ProcClass(name, types, vars, ltypes, lvars, methods, main, switchBlock, syncBody) ::= <<
+ProcClass(name, types, vars, ltypes, lvars, methods, main, parDecl, parSize, switchBlock, syncBody) ::= <<
 class <name> : public pj_runtime::pj_process
 {
 
@@ -138,10 +138,14 @@ class <name> : public pj_runtime::pj_process
     virtual ~<name>() = default;
 
     <! -------- Run Method -------- !>
-    void run() {
+    void run()
+    {
+        <if(parDecl && parSize)>static pj_runtime::pj_par* <parDecl> = new pj_runtime::pj_par(<parSize>, this);<endif>
+
         <if(switchBlock)><switchBlock; separator="\n"><endif>
         <if(syncBody)><syncBody; separator="\n"><endif>
         terminate();
+        return;
     }
     
 <! every process has these 2 things in common, so just put them here !>
@@ -274,7 +278,6 @@ SwitchCase(jump) ::= "case <jump>: goto L<jump>; break;"
 // 6) barrier:
 ParBlock(name, count, process, body, jump, barrier, procName) ::= <<
 <! TODO: yet to be evaluated and adjusted !>
-final PJPar <name> = new PJPar(<count>, <process>);
 <if(barrier)><barrier:{b | <b>.enroll(<count>)}; separator=";\n">;<endif>
 
 <! TODO: is this where the first label should go? !>
@@ -285,10 +288,10 @@ final PJPar <name> = new PJPar(<count>, <process>);
 <! Not to be scheduled again until 'data' is ready !>
 // This does not work in C++ (label should be the actual \<ProcName>L\<labelNumber>)
 // my procName is <procName>
-if (<name>.shouldYield()) {
-    this.runLabel = <jump>;
-    yield();
+if (<name>.should_yield()) {
+    this->set_label(<jump>);
 }</n>
+return;
 <procName>L<jump>:
 >>
 

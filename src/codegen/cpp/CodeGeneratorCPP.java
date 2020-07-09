@@ -60,6 +60,11 @@ public class CodeGeneratorCPP extends Visitor<Object> {
     
     // Current par-block.
     private String currentParBlock = null;
+
+    // Contains par block objects mapped to their names
+    private HashMap<Object, String> parBlockNames = new HashMap<Object, String>();
+
+    private HashMap<Object, Integer> parBlockSizes = new HashMap<Object, Integer>();
     
     // All imports are kept in this table.
     private HashSet<String> importFiles = new LinkedHashSet<String>();
@@ -294,7 +299,41 @@ public class CodeGeneratorCPP extends Visitor<Object> {
                 stProcTypeDecl = stGroup.getInstanceOf("ProcClass");
                 stProcTypeDecl.add("name", procName);
                 // Visit all declarations that appear in the procedure.
-                String[] body = (String[]) pd.body().visit(this);
+                String[] body = new String[pd.body().nchildren];
+                // If we have a parBlock we need to declare the par object
+                // before the switch statement -- as we cannot use gotos if
+                // we will potentially jump past initialization of a necessary
+                // object -- like  a par block :^)
+                // ---
+                // TODO: make sure this doesn't get screwed up against the line
+                // it replaced (below)
+                // String[] body = (String[]) pd.body().visit(this);
+                for(int i = 0; i < pd.body().nchildren; i++) {
+                    if(pd.body().children[i] instanceof Sequence) {
+                        for(int j = 0; j < ((Sequence)pd.body().children[i]).size(); j++) {
+                            // if we have a ParBlock we need its generated name + the number of procs
+                            if(((Sequence)pd.body().children[i]).child(j) != null &&
+                               ((Sequence)pd.body().children[i]).child(j)instanceof ParBlock) {
+                                Log.log(pd, "found ParBlock (in sequence inside block).");
+                                // get the returned render of the string template from visiting the ParBlock
+                                body[i] = (String)((ParBlock)((Sequence)pd.body().children[i]).child(j)).visit(this);
+                                // get the generated name from the hashmap of names
+                                String parName = parBlockNames.get(((ParBlock)((Sequence)pd.body().children[i]).child(j)));
+                                Log.log(pd, "ParBlock registered with name " + parName);
+                                // add the name to the template
+                                stProcTypeDecl.add("parDecl", parName);
+                                // get the Integer size stored (couldn't store bare ints by design of HashMap)
+                                Integer parSize = parBlockSizes.get(((ParBlock)((Sequence)pd.body().children[i]).child(j)));
+                                Log.log(pd, "ParBlock registered with count " + parSize.toString());
+                                // add the size to the template
+                                stProcTypeDecl.add("parSize", parSize.intValue());
+                            } else if(((Sequence)pd.body().children[i]).child(j) != null) {
+                                // otherwise just visit and get the render back
+                                body[i] = (String)((Sequence)pd.body().children[i]).child(j).visit(this);
+                            }
+                        }
+                    }
+                }
                 // The statements that appear in the body of the procedure.
                 stProcTypeDecl.add("syncBody", body);
             } else {
@@ -1520,10 +1559,12 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             barrierList = new ArrayList<String>();
         // Create a name for this new par-block.
         currentParBlock = Helper.makeVariableName(Tag.PAR_BLOCK_NAME.toString(), ++parDecId, Tag.LOCAL_NAME);
+        parBlockNames.put(pb, currentParBlock);
         // Since this is a new par-block, we need to create a variable inside
         // the process in which this par-block was declared.
         stParBlock.add("name", currentParBlock);
         stParBlock.add("count", pb.stats().size());
+        parBlockSizes.put(pb, new Integer(pb.stats().size()));
         stParBlock.add("process", "this");
         stParBlock.add("procName", generatedProcNames.get(currentProcName));
         
