@@ -73,8 +73,8 @@ public class ResolveImportTopDecls extends Visitor<Object> {
             for (AST t : c.typeDecls())
                 if (t instanceof ConstantDecl) {
                     Log.log(im, "Found ConstantDecl " + ((ConstantDecl)t).toString());
-                    // TODO: does this need to be visited at all?
-                    ((ConstantDecl)t).type().visit(this);
+                    // TODO: let Pedersen decide if this gets visited (in reply to Ben)
+                    // ((ConstantDecl)t).type().visit(this);
                 } else {
                     t.visit(this);   
                 }
@@ -104,6 +104,6 @@ public class ResolveImportTopDecls extends Visitor<Object> {
     }
 
     /* TODO: do we need a visitConstantDecl here? is there anything to do with ConstantDecls
-     * above in visitImport()?
+     * above in visitImport()? (check email from Pedersen when he replies)
      */
 }
