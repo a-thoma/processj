@@ -67,6 +67,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
     // Contains par block objects mapped to their names
     private HashMap<Object, String> parBlockNames = new HashMap<Object, String>();
 
+    // Contains par block objects mapped to the number of processes in them
     private HashMap<Object, Integer> parBlockSizes = new HashMap<Object, Integer>();
     
     // All imports are kept in this table.
@@ -308,6 +309,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
                 stProcTypeDecl.add("name", procName);
                 // Visit all declarations that appear in the procedure.
                 String[] body = new String[pd.body().nchildren];
+
                 // If we have a parBlock we need to declare the par object
                 // before the switch statement -- as we cannot use gotos if
                 // we will potentially jump past initialization of a necessary
@@ -315,13 +317,14 @@ public class CodeGeneratorCPP extends Visitor<Object> {
                 // ---
                 // TODO: make sure this doesn't get screwed up against the line
                 // it replaced (below)
-                // String[] body = (String[]) pd.body().visit(this);
-                for(int i = 0; i < pd.body().nchildren; i++) {
-                    if(pd.body().children[i] instanceof Sequence) {
-                        for(int j = 0; j < ((Sequence)pd.body().children[i]).size(); j++) {
+                // Log.log(pd, "Visiting the body from visitProcTypeDecl");
+                // String[] body = (String[]) pd.body().visit(this);                
+                for (int i = 0; i < pd.body().nchildren; i++) {
+                    if (pd.body().children[i] instanceof Sequence) {
+                        for (int j = 0; j < ((Sequence)pd.body().children[i]).size(); j++) {
                             // if we have a ParBlock we need its generated name + the number of procs
-                            if(((Sequence)pd.body().children[i]).child(j) != null &&
-                               ((Sequence)pd.body().children[i]).child(j)instanceof ParBlock) {
+                            if (((Sequence)pd.body().children[i]).child(j) != null &&
+                                ((Sequence)pd.body().children[i]).child(j) instanceof ParBlock) {
                                 Log.log(pd, "found ParBlock (in sequence inside block).");
                                 // get the returned render of the string template from visiting the ParBlock
                                 body[i] = (String)((ParBlock)((Sequence)pd.body().children[i]).child(j)).visit(this);
@@ -335,9 +338,9 @@ public class CodeGeneratorCPP extends Visitor<Object> {
                                 Log.log(pd, "ParBlock registered with count " + parSize.toString());
                                 // add the size to the template
                                 stProcTypeDecl.add("parSize", parSize.intValue());
-                            } else if(((Sequence)pd.body().children[i]).child(j) != null) {
+                            } else if (((Sequence)pd.body().children[i]).child(j) != null) {
                                 // otherwise just visit and get the render back
-                                body[i] = (String)((Sequence)pd.body().children[i]).child(j).visit(this);
+                                body[i] += (String)((Sequence)pd.body().children[i]).child(j).visit(this);
                             }
                         }
                     }
