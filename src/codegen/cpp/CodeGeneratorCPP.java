@@ -1207,7 +1207,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             //      1.) 'std' is the name of the package,
             //      2.) 'io' is the name of the class/file,
             //      3.) 'println' is the method declared in the class
-            pdName = pd.filename + "." + pdName;
+            pdName = pd.filename + "::" + pdName;
         } else
             ; // This procedure is called from another package.
         
