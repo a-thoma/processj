@@ -1,11 +1,14 @@
-import std.*;
+// import std.*;
+// test the autogen for libraries
+import std.math;
+import std.io;
 
 public void foo() { }
 
 public void bar() { }
 
 public void main(string[] args) {
-	//par {
+	par {
 		// TODO: we need rewriters for println to std::cout
 		// ---
 		// this will be necessary for every library we use...
@@ -16,5 +19,5 @@ public void main(string[] args) {
 		println("Print from Hello");
 		foo();
 		bar();
-	//}
+	}
 }
