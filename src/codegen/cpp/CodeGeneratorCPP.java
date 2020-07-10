@@ -339,7 +339,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
                                 // add the size to the template
                                 stProcTypeDecl.add("parSize", parSize.intValue());
                             } else if (((Sequence)pd.body().children[i]).child(j) != null) {
-                                // otherwise just visit and get the render back
+                                // otherwise just visit and get the render back (nulls won't matter here i think)
                                 body[i] += (String)((Sequence)pd.body().children[i]).child(j).visit(this);
                             }
                         }
@@ -1257,8 +1257,8 @@ public class CodeGeneratorCPP extends Visitor<Object> {
 
         Log.log(im, "import stringtemplate instance is " + stImport.render());
         stImport = stGroup.getInstanceOf("Import");
-        // NOTE: is the below commented-out line important still...?
-        // i.e. does removing this have repercussions? find out...
+        // TODO: this doesn't actually use the stImport grabbed above,
+        // need to fix that
         // stImport.add("package", im.toString());
 
         // replace dots with slashes to build the path to the file we
@@ -1291,10 +1291,13 @@ public class CodeGeneratorCPP extends Visitor<Object> {
                 // build the full import
                 Log.log(im, "building import statement(s)");
                 for (int i = 0; i < foundImports.length; i++) {
-                    includeLine += "#include <" + foundImports[i] + ">\n";
+                    Log.log(im, "found list import " + foundImports[i]);
+                    // Take off the .pj suffix and add the .hpp suffix
+                    String removeSuffix = foundImports[i].replace(".pj", ".hpp");
+                    Log.log(im, "removed .pj and replaced with .hpp: " + removeSuffix);
+                    includeLine += "#include <" + importPath.replace("*", "") + removeSuffix + ">\n";
                 }
             }
-
             return includeLine;
         }
 
