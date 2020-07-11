@@ -5,17 +5,24 @@ RUNTIMEFLAGS := -L$(RUNTIMEDIR)lib -lprocessj
 
 CPPFLAGS := -Wall -g -I$(RUNTIMEDIR)include -pthread -std=c++17
 
+BUILDFLAGS := -Wall -g -I$(RUNTIMEDIR)include -Ilib/C++ -pthread -std=c++17
+
 OFLAGS := $(CPPFLAGS) -c -fPIC
 
 all: directoryexists $(RUNTIMEDIR)lib/libprocessj.a
 
 tests: directoryexists $(RUNTIMEDIR)lib/libprocessj.a testbed
 
+build: directoryexists $(RUNTIMEDIR)lib/libprocessj.a $(NAME)
+
+$(NAME): builds/$(NAME).cpp
+	g++ $(BUILDFLAGS) -o $@ $< $(RUNTIMEFLAGS)
+
 testbed: $(RUNTIMEDIR)src/tests/pj_process_tests.cpp $(RUNTIMEDIR)include/tests/pj_process_tests.hpp
 	g++ $(CPPFLAGS) -o $@ $< $(RUNTIMEFLAGS)
 
 directoryexists:
-	if [ ! -d "./$(RUNTIMEDIR)lib" ]; then mkdir -p lib; fi
+	if [ ! -d "./$(RUNTIMEDIR)lib" ]; then mkdir -p $(RUNTIMEDIR)lib; fi
 
 $(RUNTIMEDIR)lib/libprocessj.a: $(RUNTIMEDIR)lib/pj_runtime.o $(RUNTIMEDIR)lib/pj_utilities.o
 	ar cvq $@ $^
@@ -35,4 +42,4 @@ $(RUNTIMEDIR)lib/pj_utilities.o: $(RUNTIMEDIR)src/utilities/pj_utilities.cpp $(R
 # 	g++ $(CPPFLAGS) -o $@ $< $(RUNTIMEFLAGS)
 
 clean:
-	rm -rf $(RUNTIMEDIR)lib/libprocessj.a pj_runtime testbed
+	rm -rf $(RUNTIMEDIR)lib/libprocessj.a pj_runtime testbed $(NAME)

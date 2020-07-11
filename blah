@@ -102,7 +102,7 @@ PROCESSJC=`java -cp $installdir/bin:$installdir/resources/jars/java_cup_runtime.
 ERRORS=`echo "${PROCESSJC}" | awk -v n=1 '{if(NR>n) print a[NR%n]; a[NR%n]=$0}'`
 STATUS=`echo "${PROCESSJC}" | awk '/./{line=$0} END{print line}'`
 
-if [ "$STATUS" = "** COMPILATION COMPLITED SUCCESSFULLY **" ] ; then
+if [ "$STATUS" = "** COMPILATION COMPLETED SUCCESSFULLY **" ] ; then
   echo "$ERRORS"
   echo "ProcessJ compilation successful"
 else
@@ -110,13 +110,17 @@ else
   exit 1
 fi
 
-# workaround to stop after compilation for now
-exit 0
-
 # TODO: make this generate c++ code
 # ---
 # need to include the runtime (finally) and make sure that the native libraries
 # (i.e. io.hpp) are included
+
+############################################################################
+## build the runtime using make
+# make build -j6 NAME=$@
+
+# workaround to stop after compilation for now
+exit 0
 
 ############################################################################
 

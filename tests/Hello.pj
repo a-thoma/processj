@@ -1,6 +1,6 @@
 // import std.*;
 // test the autogen for libraries
-import std.math;
+//import std.math;
 import std.io;
 
 public void foo() { }
