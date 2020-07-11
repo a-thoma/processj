@@ -1,7 +1,8 @@
 #ifndef PJ_IO_HPP
 #define PJ_IO_HPP
-namespace io
+class io
 {
+public:
     static void println()
     {
         std::cout << std::endl;
@@ -90,5 +91,5 @@ namespace io
     {
         std::cout << s;
     }
-}
+};
 #endif

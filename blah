@@ -107,7 +107,7 @@ if [ "$STATUS" = "** COMPILATION COMPLETED SUCCESSFULLY **" ] ; then
   echo "ProcessJ compilation successful"
 else
   echo "$ERRORS"
-  exit 1
+  # exit 1
 fi
 
 # TODO: make this generate c++ code
@@ -117,9 +117,19 @@ fi
 
 ############################################################################
 ## build the runtime using make
-# make build -j6 NAME=$@
+# strip .pj
+BINARYFILE=${@%???}
+# strip everything but the binary
+BINARYFILE=${BINARYFILE##*/}
+echo "Compiling binary for $BINARYFILE"
+# makefile uses NAME variable to look in builds/ for a .cpp file to build
+# ---
+# this should change later, but for now it works. will need to redo
+# so it's more portable
+O=`make build -j6 NAME=$BINARYFILE`
+echo ${O}
 
-# workaround to stop after compilation for now
+# workaround to stop after compilation -- we have a binary!
 exit 0
 
 ############################################################################
