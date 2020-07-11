@@ -91,3 +91,4 @@ namespace io
         std::cout << s;
     }
 }
+#endif
