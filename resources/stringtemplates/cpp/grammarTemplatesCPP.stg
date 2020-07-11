@@ -19,7 +19,7 @@ CodeGeneratorCPP visitor.
 // 4) body: A list of declarations generated from a ProcessJ source code.
 // 5) imports: A list of import declarations.
 //---
-// needs to be finished: is this all we need?
+// needs to be finished: is this all we need? TODO: maybe the target c++ std
 Compilation(pathName, fileName, name, body, version, imports) ::= <<
 #include \<runtime/pj_runtime.hpp>
 <if(imports)><imports; separator="\n"><\n><endif>
@@ -29,10 +29,8 @@ Compilation(pathName, fileName, name, body, version, imports) ::= <<
  * Package name '<pathName>'.
  * Code generation for '<fileName>'.
  * Target class '<name>'.
- * Java code version '<version>'.
  *
  * @author ProcessJ Group - University of Nevada, Las Vegas.
- * @since 1.2
  */
 <!class <name> {!>
     
