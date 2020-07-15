@@ -62,7 +62,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
     private String currentParBlock = null;
 
     // Counter for anonymous processes generated in a par
-    private int parAnonProcCount = 0;
+    private int procCount = 0;
 
     // Contains par block objects mapped to their names
     private HashMap<Object, String> parBlockNames = new HashMap<Object, String>();
@@ -266,9 +266,9 @@ public class CodeGeneratorCPP extends Visitor<Object> {
                 stProcTypeDecl.add("switchBlock", stSwitchBlock.render());
             }
             // add a generated name of the process
-            parAnonProcCount++;
-            stProcTypeDecl.add("name", Helper.makeVariableName("Anonymous" + Integer.toString(parAnonProcCount) + signature(pd), 0, Tag.PROCEDURE_NAME));
-            stProcTypeDecl.add("anonCounter", parAnonProcCount);
+            stProcTypeDecl.add("name", Helper.makeVariableName("Anonymous" + Integer.toString(procCount) + signature(pd), 0, Tag.PROCEDURE_NAME));
+            stProcTypeDecl.add("anonCounter", procCount);
+            procCount++;
 
             // Restore jump label.
             jumpLabel = prevJumLabel;
@@ -302,8 +302,9 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             if (doYield) {
                 // This procedure yields! Grab the instance of a yielding procedure
                 // from the string template in order to define a new class.
-                procName = Helper.makeVariableName(currentProcName + signature(pd), 0, Tag.PROCEDURE_NAME);     
+                procName = Helper.makeVariableName(currentProcName + Integer.toString(procCount) + signature(pd), 0, Tag.PROCEDURE_NAME);     
                 generatedProcNames.put(currentProcName, procName);
+                procCount++;
                 Log.log("Stored " + currentProcName + "'s helper name as " + generatedProcNames.get(currentProcName) + ".");
                 stProcTypeDecl = stGroup.getInstanceOf("ProcClass");
                 stProcTypeDecl.add("name", procName);
@@ -335,8 +336,9 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             } else {
                 // Otherwise, grab the instance of a non-yielding procedure instead
                 // to define a new static Java method.
-                procName = Helper.makeVariableName(currentProcName + signature(pd), 0, Tag.METHOD_NAME);     
+                procName = Helper.makeVariableName(currentProcName + Integer.toString(procCount) + signature(pd), 0, Tag.METHOD_NAME);     
                 generatedProcNames.put(currentProcName, procName);
+                procCount++;
                 Log.log("Stored " + currentProcName + "'s helper name as " + generatedProcNames.get(currentProcName) + ".");
                 stProcTypeDecl = stGroup.getInstanceOf("Method");
                 stProcTypeDecl.add("name", procName);
@@ -1175,16 +1177,24 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         ProcTypeDecl pd = in.targetProc;
         // Name of invoked procedure.
         String pdName = pd.name().getname();
+        String pdGenName = generatedProcNames.get(pdName);
+
+        Log.log("in, NOTE: " + pdName + " gets us " + generatedProcNames.get(pdName));
         // Check local procedures, if none is found then the procedure must come
         // from a different file and maybe package.
         if (currentCompilation.fileName.equals(pd.myCompilation.fileName)) {
             String name = pdName + signature(pd);
-            if (Helper.doesProcedureYield(pd))
+            if (Helper.doesProcedureYield(pd)) {
                 name = Helper.makeVariableName(name, 0, Tag.PROCEDURE_NAME);
-            else
+            } else if (generatedProcNames.get(pdName) == null) {
                 name = Helper.makeVariableName(name, 0, Tag.METHOD_NAME);
-            // pdName = pd.myCompilation.fileNoExtension() + "." + name;
-            pdName = name;
+                // pdName = pd.myCompilation.fileNoExtension() + "." + name;
+            }
+            if(pdGenName == null) {
+                pdName = name;
+            } else {
+                pdName = pdGenName;
+            }
         } else if (pd.isNative) {
             // Make the package visible on import by using the qualified name of
             // the class the procedure belongs to and the name of the directory
@@ -1194,7 +1204,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             //      3.) 'println' is the method declared in the class
             pdName = pd.filename + "::" + pdName;
         } else
-            ; // This procedure is called from another package.
+            ;
         
         // These are the formal parameters of a procedure/method which are specified
         // by a list of comma-separated arguments.
