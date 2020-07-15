@@ -340,7 +340,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
                                 stProcTypeDecl.add("parSize", parSize.intValue());
                             } else if (((Sequence)pd.body().children[i]).child(j) != null) {
                                 // otherwise just visit and get the render back (nulls won't matter here i think)
-                                body[i] += (String)((Sequence)pd.body().children[i]).child(j).visit(this);
+                                body[i] += (String)((Sequence)pd.body().children[i]).child(j).visit(this) + "\n";
                             }
                         }
                     }
