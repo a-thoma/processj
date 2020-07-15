@@ -281,6 +281,7 @@ ParBlock(name, count, process, body, jump, barrier, procName) ::= <<
 <if(barrier)><barrier:{b | <b>.enroll(<count>)}; separator=";\n">;<endif>
 
 <! TODO: is this where the first label should go? !>
+// parblock first label
 <procName>L0:
 
 <if(body)><body; separator="\n\n"><endif>
@@ -829,7 +830,7 @@ ObjectGuards(guards) ::= <<
 //
 // 1) type:
 // 2) var:
-ConstantDecl(type, var) ::= "public static final <type> <var>"
+ConstantDecl(type, var) ::= "static <type> <var>"
 
 //========================================================================================
 //
