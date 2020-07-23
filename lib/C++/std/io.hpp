@@ -14,37 +14,42 @@ public:
     //     std::cout << b << std::endl;
     // }
 
-    static void println(short s)
+    static void println(const short s)
     {
         std::cout << s << std::endl;
     }
 
-    static void println(int i)
+    static void println(const int i)
     {
         std::cout << i << std::endl;
     }
 
-    static void println(char c)
+    static void println(const char c)
     {
         std::cout << c << std::endl;
     }
 
-    static void println(long l)
+    static void println(const long l)
     {
         std::cout << l << std::endl;
     }
 
-    static void println(float f)
+    static void println(const float f)
     {
         std::cout << f << std::endl;
     }
 
-    static void println(double d)
+    static void println(const double d)
     {
         std::cout << d << std::endl;
     }
 
-    static void println(std::string s)
+    static void println(const char* s)
+    {
+        std::cout << s << std::endl;
+    }
+
+    static void println(const std::string s)
     {
         std::cout << s << std::endl;
     }
