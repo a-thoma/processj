@@ -359,8 +359,19 @@ public class CodeGeneratorCPP extends Visitor<Object> {
                 stMain.add("name", procName);
                 // Pass the list of command line arguments to this main method.
                 if (!formalParams.isEmpty()) {
-                    stMain.add("types", formalParams.values());
-                    stMain.add("vars", formalParams.keySet());
+                    // stMain.add("types", formalParams.values());
+                    // stMain.add("vars", formalParams.keySet());
+                    // Here we add argc and argv to the main, so that we can
+                    // construct a vector of strings instead of an array
+                    // of char*'s, which is much closer to a String array
+                    // in java than a bare array in C++ in terms of
+                    // functionality
+                    String[] types = {"int32_t", "char*"};
+                    String[] vars  = {"argc", "argv"};
+                    stMain.add("types", types);
+                    stMain.add("vars", vars);
+                    stMain.add("argc", vars[0]);
+                    stMain.add("argv", vars[1]);
                 }
                 // Add entry point of the program.
                 stProcTypeDecl.add("main", stMain.render());
@@ -370,8 +381,14 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             // of the static class that the main method belongs to (some procedure class)
             // or should be passed to the Java method (some static method).
             if (!formalParams.isEmpty()) {
-                stProcTypeDecl.add("types", formalParams.values());
-                stProcTypeDecl.add("vars", formalParams.keySet());
+                // stProcTypeDecl.add("types", formalParams.values());
+                // stProcTypeDecl.add("vars", formalParams.keySet());
+                // Here we match what we did with main above by making space
+                // for our arg vector (literally a vector)
+                String[] types = {"std::vector<std::string>"};
+                String[] vars  = {"args"};
+                stProcTypeDecl.add("types", types);
+                stProcTypeDecl.add("vars", vars);
             }
             // The list of local variables defined in the body of a procedure becomes
             // the member variables of the procedure class.
@@ -789,7 +806,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         // to Java primitive types.
         String typeStr = py.typeName();
         if (py.isStringType())
-            typeStr = "std::string";
+            typeStr = "char*";
         else if (py.isTimerType())
             typeStr = PJTimer.class.getSimpleName();
         else if (py.isBarrierType())
@@ -818,16 +835,16 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         String chantype = "";
         switch (ct.shared()) {
         case ChannelType.NOT_SHARED:
-            chantype = PJOne2OneChannel.class.getSimpleName();
+            chantype = "pj_runtime::pj_one2one_channel";
             break;
         case ChannelType.SHARED_READ:
-            chantype = PJOne2ManyChannel.class.getSimpleName();
+            chantype = "pj_runtime::pj_one2many_channel";
             break;
         case ChannelType.SHARED_WRITE:
-            chantype = PJMany2OneChannel.class.getSimpleName();
+            chantype = "pj_runtime::pj_many2one_channel";
             break;
         case ChannelType.SHARED_READ_WRITE:
-            chantype = PJMany2ManyChannel.class.getSimpleName();
+            chantype = "pj_runtime::pj_many2many_channel";
             break;
         }
         // Resolve parameterized type for channel, e.g., chan<T>
@@ -993,10 +1010,6 @@ public class CodeGeneratorCPP extends Visitor<Object> {
     public Object visitArrayType(ArrayType at) {
         Log.log(at, "Visiting an ArrayType (" + at.typeName() + ")");
 
-        /* NOTE: still need to add brackets _after_ the name of the array,
-         * but this isn't the place to do it
-         */
-        // String stArrayType = (String) at.baseType().visit(this) + "[]";
         String stArrayType = (String) at.baseType().visit(this);
 
         return stArrayType;
@@ -1179,7 +1192,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         String pdName = pd.name().getname();
         String pdGenName = generatedProcNames.get(pdName);
 
-        Log.log("in, NOTE: " + pdName + " gets us " + generatedProcNames.get(pdName));
+        Log.log(in, "NOTE: " + pdName + " gets us " + generatedProcNames.get(pdName));
         // Check local procedures, if none is found then the procedure must come
         // from a different file and maybe package.
         if (currentCompilation.fileName.equals(pd.myCompilation.fileName)) {
