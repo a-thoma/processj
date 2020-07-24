@@ -66,10 +66,10 @@ public class CodeGeneratorCPP extends Visitor<Object> {
     private int procCount = 0;
 
     // Contains par block objects mapped to their names
-    private HashMap<Object, String> parBlockNames = new HashMap<Object, String>();
+    private HashMap<Object, String> parBlockNames = new LinkedHashMap<Object, String>();
 
     // Contains par block objects mapped to the number of processes in them
-    private HashMap<Object, Integer> parBlockSizes = new HashMap<Object, Integer>();
+    private HashMap<Object, Integer> parBlockSizes = new LinkedHashMap<Object, Integer>();
     
     // All imports are kept in this table.
     private HashSet<String> importFiles = new LinkedHashSet<String>();
@@ -85,6 +85,9 @@ public class CodeGeneratorCPP extends Visitor<Object> {
     
     // Contains local parameters transformed to fields.
     private HashMap<String, String> localParams = new LinkedHashMap<String, String>();
+
+    // Contains local param inits
+    private HashMap<String, String> localInits = new LinkedHashMap<String, String>();
     
     // Contains record members transformed to fields.
     private HashMap<String, String> recordFields = new LinkedHashMap<String, String>();
@@ -99,7 +102,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
     private ArrayList<String> barrierList = new ArrayList<String>();
 
     // Contains names of classes/procs mapped to their generated names
-    private HashMap<String, String> generatedProcNames = new HashMap<String, String>();
+    private HashMap<String, String> generatedProcNames = new LinkedHashMap<String, String>();
 
     // Identifier for parameter declaration.
     private int varDecId = 0;
@@ -282,6 +285,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             if (formals != null && formals.size() > 0) {
                 // Iterate through and visit every parameter declaration.
                 for (int i = 0; i < formals.size(); ++i) {
+                    Log.log(pd, "visiting parameters");
                     ParamDecl actualParam = formals.child(i);
                     // Retrieve the name and type of a parameter in the parameter list.
                     // Note that we ignored the value returned by this visitor.
@@ -328,6 +332,10 @@ public class CodeGeneratorCPP extends Visitor<Object> {
                                 Log.log(pd, "ParBlock registered with count " + parSize.toString());
                                 // add the size to the template
                                 stProcTypeDecl.add("parSize", parSize.intValue());
+                            }
+                            if(((Sequence)pd.body().children[i]).child(j) instanceof LocalDecl) {
+                                Log.log(pd, "Found LocalDecl " + ((LocalDecl)((Sequence)pd.body().children[i]).child(j)).name());
+                                
                             }                            
                         }
                     }
@@ -394,8 +402,10 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             // The list of local variables defined in the body of a procedure becomes
             // the member variables of the procedure class.
             if (!localParams.isEmpty()) {
+
                 stProcTypeDecl.add("ltypes", localParams.values());
                 stProcTypeDecl.add("lvars", localParams.keySet());
+                stProcTypeDecl.add("linits", localInits.values());
             }
             // Add the switch block for resumption.
             if (!switchLabelList.isEmpty()) {
@@ -697,9 +707,9 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         
         String chantype = type;
         // The channel type, e.g., one-2-one, one-2-many, many-2-one, many-to-many.
-        if (ld.type().isChannelType() || ld.type().isChannelEndType())
-            // type = PJChannel.class.getSimpleName() + type.substring(type.indexOf("<"), type.length());
-            Log.log(ld, "in visitLocalDecl(): type is " + type + ".");
+        Log.log(ld, "in visitLocalDecl(): type is " + type + ".");
+        // if (ld.type().isChannelType() || ld.type().isChannelEndType())
+        //     type = PJChannel.class.getSimpleName() + type.substring(type.indexOf("<"), type.length());
 
         // Create a tag for this local channel expression parameter.
         String newName = Helper.makeVariableName(name, ++localDecId, Tag.LOCAL_NAME);
@@ -746,12 +756,20 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         // declaration with some initial value(s).
         if (val != null)
             val = val.replace(DELIMITER, "");
+
+        localInits.put(name, val);
         
         ST stVar = stGroup.getInstanceOf("Var");
+        stVar.add("type", type);
         stVar.add("name", newName);
         stVar.add("val", val);
+
+        String stVarStr = stVar.render();
+        Log.log(ld, "In visitLocalDecl(): stVarStr is " + stVarStr + ".");
         
-        return stVar.render();
+        // return stVar.render();
+        // return stVarStr;
+        return null;
     }
     
     @Override
@@ -812,11 +830,14 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         // to Java primitive types.
         String typeStr = py.typeName();
         if (py.isStringType())
-            typeStr = "char*";
+            // typeStr = "char*";
+            typeStr = "std::string";
         else if (py.isTimerType())
-            typeStr = PJTimer.class.getSimpleName();
+            // typeStr = PJTimer.class.getSimpleName();
+            typeStr = "pj_runtime::pj_timer";
         else if (py.isBarrierType())
-            typeStr = PJBarrier.class.getSimpleName();
+            // typeStr = PJBarrier.class.getSimpleName();
+            typeStr = "pj_runtime::pj_barrier";
 
         return typeStr;
     }
@@ -1450,7 +1471,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         Log.log(rt, "Visiting a RecordTypeDecl (" + rt.name().getname() + ")");
         
         // Generated template after evaluating this visitor.
-        ST stRecordClass = stGroup.getInstanceOf("RecordClass");
+        ST stRecordStruct = stGroup.getInstanceOf("RecordStruct");
         String recName = (String) rt.name().visit(this);
         ArrayList<String> modifiers = new ArrayList<String>();
         
@@ -1467,14 +1488,14 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         // The list of fields that should be passed to the constructor
         // of the static class that the record belongs to.
         if (!recordFields.isEmpty()) {
-            stRecordClass.add("types", recordFields.values());
-            stRecordClass.add("vars", recordFields.keySet());
+            stRecordStruct.add("types", recordFields.values());
+            stRecordStruct.add("vars", recordFields.keySet());
         }
         
-        stRecordClass.add("name", recName);
-        stRecordClass.add("modifiers", modifiers);
+        stRecordStruct.add("name", recName);
+        stRecordStruct.add("modifiers", modifiers);
         
-        return stRecordClass.render();
+        return stRecordStruct.render();
     }
     
     @Override
@@ -1554,8 +1575,8 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             String field = (String) ra.field().getname();       // Field in inner class.
             
             // Cast a protocol to a supertype if needed.
-            if (protocolTagsSwitchedOn.containsKey(protocName + "." + currentProtocolTag))
-                protocName = protocolTagsSwitchedOn.get(protocName + "." + currentProtocolTag);
+            if (protocolTagsSwitchedOn.containsKey(protocName + "->" + currentProtocolTag))
+                protocName = protocolTagsSwitchedOn.get(protocName + "->" + currentProtocolTag);
             
             stRecordAccess.add("protocName", protocName);
             stRecordAccess.add("tag", currentProtocolTag);
@@ -1601,6 +1622,10 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         parBlockSizes.put(pb, new Integer(pb.stats().size()));
         stParBlock.add("process", "this");
         stParBlock.add("procName", generatedProcNames.get(currentProcName));
+
+        // we should also add a pj_runtime::pj_par to the locals of whatever
+        // process we're in
+        localParams.put(currentParBlock + "(" + pb.stats().size() + ", this)", "pj_runtime::pj_par");
         
         // Increment the jump label.
         stParBlock.add("jump", ++jumpLabel);
@@ -1825,7 +1850,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         
         // Create a tag for this local alt declaration.
         String newName = Helper.makeVariableName("alt", ++localDecId, Tag.LOCAL_NAME);
-        localParams.put(newName, "PJAlt");
+        localParams.put(newName + "(" + cases.size() + ", this)", "pj_runtime::pj_alt");
         paramDeclNames.put(newName, newName);
         // -->
         

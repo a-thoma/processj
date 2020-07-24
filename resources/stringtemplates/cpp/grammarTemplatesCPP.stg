@@ -109,7 +109,7 @@ int main(<if(vars)><types,vars:{t,v | <t> <v>}; separator=", ">[]<endif>)
 // 8) switchBlock: switch statement to jump through blocks to resume points.
 // 9) syncBody: the body (content) of synchronized method that runs/starts a process.
 // TODO: add altDecl/altSize to this
-ProcClass(name, types, vars, ltypes, lvars, methods, main, parDecl, parSize, altDecl, altSize, switchBlock, syncBody) ::= <<
+ProcClass(name, types, vars, ltypes, lvars, linits, methods, main, parDecl, parSize, altDecl, altSize, switchBlock, syncBody) ::= <<
 class <name> : public pj_runtime::pj_process
 {
 
@@ -144,13 +144,13 @@ public:
         <!TODO: LocalDecls go here as static variables!>
         <! -------- Instance variables for local parameters -------- !>
         // local variables
-        <if(lvars)><ltypes,lvars:{t,v | static <t> <v>}; separator=";\n">;<\n><endif>
-        <if(parDecl && parSize)>static pj_runtime::pj_par* <parDecl> = new pj_runtime::pj_par(<parSize>, this);<endif>
+        <if(lvars)><ltypes,lvars,linits:{t,v,i | static <t>* <v> = <i>}; separator=";\n">;<\n><endif>
+        <!<if(parDecl && parSize)>static pj_runtime::pj_par* <parDecl> = new pj_runtime::pj_par(<parSize>, this);<endif>!>
         <if(altDecl && altSize)> static pj_runtime::pj_alt* <altDecl> = new pj_runtime::pj_alt(<altSize>, this);<endif>
 
         <if(switchBlock)><switchBlock; separator="\n"><endif>
         <if(syncBody)><syncBody; separator="\n"><endif>
-        <if(parDecl && parSize)>delete <parDecl>;<endif>
+        <!<if(parDecl && parSize)>delete <parDecl>;<endif>!>
         terminate();
         return;
     }
@@ -297,7 +297,7 @@ ParBlock(name, count, process, body, jump, barrier, procName) ::= <<
 <if(body)><body; separator="\n\n"><endif>
 
 <! Not to be scheduled again until 'data' is ready !>
-if (<name>->should_yield()) {
+if (<name>.should_yield()) {
     this->set_label(<jump>);
     return;
 }</n>
@@ -376,7 +376,7 @@ private:
     <if(chan)>// chan goes here <endif>
 };<!<if(lvars)>.set(<lvars; separator=", ">)<else>.schedule();<endif>!>
 
-this->sched->insert(new <name>(this->id + <anonCounter>, this->sched<if(parBlock)>, <parBlock><endif>));
+this->sched->insert(new <name>(this->id + <anonCounter>, this->sched<if(parBlock)>, &<parBlock><endif>));
 >>
 
 //========================================================================================
@@ -388,6 +388,10 @@ ChannelDecl(type) ::= "<if(type)>new <type>()<endif>"
 //
 // 1) count:
 BarrierDecl(count) ::= "new PJBarrier(<if(count)><count><endif>)"
+
+ParDecl(count) ::= <<
+pj_runtime::pj_par* <name> = new pj_runtime::pj_par(<count>, this);
+>>
 
 //========================================================================================
 //
@@ -636,6 +640,19 @@ RecordClass(modifiers, name, types, vars) ::= <<
 }
 >>
 
+RecordStruct(modifiers, name, types, vars) ::= <<
+struct <name> : public pj_runtime::pj_record
+{
+public:
+    <name>() = default;
+    <name>(<types,vars:{t,v | <t> <v>}; separator=", ">)
+    {
+        <if(vars)><vars:{v | this-><v> = <v>}; separator=";\n">;<endif>
+    }
+    <if(vars)><types,vars:{t,v | <t> <v>}; separator=";\n">;<\n><endif>
+};
+>>
+
 //========================================================================================
 //
 // 1) type:
@@ -648,7 +665,7 @@ new <type>(<vals; separator=", ">)
 //
 // 1) name:
 // 2) member:
-RecordAccess(name, member) ::= "<if(name)><name>.<member><endif>"
+RecordAccess(name, member) ::= "<if(name)><name>-><member><endif>"
 
 //========================================================================================
 //
