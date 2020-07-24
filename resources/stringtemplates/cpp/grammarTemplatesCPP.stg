@@ -804,7 +804,7 @@ AltStat(alt, count, initBooleanGuards, initGuards, bguards, guards, jump, cases,
 <initGuards>
 boolean ready = <alt>.setGuards(<bguards>, <guards>);
 
-<
+
 
 if (!ready) {
     System.out.println("RuntimeError: One of the boolean pre-guards must be true!");

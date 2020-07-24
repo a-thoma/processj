@@ -20,6 +20,7 @@ import processj.runtime.*;
 import utilities.Log;
 import utilities.SymbolTable;
 import utilities.Visitor;
+import utilities.Assert;
 
 // required for finding imports
 import java.io.File;
@@ -661,8 +662,11 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         String type = (String) pd.type().visit(this);
         
         // Temporary _silly_ fixed for channel types.
-        if (pd.type().isChannelType() || pd.type().isChannelEndType())
-            type = PJChannel.class.getSimpleName() + type.substring(type.indexOf("<"), type.length());
+        if (pd.type().isChannelType() || pd.type().isChannelEndType()) {
+            // type = PJChannel.class.getSimpleName() + type.substring(type.indexOf("<"), type.length());
+            // TODO: make this build the appropriate type a la C++
+            Log.log(pd, "in visitParamDecl() type is " + type);
+        }
         
         // Create a tag for this parameter and then add it to the collection
         // of parameters for reference.
@@ -694,7 +698,8 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         String chantype = type;
         // The channel type, e.g., one-2-one, one-2-many, many-2-one, many-to-many.
         if (ld.type().isChannelType() || ld.type().isChannelEndType())
-            type = PJChannel.class.getSimpleName() + type.substring(type.indexOf("<"), type.length());
+            // type = PJChannel.class.getSimpleName() + type.substring(type.indexOf("<"), type.length());
+            Log.log(ld, "in visitLocalDecl(): type is " + type + ".");
 
         // Create a tag for this local channel expression parameter.
         String newName = Helper.makeVariableName(name, ++localDecId, Tag.LOCAL_NAME);
@@ -786,7 +791,8 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         String type = (String) nt.name().getname();
         // This is for protocol inheritance.
         if (nt.type() != null && nt.type().isProtocolType())
-            type = PJProtocolCase.class.getSimpleName();
+            // type = PJProtocolCase.class.getSimpleName();
+            type = "pj_runtime::pj_protocol";
 
         return type;
     }
@@ -850,6 +856,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         // Resolve parameterized type for channel, e.g., chan<T>
         // where 'T' is the type to be resolved.
         String type = getChannelType(ct.baseType());
+        // String type = getCPPChannelType(ct.baseType());
         
         return chantype + "<" + type + ">";
     }
@@ -868,18 +875,23 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         Log.log(ct, "Visiting a ChannelEndType (" + ct.typeName() + ")");
         
         // Channel class type.
-        String chanType = PJOne2OneChannel.class.getSimpleName();
+        // String chanType = PJOne2OneChannel.class.getSimpleName();
+        String chanType = "pj_runtime::pj_one2one_channel";
         if (ct.isShared()) {  // Is it a shared channel?
             if (ct.isRead())  // One-2-many channel.
-                chanType = PJOne2ManyChannel.class.getSimpleName();
+                // chanType = PJOne2ManyChannel.class.getSimpleName();
+                chanType = "pj_runtime::pj_one2many_channel";
             else if (ct.isWrite()) // Many-2-one channel.
-                chanType = PJMany2OneChannel.class.getSimpleName();
+                // chanType = PJMany2OneChannel.class.getSimpleName();
+                chanType = "pj_runtime::pj_many2one_channel";
             else // Many-2-many channel.
-                chanType = PJMany2ManyChannel.class.getSimpleName();
+                // chanType = PJMany2ManyChannel.class.getSimpleName();
+                chanType = "pj_runtime::pj_many2many_channel";
         }
         // Resolve parameterized type for channels, e.g., chan<T>
         // where 'T' is the type to be resolved.
         String type = getChannelType(ct.baseType());
+        // STring type = getCPPChannelType(ct.baseType());
         
         return chanType + "<" + type + ">";
     }
@@ -1866,7 +1878,8 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             NamedType nt = (NamedType) t;
             baseType = (String) nt.visit(this);
         } else if (t.isPrimitiveType()) // This is needed because we can only have wrapper class.
-            baseType = Helper.getWrapperType(t);
+            // baseType = Helper.getWrapperType(t);
+        baseType = getCPPChannelType(t);
         
         return baseType;
     }
@@ -2057,5 +2070,30 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         }
 
         return imports;
+    }
+
+    private String getCPPChannelType(Type type) {
+        Log.log("in getCPPChannelType()");
+        type = Assert.nonNull(type, "The parameter type cannot be null.");
+        String typeName = "";
+
+        if (type.isIntegerType())
+            typeName = "int32_t";
+        else if (type.isByteType())
+            typeName = "int8_t";
+        else if (type.isLongType())
+            typeName = "int64_t";
+        else if (type.isDoubleType())
+            typeName = "double";
+        else if (type.isFloatType())
+            typeName = "float";
+        else if (type.isBooleanType())
+            typeName = "bool";
+        else if (type.isCharType())
+            typeName = "char";
+        else if (type.isShortType())
+            typeName = "int16_t";
+        
+        return typeName;
     }
 }
