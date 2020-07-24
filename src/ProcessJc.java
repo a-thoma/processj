@@ -244,7 +244,8 @@ public class ProcessJc {
             new rewriters.InfiniteLoopRewrite().go(c);
             
             System.out.println("-- Rewriting loops.");
-            c.visit(new rewriters.UnrollLoopRewrite());
+            System.out.println("** THIS HAS BEEN DISABLED FOR NOW AS IT GENERATES BAD LABELS **");
+            // c.visit(new rewriters.UnrollLoopRewrite());
             
             System.out.println("-- Rewriting yielding expressions.");
             System.out.println("** THIS HAS BEEN DISABLED FOR NOW AS IT DOES NOT WORK CORRECTLY **");
