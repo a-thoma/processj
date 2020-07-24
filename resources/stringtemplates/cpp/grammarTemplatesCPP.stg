@@ -376,7 +376,7 @@ private:
     <if(chan)>// chan goes here <endif>
 };<!<if(lvars)>.set(<lvars; separator=", ">)<else>.schedule();<endif>!>
 
-this->sched->insert(new <name>(this->id + <anonCounter>, this->sched<if(parBlock)>, &<parBlock><endif>));
+this->sched->insert(new <name>(this->id + <anonCounter>, this->sched<if(parBlock)>, <parBlock><endif>));
 >>
 
 //========================================================================================
