@@ -560,7 +560,9 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             if (fs.init() != null) {
                 for (Statement st : fs.init()) {
                     if (st != null)
-                        init.add(((String) st.visit(this)).replace(";", ""));  // Remove the ';' added in LocalDecl.
+                        // TODO: why does this break?
+                        //init.add(((String) st.visit(this)).replace(";", ""));  // Remove the ';' added in LocalDecl.
+                        init.add((String)st.visit(this));
                 }
             }
             
