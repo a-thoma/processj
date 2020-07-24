@@ -144,9 +144,9 @@ public:
         <!TODO: LocalDecls go here as static variables!>
         <! -------- Instance variables for local parameters -------- !>
         // local variables
-        <if(lvars)><ltypes,lvars,linits:{t,v,i | static <t>* <v> = <i>}; separator=";\n">;<\n><endif>
+        <if(lvars)><ltypes,lvars,linits:{t,v,i | static <t> <v> = <i>}; separator=";\n">;<\n><endif>
         <!<if(parDecl && parSize)>static pj_runtime::pj_par* <parDecl> = new pj_runtime::pj_par(<parSize>, this);<endif>!>
-        <if(altDecl && altSize)> static pj_runtime::pj_alt* <altDecl> = new pj_runtime::pj_alt(<altSize>, this);<endif>
+        <!<if(altDecl && altSize)> static pj_runtime::pj_alt* <altDecl> = new pj_runtime::pj_alt(<altSize>, this);<endif>!>
 
         <if(switchBlock)><switchBlock; separator="\n"><endif>
         <if(syncBody)><syncBody; separator="\n"><endif>
@@ -297,7 +297,7 @@ ParBlock(name, count, process, body, jump, barrier, procName) ::= <<
 <if(body)><body; separator="\n\n"><endif>
 
 <! Not to be scheduled again until 'data' is ready !>
-if (<name>.should_yield()) {
+if (<name>->should_yield()) {
     this->set_label(<jump>);
     return;
 }</n>
@@ -389,9 +389,10 @@ ChannelDecl(type) ::= "<if(type)>new <type>()<endif>"
 // 1) count:
 BarrierDecl(count) ::= "new PJBarrier(<if(count)><count><endif>)"
 
-ParDecl(count) ::= <<
-pj_runtime::pj_par* <name> = new pj_runtime::pj_par(<count>, this);
->>
+// TODO: might not need this...
+//ParDecl(count) ::= <<
+//pj_runtime::pj_par* <name> = new pj_runtime::pj_par(<count>, this);
+//>>
 
 //========================================================================================
 //

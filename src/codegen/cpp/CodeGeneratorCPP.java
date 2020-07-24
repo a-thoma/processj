@@ -403,6 +403,18 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             // the member variables of the procedure class.
             if (!localParams.isEmpty()) {
 
+                Log.log(pd, "sizes are " + localParams.values().size() + ", " + localParams.keySet().size() + ", "
+                            + localInits.values().size());
+
+                for(int i = 0; i < localParams.values().size(); i++) {
+                    Log.log(pd, ((String)localParams.values().toArray()[i]));
+                }
+                for(int i = 0; i < localParams.keySet().size(); i++) {
+                    Log.log(pd, ((String)localParams.keySet().toArray()[i]));
+                }
+                for(int i = 0; i < localInits.values().size(); i++) {
+                    Log.log(pd, ((String)localInits.values().toArray()[i]));
+                }
                 stProcTypeDecl.add("ltypes", localParams.values());
                 stProcTypeDecl.add("lvars", localParams.keySet());
                 stProcTypeDecl.add("linits", localInits.values());
@@ -713,6 +725,12 @@ public class CodeGeneratorCPP extends Visitor<Object> {
 
         // Create a tag for this local channel expression parameter.
         String newName = Helper.makeVariableName(name, ++localDecId, Tag.LOCAL_NAME);
+
+        // If it needs to be a pointer, make it so
+        if(!(ld.type().isPrimitiveType() || ld.type().isArrayType())) {
+            Log.log(ld, "appending a pointer specifier to type of " + name);
+            type += "*";
+        }
         localParams.put(newName, type);
         paramDeclNames.put(name, newName);
         
@@ -746,10 +764,15 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         // in which it was declared, we return if and only if this local
         // variable is not initialized.
         if (expr == null) {
-            if (!ld.type().isBarrierType() && (ld.type().isPrimitiveType() ||
-                ld.type().isArrayType() ||  // Could be an uninitialized array declaration.
-                ld.type().isNamedType()))   // Could be records or protocols.
-                return null;                // The 'null' is used to removed empty sequences.
+            Log.log(ld, name + "'s expr is null.");
+            if (!ld.type().isBarrierType() && 
+                !ld.type().isChannelType() && (ld.type().isPrimitiveType() ||
+                ld.type().isArrayType() ||    // Could be an uninitialized array declaration.
+                ld.type().isNamedType())) {   // Could be records or protocols.
+                    Log.log(ld, name + " has a 0 initializer.");
+                    localInits.put(name, "0");
+                    return null;              // The 'null' is used to removed empty sequences.
+                }
         }
         
         // If we reach this section of code, then we have a variable
@@ -757,8 +780,10 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         if (val != null)
             val = val.replace(DELIMITER, "");
 
+        // We need to store the initializer so we can build the locals later
         localInits.put(name, val);
         
+        // TODO: this is no longer needed...
         ST stVar = stGroup.getInstanceOf("Var");
         stVar.add("type", type);
         stVar.add("name", newName);
@@ -1625,7 +1650,8 @@ public class CodeGeneratorCPP extends Visitor<Object> {
 
         // we should also add a pj_runtime::pj_par to the locals of whatever
         // process we're in
-        localParams.put(currentParBlock + "(" + pb.stats().size() + ", this)", "pj_runtime::pj_par");
+        localParams.put(currentParBlock, "pj_runtime::pj_par*");
+        localInits.put(currentParBlock, "new pj_runtime::pj_par(" + pb.stats().size() + ", this)");
         
         // Increment the jump label.
         stParBlock.add("jump", ++jumpLabel);
@@ -1850,7 +1876,8 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         
         // Create a tag for this local alt declaration.
         String newName = Helper.makeVariableName("alt", ++localDecId, Tag.LOCAL_NAME);
-        localParams.put(newName + "(" + cases.size() + ", this)", "pj_runtime::pj_alt");
+        localParams.put(newName, "pj_runtime::pj_alt*");
+        localInits.put(newName, "new pj_runtime::pj_alt(" + cases.size() + ", this)");
         paramDeclNames.put(newName, newName);
         // -->
         
@@ -1863,6 +1890,8 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         stAltStat.add("jump", ++jumpLabel);
         stAltStat.add("cases", altCases);
         stAltStat.add("index", n.visit(this));
+
+        // localParams.put(newName, "pj_runtime::pj_alt");
         
         // Add the jump label to the switch list.
         switchLabelList.add(renderSwitchLabel(jumpLabel));
@@ -1919,6 +1948,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         jumpLabel = 0;
 
         localParams.clear();
+        localInits.clear();
         switchLabelList.clear();
         barrierList.clear();
         
