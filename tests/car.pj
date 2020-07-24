@@ -1,4 +1,5 @@
-import std.*;
+//import std.*;
+import std.io;
 
 public record Car {
     string model;
