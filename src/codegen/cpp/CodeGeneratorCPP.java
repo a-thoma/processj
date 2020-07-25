@@ -392,10 +392,12 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             if (!formalParams.isEmpty()) {
                 // Here we match what we did with main above by making space
                 // for our arg vector (literally a vector)
-                String[] types = {"std::vector<std::string>"};
-                String[] vars  = {"args"};
-                stProcTypeDecl.add("types", types);
-                stProcTypeDecl.add("vars", vars);
+                if("main".equals(currentProcName) && pd.signature().equals(Tag.MAIN_NAME.toString())) {
+                    String[] types = {"std::vector<std::string>"};
+                    String[] vars  = {"args"};
+                    stProcTypeDecl.add("types", types);
+                    stProcTypeDecl.add("vars", vars);
+                }
                 if(!("main".equals(currentProcName) && pd.signature().equals(Tag.MAIN_NAME.toString()))) {
                     stProcTypeDecl.add("types", formalParams.values());
                     stProcTypeDecl.add("vars", formalParams.keySet());   
@@ -692,6 +694,12 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             // type = PJChannel.class.getSimpleName() + type.substring(type.indexOf("<"), type.length());
             // TODO: make this build the appropriate type a la C++
             Log.log(pd, "in visitParamDecl() type is " + type);
+        }
+
+        // If it needs to be a pointer, make it so
+        if(pd.type().isBarrierType() || !(pd.type().isPrimitiveType() || pd.type().isArrayType())) {
+            Log.log(pd, "appending a pointer specifier to type of " + name);
+            type += "*";
         }
         
         // Create a tag for this parameter and then add it to the collection
@@ -1312,7 +1320,6 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         
         stInvocation.add("name", pdName);
         stInvocation.add("vars", paramsList);
-        stInvocation.add("anonCounter", procCount);
         
         return stInvocation.render();
     }
@@ -1968,6 +1975,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
     private String renderSwitchLabel(int jump) {
         ST stSwitchCase = stGroup.getInstanceOf("SwitchCase");
         stSwitchCase.add("jump", jump);
+        stSwitchCase.add("name", currentProcName);
         return stSwitchCase.render();
     }
     
