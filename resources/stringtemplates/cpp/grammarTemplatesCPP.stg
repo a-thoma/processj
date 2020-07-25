@@ -221,12 +221,8 @@ public:
 
     virtual void finalize()
     {
-        <![<if(parBlock)><parBlock><endif>, <if(barrier)><barrier><endif>]()!>
-        []()
-        {
-            <if(parBlock)><parBlock>->decrement();<endif>
-            <if(barrier)><barrier:{b | <b>->resign()}; separator="\n">;<endif>
-        }();
+        <if(parBlock)><parBlock>->decrement();<endif>
+        <if(barrier)><barrier:{b | <b>->resign()}; separator="\n">;<endif>
     }
 };
 this->sched->insert(new <name>_overload_finalize(this->id + <anonCounter>, this->sched<if(barrier)>, <barrier><endif>));

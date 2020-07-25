@@ -1314,6 +1314,8 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             // Add the barrier this procedure should resign from.
             if (!barrierList.isEmpty())
                 stInvocation.add("barrier", barrierList);
+            // Add the proc count that we'll need for id generation
+            stInvocation.add("anonCounter", procCount);
         } else
             // Must be an invocation made through a static Java method.
             stInvocation = stGroup.getInstanceOf("Invocation");
