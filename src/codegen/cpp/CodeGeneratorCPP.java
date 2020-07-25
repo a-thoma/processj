@@ -390,14 +390,16 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             // of the static class that the main method belongs to (some procedure class)
             // or should be passed to the Java method (some static method).
             if (!formalParams.isEmpty()) {
-                // stProcTypeDecl.add("types", formalParams.values());
-                // stProcTypeDecl.add("vars", formalParams.keySet());
                 // Here we match what we did with main above by making space
                 // for our arg vector (literally a vector)
                 String[] types = {"std::vector<std::string>"};
                 String[] vars  = {"args"};
                 stProcTypeDecl.add("types", types);
                 stProcTypeDecl.add("vars", vars);
+                if(!("main".equals(currentProcName) && pd.signature().equals(Tag.MAIN_NAME.toString()))) {
+                    stProcTypeDecl.add("types", formalParams.values());
+                    stProcTypeDecl.add("vars", formalParams.keySet());   
+                }
             }
             // The list of local variables defined in the body of a procedure becomes
             // the member variables of the procedure class.
@@ -729,7 +731,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         String newName = Helper.makeVariableName(name, ++localDecId, Tag.LOCAL_NAME);
 
         // If it needs to be a pointer, make it so
-        if(!(ld.type().isPrimitiveType() || ld.type().isArrayType())) {
+        if(ld.type().isBarrierType() || !(ld.type().isPrimitiveType() || ld.type().isArrayType())) {
             Log.log(ld, "appending a pointer specifier to type of " + name);
             type += "*";
         }
@@ -1310,6 +1312,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         
         stInvocation.add("name", pdName);
         stInvocation.add("vars", paramsList);
+        stInvocation.add("anonCounter", procCount);
         
         return stInvocation.render();
     }
@@ -1740,6 +1743,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         
         // Increment the jump label.
         stSyncStat.add("resume0", ++jumpLabel);
+        stSyncStat.add("procName", generatedProcNames.get(currentProcName));
         // Add the jump label to the switch list.
         switchLabelList.add(renderSwitchLabel(jumpLabel));
         

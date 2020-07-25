@@ -190,21 +190,27 @@ Invocation(name, vars) ::= <<
 // 2) vars:
 // 3) parBlock:
 // 4) barrier:
-InvocationProcType(name, vars, parBlock, barrier) ::= <<
+InvocationProcType(name, vars, parBlock, barrier, anonCounter) ::= <<
 <! TODO: how is this going to work? we don't support anonymous processes, and the
  ! closest we might get is passing lambdas as functions to finalize() or other
  ! necessarily-overloaded functions...
  ! ---
  ! The above is the plan (overloaded functions to take lambdas as well as a default)
+ ! but this needs to be discussed with Pedersen first probably, I'm not sure what the
+ ! heck to start doing for finalize. lambdas are possible, so are other things.
+ ! ---
+ ! this also passes the par, which is fine, but the proc itself doesn't account for
+ ! the par in the args it expects... how to fix this?
  !>
  // THIS DOES NOT WORK WITH C++ (InvocationProcType)
-(new <name>(<if(vars)><vars; separator=", "><endif>) {
+<!(new <name>(<if(vars)><vars; separator=", "><endif>) {
     @Override
     public void finalize() {
         <parBlock>.decrement();
         <if(barrier)><barrier:{b | <b>.resign()}; separator=";\n">;<endif>
     }
-}).schedule();
+}).schedule();!>
+this->sched->insert(new <name>(this->id + <anonCounter>, this->sched<if(parBlock)>, <parBlock><endif><if(barrier)>, <barrier><endif>));
 >>
 
 //========================================================================================
@@ -288,11 +294,11 @@ SwitchCase(jump) ::= "case <jump>: goto L<jump>; break;"
 // 5) jump: the label to restart from.
 // 6) barrier:
 ParBlock(name, count, process, body, jump, barrier, procName) ::= <<
-<! TODO: yet to be evaluated and adjusted !>
-<if(barrier)><barrier:{b | <b>.enroll(<count>)}; separator=";\n">;<endif>
 
 <! TODO: is this where the first label should go? !>
 <procName>L0:
+<! TODO: yet to be evaluated and adjusted !>
+<if(barrier)><barrier:{b | <b>->enroll(<count>)}; separator=";\n">;<endif>
 
 <if(body)><body; separator="\n\n"><endif>
 
@@ -387,7 +393,7 @@ ChannelDecl(type) ::= "<if(type)>new <type>()<endif>"
 //========================================================================================
 //
 // 1) count:
-BarrierDecl(count) ::= "new PJBarrier(<if(count)><count><endif>)"
+BarrierDecl(count) ::= "new pj_runtime::pj_barrier(<if(count)><count><endif>)"
 
 // TODO: might not need this...
 //ParDecl(count) ::= <<
@@ -718,14 +724,15 @@ ProtocolAccess(protocName, tag, var, member) ::= <<
 >>
 
 //========================================================================================
-//
+// TODO: this needs the proc name to build the label correctly
 // 1) barrier:
 // 2) resume0:
-SyncStat(barrier, resume0) ::= <<
-<barrier>.sync(this);
-this.runLabel = <resume0>;
+SyncStat(barrier, resume0, procName) ::= <<
+<barrier>->sync(this);
+this->set_label(<resume0>);
 yield();
-label(<resume0>);
+<!label(<resume0>);!>
+<procName><resume0>:
 >>
 
 //========================================================================================
