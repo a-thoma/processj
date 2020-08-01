@@ -98,7 +98,11 @@ namespace pj_runtime
                         this->process->set_ready();
                         return static_cast<int32_t>(i);
                     }
-                    else { std::cout << "timer not timed out\n"; }
+                    else
+                    {
+                        std::cout << "timer not timed out\n";
+                        std::get<pj_runtime::pj_timer*>(this->guards[i])->start();
+                    }
                 }
             }
             return -1;

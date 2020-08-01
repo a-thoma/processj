@@ -71,20 +71,20 @@ int32_t main(void)
     // pj_tests::barrier_test b_test;
     // b_test.run();
 
-    // pj_tests::alt_test a_test;
-    // a_test.run();
+    pj_tests::alt_test a_test;
+    a_test.run();
 
     // pj_tests::record_test r_test;
     // r_test.run();
 
-    // pj_tests::protocol_test p_test;
+    // pj_tests::protocol_test pr_test;
     // p_test.run();
 
     // pj_tests::anonproc_test ap_test;
     // ap_test.run();
 
-    pj_tests::par_test p_test;
-    p_test.run();
+    // pj_tests::par_test p_test;
+    // p_test.run();
 
     // pj_tests::static_method_test sm_test;
     // sm_test.run();

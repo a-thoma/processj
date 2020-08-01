@@ -23,18 +23,14 @@ namespace pj_tests
         {
             switch(get_label())
             {
-                case 0: goto L0;   break;
-                case 1: goto LEND; break;
+                case 0: goto LEND; break;
             }
-        L0:
+        LEND:
             std::cout << "process " << this->id
                       << " writing data " << data << "...\n";
             this->chan->write(this, this->data);
             std::cout << "process " << this->id << " wrote data "
                       << data << std::endl;
-            set_label(1);
-            return;
-        LEND:
             std::cout << "END (proc " << id << ")\n";
             terminate();
             return;
@@ -52,11 +48,11 @@ namespace pj_tests
     public:
         alt_process() = delete;
 
-        alt_process(uint32_t                                           id,
-                    std::vector<pj_runtime::pj_one2one_channel<T>*> chans)
-        : id(id), chans(chans),
-          alt({chans.size(), this})
+        alt_process(uint32_t                             id,
+                    pj_runtime::pj_one2one_channel<T>* chan)
+        : id(id)
         {
+            this->chan = chan;
         }
 
         virtual ~alt_process() = default;
@@ -70,30 +66,32 @@ namespace pj_tests
          */
         void run()
         {
-            static uint32_t i;
             static std::vector<pj_runtime::pj_alt_guard_type> guards;
             static std::vector<bool> b_guards;
             static int32_t enable_result;
             static int32_t disable_result;
+            static bool ready;
+            static pj_runtime::pj_alt alt(1, this);
             switch(this->get_label())
             {
                 case 0: goto L0;   break;
-                case 1: goto L1;   break;
-                case 2: goto LEND; break;
+                case 1: goto LEND; break;
             }
         L0:
             std::cout << "Hello from L0! (process " << this->id
                       << " on cpu " << sched_getcpu() << ")\n";
-            /* TODO: alt constructed here, rest of code to follow */
-            for(i = 0; i < this->chans.size(); ++i)
-            {
-                guards.push_back(chans[i]);
-                b_guards.push_back(true);
+            guards.push_back(chan);
+            b_guards.push_back(true);
+            ready = alt.set_guards(b_guards, guards);
+
+            if(!ready) {
+                std::cout << "RuntimeError: One of the boolean pre-guards must be true!" << std::endl;
+                abort();
             }
+
             this->set_not_ready();
-            alt.set_guards(b_guards, guards);
             enable_result = alt.enable();
-            std::cout << "process " << this->id << "enable_result is " 
+            std::cout << "process " << this->id << ": enable_result is " 
                       << enable_result << std::endl;
             /* NOTE: this condition optimizes the alt's performance
              * ---
@@ -107,7 +105,7 @@ namespace pj_tests
                 set_label(1);
                 return;
             }
-        L1:
+        LEND:
             std::cout << "process " << this->id << ": again, enable_result is "
                       << enable_result << std::endl;
             disable_result = alt.disable(enable_result);
@@ -118,7 +116,7 @@ namespace pj_tests
                 case 0:
                 {
                     /* generated code because choice 0 is a channel */
-                    T x = chans[0]->read(this);
+                    T x = chan->read(this);
                     /* then we do something afterwards (the code after the guard) */
                     std::cout << "process " << this->id << ": doing something with variable "
                               << x << std::endl;
@@ -129,14 +127,11 @@ namespace pj_tests
                 }
                 default:
                 {
-                    std::cout << "process " << this->id 
-                              << ": FATAL ERROR IN ALT: BAD disable_result FROM DISABLE()\n";
-                    abort();
+                    // std::cout << "process " << this->id 
+                    //           << ": FATAL ERROR IN ALT: BAD disable_result FROM DISABLE()\n";
+                    // abort();
                 }
             }
-            set_label(2);
-            return;
-        LEND:
             std::cout << "END (process " << this->id
                       << " on cpu " << sched_getcpu() << ")\n";
             terminate();
@@ -150,8 +145,7 @@ namespace pj_tests
 
     private:
         uint32_t id;
-        std::vector<pj_runtime::pj_one2one_channel<T>*> chans;
-        pj_runtime::pj_alt alt;
+        pj_runtime::pj_one2one_channel<T>* chan;
     };
 
     class alt_timeout_process : public pj_runtime::pj_process
@@ -159,32 +153,32 @@ namespace pj_tests
     public:
         alt_timeout_process() = delete;
 
-        alt_timeout_process(uint32_t                 id,
-                            pj_runtime::pj_timer* timer)
-        : id(id), alt({1, this})
+        alt_timeout_process(uint32_t id)
+        : id(id)
         {
-            this->timer = timer;
+
         }
 
         virtual ~alt_timeout_process() = default;
 
         void run()
         {
+            static pj_runtime::pj_alt alt(1, this);
             static std::vector<pj_runtime::pj_alt_guard_type> guards;
             static std::vector<bool> b_guards;
             static int32_t enable_result;
             static int32_t disable_result;
+            static pj_runtime::pj_timer timer;
             switch(this->get_label())
             {
                 case 0: goto L0;   break;
-                case 1: goto L1;   break;
-                case 2: goto LEND; break;
+                case 1: goto LEND; break;
             }
         L0:
             std::cout << "Hello from L0! (process " << this->id
                       << " on cpu " << sched_getcpu() << ")\n";
             /* TODO: alt constructed here, rest of code to follow */
-            guards.push_back(timer);
+            guards.push_back(&timer);
             b_guards.push_back(true);
             this->set_not_ready();
             alt.set_guards(b_guards, guards);
@@ -203,7 +197,7 @@ namespace pj_tests
                 set_label(1);
                 return;
             }
-        L1:
+        LEND:
             std::cout << "process " << this->id << ": again, enable_result is "
                       << enable_result << std::endl;
             disable_result = alt.disable(enable_result);
@@ -223,14 +217,11 @@ namespace pj_tests
                  */
                 default:
                 {
-                    std::cout << "process " << this->id
-                              << ": FATAL ERROR IN ALT: BAD disable_result FROM DISABLE()\n";
-                    abort();
+                    // std::cout << "process " << this->id
+                    //           << ": FATAL ERROR IN ALT: BAD disable_result FROM DISABLE()\n";
+                    // abort();
                 }
             }
-            set_label(2);
-            return;
-        LEND:
             std::cout << "END (process " << this->id
                       << " on cpu " << sched_getcpu() << ")\n";
             terminate();
@@ -244,8 +235,6 @@ namespace pj_tests
 
     private:
         uint32_t id;
-        pj_runtime::pj_timer* timer;
-        pj_runtime::pj_alt alt;
     };
 
     class alt_skip_process : public pj_runtime::pj_process
@@ -253,35 +242,43 @@ namespace pj_tests
     public:
         alt_skip_process() = delete;
 
-        alt_skip_process(uint32_t      id,
-                         std::string skip)
-        : id(id), alt({1, this})
+        alt_skip_process(uint32_t      id)
+        : id(id)
         {
-            this->skip = skip;
+
         }
 
         virtual ~alt_skip_process() = default;
 
         void run()
         {
+            static pj_runtime::pj_alt alt(1, this);
             static std::vector<pj_runtime::pj_alt_guard_type> guards;
             static std::vector<bool> b_guards;
             static int32_t enable_result;
             static int32_t disable_result;
+            static bool ready;
             switch(this->get_label())
             {
                 case 0: goto L0;   break;
-                case 1: goto L1;   break;
-                case 2: goto LEND; break;
+                case 1: goto LEND; break;
             }
         L0:
             std::cout << "Hello from L0! (process " << this->id
                       << " on cpu " << sched_getcpu() << ")\n";
             /* TODO: alt constructed here, rest of code to follow */
-            guards.push_back(skip);
+            guards.push_back("skip");
             b_guards.push_back(true);
             this->set_not_ready();
-            alt.set_guards(b_guards, guards);
+            ready = alt.set_guards(b_guards, guards);
+
+            if(!ready)
+            {
+                std::cout << "RuntimeError: One of the boolean pre-guards must be true!" << std::endl;
+                abort();
+            }
+
+            this->set_not_ready();
             enable_result = alt.enable();
             std::cout << "process " << this->id << ": enable_result is "
                       << enable_result << std::endl;
@@ -297,7 +294,7 @@ namespace pj_tests
                 set_label(1);
                 return;
             }
-        L1:
+        LEND:
             std::cout << "process " << this->id << ": again, enable_result is "
                       << enable_result << std::endl;
             disable_result = alt.disable(enable_result);
@@ -317,14 +314,11 @@ namespace pj_tests
                  */
                 default:
                 {
-                    std::cout << "process " << this->id
-                              << ": FATAL ERROR IN ALT: BAD disable_result FROM DISABLE()\n";
-                    abort();
+                    // std::cout << "process " << this->id
+                    //           << ": FATAL ERROR IN ALT: BAD disable_result FROM DISABLE()\n";
+                    // abort();
                 }
             }
-            set_label(2);
-            return;
-        LEND:
             std::cout << "END (process " << this->id
                       << " on cpu " << sched_getcpu() << ")\n";
             terminate();
@@ -338,8 +332,6 @@ namespace pj_tests
 
     private:
         uint32_t id;
-        std::string skip;
-        pj_runtime::pj_alt alt;
     };
 
     class alt_test
@@ -356,39 +348,27 @@ namespace pj_tests
             pj_runtime::pj_scheduler sched;
 
             std::cout << "\n *** CREATING CHANNELS FOR ALT GUARDS *** \n\n";
-            std::vector<pj_runtime::pj_one2one_channel<uint32_t>*> chans(1);
-            uint32_t i;
-            for(i = 0; i < chans.size(); ++i)
-            {
-                chans[i] = new pj_runtime::pj_one2one_channel<uint32_t>();
-            }
-
-            std::cout << "\n *** CREATING TIMEOUT FOR ALT GUARDS *** \n\n";
-            /* NOTE: default constructor gives an immediate timeout */
-            pj_runtime::pj_timer* timer = new pj_runtime::pj_timer();
+            pj_runtime::pj_one2one_channel<uint32_t>* chan1 =
+                new pj_runtime::pj_one2one_channel<uint32_t>();
+            pj_runtime::pj_one2one_channel<uint32_t>* chan2 =
+                new pj_runtime::pj_one2one_channel<uint32_t>();
 
             std::cout << "\n *** CREATING PROCESS FOR ALT *** \n\n";
-            alt_process<uint32_t>* a_process = new alt_process<uint32_t>(0, chans);
+            alt_process<uint32_t>* a_process = new alt_process<uint32_t>(0, chan1);
 
-            std::cout << "\n *** CREATING OTHER PROCESSES *** \n\n";
-            alt_writer<uint32_t>* processes[1];
-            for(i = 1; i < 2; ++i)
-            {
-                processes[i - 1] = new alt_writer<uint32_t>(i, chans[i - 1], i);
-            }
+            std::cout << "\n *** CREATING PROCESS FOR ALT ON CHANNEL READ *** \n\n";
+            alt_writer<uint32_t>* process = new alt_writer<uint32_t>(1, chan2, 1);
 
             std::cout << "\n *** CREATING PROCESS FOR ALT ON TIMEOUT *** \n\n";
-            alt_timeout_process* at_process = new alt_timeout_process(2, timer);
+            // alt_timeout_process* at_process = new alt_timeout_process(2, timer);
+            alt_timeout_process* at_process = new alt_timeout_process(2);
 
             std::cout << "\n *** CREATING PROCESS FOR ALT ON SKIP *** \n\n";
-            alt_skip_process* as_process = new alt_skip_process(3, "skip");
+            alt_skip_process* as_process = new alt_skip_process(3);
 
             std::cout << "\n *** SCHEDULING PROCESSES *** \n\n";
             sched.insert(a_process);
-            for(i = 1; i < 2; ++i)
-            {
-                sched.insert(processes[i - 1]);
-            }
+            sched.insert(process);
             sched.insert(at_process);
             sched.insert(as_process);
 
@@ -396,10 +376,8 @@ namespace pj_tests
             sched.start();
 
             std::cout << "\n *** FREEING MEMORY *** \n\n";
-            for(i = 0; i < chans.size(); ++i)
-            {
-                delete chans[i];
-            }
+            delete chan2;
+            delete chan1;
         }
     };
 }
