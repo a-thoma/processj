@@ -392,13 +392,13 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             if (!formalParams.isEmpty()) {
                 // Here we match what we did with main above by making space
                 // for our arg vector (literally a vector)
-                if("main".equals(currentProcName) && pd.signature().equals(Tag.MAIN_NAME.toString())) {
+                if ("main".equals(currentProcName) && pd.signature().equals(Tag.MAIN_NAME.toString())) {
                     String[] types = {"std::vector<std::string>"};
                     String[] vars  = {"args"};
                     stProcTypeDecl.add("types", types);
                     stProcTypeDecl.add("vars", vars);
                 }
-                if(!("main".equals(currentProcName) && pd.signature().equals(Tag.MAIN_NAME.toString()))) {
+                if (!("main".equals(currentProcName) && pd.signature().equals(Tag.MAIN_NAME.toString()))) {
                     stProcTypeDecl.add("types", formalParams.values());
                     stProcTypeDecl.add("vars", formalParams.keySet());   
                 }
@@ -978,6 +978,8 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         
         stChanWriteStat.add("chanName", chanWriteName);
         stChanWriteStat.add("writeExpr", expr);
+        Log.log(cw, "proc name is " + currentProcName + ", = " + generatedProcNames.get(currentProcName));
+        stChanWriteStat.add("procName", generatedProcNames.get(currentProcName));
         
         // Add the switch block for resumption.
         for (int label = 0; label < countLabel; ++label) {
@@ -1294,9 +1296,37 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         Sequence<Expression> parameters = in.params();
         String[] paramsList = (String[]) parameters.visit(this);
         if (paramsList != null) {
-            for (int i = 0; i < paramsList.length; ++i)
+            for (int i = 0; i < paramsList.length; ++i) {
                 paramsList[i] = paramsList[i].replace(DELIMITER, "");
+            }
         }
+
+        // We need to extract the types of the original proc we're
+        // extending in-line to construct the correct overloaded constructor
+        // (and to call the base constructor with the correct arguments)
+        // Invocation -> ProcTypeDecl -> Sequence<ParamDecl>
+        // in         .  targetProc   .  formalParams()
+        Sequence<ParamDecl> formalParams = in.targetProc.formalParams();
+        String[] typesList = new String[formalParams.size()];
+        for (int i = 0; i < formalParams.size(); ++i) {
+            Type t = (Type) ((ParamDecl)formalParams.child(i)).type();
+            typesList[i] = (String)t.visit(this);
+
+            if(t.isBarrierType() || !(t.isPrimitiveType() || t.isArrayType())) {
+                Log.log(pd, "appending a pointer specifier to type of " + ((ParamDecl)formalParams.child(i)).name());
+                typesList[i] += "*";
+            }
+        }
+
+        // if (formalParams != null && formalParams.size() > 0) {
+        //     String[] typesList = new String[formalParams.size()];
+        //     Log.log("FORMAL PARAMS NOT NULL (size is " + formalParams.size() + ").");
+        //     for (int i = 0; i < formalParams.size(); ++i) {
+        //         Log.log(in, "invocation's original class formal param found: " + formalParams.child(i).type());
+        //         typesList[i] = formalParams.child(i).type().visit(this);
+        //         Log.log(in, "visiting returned " + typesList[i]);
+        //     }
+        // }
         
         // For an invocation of a procedure that yields and one which
         // is not inside par-block, we wrap the procedure in a par-block.
@@ -1312,8 +1342,14 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             stInvocation = stGroup.getInstanceOf("InvocationProcType");
             stInvocation.add("parBlock", currentParBlock);
             // Add the barrier this procedure should resign from.
-            if (!barrierList.isEmpty())
+            if (!barrierList.isEmpty()) {
                 stInvocation.add("barrier", barrierList);
+                stInvocation.add("vars", barrierList);
+                stInvocation.add("types", "pj_runtime::pj_barrier*");
+            }
+
+            // Add the types for our vars
+            stInvocation.add("types", typesList);
             // Add the proc count that we'll need for id generation
             stInvocation.add("anonCounter", procCount);
         } else
@@ -1322,6 +1358,8 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         
         stInvocation.add("name", pdName);
         stInvocation.add("vars", paramsList);
+
+        Log.log(in, "Leaving visitInvocation()");
         
         return stInvocation.render();
     }
@@ -1874,7 +1912,8 @@ public class CodeGeneratorCPP extends Visitor<Object> {
                     cr = (ChannelReadExpr) ((Assignment) e).right();
                 guards.add((String) cr.channel().visit(this));
             } else if (stat instanceof SkipStat)
-                guards.add(PJAlt.class.getSimpleName() + ".SKIP");
+                // guards.add(PJAlt.class.getSimpleName() + ".SKIP");
+                guards.add("pj_runtime::pj_alt::SKIP");
             
             altCases.add((String) ac.visit(this));
         }
@@ -1898,10 +1937,20 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         
         stAltStat.add("alt", newName);
         stAltStat.add("count", cases.size());
-        stAltStat.add("initBooleanGuards", stBooleanGuards.render());
-        stAltStat.add("initGuards", stObjectGuards.render());
-        stAltStat.add("bguards", "booleanGuards");
-        stAltStat.add("guards", "objectGuards");
+        // stAltStat.add("initBooleanGuards", stBooleanGuards.render());
+        // stAltStat.add("initGuards", stObjectGuards.render());
+        // stAltStat.add("bguards", "booleanGuards");
+        // stAltStat.add("guards", "objectGuards");
+        // need to reroute these to be declared/initialized before the switch-case
+        localParams.put("boolean_guards", "std::vector<bool>");
+        localInits.put("boolean_guards", stBooleanGuards.render());
+        localParams.put("object_guards", "std::vector<pj_runtime::pj_alt_guard_type>");
+        localInits.put("object_guards", stObjectGuards.render());
+        localParams.put("alt_ready", "bool");
+        localInits.put("alt_ready", "false");
+        localParams.put("selected", "int");
+        localInits.put("selected", "-1");
+        stAltStat.add("procName", generatedProcNames.get(currentProcName));
         stAltStat.add("jump", ++jumpLabel);
         stAltStat.add("cases", altCases);
         stAltStat.add("index", n.visit(this));
@@ -1946,9 +1995,10 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         if (t.isNamedType()) {
             NamedType nt = (NamedType) t;
             baseType = (String) nt.visit(this);
-        } else if (t.isPrimitiveType()) // This is needed because we can only have wrapper class.
+        } else if (t.isPrimitiveType()) { // This is needed because we can only have wrapper class.
             // baseType = Helper.getWrapperType(t);
-        baseType = getCPPChannelType(t);
+            baseType = getCPPChannelType(t);
+        }
         
         return baseType;
     }
@@ -2077,6 +2127,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         
         stChannelReadExpr.add("lhs", lhs);
         stChannelReadExpr.add("op", op);
+        stChannelReadExpr.add("procName", generatedProcNames.get(currentProcName));
         
         return stChannelReadExpr.render();
     }
