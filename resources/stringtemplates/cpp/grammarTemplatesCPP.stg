@@ -189,7 +189,7 @@ Invocation(name, vars) ::= <<
 // 2) vars:
 // 3) parBlock:
 // 4) barrier:
-InvocationProcType(name, vars, parBlock, barrier, anonCounter) ::= <<
+InvocationProcType(name, vars, types, parBlock, barrier, anonCounter) ::= <<
 <! TODO: how is this going to work? we don't support anonymous processes, and the
  ! closest we might get is passing lambdas as functions to finalize() or other
  ! necessarily-overloaded functions...
@@ -213,19 +213,28 @@ InvocationProcType(name, vars, parBlock, barrier, anonCounter) ::= <<
 class <name>_overload_finalize : public <name>
 {
 public:
-    <name>_overload_finalize(int32_t id, pj_runtime::pj_scheduler* sched<if(barrier)>, pj_runtime::pj_barrier* <barrier><endif>)
+    <!<name>_overload_finalize(int32_t id, pj_runtime::pj_scheduler* sched<if(barrier)>, pj_runtime::pj_barrier* <barrier><endif>)
     : <name>{id, sched<if(barrier)>, <barrier><endif>}
+    {
+
+    }!>
+    <name>_overload_finalize(int32_t id, pj_runtime::pj_scheduler* sched<if(vars)>, <types,vars:{t,v | <t> <v>}; separator=", "><endif>)
+    : <name>{id, sched<if(vars)>, <vars; separator=", "><endif>}
     {
 
     }
 
+    // my vars are <if(vars)><types,vars:{t,v | <t> <v>}; separator=", "><endif>
     virtual void finalize()
     {
         <if(parBlock)><parBlock>->decrement();<endif>
         <if(barrier)><barrier:{b | <b>->resign()}; separator="\n">;<endif>
     }
 };
-this->sched->insert(new <name>_overload_finalize(this->id + <anonCounter>, this->sched<if(barrier)>, <barrier><endif>));
+<!this->sched->insert(new <name>_overload_finalize(this->id + <anonCounter>, this->sched<if(barrier)>, <
+barrier><endif>));!>
+
+this->sched->insert(new <name>_overload_finalize(this->id + <anonCounter>, this->sched<if(vars)>, <vars; separator=", "><endif>));
 >>
 
 //========================================================================================
@@ -474,11 +483,12 @@ label(<resume0>);
 // 1) chaName: name of the write channel-end.
 // 2) resume0:
 // 3) resume1:
-ChanWriteStat(chanName, writeExpr, resume0) ::= <<
+ChanWriteStat(chanName, writeExpr, procName, resume0) ::= <<
 <chanName>->write(this, <writeExpr>);
-this->runLabel = <resume0>;
+this->set_label(<resume0>);
 yield();
-label(<resume0>);<\n>
+
+<procName>L<resume0>:<\n>
 >>
 
 //========================================================================================
@@ -486,26 +496,26 @@ label(<resume0>);<\n>
 // 1) chaName: name of the write channel-end.
 // 2) resume0:
 // 3) resume1:
-ChannelReadExpr(chanName, lhs, op, resume0, resume1, extendRv) ::= <<
-if (!<chanName>.isReadyToRead(this)) {
-    this.runLabel = <resume0>;
+ChannelReadExpr(chanName, lhs, op, procName, resume0, resume1, extendRv) ::= <<
+if (!<chanName>->is_ready_to_read(this)) {
+    this->set_label(<resume0>);
     yield();
 }
 
-label(<resume0>);
+<procName>L<resume0>:
 <if(extendRv)> // Do we have a rendezvous?
-<lhs> <op> <chanName>.preReadRendezvous(this);
+<lhs> <op> <chanName>->pre_read_rendezvous(this);
 <extendRv>
-<chanName>.postReadRendezvous(this);
+<chanName>->post_read_rendezvous(this);
 <else>
-<if(lhs)><lhs> <op> <chanName>.read(this);
-<else><chanName>.read(this);
+<if(lhs)><lhs> <op> <chanName>->read(this);
+<else><chanName>->read(this);
 <endif>
 <endif>
-this.runLabel = <resume1>;
+this->set_label(<resume1>);
 yield();
 
-label(<resume1>);<!-- remove 'line-feed' --!>
+<procName>L<resume1>:<!-- remove 'line-feed' --!>
 >>
 
 //========================================================================================
@@ -839,29 +849,28 @@ case <number>:
 // 7) jump:
 // 8) cases:
 // 9) index:
-AltStat(alt, count, initBooleanGuards, initGuards, bguards, guards, jump, cases, index) ::= <<
+AltStat(alt, count, bguards, guards, procName, jump, cases, index) ::= <<
 // pj_runtime::pj_alt* <alt> = new PJAlt(<count>, this); // this has been abstracted to the run() method
 // THE BELOW also needs to go before the switchStat as method-static locals
-<initBooleanGuards>
-<initGuards>
-boolean ready = <alt>.setGuards(<bguards>, <guards>);
+<! TODO: redirect these to the proc so they can be included in the static inits before the switchcase !>
 
+alt_ready = <alt>->set_guards(boolean_guards, object_guards);
 
-
-if (!ready) {
-    System.out.println("RuntimeError: One of the boolean pre-guards must be true!");
-    System.exit(1);
+if (!alt_ready) {
+    std::cout \<\< "RuntimeError: One of the boolean pre-guards must be true!" \<\< std::endl;
+    abort();
 }
 
-this.setNotReady();
-<index> = <alt>.enable();
-this.runLabel = <jump>;
+this->set_not_ready();
+<index> = <alt>->enable();
+this->set_label(<jump>);
 yield();
 
-label(<jump>);
-int selected = <alt>.disable(<index>);
+<procName>L<jump>:
+selected = <alt>->disable(<index>);
 
-switch(selected) {
+switch(selected)
+{
     <cases; separator="\n">
     default:
         break;
@@ -874,14 +883,14 @@ switch(selected) {
 // 2) constants:
 BooleanGuards(locals, constants) ::= <<
 <if(locals)><locals; separator="\n"><endif>
-<if(constants)>boolean[] booleanGuards = { <constants; separator=", "> };<endif>
+<if(constants)>{ <constants; separator=", "> }<endif>
 >>
 
 //========================================================================================
 //
 // 1) guards:
 ObjectGuards(guards) ::= <<
-<if(guards)>Object[] objectGuards = { <guards; separator=", "> };<endif>
+<if(guards)>{ <guards; separator=", "> }<endif>
 >>
 
 //========================================================================================
