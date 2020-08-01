@@ -884,8 +884,9 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         Log.log(li, "Visiting a Primitive Literal (" + li.getText() + ")");
         
         ST stPrimitiveLiteral = stGroup.getInstanceOf("PrimitiveLiteral");
-        if (li.isSuffixed())
+        if (li.isSuffixed()) {
             stPrimitiveLiteral.add("type", li.suffix());
+        }
         stPrimitiveLiteral.add("value", li.getText());
         
         return stPrimitiveLiteral.render();
