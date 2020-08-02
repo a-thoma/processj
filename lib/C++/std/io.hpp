@@ -8,10 +8,30 @@ public:
         std::cout << std::endl;
     }
 
-    template<typename T>
-    static void println(T v)
+    template <typename T>
+    static void println(T arg)
     {
-        std::cout << v << std::endl;
+        std::cout << arg << std::endl;
+    }
+
+    template <typename T, typename... Args>
+    static void println(T arg, Args... args)
+    {
+        std::cout << arg;
+        println(args...);
+    }
+
+    template <typename T>
+    static void print(T arg)
+    {
+        std::cout << arg;
+    }
+
+    template <typename T, typename... Args>
+    static void print(T arg, Args... args)
+    {
+        std::cout << arg;
+        print(args...);
     }
 
     // TODO: what is a byte in c++, a char...? flesh this out

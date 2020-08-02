@@ -13,6 +13,7 @@ import namechecker.ResolveImports;
 import parser.parser;
 import printers.ParseTreePrinter;
 import rewriters.CastRewrite;
+import rewriters.IOCallsRewrite;
 import scanner.Scanner;
 import utilities.CompilerErrorManager;
 import utilities.ConfigFileReader;
@@ -265,6 +266,12 @@ public class ProcessJc {
 //            else
 //            	;
             
+            // rewriter for io and print calls, mapping '+' to ','
+            if (Settings.language == Language.CPLUS) {
+                System.out.println("-- rewriting print() and println() calls.");
+                c.visit(new rewriters.IOCallsRewrite());
+            }
+
             // switch on language requested
             if(Settings.language == Language.JVM) {
             	System.out.println("Generating code for the JVM");
