@@ -39,7 +39,7 @@ public class IOCallsRewrite extends Visitor<AST> {
 					if (checkForString((BinaryExpr)params.child(i)) == true) {
 						rewritten = true;
 						Log.log(in, "string concatenation found, rewriting.");
-						newParams.merge(this.extractParams((BinaryExpr)params.child(i)));	
+						newParams.merge(rebuildParams(extractParams((BinaryExpr)params.child(i))));
 					}
 				}
 			}
@@ -59,26 +59,69 @@ public class IOCallsRewrite extends Visitor<AST> {
 	}
 
 	public Sequence<Expression> extractParams(BinaryExpr be) {
-		Log.log(be, "Rewriting binary expression " + be.toString() + " to use , instead of +");
+		Log.log(be, "Extracting Parameters from " + be.toString());
+
+		Log.log(be, "Left is " + be.left().toString() + ", right is " + be.right().toString());
 
 		Sequence<Expression> newParams = new Sequence<Expression>();
+
 		if (be.left() instanceof BinaryExpr) {
 			newParams.merge(extractParams((BinaryExpr)be.left()));
-		} else {
+		} else if (be.left() instanceof PrimitiveLiteral) {
 			newParams.append(be.left());
 		}
 
-		if (be.right() instanceof BinaryExpr) {
-			newParams.merge(extractParams((BinaryExpr)be.right()));
-		} else {
-			newParams.append(be.right());
+		newParams.append(be.right());
+
+		return newParams;
+	}
+
+	public Sequence<Expression> rebuildParams(Sequence<Expression> params) {
+		Log.log("rebuilding params from sequence:");
+		for (int i = 0; i < params.size(); ++i) {
+			Log.log(params.child(i).toString());
 		}
 
-		Log.log(be, "Got new params:");
-		for (int i = 0; i < newParams.size(); ++i) {
-			Log.log(be, newParams.child(i).toString());
+		Sequence<Expression> rebuiltParams = new Sequence<Expression>();
+		Expression left = null;
+		BinaryExpr be = null;
+
+		// parse the params and rebuilt our arguments the correct way
+		for (int i = 0; i < params.size(); ++i) {
+			Log.log("Checking " + params.child(i));
+			if (params.child(i) instanceof PrimitiveLiteral &&
+				((PrimitiveLiteral)params.child(i)).getKind() == PrimitiveLiteral.StringKind) {
+				Log.log(params.child(i).toString() + " is string PrimitiveLiteral, appending as argument");
+				if (be != null) {
+					Log.log("Appending new BinaryExpr " + be.toString() + " to rebuiltParams");
+					rebuiltParams.append(be);
+					be = null;
+				} else if (left != null) {
+					Log.log("Appending unfinished lhs of BinaryExpr " + left.toString() + " to rebuiltParams");
+					rebuiltParams.append(left);
+					left = null;
+				}
+				Log.log("Appending " + params.child(i).toString() + " to rebuiltParams");
+				rebuiltParams.append(params.child(i));
+			} else {
+				Log.log(params.child(i).toString() + " is not string PrimitiveLiteral");
+				if (be != null) {
+					Log.log("Appending " + params.child(i).toString() + " to existing binaryExpr");
+					be = new BinaryExpr(be, params.child(i), BinaryExpr.PLUS);
+				} else if (left != null) {
+					Log.log("Appending " + params.child(i).toString() + " as rhs of new binaryExpr");
+					be = new BinaryExpr(left, params.child(i), BinaryExpr.PLUS);
+				} else if (i == params.size() - 1) {
+					Log.log("Last item in params, adding as next argument");
+					rebuiltParams.append(params.child(i));
+				} else {
+					Log.log("Adding " + params.child(i).toString() + " as lhs of potential BinaryExpr");
+					left = params.child(i);
+				}
+			}
 		}
-		return newParams;
+
+		return rebuiltParams;
 	}
 
 	public boolean checkForString(BinaryExpr be) {
