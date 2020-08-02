@@ -269,7 +269,7 @@ public class ProcessJc {
             // rewriter for io and print calls, mapping '+' to ','
             if (Settings.language == Language.CPLUS) {
                 System.out.println("-- rewriting print() and println() calls.");
-                c.visit(new rewriters.IOCallsRewrite());
+                c.visit(new rewriters.IOCallsRewrite());   
             }
 
             // switch on language requested

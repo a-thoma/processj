@@ -1,0 +1,6 @@
+import std.io;
+
+public void main(string[] args) {
+	println("Hello from " + "hello!");
+	println(69 + 420);
+}

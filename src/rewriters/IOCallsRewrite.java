@@ -29,13 +29,18 @@ public class IOCallsRewrite extends Visitor<AST> {
 		}
 
 		if (in.params() != null) {
+			boolean rewritten = false;
 			Sequence<Expression> params = in.params();
 			Sequence<Expression> newParams = new Sequence<Expression>();
 			Log.log(in, "Invocation of " + in.toString() + " has argument(s):");
 			for (int i = 0; i < params.size(); ++i) {
 				if (params.child(i) instanceof BinaryExpr) {
 					Log.log(in, params.child(i).toString());
-					newParams.merge(this.extractParams((BinaryExpr)params.child(i)));
+					if (checkForString((BinaryExpr)params.child(i)) == true) {
+						rewritten = true;
+						Log.log(in, "string concatenation found, rewriting.");
+						newParams.merge(this.extractParams((BinaryExpr)params.child(i)));	
+					}
 				}
 			}
 
@@ -45,7 +50,9 @@ public class IOCallsRewrite extends Visitor<AST> {
 			}
 
 			// TODO: is this appropriate? is there another way?
-			in.children[2] = newParams;
+			if(rewritten == true) {
+				in.children[2] = newParams;	
+			}
 		}
 
 		return null;
@@ -72,5 +79,36 @@ public class IOCallsRewrite extends Visitor<AST> {
 			Log.log(be, newParams.child(i).toString());
 		}
 		return newParams;
+	}
+
+	public boolean checkForString(BinaryExpr be) {
+		Log.log(be, "Checking for string concatenation versus addition");
+
+		// Check if the lhs is a string
+		if (be.left() instanceof PrimitiveLiteral) {
+			if(((PrimitiveLiteral)be.left()).getKind() == PrimitiveLiteral.StringKind) {
+				return true;
+			}
+		}
+		// Now the rhs
+		if (be.right() instanceof PrimitiveLiteral) {
+			if(((PrimitiveLiteral)be.right()).getKind() == PrimitiveLiteral.StringKind) {
+				return true;
+			}
+		}
+
+		// recursively check on left and right
+		boolean left = false;
+		boolean right = false;
+
+		if (be.left() instanceof BinaryExpr) {
+			left = checkForString((BinaryExpr)be.left());
+		}
+
+		if(be.right() instanceof BinaryExpr) {
+			right = checkForString((BinaryExpr)be.right());
+		}
+
+		return false | left | right;
 	}
 }
