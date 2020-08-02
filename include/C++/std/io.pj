@@ -13,6 +13,7 @@ public native void println(long l);
 public native void println(float f);
 public native void println(double d);
 
+public native void print();
 public native void print(string s);
 public native void print(byte b);
 public native void print(short s);

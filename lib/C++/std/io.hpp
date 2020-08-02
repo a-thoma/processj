@@ -23,7 +23,7 @@ public:
 
     static void print()
     {
-        return;
+        std::cout << "";
     }
 
     template <typename T>
