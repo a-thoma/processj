@@ -29,6 +29,11 @@ public class IOCallsRewrite extends Visitor<AST> {
 		}
 
 		if (in.params() != null) {
+			if(in.params().size() == 0) {
+				Log.log(in, "Params are empty");
+				return in;
+			}
+			
 			boolean rewritten = false;
 			Sequence<Expression> params = in.params();
 			Sequence<Expression> newParams = new Sequence<Expression>();
@@ -55,7 +60,7 @@ public class IOCallsRewrite extends Visitor<AST> {
 			}
 		}
 
-		return null;
+		return in;
 	}
 
 	public Sequence<Expression> extractParams(BinaryExpr be) {
