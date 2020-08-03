@@ -8,6 +8,11 @@
 ##                                                                          ##
 ##############################################################################
 
+# make sure we don't continue on if something in this script doesn't work right
+# TODO: rewrite this script to use the benefits of set -e -o pipefail while
+# still printing errors... if that's possible.
+# set -e -o pipefail
+
 homedir=~
 eval homedir=$homedir
 
@@ -109,6 +114,10 @@ else
   echo "$ERRORS"
   # exit 1
 fi
+
+# temporary stop until I get an actual flag somehow that says "oh hey you should
+# just generate C++ code and not build the binary"
+# exit 0
 
 # TODO: make this generate c++ code
 # ---
