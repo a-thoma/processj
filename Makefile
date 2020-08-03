@@ -42,4 +42,4 @@ $(RUNTIMEDIR)lib/pj_utilities.o: $(RUNTIMEDIR)src/utilities/pj_utilities.cpp $(R
 # 	g++ $(CPPFLAGS) -o $@ $< $(RUNTIMEFLAGS)
 
 clean:
-	rm -rf $(RUNTIMEDIR)lib/libprocessj.a pj_runtime testbed $(NAME)
+	rm -rf $(RUNTIMEDIR)lib/* pj_runtime testbed $(NAME)
