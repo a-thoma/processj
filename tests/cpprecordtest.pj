@@ -1,0 +1,44 @@
+import std.io;
+
+public record Animal {
+	string kind;
+	int legs;
+	string sound;
+}
+
+public record Human extends Animal {
+	string firstname;
+	string lastname;
+	int age;
+}
+
+public void main(string[] args) {
+	Animal a = new Animal {
+		kind = "dog",
+		legs = 4,
+		sound = "vov"
+	};
+
+	println("This is a " + a.legs + "-legged " + a.kind + " that goes " + a.sound + ".");
+
+	Human h = new Human {
+		kind = "human",
+		legs = 2,
+		sound = "Hello!",
+		firstname = "Alex",
+		lastname = "Thomason",
+		age = 24
+	};
+
+	println("This is " + h.age + "-year-old " + h.firstname + " " + h.lastname + ".");
+	println("For reasons unknown, we would like to inform you that they have " + h.legs + " legs, are definitely a " + h.kind + ", and would like to say " + h.sound);
+
+	Animal h2 = new Human {
+		kind = "human",
+		legs = 2,
+		sound = "Goodbye!",
+		firstname = "Ben",
+		lastname = "Zofcin",
+		age = 23
+	};
+}
