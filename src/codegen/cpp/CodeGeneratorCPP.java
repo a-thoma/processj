@@ -1345,8 +1345,8 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             // Add the barrier this procedure should resign from.
             if (!barrierList.isEmpty()) {
                 stInvocation.add("barrier", barrierList);
-                stInvocation.add("vars", barrierList);
-                stInvocation.add("types", "pj_runtime::pj_barrier*");
+                // stInvocation.add("vars", barrierList);
+                // stInvocation.add("types", "pj_runtime::pj_barrier*");
             }
 
             // Add the types for our vars
@@ -1597,7 +1597,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         Log.log(rl, "Visiting a RecordLiteral (" + rl.name().getname() + ")");
         
         // Generated template after evaluating this visitor.
-        ST stRecordListeral = stGroup.getInstanceOf("RecordLiteral");
+        ST stRecordLiteral = stGroup.getInstanceOf("RecordLiteral");
         String type = (String) rl.name().visit(this);
         
         // This map is used to determine the order in which values
@@ -1626,10 +1626,10 @@ public class CodeGeneratorCPP extends Visitor<Object> {
                 ; // We should never get here.
         }
         
-        stRecordListeral.add("type", type);
-        stRecordListeral.add("vals", members.values());
+        stRecordLiteral.add("type", type);
+        stRecordLiteral.add("vals", members.values());
         
-        return stRecordListeral.render();
+        return stRecordLiteral.render();
     }
     
     @Override
