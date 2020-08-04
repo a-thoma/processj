@@ -109,7 +109,7 @@ int main(<if(vars)><types,vars:{t,v | <t> <v>}; separator=", ">[]<endif>)
 // 8) switchBlock: switch statement to jump through blocks to resume points.
 // 9) syncBody: the body (content) of synchronized method that runs/starts a process.
 // TODO: add altDecl/altSize to this
-ProcClass(name, types, vars, ltypes, lvars, linits, methods, main, parDecl, parSize, altDecl, altSize, switchBlock, syncBody) ::= <<
+ProcClass(name, types, vars, ltypes, lvars, linits, methods, main, switchBlock, syncBody) ::= <<
 class <name> : public pj_runtime::pj_process
 {
 
@@ -145,12 +145,9 @@ public:
         <! -------- Instance variables for local parameters -------- !>
         // local variables
         <if(lvars)><ltypes,lvars,linits:{t,v,i | static <t> <v> = <i>}; separator=";\n">;<\n><endif>
-        <!<if(parDecl && parSize)>static pj_runtime::pj_par* <parDecl> = new pj_runtime::pj_par(<parSize>, this);<endif>!>
-        <!<if(altDecl && altSize)> static pj_runtime::pj_alt* <altDecl> = new pj_runtime::pj_alt(<altSize>, this);<endif>!>
 
         <if(switchBlock)><switchBlock; separator="\n"><endif>
         <if(syncBody)><syncBody; separator="\n"><endif>
-        <!<if(parDecl && parSize)>delete <parDecl>;<endif>!>
         terminate();
         return;
     }

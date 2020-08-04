@@ -66,12 +66,6 @@ public class CodeGeneratorCPP extends Visitor<Object> {
     private int procCount = 0;
 
     private int protocolCaseIndex = 0;
-
-    // Contains par block objects mapped to their names
-    private HashMap<Object, String> parBlockNames = new LinkedHashMap<Object, String>();
-
-    // Contains par block objects mapped to the number of processes in them
-    private HashMap<Object, Integer> parBlockSizes = new LinkedHashMap<Object, Integer>();
     
     // All imports are kept in this table.
     private HashSet<String> importFiles = new LinkedHashSet<String>();
@@ -321,30 +315,6 @@ public class CodeGeneratorCPP extends Visitor<Object> {
                 // Visit all declarations that appear in the procedure.
                 String[] body = (String[]) pd.body().visit(this);
 
-                // if we have a parblock, we need to get some information using it
-                for (int i = 0; i < pd.body().nchildren; i++) {
-                    if (pd.body().children[i] instanceof Sequence) {
-                        for (int j = 0; j < ((Sequence)pd.body().children[i]).size(); j++) {
-
-                            if(((Sequence)pd.body().children[i]).child(j) instanceof ParBlock) {
-                                // get the generated name from the hashmap of names
-                                String parName = parBlockNames.get(((ParBlock)((Sequence)pd.body().children[i]).child(j)));
-                                Log.log(pd, "ParBlock registered with name " + parName);
-                                // add the name to the template
-                                stProcTypeDecl.add("parDecl", parName);
-                                // get the Integer size stored (couldn't store bare ints by design of HashMap)
-                                Integer parSize = parBlockSizes.get(((ParBlock)((Sequence)pd.body().children[i]).child(j)));
-                                Log.log(pd, "ParBlock registered with count " + parSize.toString());
-                                // add the size to the template
-                                stProcTypeDecl.add("parSize", parSize.intValue());
-                            }
-                            if(((Sequence)pd.body().children[i]).child(j) instanceof LocalDecl) {
-                                Log.log(pd, "Found LocalDecl " + ((LocalDecl)((Sequence)pd.body().children[i]).child(j)).name());
-                                
-                            }                            
-                        }
-                    }
-                }
                 // The statements that appear in the body of the procedure.
                 stProcTypeDecl.add("syncBody", body);
             } else {
@@ -1705,12 +1675,10 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             barrierList = new ArrayList<String>();
         // Create a name for this new par-block.
         currentParBlock = Helper.makeVariableName(Tag.PAR_BLOCK_NAME.toString(), ++parDecId, Tag.LOCAL_NAME);
-        parBlockNames.put(pb, currentParBlock);
         // Since this is a new par-block, we need to create a variable inside
         // the process in which this par-block was declared.
         stParBlock.add("name", currentParBlock);
         stParBlock.add("count", pb.stats().size());
-        parBlockSizes.put(pb, new Integer(pb.stats().size()));
         stParBlock.add("process", "this");
         stParBlock.add("procName", generatedProcNames.get(currentProcName));
 
