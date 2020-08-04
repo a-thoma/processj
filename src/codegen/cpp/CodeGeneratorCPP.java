@@ -82,8 +82,11 @@ public class CodeGeneratorCPP extends Visitor<Object> {
     // Contains local parameters transformed to fields.
     private HashMap<String, String> localParams = new LinkedHashMap<String, String>();
 
-    // Contains local param inits
+    // Contains local param init statements
     private HashMap<String, String> localInits = new LinkedHashMap<String, String>();
+
+    // Contains local param delete statements
+    private HashMap<String, String> localDeletes = new LinkedHashMap<String, String>();
     
     // Contains record members transformed to fields.
     private HashMap<String, String> recordFields = new LinkedHashMap<String, String>();
@@ -383,7 +386,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             if (!localParams.isEmpty()) {
 
                 Log.log(pd, "sizes are " + localParams.values().size() + ", " + localParams.keySet().size() + ", "
-                            + localInits.values().size());
+                            + localInits.values().size() + ", " + localDeletes.values().size());
 
                 for(int i = 0; i < localParams.values().size(); i++) {
                     Log.log(pd, ((String)localParams.values().toArray()[i]));
@@ -394,9 +397,13 @@ public class CodeGeneratorCPP extends Visitor<Object> {
                 for(int i = 0; i < localInits.values().size(); i++) {
                     Log.log(pd, ((String)localInits.values().toArray()[i]));
                 }
+                for(int i = 0; i < localDeletes.values().size(); i++) {
+                    Log.log(pd, ((String)localDeletes.values().toArray()[i]));
+                }
                 stProcTypeDecl.add("ltypes", localParams.values());
                 stProcTypeDecl.add("lvars", localParams.keySet());
                 stProcTypeDecl.add("linits", localInits.values());
+                stProcTypeDecl.add("ldeletes", localDeletes.values());
             }
             // Add the switch block for resumption.
             if (!switchLabelList.isEmpty()) {
@@ -717,6 +724,9 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         if(ld.type().isBarrierType() || !(ld.type().isPrimitiveType() || ld.type().isArrayType())) {
             Log.log(ld, "appending a pointer specifier to type of " + name);
             type += "*";
+            Log.log(ld, "creating delete statement for " + name);
+            String deleteStmt = "delete " + newName + ";";
+            localDeletes.put(name, deleteStmt);
         }
         localParams.put(newName, type);
         paramDeclNames.put(name, newName);
@@ -1686,6 +1696,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         // process we're in
         localParams.put(currentParBlock, "pj_runtime::pj_par*");
         localInits.put(currentParBlock, "new pj_runtime::pj_par(" + pb.stats().size() + ", this)");
+        localDeletes.put(currentParBlock, "delete " + currentParBlock + ";");
         
         // Increment the jump label.
         stParBlock.add("jump", ++jumpLabel);
@@ -1914,6 +1925,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         String newName = Helper.makeVariableName("alt", ++localDecId, Tag.LOCAL_NAME);
         localParams.put(newName, "pj_runtime::pj_alt*");
         localInits.put(newName, "new pj_runtime::pj_alt(" + cases.size() + ", this)");
+        localDeletes.put(newName, "delete " + newName + ";");
         paramDeclNames.put(newName, newName);
         // -->
         
@@ -1996,6 +2008,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
 
         localParams.clear();
         localInits.clear();
+        localDeletes.clear();
         switchLabelList.clear();
         barrierList.clear();
         

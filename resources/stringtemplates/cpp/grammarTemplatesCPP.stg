@@ -109,7 +109,7 @@ int main(<if(vars)><types,vars:{t,v | <t> <v>}; separator=", ">[]<endif>)
 // 8) switchBlock: switch statement to jump through blocks to resume points.
 // 9) syncBody: the body (content) of synchronized method that runs/starts a process.
 // TODO: add altDecl/altSize to this
-ProcClass(name, types, vars, ltypes, lvars, linits, methods, main, switchBlock, syncBody) ::= <<
+ProcClass(name, types, vars, ltypes, lvars, linits, ldeletes, methods, main, switchBlock, syncBody) ::= <<
 class <name> : public pj_runtime::pj_process
 {
 
@@ -148,6 +148,7 @@ public:
 
         <if(switchBlock)><switchBlock; separator="\n"><endif>
         <if(syncBody)><syncBody; separator="\n"><endif>
+        <if(ldeletes)><ldeletes; separator="\n"><endif>
         terminate();
         return;
     }
