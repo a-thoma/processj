@@ -65,6 +65,8 @@ public class CodeGeneratorCPP extends Visitor<Object> {
     // Counter for anonymous processes generated in a par
     private int procCount = 0;
 
+    private int protocolCaseIndex = 0;
+
     // Contains par block objects mapped to their names
     private HashMap<Object, String> parBlockNames = new LinkedHashMap<Object, String>();
 
@@ -94,6 +96,9 @@ public class CodeGeneratorCPP extends Visitor<Object> {
 
     // Contains protocol names and the corresponding tags currently switched on.
     private Hashtable<String, String> protocolTagsSwitchedOn = new Hashtable<String, String>();
+
+    // Maps protocol case names to indexes
+    private HashMap<String, Integer> protocolCaseNameIndices = new LinkedHashMap<String, Integer>();
     
     // List of switch labels.
     private ArrayList<String> switchLabelList = new ArrayList<String>();
@@ -845,9 +850,10 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         
         String type = (String) nt.name().getname();
         // This is for protocol inheritance.
-        if (nt.type() != null && nt.type().isProtocolType())
+        if (nt.type() != null && nt.type().isProtocolType()) {
             // type = PJProtocolCase.class.getSimpleName();
-            type = "pj_runtime::pj_protocol";
+            type = "pj_runtime::pj_protocol_case";
+        }
 
         return type;
     }
@@ -866,15 +872,18 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         // ProcessJ primitive types that do not translate directly
         // to Java primitive types.
         String typeStr = py.typeName();
-        if (py.isStringType())
+        if (py.isStringType()) {
             // typeStr = "char*";
             typeStr = "std::string";
-        else if (py.isTimerType())
+        } else if (py.isBooleanType()) {
+            typeStr = "bool";
+        } else if (py.isTimerType()) {
             // typeStr = PJTimer.class.getSimpleName();
             typeStr = "pj_runtime::pj_timer";
-        else if (py.isBarrierType())
+        } else if (py.isBarrierType()) {
             // typeStr = PJBarrier.class.getSimpleName();
             typeStr = "pj_runtime::pj_barrier";
+        }
 
         return typeStr;
     }
@@ -1167,7 +1176,8 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             // Silly way to keep track of a protocol tag, however, this
             // should (in theory) _always_ work.
             currentProtocolTag = label;
-            label = "\"" + label + "\"";
+            // label = "\"" + label + "\"";
+            label = Integer.toString(protocolCaseNameIndices.get(sl.expr().toString()));
         }
         stSwitchLabel.add("label", label);
         
@@ -1494,8 +1504,10 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             stProtocolCase.add("types", recordFields.values());
             stProtocolCase.add("vars", recordFields.keySet());
         }
-        
+
         stProtocolCase.add("name", protocName);
+        stProtocolCase.add("index", protocolCaseIndex);
+        protocolCaseNameIndices.put(protocName, protocolCaseIndex++);
         
         return stProtocolCase.render();
     }
@@ -1538,6 +1550,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         }
         
         stProtocolLiteral.add("type", type);
+        stProtocolLiteral.add("protocolType", pl.myTypeDecl.name().getname());
         stProtocolLiteral.add("tag", tag);
         stProtocolLiteral.add("vals", members.values());
         

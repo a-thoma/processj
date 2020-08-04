@@ -617,7 +617,7 @@ SwitchGroup(labels, stats) ::= <<
 // 1) expr:
 // 2) block:
 SwitchStat(expr, block, tag) ::= <<
-switch(<expr><if(tag)>.tag<endif>) {
+switch(<expr><if(tag)>->tag<endif>) {
 <block; separator="\n">
 }
 >>
@@ -707,9 +707,14 @@ RecordAccess(name, member) ::= "<if(name)><name>-><member><endif>"
 // 2) name: the name that uniquely applies and identifies the protocol.
 // 3) body:
 ProtocolClass(modifiers, name, body) ::= <<
-<if(modifiers)><modifiers; separator=" "> <else>protected <endif>static class <name> {
+<!<if(modifiers)><modifiers; separator=" "> <else>protected <endif>static class <name> {
     <body; separator="\n\n">
-}
+}!>
+struct <name> : pj_runtime::pj_protocol
+{
+public:
+    <body; separator="\n\n">
+};
 >>
 
 //========================================================================================
@@ -718,7 +723,7 @@ ProtocolClass(modifiers, name, body) ::= <<
 // 2) name:
 // 3) types:
 // 4) vars:
-ProtocolCase(modifier, name, types, vars) ::= <<
+ProtocolCaseOld(modifier, name, types, vars) ::= <<
 <if(modifier)><modifier> <else>protected <endif>static class <name> extends PJProtocolCase {
     <! -------- Member variables -------- !>
     <if(vars)><types,vars:{t,v | public <t> <v>}; separator=";\n">;<\n><endif>
@@ -731,13 +736,29 @@ ProtocolCase(modifier, name, types, vars) ::= <<
 }
 >>
 
+ProtocolCase(modifier, name, types, vars, index) ::= <<
+struct <name> : public pj_runtime::pj_protocol_case
+{
+public:
+    <name>() = default;
+
+    <name>(<if(vars)><types,vars:{t,v | <t> <v>}; separator=", "><endif>)
+    {
+        <if(vars)><vars:{v | this-><v> = <v>;}; separator="\n"><endif>
+        this->tag = <index>;
+    }
+
+    <if(vars)><types,vars:{t,v | <t> <v>;}; separator="\n"><endif>
+};
+>>
+
 //========================================================================================
 //
 // 1) name:
 // 2) tag:
 // 3) vals:
-ProtocolLiteral(type, tag, vals) ::= <<
-new <type>.<tag>(<if(vals)><vals; separator=", "><endif>)
+ProtocolLiteral(type, protocolType, tag, vals) ::= <<
+new <type>::<tag>(<if(vals)><vals; separator=", "><endif>)
 >>
 
 //========================================================================================
@@ -747,7 +768,7 @@ new <type>.<tag>(<if(vals)><vals; separator=", "><endif>)
 // 3) var:
 // 4) member:
 ProtocolAccess(protocName, tag, var, member) ::= <<
-<if(protocName)>(((<protocName>.<tag>) <var>).<member>)<endif>
+<if(protocName)>reinterpret_cast\<<protocName>::<tag>*>(<var>)-><member><endif>
 >>
 
 //========================================================================================
