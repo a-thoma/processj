@@ -370,8 +370,6 @@ public:
     {
         <if(switchBlock)><switchBlock; separator="\n"><endif>
         <if(syncBody)><syncBody; separator="\n"><endif>
-        <!<if(parBlock)><parBlock>->decrement();<endif>!>
-        <!<if(barrier)><barrier:{b | <b>->resign()}; separator=";\n">;<endif>!>
         terminate();
     }
     <! Finalize method !>
