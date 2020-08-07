@@ -354,25 +354,13 @@ AnonymousProcess(switchBlock, syncBody, parBlock, barrier, ltypes, lvars, name, 
 <! TODO: same as InvocationProcType, doesn't work with C++ at all. need to adjust !>
 class <name> : public pj_runtime::pj_process
 {
-    <! -------- Instance variables for local parameters -------- !>
-    <! TODO: need to figure out what the below set() thing does !>
-    <!<if(lvars)><ltypes,lvars:{t,v | protected <t> <v>}; separator=";\n">;<\n>
-    PJProcess set(<ltypes,lvars:{t,v | <t> <v>}; separator=", ">) {
-        <lvars:{v | this.<v> = <v>}; separator=";\n">;
-        return this;
-    }<\n>
-    <endif>!>
-    <! default constructors, etc !>
 public:
     <name>() = delete;
-    <! TODO: this might be bad spacing later on !>
     <name>(int32_t                      id,
-                      pj_runtime::pj_scheduler* sched<if(parBlock)>,
-                      pj_runtime::pj_par*         par<endif>)
+                      pj_runtime::pj_scheduler* sched)
     : id(id)
     {
         this->sched = sched;
-        <if(parBlock)>this->par = par;<endif>
     }
 
     <! virtual destructor !>
@@ -383,9 +371,8 @@ public:
     {
         <if(switchBlock)><switchBlock; separator="\n"><endif>
         <if(syncBody)><syncBody; separator="\n"><endif>
-        <! TODO: this might be the wrong place to put the decrement/resign... !>
-        <if(parBlock)>this->par->decrement();<endif>
-        <if(barrier)><barrier:{b | <b>.resign()}; separator=";\n">;<endif>
+        <if(parBlock)><parBlock>->decrement();<endif>
+        <if(barrier)><barrier:{b | <b>->resign()}; separator=";\n">;<endif>
         terminate();
     }
     <! Finalize method !>
@@ -402,11 +389,9 @@ public:
 private:
     int32_t id;
     pj_runtime::pj_scheduler* sched;
-    <if(parBlock)>pj_runtime::pj_par* par;<endif>
-    <if(chan)>// chan goes here <endif>
-};<!<if(lvars)>.set(<lvars; separator=", ">)<else>.schedule();<endif>!>
+};
 
-this->sched->insert(new <name>(this->id + <anonCounter>, this->sched<if(parBlock)>, <parBlock><endif>));
+this->sched->insert(new <name>(this->id + <anonCounter>, this->sched));
 >>
 
 //========================================================================================
