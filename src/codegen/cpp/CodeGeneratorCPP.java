@@ -1545,10 +1545,21 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         ST stRecordStruct = stGroup.getInstanceOf("RecordStruct");
         String recName = (String) rt.name().visit(this);
         ArrayList<String> modifiers = new ArrayList<String>();
-        
-        for (Modifier m : rt.modifiers())
+        for (Modifier m : rt.modifiers()) {
             modifiers.add((String) m.visit(this));
-        
+        }
+
+        // Check for any extended records
+        if (rt.extend() != null && rt.extend().size() > 0) {
+            Log.log(rt, "extend not empty.");
+            Sequence<Name> extend = rt.extend();
+            for(int i = 0; i < extend.size(); ++i) {
+                Name n = extend.child(i);
+                Log.log("Found name " + n.simplename());
+                stRecordStruct.add("extend", n.simplename());
+            }
+        }
+
         // Remove fields from record.
         recordFields.clear();
         
@@ -1565,7 +1576,6 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         
         stRecordStruct.add("name", recName);
         stRecordStruct.add("modifiers", modifiers);
-        
         return stRecordStruct.render();
     }
     

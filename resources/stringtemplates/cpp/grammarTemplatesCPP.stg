@@ -650,8 +650,9 @@ RecordClass(modifiers, name, types, vars) ::= <<
 }
 >>
 
-RecordStruct(modifiers, name, types, vars) ::= <<
-struct <name> : public pj_runtime::pj_record
+RecordStruct(modifiers, name, extend, types, vars) ::= <<
+<if(extend)>// extends records <extend:{e | <e>}; separator=", "><endif>
+<if(extend)>struct <name> : <extend:{e | public <e>}; separator=", "><else>struct <name> : public pj_runtime::pj_record<endif>
 {
 public:
     <name>() = default;
