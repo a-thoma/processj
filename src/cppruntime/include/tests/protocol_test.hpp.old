@@ -1,50 +1,22 @@
 #ifndef PROTOCOL_TEST_HPP
 #define PROTOCOL_TEST_HPP
 
-
-/* NO LONGER VALID */
-
 namespace pj_tests
 {
-    class protocol_p
+    struct request
     {
-    public:
-        protocol_p() = delete;
+        int32_t number;
+        double  amount;
+    };
 
-        struct request
-        {
-        public:
+    struct reply
+    {
+        bool status;
+    };
 
-            request() = default;
-
-            request(int number, double amount)
-            : number(number), amount(amount)
-            {
-
-            }
-
-            ~request() = default;
-
-            int number;
-            double amount;
-        };
-
-        struct reply
-        {
-        public:
-
-            reply() = default;
-
-            reply(bool status)
-            : status(status)
-            {
-
-            }
-
-            ~reply() = default;
-
-            bool status;
-        };
+    struct deny
+    {
+        int32_t code;
     };
 
     template <typename T>
@@ -64,7 +36,7 @@ namespace pj_tests
 
         void run()
         {
-            static protocol_p::request req{.number = 0, .amount = 420.69};
+            static struct request req{.number = 0, .amount = 420.69};
             data = req;
             switch(get_label())
             {
@@ -117,8 +89,8 @@ namespace pj_tests
 
         void run()
         {
-            static protocol_p::request req;
-            static protocol_p::reply   rep;
+            static struct request req;
+            static struct reply   rep;
             switch(get_label())
             {
                 case 0: goto L0;   break;
@@ -141,16 +113,16 @@ namespace pj_tests
         L1:
             std::cout << "reading data...\n";
             data = this->chan->read(this);
-            if(std::holds_alternative<protocol_p::request>(data))
+            if(std::holds_alternative<struct request>(data))
             {
                 std::cout << "reader received a request\n";
-                req = std::get<protocol_p::request>(data);
+                req = std::get<struct request>(data);
                 std::cout << req.number << ", " << req.amount << std::endl;
             }
-            else if(std::holds_alternative<protocol_p::reply>(data))
+            else if(std::holds_alternative<struct reply>(data))
             {
                 std::cout << "reader received a reply\n";
-                rep = std::get<protocol_p::reply>(data);
+                rep = std::get<struct reply>(data);
                 std::cout << std::boolalpha << rep.status << std::endl;
             }
             set_label(2);
@@ -208,13 +180,13 @@ namespace pj_tests
             pj_runtime::pj_scheduler sched;
 
             std::cout << "\n *** CREATING CHANNEL FOR PROTOCOL *** \n\n";
-            pj_runtime::pj_one2one_channel<pj_runtime::pj_protocol<protocol_p::request, protocol_p::reply>> oto_ch;
+            pj_runtime::pj_one2one_channel<pj_runtime::pj_protocol<struct request, struct reply>> oto_ch;
 
             std::cout << "\n *** CREATING READER AND WRITER PROCESSES *** \n\n";
             auto* oto_w =
-                new protocol_writer<pj_runtime::pj_protocol<protocol_p::request, protocol_p::reply>>(0, &oto_ch);
+                new protocol_writer<pj_runtime::pj_protocol<struct request, struct reply>>(0, &oto_ch);
             auto* oto_r =
-                new protocol_reader<pj_runtime::pj_protocol<protocol_p::request, protocol_p::reply>>(1, &oto_ch);
+                new protocol_reader<pj_runtime::pj_protocol<struct request, struct reply>>(1, &oto_ch);
 
             std::cout << "\n *** SCHEDULING PROCESSES *** \n\n";
             sched.insert(oto_w);

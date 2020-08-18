@@ -18,5 +18,6 @@
 #include <runtime/pj_record.hpp>
 #include <runtime/pj_protocol.hpp>
 #include <runtime/pj_par.hpp>
+#include <runtime/pj_array.hpp>
 
 #endif

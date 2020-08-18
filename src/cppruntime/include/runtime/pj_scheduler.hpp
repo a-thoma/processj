@@ -292,9 +292,6 @@ namespace pj_runtime
                 abort();
             }
 
-
-            perror("pthread_setaffinity_np");
-
             lock.lock();
             std::cout << "verifying thread " << th_id << "'s cpu_set...\n";
             lock.unlock();
