@@ -1,0 +1,10 @@
+import std.io;
+
+public void main(string[] args) {
+	int x[] = new int[]{1, 2, 3, 4};
+	for(int i = 0; i < x.size; i++)
+	{
+		print(x[i] + ", ");
+	}
+	println();
+}
