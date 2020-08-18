@@ -721,7 +721,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         String newName = Helper.makeVariableName(name, ++localDecId, Tag.LOCAL_NAME);
 
         // If it needs to be a pointer, make it so
-        if(ld.type().isBarrierType() || !(ld.type().isPrimitiveType() || ld.type().isArrayType())) {
+        if(ld.type().isBarrierType() || !(ld.type().isPrimitiveType()/* || ld.type().isArrayType()*/)) {
             Log.log(ld, "appending a pointer specifier to type of " + name);
             type += "*";
             Log.log(ld, "creating delete statement for " + name);
@@ -841,8 +841,13 @@ public class CodeGeneratorCPP extends Visitor<Object> {
     @Override
     public Object visitNewArray(NewArray ne) {
         Log.log(ne, "Visiting a NewArray");
-        
-        return createNewArray(null, ne);
+        Object o = createNewArray(null, ne);
+
+        if(o instanceof String) {
+            Log.log(ne, "array template is " + o);
+        }
+        // return createNewArray(null, ne);
+        return o;
     }
     
     @Override
@@ -1074,7 +1079,9 @@ public class CodeGeneratorCPP extends Visitor<Object> {
 
         String stArrayType = (String) at.baseType().visit(this);
 
-        return stArrayType;
+        Log.log(at, "stArrayType is " + stArrayType);
+
+        return "pj_runtime::pj_array<" + stArrayType + ">";
     }
     
     @Override
@@ -2081,7 +2088,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             stNewArrayLiteral.add("dims", dims);
         
         stNewArray.add("name", lhs);
-        stNewArray.add("type", type);
+        stNewArray.add("type", "pj_runtime::pj_array<" + type + ">");
         stNewArray.add("init", stNewArrayLiteral.render());
         
         // Reset value for array literal expressions.

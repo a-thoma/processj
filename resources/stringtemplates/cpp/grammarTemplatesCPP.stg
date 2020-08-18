@@ -420,21 +420,21 @@ PrimitiveLiteral(value, type) ::= "<value><if(type)><type><endif>"
 // 3) dims:
 // 4) vals:
 NewArray(name, type, init) ::= <<
-<if(name && type)><type>* <name> = <endif>new <type><init><if(name)>;<endif>
+new <type><init>;
 >>
 
 //========================================================================================
 // 1) dims:
 // 2) vals:
 NewArrayLiteral(dims, vals, dim) ::= <<
-<if(dims)><dims:{dim | [<dim>]}; separator = ""><else><dim>{ <vals:{v | <v>}; separator=","> }<endif>
+<if(dims)><dims:{dim | [<dim>]}; separator = ""><else>{ <vals:{v | <v>}; separator=","> }<endif>
 >>
 
 //========================================================================================
 //
 // 1) name:
 // 2) index:
-ArrayAccessExpr(name, index) ::= "<name>[<index>]"
+ArrayAccessExpr(name, index) ::= "(*<name>)[<index>]"
 
 //========================================================================================
 //
