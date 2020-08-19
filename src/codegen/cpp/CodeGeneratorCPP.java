@@ -62,8 +62,11 @@ public class CodeGeneratorCPP extends Visitor<Object> {
     // Current par-block.
     private String currentParBlock = null;
 
-    // Current array type
-    private String currentArrayType = null;
+    // Current array depth reached
+    private int currentArrayDepth = 0;
+
+    // Current array type string
+    private String currentArrayTypeString = null;
 
     // Counter for anonymous processes generated in a par
     private int procCount = 0;
@@ -550,8 +553,8 @@ public class CodeGeneratorCPP extends Visitor<Object> {
                 for (Statement st : fs.init()) {
                     if (st != null)
                         // TODO: why does this break?
-                        //init.add(((String) st.visit(this)).replace(";", ""));  // Remove the ';' added in LocalDecl.
-                        init.add((String)st.visit(this));
+                        init.add(((String) st.visit(this)).replace(";", ""));  // Remove the ';' added in LocalDecl.
+                        // init.add((String)st.visit(this));
                 }
             }
             
@@ -572,7 +575,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             }
         } else // No! then this is a par-for.
             ;
-        
+
         if (!init.isEmpty())
             stForStat.add("init", init);
         if (!incr.isEmpty())
@@ -737,7 +740,8 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         paramDeclNames.put(name, newName);
 
         if (ld.type().isArrayType()) {
-            currentArrayType = type;
+            currentArrayTypeString = type;
+            currentArrayDepth = ((ArrayType)ld.type()).getActualDepth() - 1;
         }
         
         // This variable could be initialized, e.g., through an assignment operator.
@@ -791,16 +795,16 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         
         // TODO: this is no longer needed...
         ST stVar = stGroup.getInstanceOf("Var");
-        stVar.add("type", type);
+        // stVar.add("type", type);
         stVar.add("name", newName);
         stVar.add("val", val);
 
         String stVarStr = stVar.render();
         Log.log(ld, "In visitLocalDecl(): stVarStr is " + stVarStr + ".");
-        
-        // return stVar.render();
+
+        return stVar.render();
         // return stVarStr;
-        return null;
+        // return null;
     }
     
     @Override
@@ -1072,9 +1076,13 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             // The following extends naturally to two-dimensional, and
             // even higher-dimensional arrays -- but they are not used
             // very often in practice.
+            String previousArrayTypeString = currentArrayTypeString;
+            String type = getNestedArrayType();
+            currentArrayTypeString = type;
             String[] vals = (String[]) al.elements().visit(this);
+            currentArrayTypeString = previousArrayTypeString;
             return "new " +
-                   getNestedArrayType(currentArrayType) +
+                   type +
                    Arrays.asList(vals)
                     .toString()
                     .replace("[", " { ")
@@ -2090,7 +2098,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         ST stNewArray = stGroup.getInstanceOf("NewArray");
         String[] dims = (String[]) na.dimsExpr().visit(this);
         // String type = (String) na.baseType().visit(this);
-        String type = currentArrayType;
+        String type = currentArrayTypeString;
         type = type.substring(0, type.length() - 1);
 
         ST stNewArrayLiteral = stGroup.getInstanceOf("NewArrayLiteral");
@@ -2114,15 +2122,20 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         
         // Reset value for array literal expressions.
         isArrayLiteral = false;
-        currentArrayType = null;
+        currentArrayTypeString = null;
+        currentArrayDepth = 0;
         
         return stNewArray.render();
     }
 
-    private Object getNestedArrayType(String arrayType) {
-        int firstIndex = arrayType.indexOf("<") + 1;
-        int lastIndex = arrayType.lastIndexOf(">") - 1;
-        return arrayType.substring(firstIndex, lastIndex);
+    private String getNestedArrayType() {
+        String str = currentArrayTypeString;
+        int firstIndex = 0;
+        int lastIndex = 0;
+        firstIndex = str.indexOf("<") + 1;
+        lastIndex = str.lastIndexOf(">") - 1;
+        str = str.substring(firstIndex, lastIndex);
+        return str;
     }
     
     private Object createChannelReadExpr(String lhs, String op, ChannelReadExpr cr) {
