@@ -7,7 +7,6 @@ import utilities.Visitor;
 public class IOCallsRewrite extends Visitor<AST> {
 
 	public IOCallsRewrite() {
-		Log.startLogging();
 		Log.logHeader("****************************************");
 		Log.logHeader("*   I O   C A L L S   R E W R I T E    *");
 		Log.logHeader("****************************************");
@@ -212,7 +211,8 @@ public class IOCallsRewrite extends Visitor<AST> {
 				t = ((ArrayType)((LocalDecl)md).type()).getActualBaseType();
 				Log.log("md instanceof LocalDecl: " + t.toString());
 			} else if (md instanceof ParamDecl) {
-				Log.log("md instanceof ParamDecl (NOT DONE YET)");
+				t = ((ArrayType)((ParamDecl)md).type()).getActualBaseType();
+				Log.log("md instanceof ParamDecl: " + t.toString());
 			}
 		}
 
