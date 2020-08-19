@@ -406,10 +406,16 @@ public class CodeGeneratorCPP extends Visitor<Object> {
                 for(int i = 0; i < localDeletes.values().size(); i++) {
                     Log.log(pd, ((String)localDeletes.values().toArray()[i]));
                 }
+
                 stProcTypeDecl.add("ltypes", localParams.values());
                 stProcTypeDecl.add("lvars", localParams.keySet());
-                stProcTypeDecl.add("linits", localInits.values());
-                stProcTypeDecl.add("ldeletes", localDeletes.values());
+                if (!localInits.isEmpty()) {
+                    stProcTypeDecl.add("linits", localInits.values());
+                }
+
+                if(!localDeletes.isEmpty()) {
+                    stProcTypeDecl.add("ldeletes", localDeletes.values());
+                }
             }
             // Add the switch block for resumption.
             if (!switchLabelList.isEmpty()) {
