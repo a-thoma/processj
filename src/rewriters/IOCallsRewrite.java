@@ -110,55 +110,41 @@ public class IOCallsRewrite extends Visitor<AST> {
 				Log.log("Appending " + params.child(i).toString() + " to rebuiltParams");
 				rebuiltParams.append(params.child(i));
 			} else if (params.child(i) instanceof ArrayAccessExpr) {
-				Log.log("Element is an ArrayAccessExpr");
-				Expression arrayAccessExprElement = ((ArrayAccessExpr)params.child(i)).target();
-				Log.log("target of element is " + arrayAccessExprElement.toString());
-				if (arrayAccessExprElement instanceof NameExpr) {
-					Log.log("target of element is a NameExpr");
-					AST md = ((NameExpr)arrayAccessExprElement).myDecl;
-					Log.log("myDecl is " + md.toString());
-					if (md instanceof LocalDecl) {
-						Log.log("md instanceof LocalDecl");
-						Type t = ((ArrayType)((LocalDecl)md).type()).baseType();
-						if (t instanceof NamedType) {
-							Log.log("array of NamedTypes");
-						} else if (t instanceof PrimitiveType) {
-							Log.log("array of PrimitiveTypes");
-							if (((PrimitiveType)t).getKind() == PrimitiveType.StringKind) {
-								Log.log(params.child(i).toString() + " is string PrimitiveLiteral");
-								if (be != null) {
-									Log.log("Appending to new BinaryExpr " + be.toString() + " to rebuiltParams");
-									rebuiltParams.append(be);
-									be = null;
-								} else if (left != null) {
-									Log.log("Appending unfinished lhs of BinaryExpr " + left.toString() + " to rebuiltParams");
-									rebuiltParams.append(left);
-									left = null;
-								}
-								Log.log("Appending " + params.child(i).toString() + " to rebuiltParams");
+				Type t = getArrayType(((ArrayAccessExpr)params.child(i)).target());
+				if (t instanceof NamedType) {
+						Log.log("array of NamedTypes");
+					} else if (t instanceof PrimitiveType) {
+						Log.log("array of PrimitiveTypes");
+						if (((PrimitiveType)t).getKind() == PrimitiveType.StringKind) {
+							Log.log(params.child(i).toString() + " is string PrimitiveLiteral");
+							if (be != null) {
+								Log.log("Appending to new BinaryExpr " + be.toString() + " to rebuiltParams");
+								rebuiltParams.append(be);
+								be = null;
+							} else if (left != null) {
+								Log.log("Appending unfinished lhs of BinaryExpr " + left.toString() + " to rebuiltParams");
+								rebuiltParams.append(left);
+								left = null;
+							}
+							Log.log("Appending " + params.child(i).toString() + " to rebuiltParams");
+							rebuiltParams.append(params.child(i));
+						} else {
+							Log.log(params.child(i).toString() + " is not string PrimitiveLiteral");
+							if (be != null) {
+								Log.log("Appending " + params.child(i).toString() + " to existing binaryExpr");
+								be = new BinaryExpr(be, params.child(i), BinaryExpr.PLUS);
+							} else if (left != null) {
+								Log.log("Appending " + params.child(i).toString() + " as rhs of new binaryExpr");
+								be = new BinaryExpr(left, params.child(i), BinaryExpr.PLUS);
+							} else if (i == params.size() - 1) {
+								Log.log("Last item in params, adding as next argument");
 								rebuiltParams.append(params.child(i));
 							} else {
-								Log.log(params.child(i).toString() + " is not string PrimitiveLiteral");
-								if (be != null) {
-									Log.log("Appending " + params.child(i).toString() + " to existing binaryExpr");
-									be = new BinaryExpr(be, params.child(i), BinaryExpr.PLUS);
-								} else if (left != null) {
-									Log.log("Appending " + params.child(i).toString() + " as rhs of new binaryExpr");
-									be = new BinaryExpr(left, params.child(i), BinaryExpr.PLUS);
-								} else if (i == params.size() - 1) {
-									Log.log("Last item in params, adding as next argument");
-									rebuiltParams.append(params.child(i));
-								} else {
-									Log.log("Adding " + params.child(i).toString() + " as lhs of potential BinaryExpr");
-									left = params.child(i);
-								}
+								Log.log("Adding " + params.child(i).toString() + " as lhs of potential BinaryExpr");
+								left = params.child(i);
 							}
 						}
-					} else if (md instanceof ParamDecl) {
-						Log.log("md instanceof ParamDecl (NOT DONE YET)");
 					}
-					
-				}
 			} else {
 				Log.log(params.child(i).toString() + " is not string PrimitiveLiteral");
 				if (be != null) {
@@ -209,5 +195,27 @@ public class IOCallsRewrite extends Visitor<AST> {
 		}
 
 		return false | left | right;
+	}
+
+	public Type getArrayType(Expression target) {
+		Log.log("Finding base type of n-dimensional array");
+		Log.log("target of element is " + target.toString());
+		if (target instanceof ArrayAccessExpr) {
+			return getArrayType(((ArrayAccessExpr)target).target());
+		}
+		Type t = null;
+		if (target instanceof NameExpr) {
+			Log.log("target of element is a NameExpr");
+			AST md = ((NameExpr)target).myDecl;
+			Log.log("myDecl is " + md.toString());
+			if (md instanceof LocalDecl) {
+				t = ((ArrayType)((LocalDecl)md).type()).getActualBaseType();
+				Log.log("md instanceof LocalDecl: " + t.toString());
+			} else if (md instanceof ParamDecl) {
+				Log.log("md instanceof ParamDecl (NOT DONE YET)");
+			}
+		}
+
+		return t;
 	}
 }
