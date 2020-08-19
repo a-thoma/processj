@@ -1093,10 +1093,14 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         Log.log(at, "stArrayType is " + stArrayType);
 
         if (!at.baseType().isPrimitiveType() || !at.baseType().isNamedType()) {
-            return "pj_runtime::pj_array<" + stArrayType + ">*";
+            if (at.getActualDepth() > 1) {
+                Log.log(at, "depth > 1, pj_md_array used");
+                return "pj_runtime::pj_md_array<" + stArrayType + ">*";
+            }
+            // return "pj_runtime::pj_array<" + stArrayType + ">*";
         }
-
-        return "pj_runtime::pj_array<" + stArrayType + ">";
+        Log.log(at, "base of array, pj_array used");
+        return "pj_runtime::pj_array<" + stArrayType + ">*";
     }
     
     @Override
