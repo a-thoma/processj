@@ -249,14 +249,15 @@ this->sched->insert(new <name>_overload_finalize(this->id + <anonCounter>, this-
 // 6) ltypes: data types for local parameters.
 // 7) lvars: unique names for fields preceded by '_ld'.
 // 8) body: the method body enclosed between braces.
-Method(modifier, type, name, types, vars, ltypes, lvars, body) ::= <<
+Method(modifier, type, name, types, vars, ltypes, lvars, linits, ldeletes, body) ::= <<
 <! TODO: this is fine for now... might not really be !>
 static <type> <name>(<types,vars:{t,v | <t> <v>}; separator=", ">)
 {
     <! -------- Variables for local parameters -------- !>
-    <if(lvars)><ltypes,lvars:{t,v | <t> <v>}; separator=";\n">;<\n><endif>
+    <if(linits)><ltypes,lvars,linits:{t,v,i | <t> <v> = <i>}; separator=";\n">;<\n><endif>
     <! The body may be an invocation or a sequence of statements !>
     <if(body)><body; separator="\n"><endif>
+    <if(ldeletes)><ldeletes:{d | delete <d>}; separator=";\n">;<\n><endif>
 }
 >>
 
