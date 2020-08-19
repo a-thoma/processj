@@ -62,6 +62,9 @@ public class CodeGeneratorCPP extends Visitor<Object> {
     // Current par-block.
     private String currentParBlock = null;
 
+    // Current array type
+    private String currentArrayType = null;
+
     // Counter for anonymous processes generated in a par
     private int procCount = 0;
 
@@ -721,15 +724,21 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         String newName = Helper.makeVariableName(name, ++localDecId, Tag.LOCAL_NAME);
 
         // If it needs to be a pointer, make it so
-        if(ld.type().isBarrierType() || !(ld.type().isPrimitiveType()/* || ld.type().isArrayType()*/)) {
+        if(ld.type().isBarrierType() || !(ld.type().isPrimitiveType() || ld.type().isArrayType())) {
             Log.log(ld, "appending a pointer specifier to type of " + name);
             type += "*";
+        }
+        if (ld.type().isBarrierType() || !(ld.type().isPrimitiveType())) {
             Log.log(ld, "creating delete statement for " + name);
             String deleteStmt = "delete " + newName + ";";
             localDeletes.put(name, deleteStmt);
         }
         localParams.put(newName, type);
         paramDeclNames.put(name, newName);
+
+        if (ld.type().isArrayType()) {
+            currentArrayType = type;
+        }
         
         // This variable could be initialized, e.g., through an assignment operator.
         Expression expr = ld.var().init();
@@ -778,7 +787,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             val = val.replace(DELIMITER, "");
 
         // We need to store the initializer so we can build the locals later
-        localInits.put(name, val);
+        localInits.put(newName, val);
         
         // TODO: this is no longer needed...
         ST stVar = stGroup.getInstanceOf("Var");
@@ -1064,7 +1073,9 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             // even higher-dimensional arrays -- but they are not used
             // very often in practice.
             String[] vals = (String[]) al.elements().visit(this);
-            return Arrays.asList(vals)
+            return "new " +
+                   getNestedArrayType(currentArrayType) +
+                   Arrays.asList(vals)
                     .toString()
                     .replace("[", " { ")
                     .replace("]", " } ");
@@ -1080,6 +1091,10 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         String stArrayType = (String) at.baseType().visit(this);
 
         Log.log(at, "stArrayType is " + stArrayType);
+
+        if (!at.baseType().isPrimitiveType() || !at.baseType().isNamedType()) {
+            return "pj_runtime::pj_array<" + stArrayType + ">*";
+        }
 
         return "pj_runtime::pj_array<" + stArrayType + ">";
     }
@@ -2070,7 +2085,9 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         // Generated template after evaluating this visitor.
         ST stNewArray = stGroup.getInstanceOf("NewArray");
         String[] dims = (String[]) na.dimsExpr().visit(this);
-        String type = (String) na.baseType().visit(this);
+        // String type = (String) na.baseType().visit(this);
+        String type = currentArrayType;
+        type = type.substring(0, type.length() - 1);
 
         ST stNewArrayLiteral = stGroup.getInstanceOf("NewArrayLiteral");
         if (na.init() != null) {
@@ -2088,13 +2105,20 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             stNewArrayLiteral.add("dims", dims);
         
         stNewArray.add("name", lhs);
-        stNewArray.add("type", "pj_runtime::pj_array<" + type + ">");
+        stNewArray.add("type", type);
         stNewArray.add("init", stNewArrayLiteral.render());
         
         // Reset value for array literal expressions.
         isArrayLiteral = false;
+        currentArrayType = null;
         
         return stNewArray.render();
+    }
+
+    private Object getNestedArrayType(String arrayType) {
+        int firstIndex = arrayType.indexOf("<") + 1;
+        int lastIndex = arrayType.lastIndexOf(">") - 1;
+        return arrayType.substring(firstIndex, lastIndex);
     }
     
     private Object createChannelReadExpr(String lhs, String op, ChannelReadExpr cr) {
