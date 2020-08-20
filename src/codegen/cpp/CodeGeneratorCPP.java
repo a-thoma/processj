@@ -808,9 +808,11 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         String stVarStr = stVar.render();
         Log.log(ld, "In visitLocalDecl(): stVarStr is " + stVarStr + ".");
 
-        return stVar.render();
+        if (!ld.type().isArrayType()) {
+            return stVar.render();
+        }
         // return stVarStr;
-        // return null;
+        return null;
     }
     
     @Override
