@@ -68,6 +68,12 @@ public class CodeGeneratorCPP extends Visitor<Object> {
     // Current array type string
     private String currentArrayTypeString = null;
 
+    // Current channel read variable name
+    private String currentChannelReadName = null;
+
+    // Current channel read operator
+    private String currentChannelReadOp = null;
+
     // Counter for anonymous processes generated in a par
     private int procCount = 0;
 
@@ -420,41 +426,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             // Add the switch block for resumption.
             if (!switchLabelList.isEmpty()) {
                 ST stSwitchBlock = stGroup.getInstanceOf("SwitchBlock");
-                // stSwitchBlock.add("jumps", switchLabelList);
-
-                Log.log(pd, "the switchLabelList is (before):\n");
-                for (int i = 0; i < switchLabelList.size(); i++) {
-                    Log.log(switchLabelList.get(i));
-                }
-                // Append the name of the process to the labels
-                String str;
-                ArrayList<String> newSwitchLabelList = new ArrayList<String>();
-                for(int i = 0; i < switchLabelList.size(); i++) {
-                    // split label like:
-                    // "case 0: goto " + procName +  "LN; break;"
-                    //  by making a substring upto LN and wrapping them
-                    // around the procName
-
-                    // find end index of the substring, "case <num>: goto " by finding
-                    // where "goto" is and going 1 past that (usable whitespace)
-                    int gotoIndex = switchLabelList.get(i).lastIndexOf("goto") + 5;
-                    // make our first substring from that index
-                    str = switchLabelList.get(i).substring(0, gotoIndex);
-                    Log.log(pd, "my substring is " + str);
-                    // make the new string by combining our beginning substring,
-                    // the procName variable, and the last index of "goto" onwards
-                    String newstr = str +
-                                    procName +
-                                    switchLabelList.get(i).substring(gotoIndex, switchLabelList.get(i).length());
-                    Log.log(pd, "my new label is " + newstr);
-                    newSwitchLabelList.add(i, newstr);
-                }
-                Log.log(pd, "the switchLabelList is (after):\n");
-                for (int i = 0; i < newSwitchLabelList.size(); i++) {
-                    Log.log(newSwitchLabelList.get(i));
-                }
-
-                stSwitchBlock.add("jumps", newSwitchLabelList);
+                stSwitchBlock.add("jumps", switchLabelList);
                 stSwitchBlock.add("name", procName);
                 stProcTypeDecl.add("switchBlock", stSwitchBlock.render());
             }
@@ -554,12 +526,16 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         ArrayList<String> init = new ArrayList<String>();  // Initialization part.
         ArrayList<String> incr = new ArrayList<String>();  // Increment part.
         
+        String initStr = null;
         if (!fs.isPar()) { // Is it a regular for loop?
             if (fs.init() != null) {
                 for (Statement st : fs.init()) {
                     if (st != null)
                         // TODO: why does this break?
-                        init.add(((String) st.visit(this)).replace(";", ""));  // Remove the ';' added in LocalDecl.
+                        initStr = (String)st.visit(this);
+                        if(initStr != null) {
+                            init.add(initStr.replace(";", ""));  // Remove the ';' added in LocalDecl.
+                        }
                         // init.add((String)st.visit(this));
                 }
             }
@@ -752,8 +728,18 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         
         // This variable could be initialized, e.g., through an assignment operator.
         Expression expr = ld.var().init();
+
         // Visit the expressions associated with this variable.
         if (expr != null) {
+            if (expr instanceof ChannelReadExpr) {
+                // Save the name of the variable if it's a channel read so we can read to it
+                currentChannelReadName = newName;
+
+                // This is always assignment in the case of a read
+                // but it doesn't hurt to make it a variable in
+                // case we decide to add more functionality
+                currentChannelReadOp = "=";
+            }
             if (ld.type() instanceof PrimitiveType)
                 val = (String) expr.visit(this);
             else if (ld.type() instanceof NamedType) // Must be a record or protocol.
@@ -793,23 +779,37 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         
         // If we reach this section of code, then we have a variable
         // declaration with some initial value(s).
-        if (val != null)
+        if ((val != null) && !(expr instanceof ChannelReadExpr)) {
             val = val.replace(DELIMITER, "");
+        }
 
-        // We need to store the initializer so we can build the locals later
-        localInits.put(newName, val);
+        if (expr instanceof ChannelReadExpr) {
+            if (ld.type().isPrimitiveType()) {
+                localInits.put(newName, (((PrimitiveType)ld.type()).getKind() == PrimitiveType.StringKind) ? "\"\"" : "0");
+            } else if (ld.type().isNamedType() ||
+                       ld.type().isArrayType()) {
+                localInits.put(name, "nullptr");
+            }
+        } else {
+            // We need to store the initializer so we can build the locals later
+            localInits.put(newName, val);   
+        }
         
         // TODO: this is no longer needed...
-        ST stVar = stGroup.getInstanceOf("Var");
+        // ST stVar = stGroup.getInstanceOf("Var");
         // stVar.add("type", type);
-        stVar.add("name", newName);
-        stVar.add("val", val);
+        // stVar.add("name", newName);
+        // stVar.add("val", val);
 
-        String stVarStr = stVar.render();
-        Log.log(ld, "In visitLocalDecl(): stVarStr is " + stVarStr + ".");
+        // String stVarStr = stVar.render();
+        // Log.log(ld, "In visitLocalDecl(): stVarStr is " + stVarStr + ".");
 
-        if (!ld.type().isArrayType()) {
-            return stVar.render();
+        // reset channel read name
+        currentChannelReadName = null;
+        currentChannelReadOp = null;
+
+        if (expr instanceof ChannelReadExpr) {
+            return val;
         }
         // return stVarStr;
         return null;
@@ -1026,6 +1026,12 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             stChannelReadExpr.add("resume" + label, ++jumpLabel);
             // Add jump label to the switch list.
             switchLabelList.add(renderSwitchLabel(jumpLabel));
+        }
+        stChannelReadExpr.add("procName", generatedProcNames.get(currentProcName));
+
+        if (currentChannelReadName != null) {
+            stChannelReadExpr.add("lhs", currentChannelReadName);
+            stChannelReadExpr.add("op", currentChannelReadOp);
         }
         
         return stChannelReadExpr.render();
@@ -2074,7 +2080,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
     private String renderSwitchLabel(int jump) {
         ST stSwitchCase = stGroup.getInstanceOf("SwitchCase");
         stSwitchCase.add("jump", jump);
-        stSwitchCase.add("name", currentProcName);
+        stSwitchCase.add("name", generatedProcNames.get(currentProcName));
         return stSwitchCase.render();
     }
     
