@@ -288,11 +288,11 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             stProcTypeDecl.add("anonCounter", procCount);
             procCount++;
 
-            // TODO: make anonymous procs act like the nestedvariableclassuse spike
-            // if (!formalParams.isEmpty()) {
-            //     stProcTypeDecl.add("types", formalParams.values());
-            //     stProcTypeDecl.add("vars", formalParams.keySet());    
-            // }
+            // any anonymous process needs access to the arguments of its enclosing class
+            if (!formalParams.isEmpty()) {
+                stProcTypeDecl.add("types", formalParams.values());
+                stProcTypeDecl.add("vars", formalParams.keySet());    
+            }
 
             // Restore jump label.
             jumpLabel = prevJumLabel;
