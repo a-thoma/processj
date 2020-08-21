@@ -334,6 +334,7 @@ if (<name>->should_yield()) {
 }</n>
 
 <procName>L<jump>:
+(void)0; <! avoid dangling label in a loop !>
 >>
 
 //========================================================================================
@@ -470,7 +471,8 @@ this->set_label(<resume0>);
 // yield();
 return;
 
-<procName>L<resume0>:<\n>
+<procName>L<resume0>:
+(void)0; <! avoid dangling label in a loop !>
 >>
 
 //========================================================================================
@@ -500,6 +502,7 @@ this->set_label(<resume1>);
 return;
 
 <procName>L<resume1>:<!-- remove 'line-feed' --!>
+(void)0; <! avoid dangling label in a loop !>
 >>
 
 //========================================================================================
@@ -568,10 +571,8 @@ label(<resume1>);
 IfStat(expr, thenPart, elsePart) ::= <<
 if (<expr>) {
     <thenPart; separator="\n">
-    (void)0;
 }<if(elsePart)> else {
     <elsePart; separator="\n">
-    (void)0;
 }<endif>
 >>
 
@@ -777,8 +778,6 @@ yield();
 WhileStat(expr, body, negexpr) ::= <<
 while (<expr>) {
     <if(body)><body; separator="\n"><endif>
-    <! needed for dangling labels at the end of a while !>
-    (void)0;
 }
 >>
 
@@ -789,7 +788,6 @@ while (<expr>) {
 DoStat(expr, body) ::= <<
 do {
     <if(body)><body; separator="\n"><endif>
-    (void)0;
 } while (<expr>);
 >>
 
@@ -802,7 +800,6 @@ do {
 ForStat(init, expr, incr, stats) ::= <<
 for (<if(init)><init; separator=", "><else>/* ... */<endif>; <!--!><if(expr)><expr><else>/* ... */<endif>; <!--!><if(incr)><incr; separator=", "><else>/* ... */<endif>) {
      <stats; separator="\n">
-     (void)0;
 }
 >>
 
