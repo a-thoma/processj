@@ -1353,7 +1353,10 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         // in         .  targetProc   .  formalParams()
         Sequence<ParamDecl> formalParams = in.targetProc.formalParams();
         String[] typesList = new String[formalParams.size()];
+        String[] varsList = new String[formalParams.size()];
         for (int i = 0; i < formalParams.size(); ++i) {
+            Log.log(in, "visiting formal parameter " + ((ParamDecl)formalParams.child(i)).name().toString());
+            varsList[i] = ((ParamDecl)formalParams.child(i)).name().toString();
             Type t = (Type) ((ParamDecl)formalParams.child(i)).type();
             typesList[i] = (String)t.visit(this);
 
@@ -1395,14 +1398,17 @@ public class CodeGeneratorCPP extends Visitor<Object> {
 
             // Add the types for our vars
             stInvocation.add("types", typesList);
+            stInvocation.add("vars", varsList);
+            stInvocation.add("argvars", paramsList);
             // Add the proc count that we'll need for id generation
             stInvocation.add("anonCounter", procCount);
-        } else
+        } else {
             // Must be an invocation made through a static Java method.
             stInvocation = stGroup.getInstanceOf("Invocation");
+            stInvocation.add("vars", paramsList);
+        }
         
         stInvocation.add("name", pdName);
-        stInvocation.add("vars", paramsList);
 
         Log.log(in, "Leaving visitInvocation()");
         
@@ -2065,9 +2071,9 @@ public class CodeGeneratorCPP extends Visitor<Object> {
      * This is used for newly-created processes.
      */
     private void resetGlobals() {
-        parDecId = 0;
-        varDecId = 0;
-        localDecId = 0;
+        // parDecId = 0;
+        // varDecId = 0;
+        // localDecId = 0;
         jumpLabel = 0;
 
         localParams.clear();

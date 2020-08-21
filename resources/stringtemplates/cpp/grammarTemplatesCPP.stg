@@ -187,7 +187,7 @@ Invocation(name, vars) ::= <<
 // 2) vars:
 // 3) parBlock:
 // 4) barrier:
-InvocationProcType(name, vars, types, parBlock, barrier, anonCounter) ::= <<
+InvocationProcType(name, vars, argvars, types, parBlock, barrier, anonCounter) ::= <<
 <! TODO: how is this going to work? we don't support anonymous processes, and the
  ! closest we might get is passing lambdas as functions to finalize() or other
  ! necessarily-overloaded functions...
@@ -232,7 +232,7 @@ public:
 <!this->sched->insert(new <name>_overload_finalize(this->id + <anonCounter>, this->sched<if(barrier)>, <
 barrier><endif>));!>
 
-this->sched->insert(new <name>_overload_finalize(this->id + <anonCounter>, this->sched<if(vars)>, <vars; separator=", "><endif>));
+this->sched->insert(new <name>_overload_finalize(this->id + <anonCounter>, this->sched<if(argvars)>, <argvars; separator=", "><endif>));
 >>
 
 //========================================================================================
@@ -370,14 +370,14 @@ public:
     virtual ~<name>() = default;
 
     <! Synchronized run method !>
-    void run()
+    virtual void run()
     {
         <if(switchBlock)><switchBlock; separator="\n"><endif>
         <if(syncBody)><syncBody; separator="\n"><endif>
         terminate();
     }
     <! Finalize method !>
-    void finalize()
+    virtual void finalize()
     {
         <if(parBlock)><parBlock>->decrement();<endif>
         <if(barrier)><barrier:{b | <b>->resign()}; separator=";\n">;<endif>
