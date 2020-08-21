@@ -363,7 +363,6 @@ public:
         this->sched = sched;
         <if(vars)>
         <vars:{v | this-><v> = <v>;}; separator="\n"><endif>
-        // HERE
     }
 
     <! virtual destructor !>
@@ -569,8 +568,10 @@ label(<resume1>);
 IfStat(expr, thenPart, elsePart) ::= <<
 if (<expr>) {
     <thenPart; separator="\n">
+    (void)0;
 }<if(elsePart)> else {
     <elsePart; separator="\n">
+    (void)0;
 }<endif>
 >>
 
@@ -773,9 +774,11 @@ yield();
 //
 // 1) expr:
 // 2) body:
-WhileStat(expr, body) ::= <<
+WhileStat(expr, body, negexpr) ::= <<
 while (<expr>) {
     <if(body)><body; separator="\n"><endif>
+    <! needed for dangling labels at the end of a while !>
+    (void)0;
 }
 >>
 
@@ -786,6 +789,7 @@ while (<expr>) {
 DoStat(expr, body) ::= <<
 do {
     <if(body)><body; separator="\n"><endif>
+    (void)0;
 } while (<expr>);
 >>
 
@@ -798,6 +802,7 @@ do {
 ForStat(init, expr, incr, stats) ::= <<
 for (<if(init)><init; separator=", "><else>/* ... */<endif>; <!--!><if(expr)><expr><else>/* ... */<endif>; <!--!><if(incr)><incr; separator=", "><else>/* ... */<endif>) {
      <stats; separator="\n">
+     (void)0;
 }
 >>
 
