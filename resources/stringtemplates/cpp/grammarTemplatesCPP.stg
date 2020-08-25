@@ -146,8 +146,9 @@ public:
         <! -------- Instance variables for local parameters -------- !>
 
         // local variables
-        <if(lvars)><ltypes,lvars,linits:{t,v | static <t> <v>}; separator=";\n">;<\n><endif>
+        <if(lvars)><ltypes,lvars:{t,v | static <t> <v>}; separator=";\n">;<\n><endif>
         <if(switchBlock)><switchBlock; separator="\n"><endif>
+        <if(linits)><lvars,linits:{v,i | <v> = <i>}; separator=";\n">;<\n><endif>
         <if(syncBody)><syncBody; separator="\n"><endif>
         <if(ldeletes)><ldeletes; separator="\n"><endif>
         terminate();
@@ -866,10 +867,6 @@ case <number>:
 // 8) cases:
 // 9) index:
 AltStat(alt, count, bguards, guards, procName, jump, cases, index) ::= <<
-// pj_runtime::pj_alt* <alt> = new PJAlt(<count>, this); // this has been abstracted to the run() method
-// THE BELOW also needs to go before the switchStat as method-static locals
-<! TODO: redirect these to the proc so they can be included in the static inits before the switchcase !>
-
 alt_ready = <alt>->set_guards(boolean_guards, object_guards);
 
 if (!alt_ready) {
