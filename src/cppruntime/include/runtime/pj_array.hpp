@@ -20,6 +20,18 @@ namespace pj_runtime
             m_array = nullptr;
         }
 
+        pj_array(T* data, T* data_end)
+	:length(data_end - data)
+        {
+	    m_array = new T[length];
+	    T* iter = data;
+	    std::size_t i = 0;
+	    while(iter != data_end)
+	    {
+	        m_array[i++] = (*iter++);
+            }
+	}
+
         pj_array(std::initializer_list<T> values)
         :length(values.size())
         {
