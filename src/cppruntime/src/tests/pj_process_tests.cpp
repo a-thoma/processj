@@ -90,8 +90,11 @@ int32_t main(void)
     // pj_tests::static_method_test sm_test;
     // sm_test.run();
 
-    pj_tests::array_test ar_test;
-    ar_test.run();
+    // pj_tests::array_test ar_test;
+    // ar_test.run();
+
+    pj_tests::string_test s_test;
+    s_test.run();
 
     return 0;
 }

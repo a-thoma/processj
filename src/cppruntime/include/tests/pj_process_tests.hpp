@@ -18,6 +18,7 @@
 #include <tests/par_test.hpp>
 #include <tests/static_method_test.hpp>
 #include <tests/array_test.hpp>
+#include <tests/string_test.hpp>
 
 #include <iostream>
 #include <cstdlib>

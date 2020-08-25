@@ -36,10 +36,12 @@ namespace pj_tests
             public:
                 anon() = delete;
                 anon(int32_t id,
-                     pj_runtime::pj_scheduler* sched)
+                     pj_runtime::pj_scheduler* sched,
+                     pj_runtime::pj_par* par)
                 : id(id)
                 {
                     this->sched = sched;
+                    this->par   = par;
                 }
 
                 virtual ~anon() = default;
@@ -66,13 +68,9 @@ namespace pj_tests
                      * to generalize these anonymous functions within the pars.
                      * or maybe it'll be easier... not sure yet.
                      */
+                    this->par->decrement();
                     terminate();
                     return;
-                }
-
-                void finalize()
-                {
-                    par->decrement();
                 }
 
                 /* NOTE: local classes cannot have friend functions defined */
@@ -80,11 +78,12 @@ namespace pj_tests
             private:
                 int32_t id;
                 pj_runtime::pj_scheduler* sched;
+                pj_runtime::pj_par* par;
             };
 
             /* plunk 2 new anon procs into the scheduler */
-            this->sched->insert(new anon(this->id + 1, this->sched));
-            this->sched->insert(new anon(this->id + 2, this->sched));
+            this->sched->insert(new anon(this->id + 1, this->sched, par));
+            this->sched->insert(new anon(this->id + 2, this->sched, par));
 
             /* more code generated for our par block below */
             if(par->should_yield())

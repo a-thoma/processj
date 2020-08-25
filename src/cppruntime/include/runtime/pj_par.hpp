@@ -28,9 +28,9 @@ namespace pj_runtime
         void decrement()
         {
             std::lock_guard<std::mutex> lock(this->mtx);
-	    std::cout << "decrementing " << process_count;
+
             this->process_count--;
-	    std::cout << " to " << process_count << std::endl;
+
             if(this->process_count == 0)
             {
                 this->process->set_ready();
