@@ -364,19 +364,19 @@ public class CodeGeneratorCPP extends Visitor<Object> {
                 stMain.add("name", procName);
                 // Pass the list of command line arguments to this main method.
                 if (!formalParams.isEmpty()) {
-                    // stMain.add("types", formalParams.values());
-                    // stMain.add("vars", formalParams.keySet());
+                    stMain.add("types", formalParams.values());
+                    stMain.add("vars", formalParams.keySet());
                     // Here we add argc and argv to the main, so that we can
                     // construct a vector of strings instead of an array
                     // of char*'s, which is much closer to a String array
                     // in java than a bare array in C++ in terms of
                     // functionality
-                    String[] types = {"int32_t", "char*"};
-                    String[] vars  = {"argc", "argv"};
-                    stMain.add("types", types);
-                    stMain.add("vars", vars);
-                    stMain.add("argc", vars[0]);
-                    stMain.add("argv", vars[1]);
+                    // String[] types = {"int32_t", "char*"};
+                    // String[] vars  = {"argc", "argv"};
+                    // stMain.add("types", types);
+                    // stMain.add("vars", vars);
+                    // stMain.add("argc", vars[0]);
+                    // stMain.add("argv", vars[1]);
                 }
                 // Add entry point of the program.
                 stProcTypeDecl.add("main", stMain.render());
@@ -389,10 +389,10 @@ public class CodeGeneratorCPP extends Visitor<Object> {
                 // Here we match what we did with main above by making space
                 // for our arg vector (literally a vector)
                 if ("main".equals(currentProcName) && pd.signature().equals(Tag.MAIN_NAME.toString())) {
-                    String[] types = {"std::vector<std::string>"};
-                    String[] vars  = {"args"};
-                    stProcTypeDecl.add("types", types);
-                    stProcTypeDecl.add("vars", vars);
+                    // String[] types = {"std::vector<std::string>"};
+                    // String[] vars  = {"args"};
+                    stProcTypeDecl.add("types", formalParams.values());
+                    stProcTypeDecl.add("vars", formalParams.keySet());
                 }
                 if (!("main".equals(currentProcName) && pd.signature().equals(Tag.MAIN_NAME.toString()))) {
                     stProcTypeDecl.add("types", formalParams.values());
@@ -802,13 +802,13 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         }
         
         // TODO: this is no longer needed...
-        // ST stVar = stGroup.getInstanceOf("Var");
+        ST stVar = stGroup.getInstanceOf("Var");
         // stVar.add("type", type);
-        // stVar.add("name", newName);
-        // stVar.add("val", val);
+        stVar.add("name", newName);
+        stVar.add("val", val);
 
-        // String stVarStr = stVar.render();
-        // Log.log(ld, "In visitLocalDecl(): stVarStr is " + stVarStr + ".");
+        String stVarStr = stVar.render();
+        Log.log(ld, "In visitLocalDecl(): stVarStr is " + stVarStr + ".");
 
         // reset channel read name
         currentChannelReadName = null;
@@ -817,8 +817,8 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         if (expr instanceof ChannelReadExpr) {
             return val;
         }
-        // return stVarStr;
-        return null;
+        return stVarStr;
+        // return null;
     }
     
     @Override
@@ -885,8 +885,8 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         // to Java primitive types.
         String typeStr = py.typeName();
         if (py.isStringType()) {
-            // typeStr = "char*";
-            typeStr = "std::string";
+            typeStr = "char*";
+            // typeStr = "std::string";
         } else if (py.isBooleanType()) {
             typeStr = "bool";
         } else if (py.isTimerType()) {
@@ -1765,8 +1765,8 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         // we should also add a pj_runtime::pj_par to the locals of whatever
         // process we're in
         localParams.put(currentParBlock, "pj_runtime::pj_par*");
-        localInits.put(currentParBlock, "new pj_runtime::pj_par(" + pb.stats().size() + ", this)");
-        localDeletes.put(currentParBlock, "delete " + currentParBlock + ";");
+        // localInits.put(currentParBlock, "pj_runtime::pj_par(" + pb.stats().size() + ", this)");
+        // localDeletes.put(currentParBlock, "delete " + currentParBlock + ";");
         
         // Increment the jump label.
         stParBlock.add("jump", ++jumpLabel);
