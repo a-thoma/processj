@@ -782,13 +782,15 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             //     !ld.type().isChannelType() && (ld.type().isPrimitiveType() ||
             //     ld.type().isArrayType() ||    // Could be an uninitialized array declaration.
             //     ld.type().isNamedType())) {   // Could be records or protocols.
-                    Log.log(ld, name + " has a 0 initializer.");
-                    // TODO: static cast this to the type of the variable
-                    // localInits.put(name, "0");
-                    // TODO: do we need this as an init? probably not...
-                    localInits.put(name, "static_cast<" + type + ">(0)");
+                Log.log(ld, name + " has a 0 initializer.");
+                // TODO: static cast this to the type of the variable
+                // localInits.put(name, "0");
+                // TODO: do we need this as an init? probably not...
+                localInits.put(name, "static_cast<" + type + ">(0)");
+                if(!ld.type().isChannelType()) {
                     return null;              // The 'null' is used to removed empty sequences.
-                // }
+                }
+            // }
         }
         
         // If we reach this section of code, then we have a variable
