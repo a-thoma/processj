@@ -778,6 +778,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
                 ld.type().isArrayType() ||    // Could be an uninitialized array declaration.
                 ld.type().isNamedType())) {   // Could be records or protocols.
                     Log.log(ld, name + " has a 0 initializer.");
+                    // TODO: static cast this to the type of the variable
                     localInits.put(name, "0");
                     return null;              // The 'null' is used to removed empty sequences.
                 }
@@ -801,7 +802,6 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             localInits.put(newName, val);   
         }
         
-        // TODO: this is no longer needed...
         ST stVar = stGroup.getInstanceOf("Var");
         // stVar.add("type", type);
         stVar.add("name", newName);
