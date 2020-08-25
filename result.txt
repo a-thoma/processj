@@ -1,0 +1,334 @@
+-- Setting absolute path, file and package name for 'bartest.pj'.
+-- Resolving imports.
+-- Declaring Top Level Declarations.
+-- Reconstructing records.
+-- Reconstructing protocols.
+-- Reconstructing statements.
+-- Checking native Top Level Declarations.
+-- Resolving imported types.
+-- Checking name usage.
+-- Reconstructing array types.
+-- Reconstructing array literas.
+-- Checking types.
+-- Computing reachability.
+-- Performing parallel usage check.
+-- Marking yielding statements and expressions.
+-- Checking literal inits are free of channel communication.
+-- Rewriting infinite loops.
+-- Rewriting loops.
+** THIS HAS BEEN DISABLED FOR NOW AS IT GENERATES BAD LABELS **
+-- Rewriting yielding expressions.
+** THIS HAS BEEN DISABLED FOR NOW AS IT DOES NOT WORK CORRECTLY **
+-- Checking break and continue labels.
+-- Collecting left-hand sides for par for code generation.
+-- rewriting print() and println() calls.
+Generating CPP code
+Beginning of generateCodeCPP
+Starting the logger (For debugging)
+Logging started. Continuing on...
+Before getting PJConfig (necessary?)
+After getting PJConfig (necessary?)
+Creating code generator
+*****************************************
+* C O D E - G E N E R A T O R   C P P   *
+*****************************************
+Getting working directory from config...
+workingdir is code/school/processj/builds
+Generating code...
+tests/bartest.pj:3: Visiting a Compilation
+tests/bartest.pj:1: Visiting an import statement (std.*)
+tests/bartest.pj:1: IMPORTANT: this visitor is not finished yet
+tests/bartest.pj:1: import statement is: std.*
+tests/bartest.pj:1: import stringtemplate instance is #include <>
+tests/bartest.pj:1: import path is std/*
+tests/bartest.pj:1: wildcard detected, building import list
+tests/bartest.pj: in findImports
+tests/bartest.pj: NOTE: current directory is /home/unknown/code/school/processj.
+tests/bartest.pj: dir length is 17.
+tests/bartest.pj: Finding files in directory include/C++/std...
+tests/bartest.pj: Found file io.pj.
+tests/bartest.pj: Found file math.pj.
+tests/bartest.pj: Found file random.pj.
+tests/bartest.pj:1: building import statement(s)
+tests/bartest.pj:1: found list import io.pj
+tests/bartest.pj:1: removed .pj and replaced with .hpp: io.hpp
+tests/bartest.pj:1: found list import math.pj
+tests/bartest.pj:1: removed .pj and replaced with .hpp: math.hpp
+tests/bartest.pj:1: found list import random.pj
+tests/bartest.pj:1: removed .pj and replaced with .hpp: random.hpp
+tests/bartest.pj:3: Visiting a ProcTypeDecl (foo)
+tests/bartest.pj:3: Visiting a Name (foo)
+tests/bartest.pj:3: visiting parameters
+tests/bartest.pj:3: Visiting a ParamDecl (barrier b)
+tests/bartest.pj:3: Visiting a Name (b)
+tests/bartest.pj:3: Visiting a Primitive Type (barrier)
+tests/bartest.pj:3: appending a pointer specifier to type of b
+tests/bartest.pj:3: visiting parameters
+tests/bartest.pj:3: Visiting a ParamDecl (chan<int>.read r)
+tests/bartest.pj:3: Visiting a Name (r)
+tests/bartest.pj:3: Visiting a ChannelEndType (chan<int>.read)
+tests/bartest.pj: in getCPPChannelType()
+tests/bartest.pj:3: in visitParamDecl() type is pj_runtime::pj_one2one_channel<int32_t>
+tests/bartest.pj:3: appending a pointer specifier to type of r
+tests/bartest.pj:3: visiting parameters
+tests/bartest.pj:3: Visiting a ParamDecl (timer t)
+tests/bartest.pj:3: Visiting a Name (t)
+tests/bartest.pj:3: Visiting a Primitive Type (timer)
+tests/bartest.pj:3: appending a pointer specifier to type of t
+tests/bartest.pj:3: Visiting a Sequence
+tests/bartest.pj:3: Visiting a Modifier (public)
+tests/bartest.pj:3: Visiting a Primitive Type (void)
+tests/bartest.pj: Stored foo's helper name as _proc$foo0$796934035.
+tests/bartest.pj:4: Visiting a Block
+tests/bartest.pj:4: Visiting a Sequence
+tests/bartest.pj:4: Visiting a SyncStat
+tests/bartest.pj:4: Visiting a NameExpr (b)
+tests/bartest.pj:4: Visiting a Name (b)
+tests/bartest.pj:0: Visiting a ParBlock with 4 statements.
+tests/bartest.pj:0: Visiting a ProcTypeDecl (Anonymous)
+tests/bartest.pj:0: Visiting a Name (Anonymous)
+tests/bartest.pj:6: Visiting a Block
+tests/bartest.pj:6: Visiting a Sequence
+tests/bartest.pj:6: Visting a LocalDecl (int d)
+tests/bartest.pj:6: Visiting a Primitive Type (int)
+tests/bartest.pj:6: in visitLocalDecl(): type is int.
+tests/bartest.pj:6: Visiting a ChannelReadExpr
+tests/bartest.pj:6: Visiting a NameExpr (r)
+tests/bartest.pj:6: Visiting a Name (r)
+tests/bartest.pj:6: In visitLocalDecl(): stVarStr is _ld$d1 = // i'm a channel read, and my procName is _proc$Anonymous10
+if (!_pd$r2->is_ready_to_read(this)) {
+    this->set_label(1);
+    // yield();
+    return;
+}
+
+_proc$Anonymous10L1:
+_ld$d1 = _pd$r2->read(this);
+this->set_label(2);
+// yield();
+return;
+
+_proc$Anonymous10L2:;.
+tests/bartest.pj:0: Visiting a ProcTypeDecl (Anonymous)
+tests/bartest.pj:0: Visiting a Name (Anonymous)
+tests/bartest.pj:7: Visiting a Block
+tests/bartest.pj:7: Visiting a Sequence
+tests/bartest.pj:7: Visting a LocalDecl (long time)
+tests/bartest.pj:7: Visiting a Primitive Type (long)
+tests/bartest.pj:7: in visitLocalDecl(): type is long.
+tests/bartest.pj:7: Visiting a ChannelReadExpr
+tests/bartest.pj:7: Visiting a NameExpr (t)
+tests/bartest.pj:7: Visiting a Name (t)
+tests/bartest.pj:7: In visitLocalDecl(): stVarStr is _ld$time2 = // i'm a channel read, and my procName is _proc$Anonymous20
+if (!_pd$t3->is_ready_to_read(this)) {
+    this->set_label(1);
+    // yield();
+    return;
+}
+
+_proc$Anonymous20L1:
+_ld$time2 = _pd$t3->read(this);
+this->set_label(2);
+// yield();
+return;
+
+_proc$Anonymous20L2:;.
+tests/bartest.pj:0: Visiting a ProcTypeDecl (Anonymous)
+tests/bartest.pj:0: Visiting a Name (Anonymous)
+tests/bartest.pj:8: Visiting a Block
+tests/bartest.pj:8: Visiting a Sequence
+tests/bartest.pj:8: Visiting a TimeoutStat
+tests/bartest.pj:8: Visiting a NameExpr (t)
+tests/bartest.pj:8: Visiting a Name (t)
+tests/bartest.pj:8: Visiting a Primitive Literal (1000)
+tests/bartest.pj:0: Visiting a ProcTypeDecl (Anonymous)
+tests/bartest.pj:0: Visiting a Name (Anonymous)
+tests/bartest.pj:9: Visiting a Block
+tests/bartest.pj:9: Visiting a Sequence
+tests/bartest.pj:9: Visiting an ExprStat
+tests/bartest.pj:9: Visiting Invocation (println)
+tests/bartest.pj:9: NOTE: println gets us null
+tests/bartest.pj:0: Visiting a Sequence
+tests/bartest.pj:9: Visiting a Primitive Literal ("read: ")
+tests/bartest.pj:9: Visiting a NameExpr (d)
+tests/bartest.pj:9: Visiting a Name (d)
+tests/bartest.pj:9: Visiting a Primitive Literal (", time: ")
+tests/bartest.pj:9: Visiting a NameExpr (time)
+tests/bartest.pj:9: Visiting a Name (time)
+tests/bartest.pj:9: visiting formal parameter s
+tests/bartest.pj:8: Visiting a Primitive Type (string)
+tests/bartest.pj:9: Leaving visitInvocation()
+tests/bartest.pj:3: sizes are 3, 3, 3, 0
+tests/bartest.pj:3: pj_runtime::pj_par*
+tests/bartest.pj:3: int
+tests/bartest.pj:3: long
+tests/bartest.pj:3: _ld$_par1
+tests/bartest.pj:3: _ld$d1
+tests/bartest.pj:3: _ld$time2
+tests/bartest.pj:3: static_cast<pj_runtime::pj_par*>(0)
+tests/bartest.pj:3: 0
+tests/bartest.pj:3: 0
+tests/bartest.pj:13: Visiting a ProcTypeDecl (bar)
+tests/bartest.pj:13: Visiting a Name (bar)
+tests/bartest.pj:13: visiting parameters
+tests/bartest.pj:13: Visiting a ParamDecl (barrier b)
+tests/bartest.pj:13: Visiting a Name (b)
+tests/bartest.pj:13: Visiting a Primitive Type (barrier)
+tests/bartest.pj:13: appending a pointer specifier to type of b
+tests/bartest.pj:13: visiting parameters
+tests/bartest.pj:13: Visiting a ParamDecl (chan<int>.write w)
+tests/bartest.pj:13: Visiting a Name (w)
+tests/bartest.pj:13: Visiting a ChannelEndType (chan<int>.write)
+tests/bartest.pj: in getCPPChannelType()
+tests/bartest.pj:13: in visitParamDecl() type is pj_runtime::pj_one2one_channel<int32_t>
+tests/bartest.pj:13: appending a pointer specifier to type of w
+tests/bartest.pj:13: Visiting a Sequence
+tests/bartest.pj:13: Visiting a Modifier (public)
+tests/bartest.pj:13: Visiting a Primitive Type (void)
+tests/bartest.pj: Stored bar's helper name as _proc$bar51107549535.
+tests/bartest.pj:14: Visiting a Block
+tests/bartest.pj:14: Visiting a Sequence
+tests/bartest.pj:14: Visiting a SyncStat
+tests/bartest.pj:14: Visiting a NameExpr (b)
+tests/bartest.pj:14: Visiting a Name (b)
+tests/bartest.pj:15: Visiting a ChannelWriteStat
+tests/bartest.pj:15: Visiting a NameExpr (w)
+tests/bartest.pj:15: Visiting a Name (w)
+tests/bartest.pj:15: Visiting a Primitive Literal (5)
+tests/bartest.pj:15: proc name is bar, = _proc$bar51107549535
+tests/bartest.pj:18: Visiting a ProcTypeDecl (f)
+tests/bartest.pj:18: Visiting a Name (f)
+tests/bartest.pj:18: visiting parameters
+tests/bartest.pj:18: Visiting a ParamDecl (int i)
+tests/bartest.pj:18: Visiting a Name (i)
+tests/bartest.pj:18: Visiting a Primitive Type (int)
+tests/bartest.pj:18: Visiting a Sequence
+tests/bartest.pj:18: Visiting a Modifier (public)
+tests/bartest.pj:18: Visiting a Primitive Type (void)
+tests/bartest.pj: Stored f's helper name as _proc$f61189.
+tests/bartest.pj:18: Visiting a Block
+tests/bartest.pj:18: Visiting a Sequence
+tests/bartest.pj:18: Visiting an ExprStat
+tests/bartest.pj:18: Visiting Invocation (println)
+tests/bartest.pj:18: NOTE: println gets us null
+tests/bartest.pj:0: Visiting a Sequence
+tests/bartest.pj:18: Visiting a Primitive Literal ("f(")
+tests/bartest.pj:18: Visiting a NameExpr (i)
+tests/bartest.pj:18: Visiting a Name (i)
+tests/bartest.pj:18: Visiting a Primitive Literal (")")
+tests/bartest.pj:18: visiting formal parameter s
+tests/bartest.pj:8: Visiting a Primitive Type (string)
+tests/bartest.pj:18: Leaving visitInvocation()
+tests/bartest.pj:19: Visiting a ProcTypeDecl (b)
+tests/bartest.pj:19: Visiting a Name (b)
+tests/bartest.pj:19: visiting parameters
+tests/bartest.pj:19: Visiting a ParamDecl (int i)
+tests/bartest.pj:19: Visiting a Name (i)
+tests/bartest.pj:19: Visiting a Primitive Type (int)
+tests/bartest.pj:19: Visiting a Sequence
+tests/bartest.pj:19: Visiting a Modifier (public)
+tests/bartest.pj:19: Visiting a Primitive Type (void)
+tests/bartest.pj: Stored b's helper name as _proc$b71189.
+tests/bartest.pj:19: Visiting a Block
+tests/bartest.pj:19: Visiting a Sequence
+tests/bartest.pj:19: Visiting an ExprStat
+tests/bartest.pj:19: Visiting Invocation (println)
+tests/bartest.pj:19: NOTE: println gets us null
+tests/bartest.pj:0: Visiting a Sequence
+tests/bartest.pj:19: Visiting a Primitive Literal ("b(")
+tests/bartest.pj:19: Visiting a NameExpr (i)
+tests/bartest.pj:19: Visiting a Name (i)
+tests/bartest.pj:19: Visiting a Primitive Literal (")")
+tests/bartest.pj:19: visiting formal parameter s
+tests/bartest.pj:8: Visiting a Primitive Type (string)
+tests/bartest.pj:19: Leaving visitInvocation()
+tests/bartest.pj:21: Visiting a ProcTypeDecl (main)
+tests/bartest.pj:21: Visiting a Name (main)
+tests/bartest.pj:21: visiting parameters
+tests/bartest.pj:21: Visiting a ParamDecl (string[] args)
+tests/bartest.pj:21: Visiting a Name (args)
+tests/bartest.pj:21: Visiting an ArrayType (string[])
+tests/bartest.pj:21: Visiting a Primitive Type (string)
+tests/bartest.pj:21: stArrayType is char*
+tests/bartest.pj:21: base of array, pj_array used
+tests/bartest.pj:21: Visiting a Sequence
+tests/bartest.pj:21: Visiting a Modifier (public)
+tests/bartest.pj:21: Visiting a Primitive Type (void)
+tests/bartest.pj: Stored main's helper name as _proc$main81169311.
+tests/bartest.pj:0: Visiting a Block
+tests/bartest.pj:0: Visiting a Sequence
+tests/bartest.pj:22: Visting a LocalDecl (timer t)
+tests/bartest.pj:22: Visiting a Primitive Type (timer)
+tests/bartest.pj:22: in visitLocalDecl(): type is pj_runtime::pj_timer.
+tests/bartest.pj:22: appending a pointer specifier to type of t
+tests/bartest.pj:22: creating delete statement for t
+tests/bartest.pj:22: t's expr is null.
+tests/bartest.pj:22: t has a 0 initializer.
+tests/bartest.pj:23: Visting a LocalDecl (barrier b)
+tests/bartest.pj:23: Visiting a Primitive Type (barrier)
+tests/bartest.pj:23: in visitLocalDecl(): type is pj_runtime::pj_barrier.
+tests/bartest.pj:23: appending a pointer specifier to type of b
+tests/bartest.pj:23: creating delete statement for b
+tests/bartest.pj:23: b's expr is null.
+tests/bartest.pj:23: b has a 0 initializer.
+tests/bartest.pj:24: Visting a LocalDecl (chan<int> c)
+tests/bartest.pj:24: Visiting a ChannelType (chan<int>)
+tests/bartest.pj: in getCPPChannelType()
+tests/bartest.pj:24: in visitLocalDecl(): type is pj_runtime::pj_one2one_channel<int32_t>.
+tests/bartest.pj:24: appending a pointer specifier to type of c
+tests/bartest.pj:24: c's expr is null.
+tests/bartest.pj:24: c has a 0 initializer.
+tests/bartest.pj:26: Visiting a ParBlock with 2 statements.
+tests/bartest.pj:25: Visiting a NameExpr (b)
+tests/bartest.pj:25: Visiting a Name (b)
+tests/bartest.pj:26: Visiting Invocation (bar)
+tests/bartest.pj:26: NOTE: bar gets us _proc$bar51107549535
+tests/bartest.pj:26: Visiting a Sequence
+tests/bartest.pj:26: Visiting a NameExpr (b)
+tests/bartest.pj:26: Visiting a Name (b)
+tests/bartest.pj:26: Visiting a ChannelEndExpr (write)
+tests/bartest.pj:26: Visiting a NameExpr (c)
+tests/bartest.pj:26: Visiting a Name (c)
+tests/bartest.pj:26: visiting formal parameter b
+tests/bartest.pj:13: Visiting a Primitive Type (barrier)
+tests/bartest.pj:13: appending a pointer specifier to type of b
+tests/bartest.pj:26: visiting formal parameter w
+tests/bartest.pj:13: Visiting a ChannelEndType (chan<int>.write)
+tests/bartest.pj: in getCPPChannelType()
+tests/bartest.pj:13: appending a pointer specifier to type of w
+tests/bartest.pj:26: Leaving visitInvocation()
+tests/bartest.pj:27: Visiting Invocation (foo)
+tests/bartest.pj:27: NOTE: foo gets us _proc$foo0$796934035
+tests/bartest.pj:27: Visiting a Sequence
+tests/bartest.pj:27: Visiting a NameExpr (b)
+tests/bartest.pj:27: Visiting a Name (b)
+tests/bartest.pj:27: Visiting a ChannelEndExpr (read)
+tests/bartest.pj:27: Visiting a NameExpr (c)
+tests/bartest.pj:27: Visiting a Name (c)
+tests/bartest.pj:27: Visiting a NameExpr (t)
+tests/bartest.pj:27: Visiting a Name (t)
+tests/bartest.pj:27: visiting formal parameter b
+tests/bartest.pj:3: Visiting a Primitive Type (barrier)
+tests/bartest.pj:3: appending a pointer specifier to type of b
+tests/bartest.pj:27: visiting formal parameter r
+tests/bartest.pj:3: Visiting a ChannelEndType (chan<int>.read)
+tests/bartest.pj: in getCPPChannelType()
+tests/bartest.pj:3: appending a pointer specifier to type of r
+tests/bartest.pj:27: visiting formal parameter t
+tests/bartest.pj:3: Visiting a Primitive Type (timer)
+tests/bartest.pj:27: Leaving visitInvocation()
+tests/bartest.pj:21: sizes are 4, 4, 4, 2
+tests/bartest.pj:21: pj_runtime::pj_timer*
+tests/bartest.pj:21: pj_runtime::pj_barrier*
+tests/bartest.pj:21: pj_runtime::pj_one2one_channel<int32_t>*
+tests/bartest.pj:21: pj_runtime::pj_par*
+tests/bartest.pj:21: _ld$t3
+tests/bartest.pj:21: _ld$b4
+tests/bartest.pj:21: _ld$c5
+tests/bartest.pj:21: _ld$_par2
+tests/bartest.pj:21: static_cast<pj_runtime::pj_timer*>(0)
+tests/bartest.pj:21: static_cast<pj_runtime::pj_barrier*>(0)
+tests/bartest.pj:21: static_cast<pj_runtime::pj_one2one_channel<int32_t>*>(0)
+tests/bartest.pj:21: static_cast<pj_runtime::pj_par*>(0)
+tests/bartest.pj:21: delete _ld$t3;
+tests/bartest.pj:21: delete _ld$b4;
