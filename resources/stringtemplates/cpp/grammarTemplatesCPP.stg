@@ -454,17 +454,16 @@ ArrayAccessExpr(name, index) ::= "(*<name>)[<index>]"
 // 1) name:
 // 2) delay:
 // 3) resume0:
-TimeoutStat(name, delay, resume0) ::= <<
-<name> = new PJTimer(this, <delay>);
-try {
-    <name>.start();
-    setNotReady();
-    this.runLabel = <resume0>;
-    yield();
-} catch (InterruptedException e) {
-    System.out.println("An Interrupted exception occurred for a timer!");
-}
-label(<resume0>);
+TimeoutStat(name, delay, resume0, procName) ::= <<
+<!<name> = new PJTimer(this, <delay>);!>
+<name> = new pj_runtime::pj_timer(this, <delay>);
+<name>->start();
+this->set_not_ready();
+this->set_label(<resume0>);
+// yield();
+return;
+
+<procName>L<resume0>:
 >>
 
 //========================================================================================
@@ -487,6 +486,7 @@ return;
 // 2) resume0:
 // 3) resume1:
 ChannelReadExpr(chanName, lhs, op, procName, resume0, resume1, extendRv) ::= <<
+// i'm a channel read, and my procName is <procName>
 if (!<chanName>->is_ready_to_read(this)) {
     this->set_label(<resume0>);
     // yield();

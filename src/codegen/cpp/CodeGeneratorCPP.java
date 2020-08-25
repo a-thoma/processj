@@ -264,6 +264,10 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         // For non-invocations, that is, for anything other than a procedure
         // that yields, we need to extends the PJProcess class anonymously.
         if ("Anonymous".equals(currentProcName)) {
+            // Generate a name
+            procName = Helper.makeVariableName(currentProcName + Integer.toString(procCount) + signature(pd), 0, Tag.PROCEDURE_NAME);                          
+            // Store generated name for labels of a possible ChannelReadExpr
+            generatedProcNames.put(currentProcName, procName);
             // Preserve current jump label.
             int prevJumLabel = jumpLabel;
             jumpLabel = 0;
@@ -281,6 +285,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             if (!switchLabelList.isEmpty()) {
                 ST stSwitchBlock = stGroup.getInstanceOf("SwitchBlock");
                 stSwitchBlock.add("jumps", switchLabelList);
+                stSwitchBlock.add("name", generatedProcNames.get(currentProcName));
                 stProcTypeDecl.add("switchBlock", stSwitchBlock.render());
             }
             // add a generated name of the process
@@ -673,7 +678,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         }
 
         // If it needs to be a pointer, make it so
-        if(pd.type().isBarrierType() || !(pd.type().isPrimitiveType() || pd.type().isArrayType())) {
+        if(pd.type().isTimerType() || pd.type().isBarrierType() || !(pd.type().isPrimitiveType() || pd.type().isArrayType())) {
             Log.log(pd, "appending a pointer specifier to type of " + name);
             type += "*";
         }
@@ -715,11 +720,11 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         String newName = Helper.makeVariableName(name, ++localDecId, Tag.LOCAL_NAME);
 
         // If it needs to be a pointer, make it so
-        if(ld.type().isBarrierType() || !(ld.type().isPrimitiveType() || ld.type().isArrayType())) {
+        if(ld.type().isBarrierType() || ld.type().isTimerType() || !(ld.type().isPrimitiveType() || ld.type().isArrayType())) {
             Log.log(ld, "appending a pointer specifier to type of " + name);
             type += "*";
         }
-        if (ld.type().isBarrierType() || !(ld.type().isPrimitiveType())) {
+        if (ld.type().isTimerType() || ld.type().isBarrierType()/* || !(ld.type().isPrimitiveType())*/) {
             Log.log(ld, "creating delete statement for " + name);
             String deleteStmt = "delete " + newName + ";";
             localDeletes.put(name, deleteStmt);
@@ -773,15 +778,17 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         // variable is not initialized.
         if (expr == null) {
             Log.log(ld, name + "'s expr is null.");
-            if (!ld.type().isBarrierType() && 
-                !ld.type().isChannelType() && (ld.type().isPrimitiveType() ||
-                ld.type().isArrayType() ||    // Could be an uninitialized array declaration.
-                ld.type().isNamedType())) {   // Could be records or protocols.
+            // if (!ld.type().isBarrierType() && 
+            //     !ld.type().isChannelType() && (ld.type().isPrimitiveType() ||
+            //     ld.type().isArrayType() ||    // Could be an uninitialized array declaration.
+            //     ld.type().isNamedType())) {   // Could be records or protocols.
                     Log.log(ld, name + " has a 0 initializer.");
                     // TODO: static cast this to the type of the variable
-                    localInits.put(name, "0");
+                    // localInits.put(name, "0");
+                    // TODO: do we need this as an init? probably not...
+                    localInits.put(name, "static_cast<" + type + ">(0)");
                     return null;              // The 'null' is used to removed empty sequences.
-                }
+                // }
         }
         
         // If we reach this section of code, then we have a variable
@@ -792,14 +799,16 @@ public class CodeGeneratorCPP extends Visitor<Object> {
 
         if (expr instanceof ChannelReadExpr) {
             if (ld.type().isPrimitiveType()) {
+                // TODO: do we need this as an init? probably not...
                 localInits.put(newName, (((PrimitiveType)ld.type()).getKind() == PrimitiveType.StringKind) ? "\"\"" : "0");
             } else if (ld.type().isNamedType() ||
                        ld.type().isArrayType()) {
+                // TODO: do we need this as an init? probably not...
                 localInits.put(name, "nullptr");
             }
         } else {
             // We need to store the initializer so we can build the locals later
-            localInits.put(newName, val);   
+            // localInits.put(newName, val);   
         }
         
         ST stVar = stGroup.getInstanceOf("Var");
@@ -1765,7 +1774,8 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         // we should also add a pj_runtime::pj_par to the locals of whatever
         // process we're in
         localParams.put(currentParBlock, "pj_runtime::pj_par*");
-        // localInits.put(currentParBlock, "pj_runtime::pj_par(" + pb.stats().size() + ", this)");
+        // TODO: do we need this as an init? probably not...
+        localInits.put(currentParBlock, "static_cast<pj_runtime::pj_par*>(0)");
         // localDeletes.put(currentParBlock, "delete " + currentParBlock + ";");
         
         // Increment the jump label.
@@ -1838,6 +1848,8 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         stTimeoutStat.add("resume0", ++jumpLabel);
         // Add the jump label to the switch list.
         switchLabelList.add(renderSwitchLabel(jumpLabel));
+        // Add the current generated proc name
+        stTimeoutStat.add("procName", generatedProcNames.get(currentProcName));
         
         return stTimeoutStat.render();
     }
