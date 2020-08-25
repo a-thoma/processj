@@ -1,0 +1,6 @@
+import std.io;
+
+public void main(string[] args) {
+	timer t;
+	long l = t.read();
+}
