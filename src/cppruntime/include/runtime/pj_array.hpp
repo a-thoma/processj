@@ -20,6 +20,12 @@ namespace pj_runtime
             m_array = nullptr;
         }
 
+        pj_array(int32_t length)
+        : length(length)
+        {
+	  m_array = new T[length];
+        }
+
         pj_array(T* data, T* data_end)
     	:length(data_end - data)
         {
