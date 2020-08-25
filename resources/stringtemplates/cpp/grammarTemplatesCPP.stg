@@ -61,7 +61,13 @@ int main(int argc, char* argv[])
     std::cout \<\< "\n *** CREATING MAIN PROCESS *** \n\n";
     <!<name>* main_proc = new <name>(argc, <vars; separator=", ">);!>
     <! TODO: need to account for arguments passed here... use a vector? !>
-    pj_runtime::pj_array args(argv, argv + argc);
+
+    pj_runtime::pj_array\<std::string> args(argc);
+    for(int i = 0; i \< argc; ++i)
+    {
+        args[i] = argv[i];
+    }
+
     <name>* main_proc = new <name>(0, &sched, &args);
 
     std::cout \<\< "\n *** SCHEDULING MAIN PROCESS *** \n\n";
