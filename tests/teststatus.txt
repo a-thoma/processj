@@ -1,3 +1,6 @@
 tests that pass:
 
 Hello.pj
+alttest.pj (will deadlock on writer2, expected)
+barrierEx.pj
+bartest.pj (t.read() is treated as a channel read expr?)
