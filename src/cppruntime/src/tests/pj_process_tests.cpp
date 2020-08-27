@@ -71,8 +71,8 @@ int32_t main(void)
     // pj_tests::barrier_test b_test;
     // b_test.run();
 
-    // pj_tests::alt_test a_test;
-    // a_test.run();
+    pj_tests::alt_test a_test;
+    a_test.run();
 
     // pj_tests::record_test r_test;
     // r_test.run();
@@ -93,8 +93,8 @@ int32_t main(void)
     // pj_tests::array_test ar_test;
     // ar_test.run();
 
-    pj_tests::string_test s_test;
-    s_test.run();
+    // pj_tests::string_test s_test;
+    // s_test.run();
 
     return 0;
 }

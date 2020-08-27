@@ -41,7 +41,8 @@ namespace pj_runtime
         {
             std::lock_guard<std::mutex> lock(this->mtx);
             std::cout << "inserting timer " << *timer << " into timerqueue\n";
-            dq.enqueue(timer, timer->timeout);
+            // dq.enqueue(timer, timer->timeout);
+            dq.enqueue(timer, timer->m_later);
             std::cout << "done inserting\n";
         }
 
@@ -98,10 +99,10 @@ namespace pj_runtime
             std::cout << "timer_thread, it's time to die\n";
 
             /* immediate death */
-            std::chrono::system_clock::time_point tp = std::chrono::system_clock::now();
+            // std::chrono::system_clock::time_point tp = std::chrono::system_clock::now();
 
             /* make our kill_timer and place it in the queue */
-            kill_timer = new pj_timer(nullptr, tp);
+            kill_timer = new pj_timer();
             this->insert(kill_timer);
 
             /* we're ready to die */

@@ -29,9 +29,9 @@ namespace pj_tests
 	        oto_w->set_not_ready();
 
 	        std::cout << "\n *** PLACING TIMER IN TIMER QUEUE *** \n\n";
-	        std::chrono::system_clock::time_point tp =
-	            std::chrono::system_clock::now() + std::chrono::seconds(3);
-	        pj_runtime::pj_timer* t = new pj_runtime::pj_timer(oto_w, tp);
+	        // std::chrono::system_clock::time_point tp =
+	        //     std::chrono::system_clock::now() + std::chrono::seconds(3);
+	        pj_runtime::pj_timer* t = new pj_runtime::pj_timer(oto_w, 3);
 	        sch.insert(t);
 
 	        std::cout << "\n *** SCHEDULING PROCESSES *** \n\n";

@@ -71,7 +71,7 @@ namespace pj_tests
             static int32_t enable_result;
             static int32_t disable_result;
             static bool ready;
-            static pj_runtime::pj_alt alt(1, this);
+            static pj_runtime::pj_alt alt(2, this);
             switch(this->get_label())
             {
                 case 0: goto L0;   break;
@@ -81,6 +81,8 @@ namespace pj_tests
             std::cout << "Hello from L0! (process " << this->id
                       << " on cpu " << sched_getcpu() << ")\n";
             guards.push_back(chan);
+            guards.push_back("skip");
+            b_guards.push_back(true);
             b_guards.push_back(true);
             ready = alt.set_guards(b_guards, guards);
 
@@ -163,7 +165,7 @@ namespace pj_tests
 
         void run()
         {
-            static pj_runtime::pj_alt alt(1, this);
+            static pj_runtime::pj_alt alt(2, this);
             static std::vector<pj_runtime::pj_alt_guard_type> guards;
             static std::vector<bool> b_guards;
             static int32_t enable_result;
@@ -179,6 +181,8 @@ namespace pj_tests
                       << " on cpu " << sched_getcpu() << ")\n";
             /* TODO: alt constructed here, rest of code to follow */
             guards.push_back(&timer);
+            guards.push_back("skip");
+            b_guards.push_back(true);
             b_guards.push_back(true);
             this->set_not_ready();
             alt.set_guards(b_guards, guards);

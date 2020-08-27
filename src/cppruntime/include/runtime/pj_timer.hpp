@@ -11,9 +11,8 @@
 
 #include <runtime/pj_process.hpp>
 
-#include <chrono>
-#include <stdexcept>
 #include <iostream>
+#include <chrono>
 #include <ostream>
 
 namespace pj_runtime
@@ -22,94 +21,73 @@ namespace pj_runtime
     {
         friend class pj_timer_queue;
         
-    public:    
-        bool started = false;
-
+    public:
         pj_timer()
+        : m_timeout(0),
+          m_now(std::chrono::system_clock::now()),
+          m_later(std::chrono::system_clock::time_point(std::chrono::seconds(m_timeout))),
+          m_delta(m_now - m_later),
+          m_expired(true),
+          m_killed(false),
+          m_process(static_cast<pj_process*>(nullptr))
         {
-            std::cout << "pj_timer constructor called\n";
-            set_timeout(std::chrono::system_clock::time_point());
+            std::cout << "pj_timer default constructor called\n";
         }
 
-        pj_timer(pj_process* p, std::chrono::system_clock::time_point t)
+        pj_timer(pj_process* p, long timeout)
+        : m_timeout(timeout),
+          m_now(std::chrono::system_clock::now()),
+          m_later(std::chrono::system_clock::time_point(std::chrono::seconds(m_timeout))),
+          m_delta(m_now - m_later),
+          m_expired(false),
+          m_killed(false),
+          m_process(p)
         {
-            std::cout << "pj_timer constructor called with arguments\n";
-            process = p;
-            set_timeout(t);
-
-            /* TODO: this is debugging and will be removed later */
-            std::cout << "after assignment, process has address "
-                      << process << std::endl;
+            std::cout << "pj_timer long argument constructor called\n";
         }
 
         ~pj_timer()
         {
-
-        }
-
-        void set_timeout(std::chrono::system_clock::time_point value)
-        {
-            if(!timeout_set)
-            {
-                timeout = value;
-                timeout_set = true;
-            }
-            else
-            {
-                throw std::runtime_error("timeout_set already true");
-            }
+            std::cout << "pj_timer destructor called\n";
         }
 
         void start()
         {
-            /* TODO: create a new timer and place it in the scheduler's timer queue
-             * ---
-             * this is done to allow for timeout on a thread for being interrupted
-             * or some other unwanted behavior, need to make this work somehow,
-             * whether or not the method stays here or gets moved elsewhere
-             */
-            timeout = std::chrono::system_clock::now() + delay;
-            // ((PJScheduler*)PJProcess::scheduler)->insertTimer(this);
+            m_now = std::chrono::system_clock::now();
+            m_later = std::chrono::system_clock::time_point(std::chrono::seconds(m_timeout));
+            m_delta = m_now - m_later;
         }
 
         void expire()
         {
-            expired = true;
+            m_expired = true;
         }
 
-        void kill()
+        long read()
         {
-            killed = true;
+            m_delta = m_later - m_now;
+            m_now = std::chrono::system_clock::now();
+            return m_delta.count();
         }
 
         pj_process* get_process()
         {
-            return (this->killed) ? (pj_process*)nullptr : (process);
+            return (m_killed) ? static_cast<pj_process*>(0) : m_process;
         }
 
-        friend std::ostream& operator<<(std::ostream& s, const pj_timer& t)
+        friend std::ostream& operator<<(std::ostream& o, const pj_timer& t)
         {
-            return s << "Process: " << t.process;
+            return o << "Process: " << t.m_process;
         }
-
-        std::chrono::system_clock::time_point read()
-        {
-            return timeout;
-        }
-
-    protected:
-        std::chrono::system_clock::time_point timeout;
-        bool expired     = false;
 
     private:
-        pj_process* process;
-
-        // std::chrono::system_clock::time_point delay;
-        std::chrono::system_clock::duration delay;
-        bool killed = false;
-
-        /* final in java */
-        bool timeout_set = false;
+        long m_timeout;
+        std::chrono::system_clock::time_point m_now;
+        std::chrono::system_clock::time_point m_later;
+        std::chrono::system_clock::duration m_delta;
+        bool m_expired;
+        bool m_killed;
+        pj_process* m_process;
     };
 }
 

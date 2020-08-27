@@ -92,7 +92,7 @@ namespace pj_runtime
                 else if(std::holds_alternative<pj_runtime::pj_timer*>(this->guards[i]))
                 {
                     std::cout << "guard is a timer\n";
-                    if(std::get<pj_runtime::pj_timer*>(this->guards[i])->read() <= std::chrono::system_clock::now())
+                    if(std::get<pj_runtime::pj_timer*>(this->guards[i])->read() <= static_cast<long>(0))
                     {
                         std::cout << "timer timed out\n";
                         this->process->set_ready();
