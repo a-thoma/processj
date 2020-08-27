@@ -786,7 +786,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
                 // TODO: static cast this to the type of the variable
                 // localInits.put(name, "0");
                 // TODO: do we need this as an init? probably not...
-                localInits.put(name, "static_cast<" + type + ">(0)");
+                // localInits.put(name, "static_cast<" + type + ">(0)");
                 if(!ld.type().isChannelType()) {
                     return null;              // The 'null' is used to removed empty sequences.
                 }
