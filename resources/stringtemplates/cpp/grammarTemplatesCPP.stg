@@ -154,7 +154,7 @@ public:
         // local variables
         <if(lvars)><ltypes,lvars:{t,v | static <t> <v>}; separator=";\n">;<\n><endif>
         <if(switchBlock)><switchBlock; separator="\n"><endif>
-        <!<if(linits)><lvars,linits:{v,i | <v> = <i>}; separator=";\n">;<\n><endif>!>
+        <if(linits)><lvars,linits:{v,i | <v> = <i>}; separator=";\n">;<\n><endif>
         <if(syncBody)><syncBody; separator="\n"><endif>
         <if(ldeletes)><ldeletes; separator="\n"><endif>
         terminate();
