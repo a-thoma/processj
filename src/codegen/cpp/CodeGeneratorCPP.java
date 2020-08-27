@@ -773,6 +773,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             stChannelDecl.add("type", chantype);
             val = stChannelDecl.render();
         }
+
         // After making this local declaration a field of the procedure
         // in which it was declared, we return if and only if this local
         // variable is not initialized.
@@ -782,15 +783,24 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             //     !ld.type().isChannelType() && (ld.type().isPrimitiveType() ||
             //     ld.type().isArrayType() ||    // Could be an uninitialized array declaration.
             //     ld.type().isNamedType())) {   // Could be records or protocols.
-                Log.log(ld, name + " has a 0 initializer.");
+                // Log.log(ld, name + " has a 0 initializer.");
                 // TODO: static cast this to the type of the variable
                 // localInits.put(name, "0");
                 // TODO: do we need this as an init? probably not...
-                // localInits.put(name, "static_cast<" + type + ">(0)");
-                if(!ld.type().isChannelType()) {
-                    return null;              // The 'null' is used to removed empty sequences.
-                }
+            localInits.put(name, "static_cast<" + type + ">(0)");
+            if (ld.type() instanceof PrimitiveType && ((PrimitiveType)ld.type()).isNumericType()) {
+                val = "static_cast<" + type + ">(0)";
+            }
+            // if (!ld.type().isChannelType()) {
+
+            //     localInits.put(name, "static_cast<" + type + ">(0)");
+            //         return null;              // The 'null' is used to removed empty sequences.
+            // } else {
+            //     localInits.put(name, val);
             // }
+            // }
+        } else {
+            localInits.put(name, "static_cast<" + type + ">(0)");
         }
         
         // If we reach this section of code, then we have a variable
@@ -802,11 +812,11 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         if (expr instanceof ChannelReadExpr) {
             if (ld.type().isPrimitiveType()) {
                 // TODO: do we need this as an init? probably not...
-                localInits.put(newName, (((PrimitiveType)ld.type()).getKind() == PrimitiveType.StringKind) ? "\"\"" : "0");
+                // localInits.put(newName, (((PrimitiveType)ld.type()).getKind() == PrimitiveType.StringKind) ? "\"\"" : "0");
             } else if (ld.type().isNamedType() ||
                        ld.type().isArrayType()) {
                 // TODO: do we need this as an init? probably not...
-                localInits.put(name, "nullptr");
+                // localInits.put(name, "nullptr");
             }
         } else {
             // We need to store the initializer so we can build the locals later
@@ -2191,6 +2201,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         
         // Is it a timer read expression?
         if (chanExpr.type.isTimerType()) {
+            Log.log(cr, "THIS IS A TIMER READ INSTEAD");
             ST stTimerRedExpr = stGroup.getInstanceOf("TimerRedExpr");
             stTimerRedExpr.add("name", lhs);
             return stTimerRedExpr.render();
