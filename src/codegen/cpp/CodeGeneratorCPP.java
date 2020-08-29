@@ -678,7 +678,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         }
 
         // If it needs to be a pointer, make it so
-        if(pd.type().isTimerType() || pd.type().isBarrierType() || !(pd.type().isPrimitiveType() || pd.type().isArrayType())) {
+        if(/*pd.type().isTimerType() ||*/ pd.type().isBarrierType() || !(pd.type().isPrimitiveType() || pd.type().isArrayType())) {
             Log.log(pd, "appending a pointer specifier to type of " + name);
             type += "*";
         }
@@ -718,13 +718,16 @@ public class CodeGeneratorCPP extends Visitor<Object> {
 
         // Create a tag for this local channel expression parameter.
         String newName = Helper.makeVariableName(name, ++localDecId, Tag.LOCAL_NAME);
+        
+        // This variable could be initialized, e.g., through an assignment operator.
+        Expression expr = ld.var().init();
 
         // If it needs to be a pointer, make it so
-        if(ld.type().isBarrierType() || ld.type().isTimerType() || !(ld.type().isPrimitiveType() || ld.type().isArrayType())) {
+        if(ld.type().isBarrierType() /*|| ld.type().isTimerType() */|| !(ld.type().isPrimitiveType() || ld.type().isArrayType())) {
             Log.log(ld, "appending a pointer specifier to type of " + name);
             type += "*";
         }
-        if (ld.type().isTimerType() || ld.type().isBarrierType()/* || !(ld.type().isPrimitiveType())*/) {
+        if (expr == null && ld.type().isTimerType() || ld.type().isBarrierType()/* || !(ld.type().isPrimitiveType())*/) {
             Log.log(ld, "creating delete statement for " + name);
             String deleteStmt = "delete " + newName + ";";
             localDeletes.put(name, deleteStmt);
@@ -736,9 +739,6 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             currentArrayTypeString = type;
             currentArrayDepth = ((ArrayType)ld.type()).getActualDepth() - 1;
         }
-        
-        // This variable could be initialized, e.g., through an assignment operator.
-        Expression expr = ld.var().init();
 
         // Visit the expressions associated with this variable.
         if (expr != null) {
@@ -787,7 +787,18 @@ public class CodeGeneratorCPP extends Visitor<Object> {
                 // TODO: static cast this to the type of the variable
                 // localInits.put(name, "0");
                 // TODO: do we need this as an init? probably not...
+
             localInits.put(name, "static_cast<" + type + ">(0)");
+
+            if (ld.type().isTimerType()) {
+                Log.log(ld, "Timer needs initializer");
+                // TODO: this may have to call some function that gets the
+                // timer's length, or we need to figure out how to redirect
+                // and rewrite the timerRead ST definition to be what we
+                // place here.
+                val = "new pj_runtime::pj_timer(this)";
+            }
+
             if (ld.type() instanceof PrimitiveType && ((PrimitiveType)ld.type()).isNumericType()) {
                 val = "static_cast<" + type + ">(0)";
             }
@@ -799,9 +810,9 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             //     localInits.put(name, val);
             // }
             // }
-        } else {
+        }/* else {
             localInits.put(name, "static_cast<" + type + ">(0)");
-        }
+        }*/
         
         // If we reach this section of code, then we have a variable
         // declaration with some initial value(s).
@@ -912,7 +923,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             typeStr = "bool";
         } else if (py.isTimerType()) {
             // typeStr = PJTimer.class.getSimpleName();
-            typeStr = "pj_runtime::pj_timer";
+            typeStr = "pj_runtime::pj_timer*";
         } else if (py.isBarrierType()) {
             // typeStr = PJBarrier.class.getSimpleName();
             typeStr = "pj_runtime::pj_barrier";
@@ -1038,30 +1049,34 @@ public class CodeGeneratorCPP extends Visitor<Object> {
     @Override
     public Object visitChannelReadExpr(ChannelReadExpr cr) {
         Log.log(cr, "Visiting a ChannelReadExpr");
-        
-        // Generated template after evaluating this visitor.
-        ST stChannelReadExpr = stGroup.getInstanceOf("ChannelReadExpr");
-        // 'c.read()' is a channel-end expression, where 'c'
-        // is the reading end of a channel.
-        Expression chanExpr = cr.channel();
-        // 'c' is the name of the channel.
-        String chanEndName = (String) chanExpr.visit(this);
-        stChannelReadExpr.add("chanName", chanEndName);
-        // Add the 'switch' block for resumption.
-        for (int label = 0; label < 2; ++label) {
-            // Increment jump label.
-            stChannelReadExpr.add("resume" + label, ++jumpLabel);
-            // Add jump label to the switch list.
-            switchLabelList.add(renderSwitchLabel(jumpLabel));
-        }
-        stChannelReadExpr.add("procName", generatedProcNames.get(currentProcName));
 
-        if (currentChannelReadName != null) {
-            stChannelReadExpr.add("lhs", currentChannelReadName);
-            stChannelReadExpr.add("op", currentChannelReadOp);
-        }
+        return createChannelReadExpr(currentChannelReadName, currentChannelReadOp, cr);
+
+        // TODO: ensure that this did not break anything via tests
         
-        return stChannelReadExpr.render();
+        // // Generated template after evaluating this visitor.
+        // ST stChannelReadExpr = stGroup.getInstanceOf("ChannelReadExpr");
+        // // 'c.read()' is a channel-end expression, where 'c'
+        // // is the reading end of a channel.
+        // Expression chanExpr = cr.channel();
+        // // 'c' is the name of the channel.
+        // String chanEndName = (String) chanExpr.visit(this);
+        // stChannelReadExpr.add("chanName", chanEndName);
+        // // Add the 'switch' block for resumption.
+        // for (int label = 0; label < 2; ++label) {
+        //     // Increment jump label.
+        //     stChannelReadExpr.add("resume" + label, ++jumpLabel);
+        //     // Add jump label to the switch list.
+        //     switchLabelList.add(renderSwitchLabel(jumpLabel));
+        // }
+        // stChannelReadExpr.add("procName", generatedProcNames.get(currentProcName));
+
+        // if (currentChannelReadName != null) {
+        //     stChannelReadExpr.add("lhs", currentChannelReadName);
+        //     stChannelReadExpr.add("op", currentChannelReadOp);
+        // }
+        
+        // return stChannelReadExpr.render();
     }
     
     @Override
@@ -2200,10 +2215,10 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         String chanEndName = (String) chanExpr.visit(this);
         
         // Is it a timer read expression?
-        if (chanExpr.type.isTimerType()) {
+        if (chanExpr.type instanceof PrimitiveType && chanExpr.type.isTimerType()) {
             Log.log(cr, "THIS IS A TIMER READ INSTEAD");
             ST stTimerRedExpr = stGroup.getInstanceOf("TimerRedExpr");
-            stTimerRedExpr.add("name", lhs);
+            stTimerRedExpr.add("timerName", chanEndName);
             return stTimerRedExpr.render();
         }
         
