@@ -424,7 +424,7 @@ BarrierDecl(count) ::= "new pj_runtime::pj_barrier(<if(count)><count><endif>)"
 //========================================================================================
 //
 // 1) name:
-TimerRedExpr(name) ::= "<name> = PJTimer.read();"
+TimerRedExpr(timerName) ::= "<timerName>->read();"
 
 //========================================================================================
 //
