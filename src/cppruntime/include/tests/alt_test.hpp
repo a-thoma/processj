@@ -170,7 +170,7 @@ namespace pj_tests
             static std::vector<bool> b_guards;
             static int32_t enable_result;
             static int32_t disable_result;
-            static pj_runtime::pj_timer timer;
+            static pj_runtime::pj_timer* timer = new pj_runtime::pj_timer(this);
             switch(this->get_label())
             {
                 case 0: goto L0;   break;
@@ -180,7 +180,7 @@ namespace pj_tests
             std::cout << "Hello from L0! (process " << this->id
                       << " on cpu " << sched_getcpu() << ")\n";
             /* TODO: alt constructed here, rest of code to follow */
-            guards.push_back(&timer);
+            guards.push_back(timer);
             guards.push_back("skip");
             b_guards.push_back(true);
             b_guards.push_back(true);
@@ -228,6 +228,8 @@ namespace pj_tests
             }
             std::cout << "END (process " << this->id
                       << " on cpu " << sched_getcpu() << ")\n";
+
+            delete timer;
             terminate();
             return;
         }

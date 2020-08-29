@@ -22,16 +22,16 @@ namespace pj_runtime
         friend class pj_timer_queue;
         
     public:
-        pj_timer()
+        pj_timer(pj_process* p)
         : m_timeout(0),
           m_now(std::chrono::system_clock::now()),
           m_later(std::chrono::system_clock::time_point(std::chrono::seconds(m_timeout))),
           m_delta(m_now - m_later),
-          m_expired(true),
+          m_expired(false),
           m_killed(false),
-          m_process(static_cast<pj_process*>(nullptr))
+          m_process(p)
         {
-            std::cout << "pj_timer default constructor called\n";
+            std::cout << "pj_timer process argument constructor called\n";
         }
 
         pj_timer(pj_process* p, long timeout)
@@ -58,6 +58,11 @@ namespace pj_runtime
             m_delta = m_now - m_later;
         }
 
+        void timeout(long timeout)
+        {
+            m_timeout = timeout;
+        }
+
         void expire()
         {
             m_expired = true;
@@ -79,6 +84,19 @@ namespace pj_runtime
         {
             return o << "Process: " << t.m_process;
         }
+
+    protected:
+        pj_timer()
+        : m_timeout(0),
+          m_now(std::chrono::system_clock::now()),
+          m_later(std::chrono::system_clock::time_point(std::chrono::seconds(0))),
+          m_delta(m_now - m_later),
+          m_expired(true),
+          m_killed(true),
+          m_process(static_cast<pj_process*>(nullptr))
+          {
+            std::cout << "pj_timer default constructor called\n";
+          }
 
     private:
         long m_timeout;

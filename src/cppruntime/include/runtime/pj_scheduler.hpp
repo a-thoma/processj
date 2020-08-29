@@ -2,7 +2,7 @@
 #define PJ_SCHEDULER_HPP
 
 #include <runtime/pj_inactive_pool.hpp>
-#include <runtime/pj_timer_queue.hpp>
+
 #include <runtime/pj_run_queue.hpp>
 #include <runtime/pj_process.hpp>
 #include <runtime/pj_timer.hpp>

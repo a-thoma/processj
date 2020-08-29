@@ -8,9 +8,12 @@
 #include <atomic>
 
 namespace pj_runtime
-{
+{    
     class pj_timer_queue
     {
+
+    friend class pj_timer;
+
     public:
         pj_timer_queue()
         : exit_value(1)
@@ -86,8 +89,9 @@ namespace pj_runtime
                     if(p)
                     {
                         p->set_ready();
-                        delete timer;
                     }
+
+                    delete timer;
                 }
             });
 
@@ -98,15 +102,14 @@ namespace pj_runtime
         {
             std::cout << "timer_thread, it's time to die\n";
 
-            /* immediate death */
-            // std::chrono::system_clock::time_point tp = std::chrono::system_clock::now();
+            /* we're ready to die */
+            kill_flag.exchange(true);
 
             /* make our kill_timer and place it in the queue */
             kill_timer = new pj_timer();
-            this->insert(kill_timer);
 
-            /* we're ready to die */
-            kill_flag.exchange(true);
+            /* drop the bomb */
+            this->insert(kill_timer);
 
             std::cout << "timer_thread told to die\n";
         }
