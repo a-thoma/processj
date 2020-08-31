@@ -812,7 +812,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             // }
             // }
         } else {
-            localInits.put(name, "static_cast<" + type + ">(" + val + ")");
+            localInits.put(name, "0");
         }
         
         // If we reach this section of code, then we have a variable
