@@ -812,7 +812,11 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             // }
             // }
         } else {
-            localInits.put(name, "0");
+            if (ld.type() instanceof PrimitiveType && ((PrimitiveType)ld.type()).isStringType()) {
+                localInits.put(name, "\"\"");
+            } else {
+                localInits.put(name, "0");
+            }
         }
         
         // If we reach this section of code, then we have a variable
