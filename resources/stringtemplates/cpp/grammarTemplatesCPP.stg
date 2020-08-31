@@ -424,7 +424,7 @@ BarrierDecl(count) ::= "new pj_runtime::pj_barrier(<if(count)><count><endif>)"
 //========================================================================================
 //
 // 1) name:
-TimerRedExpr(timerName) ::= "<timerName>->read();"
+TimerRedExpr(name) ::= "<name> = pj_runtime::pj_timer::read();"
 
 //========================================================================================
 //
@@ -462,8 +462,11 @@ ArrayAccessExpr(name, index) ::= "(*<name>)[<index>]"
 // 3) resume0:
 TimeoutStat(name, delay, resume0, procName) ::= <<
 <!<name> = new PJTimer(this, <delay>);!>
-<name> = new pj_runtime::pj_timer(this, <delay>);
+// <name> = new pj_runtime::pj_timer(this, <delay>);
+<name>->set_process(this);
+<name>->timeout(<delay>);
 <name>->start();
+this->sched->insert(<name>);
 this->set_not_ready();
 this->set_label(<resume0>);
 // yield();
@@ -779,7 +782,8 @@ ProtocolAccess(protocName, tag, var, member) ::= <<
 SyncStat(barrier, resume0, procName) ::= <<
 <barrier>->sync(this);
 this->set_label(<resume0>);
-yield();
+// yield();
+return;
 <!label(<resume0>);!>
 <procName>L<resume0>:
 >>
@@ -885,7 +889,8 @@ if (!alt_ready) {
 this->set_not_ready();
 <index> = <alt>->enable();
 this->set_label(<jump>);
-yield();
+// yield();
+return;
 
 <procName>L<jump>:
 selected = <alt>->disable(<index>);
