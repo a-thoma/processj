@@ -1434,9 +1434,15 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             }
 
             // Add the types for our vars
-            stInvocation.add("types", typesList);
-            stInvocation.add("vars", varsList);
-            stInvocation.add("argvars", paramsList);
+            if (typesList.length != 0) {
+                stInvocation.add("types", typesList);
+            }
+            if (varsList.length != 0) {
+                stInvocation.add("vars", varsList);
+            }
+            if (paramsList.length != 0) {
+                stInvocation.add("argvars", paramsList);
+            }
             // Add the proc count that we'll need for id generation
             stInvocation.add("anonCounter", procCount);
         } else {
