@@ -811,9 +811,9 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             //     localInits.put(name, val);
             // }
             // }
-        }/* else {
-            localInits.put(name, "static_cast<" + type + ">(0)");
-        }*/
+        } else {
+            localInits.put(name, "static_cast<" + type + ">(" + val + ")");
+        }
         
         // If we reach this section of code, then we have a variable
         // declaration with some initial value(s).
