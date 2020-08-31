@@ -3,6 +3,7 @@ tests that pass (with some exceptions):
 Hello.pj
 alttest.pj (will deadlock on writer2, expected)
 barrierEx.pj
+bartest.pj (fixed timer read issue and double-free issue)
 binexpr.pj (no output but verified)
 bytecode.pj (not necessary, no bytecode is modified because no bytecode is generated)
 car.pj (fixed char* issue, alls strings are now std::strings)
@@ -10,5 +11,3 @@ channelWR.pj (fixed chan init issue)
 commstime.pj (fixed problem with pars not reinitializing in a loop)
 
 tests that don't pass:
-
-bartest.pj (t.read() is treated as a channel read expr?)
