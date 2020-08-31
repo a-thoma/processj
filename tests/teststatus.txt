@@ -25,6 +25,8 @@ readEx.pj
 simple.pj (livelocks on read call, expected)
 simplepj.pj
 SwitchDemo.pj
+timer.pj
+verySimple.pj
 
 tests that don't pass:
 Demo.pj (problem with inheritance/structure)
@@ -42,8 +44,6 @@ sharedchan.pj (infinite loop issues?)
 sharedread.pj (infinite loop issues?)
 sharedwrite.pj (infinite loop issues?)
 silly.pj (more channel read stuff)
+test22.pj (probably template stuff)
 
 tests that are untested:
-test22.pj
-timer.pj
-verysimple.pj
