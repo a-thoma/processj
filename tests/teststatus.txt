@@ -9,5 +9,9 @@ bytecode.pj (not necessary, no bytecode is modified because no bytecode is gener
 car.pj (fixed char* issue, alls strings are now std::strings)
 channelWR.pj (fixed chan init issue)
 commstime.pj (fixed problem with pars not reinitializing in a loop)
+cpparraytest.pj (fixed problem with initializers)
+cppiotest.pj
+cpprecordtest.pj
+cpptimerreadtest.pj
 
 tests that don't pass:
