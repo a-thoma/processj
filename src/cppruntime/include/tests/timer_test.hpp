@@ -15,8 +15,7 @@ namespace pj_tests
 		void run()
 		{
 			std::cout << "timer_process run: new timer\n";
-	        static pj_runtime::pj_timer* t = new pj_runtime::pj_timer(this); // TODO: change runtime to add THIS to arg list
-	        // t->timeout(3);                                                // to the non-null initializer for a timer
+	        static pj_runtime::pj_timer* t = new pj_runtime::pj_timer(this, 0);
 
 	        switch(get_label())
 	        {
@@ -26,6 +25,7 @@ namespace pj_tests
 
 	        L0:
 	        std::cout << "timer_process run: start timer\n";
+	        t->timeout(0);
 	        t->start();
 	        m_sched->insert(t);
 	        this->set_not_ready();

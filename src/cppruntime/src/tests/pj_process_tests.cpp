@@ -65,14 +65,14 @@ int32_t main(void)
     // pj_tests::many2many_test mtm_test;
     // mtm_test.run();
 
-    pj_tests::timer_test t_test;
-    t_test.run();
+    // pj_tests::timer_test t_test;
+    // t_test.run();
 
     // pj_tests::barrier_test b_test;
     // b_test.run();
 
-    // pj_tests::alt_test a_test;
-    // a_test.run();
+    pj_tests::alt_test a_test;
+    a_test.run();
 
     // pj_tests::record_test r_test;
     // r_test.run();

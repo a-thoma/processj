@@ -77,6 +77,7 @@ namespace pj_utilities
              */
             std::unique_lock<std::mutex> lk(mutex);
             std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+            now = std::chrono::time_point_cast<std::chrono::milliseconds>(now);
 
             /* while the queue is empty and closed, or is not empty and 
              * there is a timepoint that hasn't expired yet
@@ -116,7 +117,7 @@ namespace pj_utilities
             {
                 cv.notify_all();
             }
-
+            
             /* return the item */
             return res;
         }

@@ -10,10 +10,12 @@ namespace pj_tests
         alt_writer() = delete;
 
         alt_writer(int32_t                              id,
+                   pj_runtime::pj_scheduler*         sched,
                    pj_runtime::pj_one2one_channel<T>* chan,
                    T                                  data)
         : id(id), data(data)
         {
+            this->sched = sched;
             this->chan = chan;
         }
 
@@ -38,6 +40,7 @@ namespace pj_tests
 
     private:
         int32_t                              id;
+        pj_runtime::pj_scheduler*         sched;
         T                                  data;
         pj_runtime::pj_one2one_channel<T>* chan;
     };
@@ -49,9 +52,11 @@ namespace pj_tests
         alt_process() = delete;
 
         alt_process(uint32_t                             id,
+                    pj_runtime::pj_scheduler*         sched,
                     pj_runtime::pj_one2one_channel<T>* chan)
         : id(id)
         {
+            this->sched = sched;
             this->chan = chan;
         }
 
@@ -147,6 +152,7 @@ namespace pj_tests
 
     private:
         uint32_t id;
+        pj_runtime::pj_scheduler*         sched;
         pj_runtime::pj_one2one_channel<T>* chan;
     };
 
@@ -155,8 +161,9 @@ namespace pj_tests
     public:
         alt_timeout_process() = delete;
 
-        alt_timeout_process(uint32_t id)
-        : id(id)
+        alt_timeout_process(uint32_t id, pj_runtime::pj_scheduler* sched)
+        : id(id),
+          sched(sched)
         {
 
         }
@@ -165,12 +172,13 @@ namespace pj_tests
 
         void run()
         {
-            static pj_runtime::pj_alt alt(2, this);
+            // static pj_runtime::pj_alt alt(2, this);
+            static pj_runtime::pj_alt alt(1, this);
             static std::vector<pj_runtime::pj_alt_guard_type> guards;
             static std::vector<bool> b_guards;
             static int32_t enable_result;
             static int32_t disable_result;
-            static pj_runtime::pj_timer* timer = new pj_runtime::pj_timer(this);
+            static pj_runtime::pj_timer* timer = new pj_runtime::pj_timer(this, 0);
             switch(this->get_label())
             {
                 case 0: goto L0;   break;
@@ -180,10 +188,13 @@ namespace pj_tests
             std::cout << "Hello from L0! (process " << this->id
                       << " on cpu " << sched_getcpu() << ")\n";
             /* TODO: alt constructed here, rest of code to follow */
+            timer->timeout(3000);
+            timer->start();
+            sched->insert(timer);
             guards.push_back(timer);
-            guards.push_back("skip");
+            // guards.push_back("skip");
             b_guards.push_back(true);
-            b_guards.push_back(true);
+            // b_guards.push_back(true);
             this->set_not_ready();
             alt.set_guards(b_guards, guards);
             enable_result = alt.enable();
@@ -241,6 +252,7 @@ namespace pj_tests
 
     private:
         uint32_t id;
+        pj_runtime::pj_scheduler* sched;
     };
 
     class alt_skip_process : public pj_runtime::pj_process
@@ -248,10 +260,11 @@ namespace pj_tests
     public:
         alt_skip_process() = delete;
 
-        alt_skip_process(uint32_t      id)
+        alt_skip_process(uint32_t                     id,
+                         pj_runtime::pj_scheduler* sched)
         : id(id)
         {
-
+            this->sched = sched;
         }
 
         virtual ~alt_skip_process() = default;
@@ -338,6 +351,7 @@ namespace pj_tests
 
     private:
         uint32_t id;
+        pj_runtime::pj_scheduler* sched;
     };
 
     class alt_test
@@ -360,23 +374,23 @@ namespace pj_tests
                 new pj_runtime::pj_one2one_channel<uint32_t>();
 
             std::cout << "\n *** CREATING PROCESS FOR ALT *** \n\n";
-            alt_process<uint32_t>* a_process = new alt_process<uint32_t>(0, chan1);
+            alt_process<uint32_t>* a_process = new alt_process<uint32_t>(0, &sched, chan1);
 
             std::cout << "\n *** CREATING PROCESS FOR ALT ON CHANNEL READ *** \n\n";
-            alt_writer<uint32_t>* process = new alt_writer<uint32_t>(1, chan2, 1);
+            alt_writer<uint32_t>* process = new alt_writer<uint32_t>(1, &sched, chan2, 1);
 
             std::cout << "\n *** CREATING PROCESS FOR ALT ON TIMEOUT *** \n\n";
             // alt_timeout_process* at_process = new alt_timeout_process(2, timer);
-            alt_timeout_process* at_process = new alt_timeout_process(2);
+            alt_timeout_process* at_process = new alt_timeout_process(2, &sched);
 
             std::cout << "\n *** CREATING PROCESS FOR ALT ON SKIP *** \n\n";
-            alt_skip_process* as_process = new alt_skip_process(3);
+            alt_skip_process* as_process = new alt_skip_process(3, &sched);
 
             std::cout << "\n *** SCHEDULING PROCESSES *** \n\n";
-            sched.insert(a_process);
-            sched.insert(process);
+            // sched.insert(a_process);
+            // sched.insert(process);
             sched.insert(at_process);
-            sched.insert(as_process);
+            // sched.insert(as_process);
 
             std::cout << "\n *** STARTING SCHEDULER *** \n\n";
             sched.start();

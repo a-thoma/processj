@@ -17,62 +17,93 @@
 
 namespace pj_runtime
 {
+    
     class pj_timer
     {
         friend class pj_timer_queue;
-        
+        friend class pj_alt;
+
     public:
-        pj_timer(pj_process* p)
-        : m_timeout(0),
-          m_now(std::chrono::system_clock::now()),
-          m_later(std::chrono::system_clock::time_point(std::chrono::seconds(m_timeout))),
-          m_delta(m_now - m_later),
+        bool m_started;
+        bool m_expired;
+
+        pj_timer()
+        : m_started(false),
           m_expired(false),
+          m_delay(0),
+          m_real_delay(std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::time_point::min())),
           m_killed(false),
-          m_process(p)
+          m_process(static_cast<pj_process*>(0))
         {
-            std::cout << "pj_timer process argument constructor called\n";
+            std::cout << "pj_timer constructor called with immediate timeout\n";
         }
 
-        pj_timer(pj_process* p, long timeout)
-        : m_timeout(timeout),
-          m_now(std::chrono::system_clock::now()),
-          m_later(std::chrono::system_clock::time_point(std::chrono::seconds(m_timeout))),
-          m_delta(m_now - m_later),
+        pj_timer(long timeout)
+        : m_started(false),
           m_expired(false),
+          m_delay(timeout),
+          m_real_delay(std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::time_point::min())),
           m_killed(false),
-          m_process(p)
+          m_process(static_cast<pj_process*>(0))
         {
-            std::cout << "pj_timer long argument constructor called\n";
+            std::cout << "pj_timer constructor called with timeout of " << m_delay << std::endl;
         }
 
-        ~pj_timer()
+        pj_timer(pj_process* process, long timeout)
+        : m_started(false),
+          m_expired(false),
+          m_delay(timeout),
+          m_real_delay(std::chrono::time_point_cast<std::chrono::milliseconds>(std::chrono::system_clock::time_point::min())),
+          m_killed(false),
+          m_process(process)
         {
-            std::cout << "pj_timer destructor called\n";
+            std::cout << "pj_timer constructor called with process ptr and timeout of " << m_delay << std::endl;
         }
+
+        ~pj_timer() = default;
 
         void start()
         {
-            m_now = std::chrono::system_clock::now();
-            m_later = std::chrono::system_clock::time_point(std::chrono::seconds(m_timeout));
-            m_delta = m_now - m_later;
+            m_real_delay = std::chrono::system_clock::time_point(std::chrono::milliseconds(pj_timer::read() + this->get_delay()));
+            std::cout << "pj_timer started\n";
+            m_started = true;
         }
 
         void timeout(long timeout)
         {
-            m_timeout = timeout;
+            m_delay = timeout;
+        }
+
+        static long read()
+        {
+            auto now = std::chrono::system_clock::now();
+            auto now_ms = std::chrono::time_point_cast<std::chrono::milliseconds>(now);
+            auto now_epoch = now_ms.time_since_epoch();
+            auto value = std::chrono::duration_cast<std::chrono::milliseconds>(now_epoch);
+            return static_cast<long>(value.count());
+        }
+
+        void kill()
+        {
+            std::cout << "pj_timer killed\n";
+            m_killed = true;
         }
 
         void expire()
         {
+            std::cout << "pj_timer expired\n";
             m_expired = true;
         }
 
-        long read()
+        long get_delay()
         {
-            m_delta = m_later - m_now;
-            m_now = std::chrono::system_clock::now();
-            return m_delta.count();
+            std::cout << "getting delay of " << m_delay << std::endl;
+            return m_delay;
+        }
+
+        void set_process(pj_process* p)
+        {
+            m_process = p;
         }
 
         pj_process* get_process()
@@ -80,30 +111,21 @@ namespace pj_runtime
             return (m_killed) ? static_cast<pj_process*>(0) : m_process;
         }
 
-        friend std::ostream& operator<<(std::ostream& o, const pj_timer& t)
+        friend std::ostream& operator<<(std::ostream& o, pj_timer& t)
         {
             return o << "Process: " << t.m_process;
         }
 
-    protected:
-        pj_timer()
-        : m_timeout(0),
-          m_now(std::chrono::system_clock::now()),
-          m_later(std::chrono::system_clock::time_point(std::chrono::seconds(0))),
-          m_delta(m_now - m_later),
-          m_expired(true),
-          m_killed(true),
-          m_process(static_cast<pj_process*>(nullptr))
-          {
-            std::cout << "pj_timer default constructor called\n";
-          }
+protected:
+        std::chrono::system_clock::time_point get_real_delay()
+        {
+            return std::chrono::time_point_cast<std::chrono::milliseconds>(m_real_delay);
+        }
 
     private:
+        long m_delay;
+        std::chrono::system_clock::time_point m_real_delay;
         long m_timeout;
-        std::chrono::system_clock::time_point m_now;
-        std::chrono::system_clock::time_point m_later;
-        std::chrono::system_clock::duration m_delta;
-        bool m_expired;
         bool m_killed;
         pj_process* m_process;
     };

@@ -44,8 +44,7 @@ namespace pj_runtime
         {
             std::lock_guard<std::mutex> lock(this->mtx);
             std::cout << "inserting timer " << *timer << " into timerqueue\n";
-            // dq.enqueue(timer, timer->timeout);
-            dq.enqueue(timer, timer->m_later);
+            dq.enqueue(timer, timer->get_real_delay());
             std::cout << "done inserting\n";
         }
 
