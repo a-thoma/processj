@@ -5,7 +5,7 @@ RUNTIMEFLAGS := -L$(RUNTIMEDIR)lib -lprocessj
 
 CPPFLAGS := -Wall -g -I$(RUNTIMEDIR)include -pthread -std=c++17
 
-BUILDFLAGS := -Wall -g -I$(RUNTIMEDIR)include -Ilib/C++ -pthread -std=c++17
+BUILDFLAGS := -Wall -g -I$(RUNTIMEDIR)include -Ilib/C++ -pthread -std=c++17 -fsanitize=address
 
 OFLAGS := $(CPPFLAGS) -c -fPIC
 
