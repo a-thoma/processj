@@ -1,13 +1,13 @@
 import std.io;
 
 public void main(string[] args) {
-	//println("Hello from " + "hello!");
-	//println(69 + 420);
-	//println("The solution to 42 + 543 is " + (42 + 543));
-	//println(23 + 46 + 4356 + 467237 + " is a very large number!");
-	//int x = 46;
-	//int y = 324;
-	//println("but " + x + y + " is smaller!");
-	//println();
+	println("Hello from " + "hello!");
+	println(69 + 420);
+	println("The solution to 42 + 543 is " + (42 + 543));
+	println(23 + 46 + 4356 + 467237 + " is a very large number!");
+	int x = 46;
+	int y = 324;
+	println("but " + x + y + " is smaller!");
+	println();
 	print();
 }
