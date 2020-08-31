@@ -13,5 +13,37 @@ cpparraytest.pj (fixed problem with initializers)
 cppiotest.pj
 cpprecordtest.pj
 cpptimerreadtest.pj
+iftest.pj
+protocols.pj
+Demo2.pj
 
 tests that don't pass:
+Demo.pj (problem with inheritance/structure)
+
+tests that are untested:
+Demo_matt.pj
+enroledtest.pj
+fortest.pj
+fullAdder.pj
+integrate.pj
+localDecl.pj
+mandelbrot.pj
+mandelbrot2.pj
+Matt.pj
+NetworkProc.pj
+parExpr.pj
+protocols.pj
+protocolSwitch.pj
+readEx.pj
+santa.pj
+santatest.pj
+sharedchan.pj
+sharedread.pj
+sharedwrite.pj
+silly.pj
+simple.pj
+simplepj.pj
+SwitchDemo.pj
+test22.pj
+timer.pj
+verysimple.pj
