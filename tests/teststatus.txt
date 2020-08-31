@@ -22,7 +22,7 @@ Demo.pj (problem with inheritance/structure)
 
 tests that are untested:
 Demo_matt.pj
-enroledtest.pj
+enrolledtest.pj
 fortest.pj
 fullAdder.pj
 integrate.pj
