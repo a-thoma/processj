@@ -727,7 +727,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             Log.log(ld, "appending a pointer specifier to type of " + name);
             type += "*";
         }
-        if (expr == null && ld.type().isTimerType() || ld.type().isBarrierType()/* || !(ld.type().isPrimitiveType())*/) {
+        if (expr == null &&/* ld.type().isTimerType() ||*/ ld.type().isBarrierType()/* || !(ld.type().isPrimitiveType())*/) {
             Log.log(ld, "creating delete statement for " + name);
             String deleteStmt = "delete " + newName + ";";
             localDeletes.put(name, deleteStmt);
@@ -791,12 +791,13 @@ public class CodeGeneratorCPP extends Visitor<Object> {
             localInits.put(name, "static_cast<" + type + ">(0)");
 
             if (ld.type().isTimerType()) {
-                Log.log(ld, "Timer needs initializer");
+                Log.log(ld, "Timer needs null initializer (for now)");
                 // TODO: this may have to call some function that gets the
                 // timer's length, or we need to figure out how to redirect
                 // and rewrite the timerRead ST definition to be what we
                 // place here.
-                val = "new pj_runtime::pj_timer(this)";
+                // val = "static_cast<" + type + ">(0)";
+                val = "new pj_runtime::pj_timer(this, 0)";
             }
 
             if (ld.type() instanceof PrimitiveType && ((PrimitiveType)ld.type()).isNumericType()) {
@@ -2218,7 +2219,7 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         if (chanExpr.type instanceof PrimitiveType && chanExpr.type.isTimerType()) {
             Log.log(cr, "THIS IS A TIMER READ INSTEAD");
             ST stTimerRedExpr = stGroup.getInstanceOf("TimerRedExpr");
-            stTimerRedExpr.add("timerName", chanEndName);
+            stTimerRedExpr.add("name", lhs);
             return stTimerRedExpr.render();
         }
         
