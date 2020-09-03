@@ -249,11 +249,11 @@ public class ProcessJc {
             // c.visit(new rewriters.UnrollLoopRewrite());
             
             System.out.println("-- Rewriting yielding expressions.");
-            System.out.println("** THIS HAS BEEN DISABLED FOR NOW AS IT DOES NOT WORK CORRECTLY **");
-            // new rewriters.ChannelReadRewrite().go(c);
-            //System.out.println("Lets reprint it all");
-            //c.visit(new printers.ParseTreePrinter());
-            //c.visit(new printers.PrettyPrinter());
+            // System.out.println("** THIS HAS BEEN DISABLED FOR NOW AS IT DOES NOT WORK CORRECTLY **");
+            new rewriters.ChannelReadRewrite().go(c);
+            System.out.println("Lets reprint it all");
+            c.visit(new printers.ParseTreePrinter());
+            c.visit(new printers.PrettyPrinter());
             System.out.println("-- Checking break and continue labels.");
 //            new semanticcheck.LabeledBreakContinueCheck().go(c);
             

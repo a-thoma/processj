@@ -646,10 +646,12 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         
         if (as.right() instanceof NewArray)
             return createNewArray(lhs, ((NewArray) as.right()));
-        else if (as.right() instanceof ChannelReadExpr)
+        else if (as.right() instanceof ChannelReadExpr) {
+            Log.log("visitAssignment: returning createChannelReadExpr");
             return createChannelReadExpr(lhs, op, ((ChannelReadExpr) as.right()));
-        else {
+        } else {
             if (as.right() != null) {
+                Log.log("visitAssignment: as.right() != null");
                 rhs = (String) as.right().visit(this);
                 rhs = rhs.replace(DELIMITER, "");
             }
@@ -2258,6 +2260,8 @@ public class CodeGeneratorCPP extends Visitor<Object> {
         stChannelReadExpr.add("lhs", lhs);
         stChannelReadExpr.add("op", op);
         stChannelReadExpr.add("procName", generatedProcNames.get(currentProcName));
+
+        Log.log("channelReadExpr: st is " + stChannelReadExpr.render());
         
         return stChannelReadExpr.render();
     }
