@@ -1,0 +1,49 @@
+tests that pass (with some exceptions):
+
+Hello.pj
+alttest.pj (will livelock on writer2, expected)
+barrierEx.pj
+bartest.pj (fixed timer read issue and double-free issue)
+binexpr.pj (no output but verified)
+bytecode.pj (not necessary, no bytecode is modified because no bytecode is generated)
+car.pj (fixed char* issue, alls strings are now std::strings)
+channelWR.pj (fixed chan init issue)
+commstime.pj (fixed problem with pars not reinitializing in a loop)
+cpparraytest.pj (fixed problem with initializers)
+cppiotest.pj
+cpprecordtest.pj
+cpptimerreadtest.pj
+iftest.pj
+protocols.pj
+Demo2.pj
+fortest.pj
+NetworkProc.pj
+parExp.pj
+protocols.pj
+protocolSwitch.pj
+readEx.pj
+simple.pj (livelocks on read call, expected)
+simplepj.pj
+SwitchDemo.pj
+timer.pj
+verySimple.pj
+
+tests that don't pass:
+Demo.pj (problem with inheritance/structure)
+Demo_matt.pj (issue with channel reads + a value)
+enrolledtest.pj (multiple pars, need to add that functionality)
+fullAdder.pj (colliding class overload names for invocation proc types)
+integrate.pj (ask pedersen/ben about this one)
+localDecl.pj (don't need this though, there's just no main)
+mandelbrot.pj (needs pgm library)
+mandelbrot2.pj (needs pgm library)
+Matt.pj (channel reads + a value again)
+santa.pj (probably lots of problems that will be fixed after the above are also fixed)
+santatest.pj (protocols with no fields?)
+sharedchan.pj (infinite loop issues?)
+sharedread.pj (infinite loop issues?)
+sharedwrite.pj (infinite loop issues?)
+silly.pj (more channel read stuff)
+test22.pj (probably template stuff)
+
+tests that are untested:
