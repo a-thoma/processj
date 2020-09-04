@@ -19,7 +19,6 @@ Demo2.pj
 fortest.pj
 NetworkProc.pj
 parExp.pj
-protocols.pj
 protocolSwitch.pj
 readEx.pj
 simple.pj (livelocks on read call, expected)
