@@ -7,6 +7,7 @@ import ast.Import;
 import ast.Pragma;
 import ast.ProcTypeDecl;
 import ast.Type;
+import ast.AST;
 import utilities.Log;
 import utilities.Visitor;
 
@@ -68,7 +69,7 @@ public class ResolveImportTopDecls extends Visitor<Object> {
                 p.visit(this);
             /* Mark all top-level declarations 'native' if they are part
              * of a native library function */
-            for (Type t : c.typeDecls())
+            for (AST t : c.typeDecls())
                 t.visit(this);
             /* Resolve updates here (if any) */
             ht.clear();

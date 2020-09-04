@@ -7,6 +7,7 @@ import ast.AST;
 import ast.Compilation;
 import codegen.Helper;
 import codegen.java.CodeGenJava;
+import codegen.cpp.CodeGeneratorCPP;
 import library.Library;
 import namechecker.ResolveImports;
 import parser.parser;
@@ -248,7 +249,8 @@ public class ProcessJc {
             new rewriters.InfiniteLoopRewrite().go(c);
             
             System.out.println("-- Rewriting loops.");
-            c.visit(new rewriters.UnrollLoopRewrite());
+            System.out.println("** THIS HAS BEEN DISABLED FOR NOW AS IT GENERATES BAD LABELS **");
+            // c.visit(new rewriters.UnrollLoopRewrite());
             
             System.out.println("-- Rewriting yielding expressions.");
 //            new rewriters.ChannelReadRewrite().go(c);
@@ -260,11 +262,18 @@ public class ProcessJc {
             
             System.out.println("-- Collecting left-hand sides for par for code generation.");
             c.visit(new rewriters.ParFor());
+
+            if (Settings.language == Language.CPLUS) {
+                System.out.println("-- rewriting print() and println() calls.");
+                c.visit(new rewriters.IOCallsRewrite());
+            }
             
             /* Run the code generator for the known (specified) target language */
-            if (Settings.language == pj.d_target)
+            if (pj.d_target == Language.JVM)
                 pj.generateCodeJava(c, inFile, globalTypeTable);
-            else {
+            else if (pj.d_target == Language.CPLUS) {
+                pj.generateCodeCPP(c, inFile, globalTypeTable);
+            } else {
                 /* Unknown target language so abort/terminate program */
                 System.out.println("Invalid target language!");
                 System.exit(1);
@@ -300,6 +309,36 @@ public class ProcessJc {
         /* Write the output to a file */
         Helper.writeToFile(code, c.fileNoExtension(), generator.workingDir());
     }
+
+    private void generateCodeCPP(Compilation co, File inFile, SymbolTable s) {
+    System.out.println("Beginning of generateCodeCPP");
+    System.out.println("Starting the logger (For debugging)");
+    Log.startLogging();
+    System.out.println("Logging started. Continuing on...");
+    /* TODO: write generateCodeCPP -- should be similar to above method
+     * ---
+     * this means we need to make a new object, CodeGeneratorCPP like CodeGeneratorJava
+     * and slap that into the runtime. we also need to rewrite the stg file to generate
+     * cpp instead of java. also need to check how jars are made so that we produce a
+     * real binary instead of accidentally trying to make a (probably malformed) jar
+     */
+    System.out.println("Before getting PJConfig (necessary?)");
+    Properties p = utilities.ConfigFileReader.getProcessJConfig();
+    System.out.println("After getting PJConfig (necessary?)");
+    
+    System.out.println("Creating code generator");
+    CodeGeneratorCPP generator = new CodeGeneratorCPP(s);
+    System.out.println("Getting working directory from config...");
+    generator.setWorkingDir(p.getProperty("workingdir"));
+    System.out.println("workingdir is " + generator.getWorkingDir());
+    System.out.println("Generating code...");
+    String code = (String) co.visit(generator);
+    System.out.println("Code generated. Writing to file...");
+    Helper.writeToFile(code,  co.fileNoExtension(), generator.getWorkingDir());
+    System.out.println("Files written.");
+    System.out.println("End of generateCodeCPP");
+}
+
     
     public ProcessJc(String[] args) {
         this.args = args;
