@@ -240,7 +240,7 @@ public class ProcessJc {
             c.visit(new yield.Yield());
             System.out.println("-- Marking yielding statements and expressions.");
             c.visit(new rewriters.Yield());
-            //c.visit(new rewriters.Expr());
+            c.visit(new rewriters.Expr());
             
             System.out.println("-- Checking literal inits are free of channel communication.");
             c.visit(new semanticcheck.LiteralInits());
@@ -253,10 +253,10 @@ public class ProcessJc {
             // c.visit(new rewriters.UnrollLoopRewrite());
             
             System.out.println("-- Rewriting yielding expressions.");
-//            new rewriters.ChannelReadRewrite().go(c);
-            //System.out.println("Lets reprint it all");
-            //c.visit(new printers.ParseTreePrinter());
-            //c.visit(new printers.PrettyPrinter());
+           new rewriters.ChannelReadRewrite().go(c);
+            System.out.println("Lets reprint it all");
+            c.visit(new printers.ParseTreePrinter());
+            c.visit(new printers.PrettyPrinter());
             System.out.println("-- Checking break and continue labels.");
 //            new semanticcheck.LabeledBreakContinueCheck().go(c);
             

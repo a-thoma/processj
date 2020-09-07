@@ -193,22 +193,27 @@ public class Expr extends Visitor<AST> {
 
 	public AST visitBlock(Block bl) {
 		System.out.println("[Expr]: Visiting a Block");
-		System.out.println("[Expr]: Block before of rewriting:");
+		System.out.println("[Expr]: Block before rewriting (parse tree):");
 		bl.visit(new ParseTreePrinter());
-		System.out.println("[Expr]: Block before rewriting:");
+		System.out.println("[Expr]: Block before rewriting (pretty print):");
 		bl.visit(new PrettyPrinter());
 
 		for (int i = 0; i<bl.stats().size(); i++) {
 			AST s = bl.stats().child(i);
 		    AST a = s.visit(this);
-			System.out.println("Result of rewriting this one statement:");
-			a.visit(new ParseTreePrinter());
-			// Don't bother with the Block wrapper if there is only one statement.
-			if (a instanceof Block && ((Block)a).stats().size() == 1)
-				bl.stats().set(i, ((Block)a).stats().child(0));
-			else
-				bl.stats().set(i, (Statement)a);
-			System.out.println("---------------------------------------");
+		    if (a != null) {
+				System.out.println("Result of rewriting this one statement:");
+				a.visit(new ParseTreePrinter());
+
+				// Don't bother with the Block wrapper if there is only one statement.
+				if (a instanceof Block && ((Block)a).stats().size() == 1)
+					bl.stats().set(i, ((Block)a).stats().child(0));
+				else
+					bl.stats().set(i, (Statement)a);
+				System.out.println("---------------------------------------");
+			} else {
+				System.out.println("Result of rewriting was null.");
+			}
 		}
 
 		System.out.println("Expr]: Block after rewriting:");
